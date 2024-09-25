@@ -27,6 +27,8 @@ class Board:
             give_help()
         print("Time to start the game!\n")
         while not self.game_over:
+            # !!! need some way of checking in here if it's time to end the game, b/c that can happen within a round
+            # also should change turn vs round
             self.take_turn()
 
     # draw the game board and display stats
@@ -55,67 +57,11 @@ class Board:
         return attack_distance >= sum(abs(a - b) for a, b in zip(self.monster.location, self.player.location))
 
     # !!! Help here - is there a more graceful way to handle the repeated code / ordering in the if / elif statement?
-    def perform_player_card(self, attack):
-        print(f"{self.player.name} performs " + attack["attack_name"] + ": Attack " + str(
-            attack["strength"]) + ", Range " + str(attack["distance"]) + ", Movement " + str(attack["movement"]) + "\n")
-        good_action = False
-        self.draw()
-        while not good_action:
-            action = input("Type 1 to move first or 2 to attack first. ")
-            if action == "1":
-                good_action = True
-                self.perform_player_movement(attack)
-                time.sleep(3)
-                self.attack_opponent(attack, True)
-            elif action == "2":
-                good_action = True
-                self.attack_opponent(attack, True)
-                time.sleep(3)
-                self.perform_player_movement(attack)
-        time.sleep(3)
 
-    def perform_player_movement(self, attack):
-        remaining_movement = attack["movement"]
-        if remaining_movement == 0:
-            print("No movement!")
-            return
-        print("\nNow it's time to move!")
-        while remaining_movement > 0:
-            print(
-                f"You are performing {attack['attack_name']} with Attack " + str(attack["strength"]) + ", Range " + str(
-                    attack["distance"]))
-            print(f"\nmovement remaining: {remaining_movement}")
-            direction = input(
-                "Type w for up, a for left, d for right, s for down, or f to finish. "
-                "If you move off the map, you'll disappear!")
-            direction_map = {
-                "w": [-1, 0],
-                "s": [1, 0],
-                "a": [0, -1],
-                "d": [0, 1]
-            }
-            if direction == "f":
-                break
-            elif direction in direction_map:
-                self.player.location = list(np.add(self.player.location, direction_map[direction]))
-                helpers.clear_terminal()
-                self.draw()
-            else:
-                print("Incorrect input. Try again!")
-                continue
-            remaining_movement -= 1
-        print("movement done!")
 
-    def perform_monster_card(self, attack):
-        print("Monster performs " + attack["attack_name"] + ": Attack " + str(attack["strength"]) + ", Range " + str(
-            attack["distance"]) + ", Movement " + str(attack["movement"]) + "\n")
-        if not self.check_attack_in_range(attack["distance"]):
-            self.perform_monster_movement(False, attack["movement"])
 
-        # after movement, try to attack
-        self.attack_opponent(attack, False)
-        time.sleep(3)
-
+    # !!! I should probably ask the character who they want to attack out of whoever is possible
+    # then board should adjudicate the attack and update people's healths
     def attack_opponent(self, attack, is_player):
         modified_attack_strength = select_and_apply_attack_modifier(attack["strength"])
         print(f"Attempting attack with strength {attack['strength']} and range {attack['distance']}\n")
@@ -145,34 +91,10 @@ class Board:
         else:
             print("Not close enough to attack")
 
-    def perform_monster_movement(self, is_player, distance):
-        # WORK ON THIS TOMORROW
-        # can probably simplify the distance calculations
-        # I think there's also an issue here if one distance is negative and the other is positive
-        y_dist = self.monster.location[0] - self.player.location[0]
-        x_dist = self.monster.location[1] - self.player.location[1]
 
-        if distance > 0:
-            print("Monster moved!\n")
-            # first move vertically if you can
-            if y_dist > 1:
-                dist_to_travel = distance if (x_dist + y_dist) > distance else y_dist - 1
-                if is_player:
-                    self.player.location[0] += dist_to_travel
-                else:
-                    self.monster.location[0] -= dist_to_travel
-
-                distance -= y_dist
-
-            # if there's distance left, move horizontally
-            if x_dist > 1:
-                dist_to_travel = distance if x_dist > distance else x_dist - 1
-                if is_player:
-                    self.player.location[1] += dist_to_travel
-                else:
-                    self.monster.location[1] -= dist_to_travel
-            self.draw()
-
+    # here the board should keep track of whose turn it is and the locations
+    # it should ask players what they want to do
+    # it should adjudicate if that's possible
     def take_turn(self):
         # randomize who starts the turn
         print("Start of Round!\n")
@@ -206,7 +128,6 @@ class Board:
  \\___/''')
         self.game_over = True
         self.player.location = (self.size + 1, self.size + 1)
-        sys.exit(0)
 
     def win_game(self):
         helpers.clear_terminal()
@@ -219,8 +140,6 @@ class Board:
               '   /   \\n'
               '        ')
         self.monster.location = (self.size + 1, self.size + 1)
-        sys.exit(0)
-
 
 def continue_turn():
     input('Hit enter to continue')
