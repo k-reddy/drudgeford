@@ -53,18 +53,21 @@ class Character:
 
     # grabs an attack card and send it to the board to be played
     def select_and_submit_attack(self, board):
-        # if it's the monster grab a random attack card
         board.draw()
-        if self.is_player is False:
-            attack_to_perform = random.choice(self.attacks)
-            board.perform_monster_card(attack_to_perform)
-        # if it's the player, let them pick their own actions
-        else:
-            attack_to_perform = self.get_player_attack_selection(board)
-            board.perform_player_card(attack_to_perform)
+        attack_to_perform = self.get_attack_selection(self, board)
+        board.perform_character_card(attack_to_perform)
+    def get_attack_selection(self, board):
+        pass
 
+    def perform_card(self, attack):
+        pass
+
+    def perform_movement(self, attack):
+        pass
+
+class Player(Character):
     # asks player what card they want to play
-    def get_player_attack_selection(self, board):
+    def get_attack_selection(self, board):
         # if you run out of actions without killing the monster, you get exhausted
         if len(self.attacks) == 0:
             print("Oh no! You have no more attacks left!")
@@ -91,3 +94,97 @@ class Character:
                 else:
                     print("Oops, typo! Try typing the number again.")
         return attack_to_perform
+
+    def perform_card(self, attack):
+        print(f"{self.player.name} performs " + attack["attack_name"] + ": Attack " + str(
+            attack["strength"]) + ", Range " + str(attack["distance"]) + ", Movement " + str(attack["movement"]) + "\n")
+        good_action = False
+        self.draw()
+        while not good_action:
+            action = input("Type 1 to move first or 2 to attack first. ")
+            if action == "1":
+                good_action = True
+                self.perform_player_movement(attack)
+                time.sleep(3)
+                self.attack_opponent(attack, True)
+            elif action == "2":
+                good_action = True
+                self.attack_opponent(attack, True)
+                time.sleep(3)
+                self.perform_player_movement(attack)
+        time.sleep(3)
+
+    def perform_movement(self, attack):
+        remaining_movement = attack["movement"]
+        if remaining_movement == 0:
+            print("No movement!")
+            return
+        print("\nNow it's time to move!")
+        while remaining_movement > 0:
+            print(
+                f"You are performing {attack['attack_name']} with Attack " + str(attack["strength"]) + ", Range " + str(
+                    attack["distance"]))
+            print(f"\nmovement remaining: {remaining_movement}")
+            direction = input(
+                "Type w for up, a for left, d for right, s for down, or f to finish. "
+                "If you move off the map, you'll disappear!")
+            direction_map = {
+                "w": [-1, 0],
+                "s": [1, 0],
+                "a": [0, -1],
+                "d": [0, 1]
+            }
+            if direction == "f":
+                break
+            elif direction in direction_map:
+                self.player.location = list(np.add(self.player.location, direction_map[direction]))
+                helpers.clear_terminal()
+                self.draw()
+            else:
+                print("Incorrect input. Try again!")
+                continue
+            remaining_movement -= 1
+        print("movement done!")
+
+class Monster(Character):
+    def get_attack_selection(self, board):
+        return random.choice(self.attacks)
+
+    def perform_card(self, attack):
+        print("Monster performs " + attack["attack_name"] + ": Attack " + str(attack["strength"]) + ", Range " + str(
+            attack["distance"]) + ", Movement " + str(attack["movement"]) + "\n")
+        if not self.check_attack_in_range(attack["distance"]):
+            self.perform_monster_movement(False, attack["movement"])
+
+        # after movement, try to attack
+        self.attack_opponent(attack, False)
+        time.sleep(3)
+
+    def perform_movement(self, attack):
+        # WORK ON THIS TOMORROW
+        # can probably simplify the distance calculations
+        # I think there's also an issue here if one distance is negative and the other is positive
+        y_dist = self.monster.location[0] - self.player.location[0]
+        x_dist = self.monster.location[1] - self.player.location[1]
+
+        distance = attack["distance"]
+        if distance > 0:
+            print("Monster moved!\n")
+            # first move vertically if you can
+            if y_dist > 1:
+                dist_to_travel = distance if (x_dist + y_dist) > distance else y_dist - 1
+                if is_player:
+                    self.player.location[0] += dist_to_travel
+                else:
+                    self.monster.location[0] -= dist_to_travel
+
+                distance -= y_dist
+
+            # if there's distance left, move horizontally
+            if x_dist > 1:
+                dist_to_travel = distance if x_dist > distance else x_dist - 1
+                if is_player:
+                    self.player.location[1] += dist_to_travel
+                else:
+                    self.monster.location[1] -= dist_to_travel
+            self.draw()
