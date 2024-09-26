@@ -21,11 +21,7 @@ class Board:
             "Welcome to your quest, " + player.name + ". \n",
             "As you enter the dungeon, you see a terrifying monster ahead! \n",
             "Kill it or be killed...\n")
-        want_help = input("Hit enter to start or type help for instructions")
-        helpers.clear_terminal()
-        if want_help == 'help':
-            give_help()
-        print("Time to start the game!\n")
+        input("Time to start the game! Hit enter to continue\n")
         while not self.game_over:
             # !!! need some way of checking in here if it's time to end the game, b/c that can happen within a round
             # also should change turn vs round
@@ -62,7 +58,13 @@ class Board:
 
     # !!! I should probably ask the character who they want to attack out of whoever is possible
     # then board should adjudicate the attack and update people's healths
+
+
+    def find_possible_attack_targets(self):
+        pass
     def attack_opponent(self, attack, is_player):
+        # targets = find_possible_attack_targets()
+        # character.pick_target(targets)
         modified_attack_strength = select_and_apply_attack_modifier(attack["strength"])
         print(f"Attempting attack with strength {attack['strength']} and range {attack['distance']}\n")
 
@@ -95,27 +97,28 @@ class Board:
     # here the board should keep track of whose turn it is and the locations
     # it should ask players what they want to do
     # it should adjudicate if that's possible
-    def take_turn(self):
+    def run_round(self):
         # randomize who starts the turn
         print("Start of Round!\n")
-        if random.choice([1, 2]) == 1:
-            # monster goes first
-            print("Ah! The Monster got a jump on you this round. Watch out...")
-            self.monster.select_and_submit_attack(self)
-            continue_turn()
-            print("Now it's your turn! Make this one count.\n")
-            self.player.select_and_submit_attack(self)
-            input("Hit enter to start the next round")
-        else:
-            # player goes first
-            print("You acted quick - it's your turn first this time.")
-            self.player.select_and_submit_attack(self)
-            continue_turn()
-            print("Now it's the Monster's turn...Watch out!")
-            self.monster.select_and_submit_attack(self)
-            input("Hit enter to start the next round")
-
+        characters = [self.player, self.monster]
+        for i, _ in enumerate(characters):
+            # randomly pick who starts the round
+            acting_character = random.choice(characters)
+            characters.remove(acting_character)
+            print(f"It's {acting_character.name}'s turn!")
+            self.run_turn(acting_character)
+            end_turn()
+        input("End of round. Hit Enter to continue")
         helpers.clear_terminal()
+
+    def run_turn(self, acting_character):
+        action_card = acting_character.select_action_card()
+        actions_to_perform = acting_character.set_action_order(action_card)
+        # I think best to move the action map here, and ask for a bool, move_first = true
+        # because the functions should have different parameters
+        for action in actions_to_perform:
+            action(action_card, self)
+
 
     def lose_game(self):
         helpers.clear_terminal()
@@ -141,25 +144,8 @@ class Board:
               '        ')
         self.monster.location = (self.size + 1, self.size + 1)
 
-def continue_turn():
-    input('Hit enter to continue')
-    helpers.clear_terminal()
-
-
-# display the game instructions
-def give_help():
-    print('''
-Welcome to the game! Here's how it works:
-- You and the monster will attack each other once per turn in a random order
-- You can only attack if you are within range of your enemy
-- You pick your attacks, and the monster's are randomly generated
-- Each attack has a movement associated with it. If you're not in range, you'll move that amount toward your enemy
-- If you end in range, you will attack. If not, you won't attack this turn.
-- Whoever runs out of health first loses
-
-Good luck!
-        ''')
-    input("Hit enter to continue")
+def end_turn():
+    input('End of turn. Hit enter to continue')
     helpers.clear_terminal()
 
 
