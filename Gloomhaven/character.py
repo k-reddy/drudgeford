@@ -147,7 +147,7 @@ class Monster(Character):
 
     def perform_movement(self, action_card, board):
         target_location = board.find_closest_opponent_location(self)
-        board.move_character_within_range_of_target(self, target_location, action_card["distance"])
+        board.move_character_to_location(self, target_location, action_card["distance"])
 
     def select_attack_target_id(self, board):
         # monster always attacks the closest opponent
