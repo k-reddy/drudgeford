@@ -1,0 +1,6 @@
+To pick up on:
+- implement everything specified
+- install ruff or black
+- make action_card a dataclass
+- make direction an enum
+- see John's code comments

@@ -7,14 +7,12 @@ import helpers
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, is_player, starting_location):
+    def __init__(self, name, health, id):
         self.name = name
         self.health = health
         # randomly generate a stack of possible attacks
         self.action_cards = self.create_action_cards()
-        # is this the player or the monster?
-        self.is_player = is_player
-        self.location = starting_location
+        self.id = id
 
     # think of this as a deck of attack cards that we will randomly pull from
     # here we generate that deck of attack cards
@@ -58,7 +56,7 @@ class Character:
         print(f"{self.name} is performing " + action_card["attack_name"] + ": Attack " + str(
             action_card["strength"]) + ", Range " + str(action_card["distance"]) + ", Movement " + str(
             action_card["movement"]) + "\n")
-    def set_action_order(self, action_card, board):
+    def decide_if_move_first(self, action_card, board):
         pass
 
     def perform_movement(self, action_card, board):
@@ -92,19 +90,14 @@ class Player(Character):
                 print("Oops, typo! Try typing the number again.")
         return action_card_to_perform
 
-    def set_action_order(self, action_card, board):
+    def decide_if_move_first(self, action_card, board):
         self.print_action_card(action_card)
-        action_orders = {
-            "1": [self.perform_movement(), self.select_attack_target],
-            "2": [self.select_attack_target, self.perform_movement()]
-        }
         action_num = input("Type 1 to move first or 2 to attack first. ")
-        while not action_num in action_order_map:
+        while action_num not in ["1","2"]:
             action_num = input("Invalid input. Please type 1 or 2. ")
+        return action_num == "1"
 
-        return action_orders[action_num]
-
-
+    # !!! Legacy code: implement
     def perform_movement(self, action_card, board):
         remaining_movement = action_card["movement"]
         if remaining_movement == 0:
@@ -130,16 +123,14 @@ class Player(Character):
                 # if legal, the board will allow you
                 # else the board will say no and you try again
                 board.adjudicate_movement_request()
-                self.player.location = list(np.add(self.player.location, direction_map[direction]))
-                helpers.clear_terminal()
-                self.draw()
             else:
                 print("Incorrect input. Try again!")
                 continue
             remaining_movement -= 1
         print("movement done!")
 
-    def select_attack_target(self):
+    # !!! Implement
+    def select_attack_target_id(self):
         # ask the board who's in range
         # ask the player who they want to attack
         # ask the board to attack that person
@@ -149,50 +140,15 @@ class Monster(Character):
     def select_action_card(self):
         return random.choice(self.action_cards)
 
-    def set_action_order(self, action_card, board):
+    def decide_if_move_first(self, action_card, board):
         self.print_action_card(action_card)
-        action_order = []
-        # if not in range, move first
-        if not board.check_attack_in_range(action_card["distance"]):
-            action_order.append(self.perform_movement)
+        # monster always moves first - won't move if they're within range
+        return True
 
-        # after movement, try to attack
-        action_order.append(self.select_attack_target)
-        return action_order
+    def perform_movement(self, action_card, board):
+        target_location = board.find_closest_opponent_location(self)
+        board.move_character_within_range_of_target(self, target_location, action_card["distance"])
 
-    def perform_movement(self, attack):
-        # WORK ON THIS TOMORROW
-        # ask the board for the closest opponent
-        # ask the board to move you as close as possible (board will have paths)
-
-        # keeping until I implement the above, with these known issues:
-        # can probably simplify the distance calculations
-        # I think there's also an issue here if one distance is negative and the other is positive
-        y_dist = self.monster.location[0] - self.player.location[0]
-        x_dist = self.monster.location[1] - self.player.location[1]
-
-        distance = attack["distance"]
-        if distance > 0:
-            print("Monster moved!\n")
-            # first move vertically if you can
-            if y_dist > 1:
-                dist_to_travel = distance if (x_dist + y_dist) > distance else y_dist - 1
-                if is_player:
-                    self.player.location[0] += dist_to_travel
-                else:
-                    self.monster.location[0] -= dist_to_travel
-
-                distance -= y_dist
-
-            # if there's distance left, move horizontally
-            if x_dist > 1:
-                dist_to_travel = distance if x_dist > distance else x_dist - 1
-                if is_player:
-                    self.player.location[1] += dist_to_travel
-                else:
-                    self.monster.location[1] -= dist_to_travel
-            self.draw()
-
-    def select_attack_target(self):
-        # ask the board for your closest opponent in range
-        return target_id
+    def select_attack_target_id(self, board):
+        # monster always attacks the closest opponent
+        return board.find_closest_opponent_id(self)
