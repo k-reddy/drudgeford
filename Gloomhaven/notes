@@ -4,3 +4,5 @@ To pick up on:
 - make action_card a dataclass
 - make direction an enum
 - see John's code comments
+
+- allow diagonal movement
