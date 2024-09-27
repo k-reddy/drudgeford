@@ -62,14 +62,16 @@ class Board:
         print(to_draw)
 
     # is the attack in range?
-    def check_attack_in_range(self, attack_distance):
-        return attack_distance >= sum(abs(a - b) for a, b in zip(self.monster.location, self.player.location))
+    def check_attack_in_range(self, attack_distance, attack_target):
+        dist_to_target = get_distance_between_locations(self.locations[self.id], self.locations[attack_target.id])
+        return attack_distance >= dist_to_target
 
-    # !!! To implement
-    def find_possible_attack_targets(self):
-        pass
+    def find_opponents(self, actor):
+        if actor == self.monster:
+            return [self.player]
+        else:
+            return [self.monster]
 
-    # !!! not sure if it's working to index everything off the id
     def attack_target(self, target_id, action_card):
         modified_attack_strength = select_and_apply_attack_modifier(action_card["strength"])
         print(f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n")
@@ -86,11 +88,19 @@ class Board:
         print("Attack hits!\n")
         print(f"After the modifier, attack strength is: {modified_attack_strength}")
 
+        if
         # !!! To implement
         # if it's the player and the attack kills, end the game. Otherwise, increment monster health
         # update the health of the character we attacked
         # if it goes below their remaining health, win or lose the game depending on who it is
         # ^ this is a place to work on the game state thing
+
+'''
+id ->
+character
+health
+action_cards
+'''
 
     def run_round(self):
         # randomize who starts the turn
@@ -125,26 +135,31 @@ class Board:
 
         end_turn()
 
-    # !!! implement - not sure whether this or the below should be primary
-    # vs secondary - again with maintaining things with the id seems to be creating issues
     def find_closest_opponent_location(self, acting_character):
         closest_opponent_id = self.find_closest_opponent_id(self, acting_character)
         return self.locations[closest_opponent_id]
 
-    # !!! Implement
     def find_closest_opponent_id(self, acting_character):
-        # find all the opponents
-        # calculate the distance of each
-        # return the closest one
-        pass
+        # right now there's only one opponent
+        return self.find_opponents(acting_character)[0].id
 
-    # !!! Implement
-    def move_character_to_location(self, target_location, acting_character):
-        pass
+    def move_character_to_location(self, acting_character, target_location, movement):
+        remaining_movement = movement
+        while remaining_movement > 0:
+            y_movement, x_movement = [b-a for a,b, in zip(self.locations[acting_character.id], target_location)]
+            if y_movement != 0:
+                axis = 0
+                direction = (1 if y_movement > 0 else -1)
+                # move one in the direction of y_movement
+            elif x_movement > 1:
+                axis = 1
+                direction = (1 if x_movement > 0 else -1)
+            else:
+                break
 
-    # !!! Implement
-    def move_character_within_range_of_target(self, target_location, attack_range):
-        pass
+            remaining_movement -= 1
+            self.locations[acting_character.id][axis] += direction
+
 
     def lose_game(self):
         helpers.clear_terminal()
@@ -190,3 +205,6 @@ def select_and_apply_attack_modifier(initial_attack_strength):
 
     attack_modifier_function = random.choices(attack_modifier_deck, attack_modifier_weights)[0]
     return attack_modifier_function(initial_attack_strength)
+
+def get_distance_between_locations(location1, location2):
+    return sum(abs(a - b) for a, b in zip(location1, location2))
