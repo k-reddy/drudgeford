@@ -2,7 +2,7 @@ import random
 import sys
 import time
 from functools import partial
-import numpy as np
+from dataclasses import dataclass
 import helpers
 
 
@@ -16,7 +16,10 @@ class Board:
         self.size = size
         self.monster = monster
         self.player = player
-        self.locations = self.set_starting_locations([monster.id, player.id])
+        self.all_character_data = self.generate_character_data([monster, player])
+        # !!! may want to add this to all_character_data rather than keeping it separate
+        # but may want to keep it separate b/c then this can also hold obstacles?
+        self.locations = self.set_starting_locations([chardata.id for chardata in self.all_character_data])
         self.game_over = False
         print(
             "Welcome to your quest, " + player.name + ". \n",
@@ -26,6 +29,19 @@ class Board:
         while not self.game_over:
             self.run_round()
         # !!! Implement something here to end the game depending on the game state
+
+    def generate_character_data(self, characters):
+        all_character_data = []
+        for i, char in enumerate(characters):
+            char_data = characterData(
+                id = str(i),
+                action_cards = create_action_cards(),
+                health = 10,
+                character = char,
+            )
+            all_character_data.append(char_data)
+        return all_character_data
+
 
     def set_starting_locations(self, ids):
         locations = {}
@@ -208,3 +224,45 @@ def select_and_apply_attack_modifier(initial_attack_strength):
 
 def get_distance_between_locations(location1, location2):
     return sum(abs(a - b) for a, b in zip(location1, location2))
+
+@dataclass
+class characterData:
+    id: str
+    action_cards: list
+    health: int
+    character: object
+
+    # think of this as a deck of attack cards that we will randomly pull from
+    # here we generate that deck of attack cards
+def create_action_cards():
+    # each attack card will be generated with a strength, distance, and number of targets, so set
+    # some values to pull from
+    strengths = [1, 2, 3, 4, 5]
+    strength_weights = [3, 5, 4, 2, 1]
+    movements = [0, 1, 2, 3, 4]
+    movement_weights = [1, 3, 4, 3, 1]
+    max_distance = 3
+    num_action_cards = 5
+    action_cards = []
+
+    # some things for attack names
+    adjectives = ['Shadowed', 'Infernal', 'Venomous', 'Blazing', 'Cursed']
+    elements = ['Fang', 'Storm', 'Flame', 'Void', 'Thorn']
+    actions = ['Strike', 'Surge', 'Rend', 'Burst', 'Reaver']
+
+    for item in [adjectives, elements, actions]:
+        random.shuffle(item)
+
+    # generate each attack card
+    for i in range(num_action_cards):
+        strength = random.choices(strengths, strength_weights)[0]
+        movement = random.choices(movements, movement_weights)[0]
+        distance = random.randint(1, max_distance)
+        action_card = {
+            "attack_name": f"{adjectives.pop()} {elements.pop()} {actions.pop()}",
+            "strength": strength,
+            "distance": distance,
+            "movement": movement
+        }
+        action_cards.append(action_card)
+    return action_cards
