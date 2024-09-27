@@ -16,6 +16,7 @@ class Board:
         self.size = size
         self.monster = monster
         self.player = player
+        self.locations = self.set_starting_locations([monster.id, player.id])
         self.game_over = False
         print(
             "Welcome to your quest, " + player.name + ". \n",
@@ -23,9 +24,21 @@ class Board:
             "Kill it or be killed...\n")
         input("Time to start the game! Hit enter to continue\n")
         while not self.game_over:
-            # !!! need some way of checking in here if it's time to end the game, b/c that can happen within a round
-            # also should change turn vs round
-            self.take_turn()
+            self.run_round()
+        # !!! Implement something here to end the game depending on the game state
+
+    def set_starting_locations(self, ids):
+        locations = {}
+        for id in ids:
+            locations[id] = self.pick_unoccupied_location(locations)
+
+
+    def pick_unoccupied_location(self, locations):
+        while True:
+            rand_location = [random.choice(self.size - 1), random.choice(self.size - 1)]
+            if rand_location not in locations.values():
+                return rand_location
+
 
     # draw the game board and display stats
     def draw(self):
@@ -36,9 +49,9 @@ class Board:
             top = ' ---' * self.size + "\n"
             sides = ''
             for j in range(self.size + 1):
-                if self.player.location == [i, j]:
-                    sides += '| C '
-                elif self.monster.location == [i, j]:
+                if [i,j] == self.locations[self.player.id]:
+                    sides += '| P '
+                elif [i, j] == self.locations[self.monster.id]:
                     sides += '| M '
                 else:
                     sides += '|   '
@@ -52,51 +65,33 @@ class Board:
     def check_attack_in_range(self, attack_distance):
         return attack_distance >= sum(abs(a - b) for a, b in zip(self.monster.location, self.player.location))
 
-    # !!! Help here - is there a more graceful way to handle the repeated code / ordering in the if / elif statement?
-
-
-
-    # !!! I should probably ask the character who they want to attack out of whoever is possible
-    # then board should adjudicate the attack and update people's healths
-
-
+    # !!! To implement
     def find_possible_attack_targets(self):
         pass
-    def attack_opponent(self, attack, is_player):
-        # targets = find_possible_attack_targets()
-        # character.pick_target(targets)
-        modified_attack_strength = select_and_apply_attack_modifier(attack["strength"])
-        print(f"Attempting attack with strength {attack['strength']} and range {attack['distance']}\n")
+
+    # !!! not sure if it's working to index everything off the id
+    def attack_target(self, target_id, action_card):
+        modified_attack_strength = select_and_apply_attack_modifier(action_card["strength"])
+        print(f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n")
 
         # if you're close enough, attack
-        if self.check_attack_in_range(attack["distance"]):
-            if modified_attack_strength <= 0:
-                print("Darn, attack missed!")
-            else:
-                print("Attack hits!\n")
-                print(f"After the modifier, attack strength is: {modified_attack_strength}")
-
-                # if it's the player and the attack kills, end the game. Otherwise, increment monster health
-                if is_player:
-                    if self.monster.health <= modified_attack_strength:
-                        self.win_game()
-                    else:
-                        self.monster.health -= modified_attack_strength
-                # similar for monster
-                else:
-                    if self.player.health <= modified_attack_strength:
-                        self.lose_game()
-                    else:
-                        self.player.health -= modified_attack_strength
-
-        # if you're not close enough and already did your movement, that's it for your turn
-        else:
+        if not self.check_attack_in_range(action_card["distance"]):
             print("Not close enough to attack")
+            return
 
+        if modified_attack_strength <= 0:
+            print("Darn, attack missed!")
+            return
 
-    # here the board should keep track of whose turn it is and the locations
-    # it should ask players what they want to do
-    # it should adjudicate if that's possible
+        print("Attack hits!\n")
+        print(f"After the modifier, attack strength is: {modified_attack_strength}")
+
+        # !!! To implement
+        # if it's the player and the attack kills, end the game. Otherwise, increment monster health
+        # update the health of the character we attacked
+        # if it goes below their remaining health, win or lose the game depending on who it is
+        # ^ this is a place to work on the game state thing
+
     def run_round(self):
         # randomize who starts the turn
         print("Start of Round!\n")
@@ -107,18 +102,49 @@ class Board:
             characters.remove(acting_character)
             print(f"It's {acting_character.name}'s turn!")
             self.run_turn(acting_character)
+
+            # !!! ideally this would go in end_turn() but then I don't know how to quit the for loop
+            if self.game_over:
+                return
             end_turn()
         input("End of round. Hit Enter to continue")
         helpers.clear_terminal()
 
     def run_turn(self, acting_character):
         action_card = acting_character.select_action_card()
-        actions_to_perform = acting_character.set_action_order(action_card)
-        # I think best to move the action map here, and ask for a bool, move_first = true
-        # because the functions should have different parameters
-        for action in actions_to_perform:
-            action(action_card, self)
+        move_first = acting_character.decide_if_move_first(action_card)
 
+        if move_first:
+            acting_character.perform_movement(action_card, self)
+            target_id = acting_character.select_attack_target_id()
+            self.attack_target(target_id, action_card)
+        else:
+            target_id = acting_character.select_attack_target_id()
+            self.attack_target(target_id, action_card)
+            acting_character.perform_movement()
+
+        end_turn()
+
+    # !!! implement - not sure whether this or the below should be primary
+    # vs secondary - again with maintaining things with the id seems to be creating issues
+    def find_closest_opponent_location(self, acting_character):
+        closest_opponent_id = self.find_closest_opponent_id(self, acting_character)
+        return self.locations[closest_opponent_id]
+
+    # !!! Implement
+    def find_closest_opponent_id(self, acting_character):
+        # find all the opponents
+        # calculate the distance of each
+        # return the closest one
+        pass
+
+    # !!! Implement
+    def move_character_to_location(self, target_location, acting_character):
+        pass
+
+    # !!! Implement
+    def move_character_within_range_of_target(self, target_location, attack_range):
+        pass
 
     def lose_game(self):
         helpers.clear_terminal()
