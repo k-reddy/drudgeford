@@ -1,4 +1,17 @@
 To pick up on:
+- figure out how to deal with the id issue
+        - right now i have the board holding everythign (health etc.), which is maybe ideal
+          for not cheating if this were on a server
+        - but the complication is that things like monster.health don't work now, so then you have
+          to figure out who the monster is and then ask for their health
+        - before, i had the players holding everything but location, but then you have issues
+          where you're messily trying to say hey attack the player with this id
+          then you have to somehow figure out who that player is, because i just have a map of
+          id to location
+        - one possible solution is to pass around the objects themselves (so the player asks for their
+          opponents then picks one to attack
+          but this seems messy also
+
 - implement everything specified
 - install ruff or black
 - make action_card a dataclass
