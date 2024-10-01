@@ -18,7 +18,8 @@ class Board:
         self.size = size
         self.characters = [monster, player]
         self.locations = initialize_board(self.size, self.size)
-        self.set_starting_locations()
+        self.add_obstacles()
+        self.set_character_starting_locations()
         self.game_status = "running"
 
         print(
@@ -36,7 +37,17 @@ class Board:
             print(self.game_status)
             self.end_game()
 
-    def set_starting_locations(self):
+    def add_obstacles(self):
+        self.locations[0][0] = 'X'
+        for i in range(3):
+            for j in range(3):
+                if i + j < 3:
+                    self.locations[i][j] = 'X'
+                    self.locations[-i - 1][-j - 1] = 'X'
+                    self.locations[i][-j - 1] = 'X'
+                    self.locations[-i - 1][j] = 'X'
+
+    def set_character_starting_locations(self):
         for x in self.characters:
             self.pick_unoccupied_location(x)
 
@@ -70,6 +81,8 @@ class Board:
                     sides += "|  P  "
                 elif isinstance(self.locations[i][j], character.Monster):
                     sides += "|  M  "
+                elif self.locations[i][j] == 'X':
+                    sides += "|  X  "
                 else:
                     sides += "|     "
             sides += "|     "
