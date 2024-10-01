@@ -20,20 +20,20 @@ class Character:
     def print_action_card(self, action_card, is_performing):
         print_str = action_card["attack_name"] + ": Attack " + str(
             action_card["strength"]) + ", Range " + str(action_card["distance"]) + ", Movement " + str(
-            action_card["movement"]) + "\n"
+            action_card["movement"])
         if is_performing:
             print_str = f'{self.name} is performing ' + print_str
         print(print_str)
 
-        print
     def decide_if_move_first(self, action_card, board):
         pass
 
     def perform_movement(self, action_card, board):
         pass
 
-    def select_attack_target(self):
+    def select_attack_target(self, in_range_opponents):
         pass
+
 
 class Player(Character):
     # asks player what card they want to play
@@ -45,7 +45,8 @@ class Player(Character):
             sys.exit()
         # if they have action cards, show them what they have
         print("Your action cards are: ")
-        for i, action_card in enumerate(self.action_card):
+        for i, action_card in enumerate(self.action_cards):
+            print(i)
             self.print_action_card(action_card, is_performing=False)
         # let them pick a valid action_card
         while True:
@@ -60,9 +61,9 @@ class Player(Character):
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card, board):
-        self.print_action_card(action_card, is_performing = True)
+        self.print_action_card(action_card, is_performing=True)
         action_num = input("Type 1 to move first or 2 to attack first. ")
-        while action_num not in ["1","2"]:
+        while action_num not in ["1", "2"]:
             action_num = input("Invalid input. Please type 1 or 2. ")
         return action_num == "1"
 
@@ -87,28 +88,35 @@ class Player(Character):
             if direction == "f":
                 break
 
-            if not direction in direction_map:
+            if direction not in direction_map:
                 print("Incorrect input. Try again!")
                 continue
 
-            # !!! implement this in board
-            # check if valid move
-            # if yes, move and return true
-            # if no, return false
-            if board.adjudicate_movement_request(self, direction_map[direction]):
+            if board.check_legality_and_move_character_in_direction(self, direction_map[direction]):
                 remaining_movement -= 1
                 continue
             else:
-                print("Invalid movement (obstacle, character, or board edge) - try again")
+                print("Invalid movement direction (obstacle, character, or board edge) - try again")
 
         print("movement done!")
 
-    # !!! Implement
-    def select_attack_target_id(self):
+    def select_attack_target(self, in_range_opponents):
         # ask the board who's in range
+        if not in_range_opponents:
+            print("No opponents in range")
+            return None
+
+        print("Opponents in range: ")
+        for i, opponent in enumerate(in_range_opponents):
+            print(f"{i}: {opponent.name}")
+
+        target_num = input("Please type the number of the opponent you want to attack")
+        while int(target_num) not in range(len(in_range_opponents)):
+            target_num = input("invalid number, try again")
         # ask the player who they want to attack
         # ask the board to attack that person
-        return target_id
+        return in_range_opponents[int(target_num)]
+
 
 class Monster(Character):
     def select_action_card(self):
@@ -120,12 +128,18 @@ class Monster(Character):
         return True
 
     def perform_movement(self, action_card, board):
-        target_location = board.find_closest_opponent_location(self)
-        board.move_character_to_location(self, target_location, action_card["distance"])
+        targets = board.find_opponents(self)
+        print(targets)
+        target_loc = board.find_location_of_target(random.choice(targets))
+        print(target_loc)
+        board.walk_character_to_location(self,target_loc, action_card["distance"])
 
-    def select_attack_target_id(self, board):
-        # monster always attacks the closest opponent
-        return board.find_closest_opponent_id(self)
+    def select_attack_target(self, in_range_opponents):
+        # monster picks a random opponent
+        if not in_range_opponents:
+            return None
+        return random.choice(in_range_opponents)
+
 
 def create_action_cards():
     # each attack card will be generated with a strength, distance, and number of targets, so set

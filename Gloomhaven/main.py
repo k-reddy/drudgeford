@@ -16,10 +16,9 @@ def main():
     helpers.clear_terminal()
     if want_help == "help":
         helpers.give_help()
-    monster = character.Monster("Tree Man", 10, id=1)
-    player = character.Player(player_name, 10, id=2)
-    board = Board(5, monster, player)
-    print("here?")
+    monster = character.Monster("Tree Man", 10)
+    player = character.Player(player_name, 10)
+    Board(5, monster, player)
 
 
 if __name__ == "__main__":
