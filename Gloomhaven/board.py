@@ -151,10 +151,7 @@ class Board:
         print("Attack hits!\n")
         print(f"After the modifier, attack strength is: {modified_attack_strength}")
 
-        target.health -= modified_attack_strength
-        print(f"New health: {target.health}")
-        if target.health <= 0:
-            self.kill_target(target)
+        self.modify_target_health(target, modified_attack_strength)
 
     def kill_target(self, target):
         self.characters.remove(target)
@@ -252,6 +249,10 @@ class Board:
             return False
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
+        terrain_damage = self.get_terrain_damage(new_location[0], new_location[1])
+        if terrain_damage:
+            print(f"{actor.name} was damaged by the terrain for {terrain_damage} health")
+            self.modify_target_health(actor, terrain_damage)
         return True
 
     def check_if_legal_move(self, row, col):
@@ -259,7 +260,7 @@ class Board:
     
     def get_terrain_damage(self, row, col):
         if self.terrain[row][col] == "FIRE":
-            return -1
+            return 1
         else:
             return None
         
