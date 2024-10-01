@@ -43,9 +43,10 @@ class Board:
             self.end_game()
 
     def add_fire_to_terrain(self):
-        for i, terrain_row in enumerate(self.terrain):
-            for j, _ in enumerate(terrain_row):
-                self.terrain[i][j] = "FIRE"
+        # for i, terrain_row in enumerate(self.terrain):
+        #     for j, _ in enumerate(terrain_row):
+        #         self.terrain[i][j] = "FIRE"
+        return
 
 
 
