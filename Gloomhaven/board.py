@@ -262,6 +262,13 @@ class Board:
             return -1
         else:
             return None
+        
+    def modify_target_health(self, target, damage):
+        target.health -= damage
+        print(f"New health: {target.health}")
+        if target.health <= 0:
+            self.kill_target(target)
+
 
     def end_game(self):
         if self.game_status == 'player_loss':
