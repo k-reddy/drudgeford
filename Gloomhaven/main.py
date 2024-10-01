@@ -18,7 +18,7 @@ def main():
         helpers.give_help()
     monster = character.Monster("Tree Man", 10)
     player = character.Player(player_name, 10)
-    Board(5, monster, player)
+    Board(10, monster, player)
 
 
 if __name__ == "__main__":
