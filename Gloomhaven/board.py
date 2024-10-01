@@ -2,6 +2,9 @@ import random
 from functools import partial
 import character
 import helpers
+import copy
+
+EMPTY_CELL = "|      "
 
 
 def initialize_board(width=5, height=5):
@@ -18,6 +21,8 @@ class Board:
         self.size = size
         self.characters = [monster, player]
         self.locations = initialize_board(self.size, self.size)
+        self.terrain = copy.deepcopy(self.locations)
+        self.add_fire_to_terrain()
         self.add_obstacles()
         self.set_character_starting_locations()
         self.game_status = "running"
@@ -36,6 +41,13 @@ class Board:
             print("what")
             print(self.game_status)
             self.end_game()
+
+    def add_fire_to_terrain(self):
+        for i, terrain_row in enumerate(self.terrain):
+            for j, _ in enumerate(terrain_row):
+                self.terrain[i][j] = "FIRE"
+
+
 
     def add_obstacles(self):
         self.locations[0][0] = 'X'
@@ -74,20 +86,29 @@ class Board:
         to_draw = ""
         top = ""
         for i in range(self.size):
-            top = " -----" * self.size + "\n"
+            top = " ------" * self.size + "\n"
             sides = ""
             for j in range(self.size):
                 if isinstance(self.locations[i][j], character.Player):
-                    sides += "|  P  "
+                    sides += "|  🧙  "
                 elif isinstance(self.locations[i][j], character.Monster):
-                    sides += "|  M  "
+                    sides += "|  🧌  "
                 elif self.locations[i][j] == 'X':
-                    sides += "|  X  "
+                    sides += "|  🪨  "
                 else:
-                    sides += "|     "
-            sides += "|     "
+                    sides += EMPTY_CELL
+            sides += EMPTY_CELL
             to_draw += top
             to_draw += sides + "\n"
+
+            fire_sides = ""
+            for j in range(self.size):
+                if self.terrain[i][j] == "FIRE":
+                    fire_sides += "|  🔥  "
+                else:
+                    fire_sides += EMPTY_CELL
+            fire_sides += EMPTY_CELL
+            to_draw += fire_sides + "\n"
         # add the bottom
         to_draw += top
         print(to_draw)
