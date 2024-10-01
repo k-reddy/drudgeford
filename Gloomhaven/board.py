@@ -138,12 +138,10 @@ class Board:
 
     def run_round(self):
         # randomize who starts the turn
-        temp_chars = self.characters.copy()
+        random.shuffle(self.characters)
         print("Start of Round!\n")
-        for i, _ in enumerate(temp_chars):
+        for i, acting_character in enumerate(self.characters):
             # randomly pick who starts the round
-            acting_character = random.choice(temp_chars)
-            temp_chars.remove(acting_character)
             print(f"It's {acting_character.name}'s turn!")
             self.run_turn(acting_character)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
