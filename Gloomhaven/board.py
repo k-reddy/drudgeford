@@ -1,21 +1,7 @@
 import random
-import sys
-import time
 from functools import partial
-from dataclasses import dataclass
+import character
 import helpers
-
-
-"""
-[
-    i: [
-        j: Object ref
-    ]
-]
-[0][0] = Monster
-[4][4] = Player
-
-"""
 
 
 def initialize_board(width=5, height=5):
@@ -28,67 +14,78 @@ def initialize_board(width=5, height=5):
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(self, size: int, monster: object, player: object) -> object:
+    def __init__(self, size: int, monster: character.Monster, player: character.Player) -> None:
         self.size = size
-        self.monster = monster
-        self.player = player
         self.characters = [monster, player]
-        self.all_character_data = self.generate_character_data([monster, player])
-        # !!! may want to add this to all_character_data rather than keeping it separate
-        # but may want to keep it separate b/c then this can also hold obstacles?
         self.locations = initialize_board(self.size, self.size)
-        self.set_starting_locations()
-        self.game_over = False
+        self.add_obstacles()
+        self.set_character_starting_locations()
+        self.game_status = "running"
+
         print(
             "Welcome to your quest, " + player.name + ". \n",
             "As you enter the dungeon, you see a terrifying monster ahead! \n",
             "Kill it or be killed...\n",
         )
         input("Time to start the game! Hit enter to continue\n")
-        while not self.game_over:
+        while self.game_status == 'running':
             self.run_round()
-        # !!! Implement something here to end the game depending on the game state
+            print(self.game_status)
+        # once we're no longer playing, end the game
+        if self.game_status != 'running':
+            print("what")
+            print(self.game_status)
+            self.end_game()
 
-    def generate_character_data(self, characters):
-        all_character_data = []
-        for i, char in enumerate(characters):
-            char_data = characterData(
-                id=str(i),
-                action_cards=create_action_cards(),
-                health=10,
-                character=char,
-            )
-            all_character_data.append(char_data)
-        return all_character_data
+    def add_obstacles(self):
+        self.locations[0][0] = 'X'
+        for i in range(3):
+            for j in range(3):
+                if i + j < 3:
+                    self.locations[i][j] = 'X'
+                    self.locations[-i - 1][-j - 1] = 'X'
+                    self.locations[i][-j - 1] = 'X'
+                    self.locations[-i - 1][j] = 'X'
 
-    def set_starting_locations(self):
-        for character in self.characters:
-            self.pick_unoccupied_location(character)
+    def set_character_starting_locations(self):
+        for x in self.characters:
+            self.pick_unoccupied_location(x)
 
-    def pick_unoccupied_location(self, character):
+
+    def pick_unoccupied_location(self, actor):
         while True:
             rand_location = [
                 random.randint(0, self.size - 1),
                 random.randint(0, self.size - 1),
             ]
             if not self.locations[rand_location[0]][rand_location[1]]:
-                self.locations[rand_location[0]][rand_location[1]] = character
+                self.locations[rand_location[0]][rand_location[1]] = actor
+                break
+
+    def print_healths(self):
+        print_str = ''
+        for x in self.characters:
+            print_str += f"{x.name} Health: {x.health}\n"
+        print(print_str)
 
     # draw the game board and display stats
     def draw(self):
-        # print(f"Monster Health: {self.monster.health}, {self.player.name}'s Health: {self.player.health}")
+        self.print_healths()
         to_draw = ""
         top = ""
         for i in range(self.size):
-            top = " ---" * self.size + "\n"
+            top = " -----" * self.size + "\n"
             sides = ""
-            for j in range(self.size + 1):
-                if isinstance(self.locations[i][j], Player):
-                    sides += "| P "
-                elif isinstance(self.locations[i][j], Monster):
-                    sides += "| M "
+            for j in range(self.size):
+                if isinstance(self.locations[i][j], character.Player):
+                    sides += "|  P  "
+                elif isinstance(self.locations[i][j], character.Monster):
+                    sides += "|  M  "
+                elif self.locations[i][j] == 'X':
+                    sides += "|  X  "
                 else:
-                    sides += "|   "
+                    sides += "|     "
+            sides += "|     "
             to_draw += top
             to_draw += sides + "\n"
         # add the bottom
@@ -96,19 +93,25 @@ class Board:
         print(to_draw)
 
     # is the attack in range?
-    def check_attack_in_range(self, attack_distance, attack_target):
+    def check_attack_in_range(self, attack_distance, attacker, target):
+        attacker_location = self.find_location_of_target(attacker)
+        target_location = self.find_location_of_target(target)
         dist_to_target = get_distance_between_locations(
-            self.locations[self.id], self.locations[attack_target.id]
+            attacker_location,
+            target_location
         )
         return attack_distance >= dist_to_target
 
-    def find_opponents(self, actor):
-        if actor == self.monster:
-            return [self.player]
-        else:
-            return [self.monster]
+    def find_location_of_target(self, target):
+        for row_num, row in enumerate(self.locations):
+            for column_num, item_in_locations in enumerate(row):
+                if target == item_in_locations:
+                    return row_num, column_num
 
-    def attack_target(self, target_id, action_card):
+    def find_opponents(self, actor):
+        return [pot_opponent for pot_opponent in self.characters if not isinstance(pot_opponent, type(actor))]
+
+    def attack_target(self, action_card, attacker, target):
         modified_attack_strength = select_and_apply_attack_modifier(
             action_card["strength"]
         )
@@ -116,8 +119,7 @@ class Board:
             f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
         )
 
-        # if you're close enough, attack
-        if not self.check_attack_in_range(action_card["distance"]):
+        if target is None or (not self.check_attack_in_range(action_card["distance"], attacker, target)):
             print("Not close enough to attack")
             return
 
@@ -128,88 +130,122 @@ class Board:
         print("Attack hits!\n")
         print(f"After the modifier, attack strength is: {modified_attack_strength}")
 
-        # if
-        # !!! To implement
-        # if it's the player and the attack kills, end the game. Otherwise, increment monster health
-        # update the health of the character we attacked
-        # if it goes below their remaining health, win or lose the game depending on who it is
-        # ^ this is a place to work on the game state thing
+        target.health -= modified_attack_strength
+        print(f"New health: {target.health}")
+        if target.health <= 0:
+            self.kill_target(target)
 
+    def kill_target(self, target):
+        self.characters.remove(target)
+        row, col = self.find_location_of_target(target)
+        self.locations[row][col] = None
 
-"""
-id ->
-character
-health
-action_cards
-"""
+    def check_and_update_game_status(self):
+        # if all the monsters are dead, player wins
+        if all(not isinstance(x, character.Monster) for x in self.characters):
+            self.game_status = 'player_win'
+        # if all the players are dead, player loses
+        elif all(not isinstance(x, character.Player) for x in self.characters):
+            self.game_status = 'player_loss'
+        return
 
+    def run_round(self):
+        # randomize who starts the turn
+        random.shuffle(self.characters)
+        print("Start of Round!\n")
+        for i, acting_character in enumerate(self.characters):
+            # randomly pick who starts the round
+            print(f"It's {acting_character.name}'s turn!")
+            self.run_turn(acting_character)
+            # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
+            # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
+            # move after acting, which is not ideal
+            self.check_and_update_game_status()
+            if self.game_status != 'running':
+                return
+        input("End of round. Hit Enter to continue")
+        helpers.clear_terminal()
 
-def run_round(self):
-    # randomize who starts the turn
-    print("Start of Round!\n")
-    characters = [self.player, self.monster]
-    for i, _ in enumerate(characters):
-        # randomly pick who starts the round
-        acting_character = random.choice(characters)
-        characters.remove(acting_character)
-        print(f"It's {acting_character.name}'s turn!")
-        self.run_turn(acting_character)
+    def run_turn(self, acting_character):
+        self.draw()
+        action_card = acting_character.select_action_card()
+        self.draw()
+        move_first = acting_character.decide_if_move_first(action_card, self)
 
-        # !!! ideally this would go in end_turn() but then I don't know how to quit the for loop
-        if self.game_over:
-            return
-        end_turn()
-    input("End of round. Hit Enter to continue")
-    helpers.clear_terminal()
-
-
-def run_turn(self, acting_character):
-    action_card = acting_character.select_action_card()
-    move_first = acting_character.decide_if_move_first(action_card)
-
-    if move_first:
-        acting_character.perform_movement(action_card, self)
-        target_id = acting_character.select_attack_target_id()
-        self.attack_target(target_id, action_card)
-    else:
-        target_id = acting_character.select_attack_target_id()
-        self.attack_target(target_id, action_card)
-        acting_character.perform_movement()
-
-    end_turn()
-
-
-def find_closest_opponent_location(self, acting_character):
-    closest_opponent_id = self.find_closest_opponent_id(self, acting_character)
-    return self.locations[closest_opponent_id]
-
-
-def find_closest_opponent_id(self, acting_character):
-    # right now there's only one opponent
-    return self.find_opponents(acting_character)[0].id
-
-
-def move_character_to_location(self, acting_character, target_location, movement):
-    remaining_movement = movement
-    while remaining_movement > 0:
-        y_movement, x_movement = [
-            b - a for a, b, in zip(self.locations[acting_character.id], target_location)
-        ]
-        if y_movement != 0:
-            axis = 0
-            direction = 1 if y_movement > 0 else -1
-            # move one in the direction of y_movement
-        elif x_movement > 1:
-            axis = 1
-            direction = 1 if x_movement > 0 else -1
+        # !!! check if there's a cleaner way to implement this
+        if move_first:
+            self.draw()
+            acting_character.perform_movement(action_card, self)
+            in_range_opponents = self.find_in_range_opponents(acting_character, action_card)
+            self.draw()
+            target = acting_character.select_attack_target(in_range_opponents)
+            self.attack_target(action_card, acting_character, target)
         else:
-            break
+            self.draw()
+            in_range_opponents = self.find_in_range_opponents(acting_character, action_card)
+            self.draw()
+            target = acting_character.select_attack_target(in_range_opponents)
+            self.attack_target(action_card, acting_character, target)
+            acting_character.perform_movement(action_card, self)
 
-        remaining_movement -= 1
-        self.locations[acting_character.id][axis] += direction
+        end_turn()
+
+    def find_in_range_opponents(self, actor, action_card):
+        opponents = self.find_opponents(actor)
+        for opponent in opponents:
+            if not self.check_attack_in_range(action_card["distance"], actor, opponent):
+                opponents.remove(opponent)
+        return opponents
+
+    # !!! this is very dumb movement - could make smarter
+    # also could make cleaner!
+    def walk_character_to_location(self, acting_character, target_location, movement):
+        old_location = self.find_location_of_target(acting_character)
+        while movement > 0:
+            y_movement, x_movement = [
+                b - a for a, b, in zip(old_location, target_location)
+            ]
+            if y_movement != 0:
+                direction = [1 if y_movement > 0 else -1, 0]
+
+                # check if move is legal and move if so
+                if self.check_legality_and_move_character_in_direction(acting_character, direction):
+                    movement -= 1
+                    continue
+
+            # can't have them move to the same row and same col, b/c that's the same spot!
+            if x_movement > 1:
+                direction = [0, 1 if x_movement > 0 else -1]
+                if self.check_legality_and_move_character_in_direction(acting_character, direction):
+                    movement -= 1
+                    continue
+
+            # if there's no more movement options, break
+            else:
+                break
+
+    def check_legality_and_move_character_in_direction(self, actor, direction):
+        old_location = self.find_location_of_target(actor)
+        new_location = [a+b for a, b in zip(old_location, direction)]
+        if not self.check_if_legal_move(new_location[0], new_location[1]):
+            return False
+        self.locations[old_location[0]][old_location[1]] = None
+        self.locations[new_location[0]][new_location[1]] = actor
+        return True
+
+    def check_if_legal_move(self, row, col):
+        return self.locations[row][col] is None
+
+    def end_game(self):
+        if self.game_status == 'player_loss':
+            lose_game()
+        elif self.game_status == 'player_win':
+            win_game()
+        else:
+            raise ValueError(f"trying to end game when status is {self.game_status}")
 
 
-def lose_game(self):
+def lose_game():
     helpers.clear_terminal()
     print(
         """You died...GAME OVER
@@ -220,21 +256,20 @@ def lose_game(self):
 |     |
 \\___/"""
     )
-    self.game_over = True
-    self.player.location = (self.size + 1, self.size + 1)
+    return None
 
 
-def win_game(self):
+def win_game():
     helpers.clear_terminal()
     print("You defeated the monster!!")
-    self.game_over = True
     print("\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        ")
-    self.monster.location = (self.size + 1, self.size + 1)
+    return None
 
 
 def end_turn():
     input("End of turn. Hit enter to continue")
     helpers.clear_terminal()
+    return
 
 
 def select_and_apply_attack_modifier(initial_attack_strength):
@@ -257,49 +292,6 @@ def select_and_apply_attack_modifier(initial_attack_strength):
 
 
 def get_distance_between_locations(location1, location2):
+    print(location1)
+    print(location2)
     return sum(abs(a - b) for a, b in zip(location1, location2))
-
-
-@dataclass
-class characterData:
-    id: str
-    action_cards: list
-    health: int
-    character: object
-
-    # think of this as a deck of attack cards that we will randomly pull from
-    # here we generate that deck of attack cards
-
-
-def create_action_cards():
-    # each attack card will be generated with a strength, distance, and number of targets, so set
-    # some values to pull from
-    strengths = [1, 2, 3, 4, 5]
-    strength_weights = [3, 5, 4, 2, 1]
-    movements = [0, 1, 2, 3, 4]
-    movement_weights = [1, 3, 4, 3, 1]
-    max_distance = 3
-    num_action_cards = 5
-    action_cards = []
-
-    # some things for attack names
-    adjectives = ["Shadowed", "Infernal", "Venomous", "Blazing", "Cursed"]
-    elements = ["Fang", "Storm", "Flame", "Void", "Thorn"]
-    actions = ["Strike", "Surge", "Rend", "Burst", "Reaver"]
-
-    for item in [adjectives, elements, actions]:
-        random.shuffle(item)
-
-    # generate each attack card
-    for i in range(num_action_cards):
-        strength = random.choices(strengths, strength_weights)[0]
-        movement = random.choices(movements, movement_weights)[0]
-        distance = random.randint(1, max_distance)
-        action_card = {
-            "attack_name": f"{adjectives.pop()} {elements.pop()} {actions.pop()}",
-            "strength": strength,
-            "distance": distance,
-            "movement": movement,
-        }
-        action_cards.append(action_card)
-    return action_cards

@@ -7,6 +7,7 @@ def clear_terminal():
         os.system('cls')
     else:
         os.system('clear')
+    return
 
 
 def give_help():
