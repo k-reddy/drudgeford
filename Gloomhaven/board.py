@@ -256,6 +256,12 @@ class Board:
 
     def check_if_legal_move(self, row, col):
         return self.locations[row][col] is None
+    
+    def get_terrain_damage(self, row, col):
+        if self.terrain[row][col] == "FIRE":
+            return -1
+        else:
+            return None
 
     def end_game(self):
         if self.game_status == 'player_loss':
