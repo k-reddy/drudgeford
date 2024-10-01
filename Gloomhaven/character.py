@@ -129,9 +129,7 @@ class Monster(Character):
 
     def perform_movement(self, action_card, board):
         targets = board.find_opponents(self)
-        print(targets)
         target_loc = board.find_location_of_target(random.choice(targets))
-        print(target_loc)
         board.walk_character_to_location(self,target_loc, action_card["distance"])
 
     def select_attack_target(self, in_range_opponents):
