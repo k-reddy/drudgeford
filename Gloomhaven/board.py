@@ -43,12 +43,11 @@ class Board:
             self.end_game()
 
     def add_fire_to_terrain(self):
-        # for i, terrain_row in enumerate(self.terrain):
-        #     for j, _ in enumerate(terrain_row):
-        #         self.terrain[i][j] = "FIRE"
+        max_loc = self.size-1
+        for i in range(10):
+            self.terrain[random.randint(0, max_loc)][random.randint(0, max_loc)] = "FIRE"
         return
-
-
+    
 
     def add_obstacles(self):
         self.locations[0][0] = 'X'
@@ -93,9 +92,9 @@ class Board:
                 if isinstance(self.locations[i][j], character.Player):
                     sides += "|  🧙  "
                 elif isinstance(self.locations[i][j], character.Monster):
-                    sides += "|  🧌  "
+                    sides += "|  🤖  "
                 elif self.locations[i][j] == 'X':
-                    sides += "|  🪨  "
+                    sides += "|  🪨   "
                 else:
                     sides += EMPTY_CELL
             sides += EMPTY_CELL
