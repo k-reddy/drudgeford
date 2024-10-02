@@ -18,9 +18,13 @@ def main():
     helpers.clear_terminal()
     if want_help == "help":
         helpers.give_help()
-    monster = character.Monster("Tree Man", 10)
+    monsters = []
+    names = ["Tree Man", "Evil Blob", "Living Skeleton"]
+    for i in range(3):
+        monster = character.Monster(names[i], 10)
+        monsters.append(monster)
     player = character.Player(player_name, 10)
-    Board(10, monster, player)
+    Board(10, monsters, player)
 
 
 if __name__ == "__main__":
