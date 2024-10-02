@@ -3,6 +3,7 @@ from functools import partial
 import character
 import helpers
 import copy
+from collections import deque
 
 EMPTY_CELL = "|      "
 
@@ -17,7 +18,9 @@ def initialize_board(width=5, height=5):
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(self, size: int, monster: character.Monster, player: character.Player) -> None:
+    def __init__(
+        self, size: int, monster: character.Monster, player: character.Player
+    ) -> None:
         self.size = size
         self.characters = [monster, player]
         self.locations = initialize_board(self.size, self.size)
@@ -33,36 +36,81 @@ class Board:
             "Kill it or be killed...\n",
         )
         input("Time to start the game! Hit enter to continue\n")
-        while self.game_status == 'running':
+        while self.game_status == "running":
             self.run_round()
             print(self.game_status)
         # once we're no longer playing, end the game
-        if self.game_status != 'running':
+        if self.game_status != "running":
             print("what")
             print(self.game_status)
             self.end_game()
 
     def add_fire_to_terrain(self):
-        max_loc = self.size-1
+        max_loc = self.size - 1
         for i in range(10):
-            self.terrain[random.randint(0, max_loc)][random.randint(0, max_loc)] = "FIRE"
+            self.terrain[random.randint(0, max_loc)][
+                random.randint(0, max_loc)
+            ] = "FIRE"
         return
-    
 
     def add_obstacles(self):
-        self.locations[0][0] = 'X'
+        self.locations[0][0] = "X"
         for i in range(3):
             for j in range(3):
                 if i + j < 3:
-                    self.locations[i][j] = 'X'
-                    self.locations[-i - 1][-j - 1] = 'X'
-                    self.locations[i][-j - 1] = 'X'
-                    self.locations[-i - 1][j] = 'X'
+                    self.locations[i][j] = "X"
+                    self.locations[-i - 1][-j - 1] = "X"
+                    self.locations[i][-j - 1] = "X"
+                    self.locations[-i - 1][j] = "X"
 
     def set_character_starting_locations(self):
         for x in self.characters:
             self.pick_unoccupied_location(x)
 
+    def get_shortest_valid_path(
+        self, start: tuple[int, int], end: tuple[int, int]
+    ) -> list[tuple[int, int]]:
+        """
+        Finds the shortest valid path between a start and end coordinate in (row, col) format.
+        Valid movements are up, down, left, right.
+        Will avoid non-empty cells except for end cell.
+
+        Returns path as list of coordinates.
+        """
+        directions = [
+            (1, 0),  # Up
+            (0, 1),  # Right
+            (-1, 0),  # Down
+            (0, -1),  # Left
+        ]
+        max_row = max_col = self.size
+        visited: set[tuple[int, int]] = set()
+
+        previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
+        queue = deque([start])
+
+        while queue:
+            current = queue.popleft()
+
+            if current == end:
+                return self.generate_path()
+
+            for direction in directions:
+                new_row = current[0] + direction[0]
+                new_col = current[1] + direction[1]
+                new_pos = (new_row, new_col)
+
+                if (
+                    0 <= new_row < max_row
+                    and 0 <= new_col < max_col
+                    and (new_row, new_col) not in visited
+                ):
+                    pass
+
+        return []
+
+    def generate_path():
+        pass
 
     def pick_unoccupied_location(self, actor):
         while True:
@@ -75,7 +123,7 @@ class Board:
                 break
 
     def print_healths(self):
-        print_str = ''
+        print_str = ""
         for x in self.characters:
             print_str += f"{x.name} Health: {x.health}\n"
         print(print_str)
@@ -93,7 +141,7 @@ class Board:
                     sides += "|  🧙  "
                 elif isinstance(self.locations[i][j], character.Monster):
                     sides += "|  🤖  "
-                elif self.locations[i][j] == 'X':
+                elif self.locations[i][j] == "X":
                     sides += "|  🪨   "
                 else:
                     sides += EMPTY_CELL
@@ -118,8 +166,7 @@ class Board:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         dist_to_target = get_distance_between_locations(
-            attacker_location,
-            target_location
+            attacker_location, target_location
         )
         return attack_distance >= dist_to_target
 
@@ -130,7 +177,11 @@ class Board:
                     return row_num, column_num
 
     def find_opponents(self, actor):
-        return [pot_opponent for pot_opponent in self.characters if not isinstance(pot_opponent, type(actor))]
+        return [
+            pot_opponent
+            for pot_opponent in self.characters
+            if not isinstance(pot_opponent, type(actor))
+        ]
 
     def attack_target(self, action_card, attacker, target):
         modified_attack_strength = select_and_apply_attack_modifier(
@@ -140,7 +191,9 @@ class Board:
             f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
         )
 
-        if target is None or (not self.check_attack_in_range(action_card["distance"], attacker, target)):
+        if target is None or (
+            not self.check_attack_in_range(action_card["distance"], attacker, target)
+        ):
             print("Not close enough to attack")
             return
 
@@ -161,10 +214,10 @@ class Board:
     def check_and_update_game_status(self):
         # if all the monsters are dead, player wins
         if all(not isinstance(x, character.Monster) for x in self.characters):
-            self.game_status = 'player_win'
+            self.game_status = "player_win"
         # if all the players are dead, player loses
         elif all(not isinstance(x, character.Player) for x in self.characters):
-            self.game_status = 'player_loss'
+            self.game_status = "player_loss"
         return
 
     def run_round(self):
@@ -173,13 +226,20 @@ class Board:
         print("Start of Round!\n")
         for i, acting_character in enumerate(self.characters):
             # randomly pick who starts the round
+
+            # For testing pathfinding. should create debug mode
+            monster_pos = self.find_location_of_target(self.characters[0])
+            player_pos = self.find_location_of_target(self.characters[1])
+            print(f"{player_pos=} - {monster_pos=}")
+            # end pathfinding test
+
             print(f"It's {acting_character.name}'s turn!")
             self.run_turn(acting_character)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
             # move after acting, which is not ideal
             self.check_and_update_game_status()
-            if self.game_status != 'running':
+            if self.game_status != "running":
                 return
         input("End of round. Hit Enter to continue")
         helpers.clear_terminal()
@@ -194,13 +254,17 @@ class Board:
         if move_first:
             self.draw()
             acting_character.perform_movement(action_card, self)
-            in_range_opponents = self.find_in_range_opponents(acting_character, action_card)
+            in_range_opponents = self.find_in_range_opponents(
+                acting_character, action_card
+            )
             self.draw()
             target = acting_character.select_attack_target(in_range_opponents)
             self.attack_target(action_card, acting_character, target)
         else:
             self.draw()
-            in_range_opponents = self.find_in_range_opponents(acting_character, action_card)
+            in_range_opponents = self.find_in_range_opponents(
+                acting_character, action_card
+            )
             self.draw()
             target = acting_character.select_attack_target(in_range_opponents)
             self.attack_target(action_card, acting_character, target)
@@ -227,14 +291,18 @@ class Board:
                 direction = [1 if y_movement > 0 else -1, 0]
 
                 # check if move is legal and move if so
-                if self.check_legality_and_move_character_in_direction(acting_character, direction):
+                if self.check_legality_and_move_character_in_direction(
+                    acting_character, direction
+                ):
                     movement -= 1
                     continue
 
             # can't have them move to the same row and same col, b/c that's the same spot!
             if x_movement > 1:
                 direction = [0, 1 if x_movement > 0 else -1]
-                if self.check_legality_and_move_character_in_direction(acting_character, direction):
+                if self.check_legality_and_move_character_in_direction(
+                    acting_character, direction
+                ):
                     movement -= 1
                     continue
 
@@ -244,37 +312,38 @@ class Board:
 
     def check_legality_and_move_character_in_direction(self, actor, direction):
         old_location = self.find_location_of_target(actor)
-        new_location = [a+b for a, b in zip(old_location, direction)]
+        new_location = [a + b for a, b in zip(old_location, direction)]
         if not self.check_if_legal_move(new_location[0], new_location[1]):
             return False
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
         terrain_damage = self.get_terrain_damage(new_location[0], new_location[1])
         if terrain_damage:
-            print(f"{actor.name} was damaged by the terrain for {terrain_damage} health")
+            print(
+                f"{actor.name} was damaged by the terrain for {terrain_damage} health"
+            )
             self.modify_target_health(actor, terrain_damage)
         return True
 
     def check_if_legal_move(self, row, col):
         return self.locations[row][col] is None
-    
+
     def get_terrain_damage(self, row, col):
         if self.terrain[row][col] == "FIRE":
             return 1
         else:
             return None
-        
+
     def modify_target_health(self, target, damage):
         target.health -= damage
         print(f"New health: {target.health}")
         if target.health <= 0:
             self.kill_target(target)
 
-
     def end_game(self):
-        if self.game_status == 'player_loss':
+        if self.game_status == "player_loss":
             lose_game()
-        elif self.game_status == 'player_win':
+        elif self.game_status == "player_win":
             win_game()
         else:
             raise ValueError(f"trying to end game when status is {self.game_status}")
