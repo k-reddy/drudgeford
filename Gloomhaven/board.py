@@ -198,9 +198,6 @@ class Board:
         ]
 
     def attack_target(self, action_card, attacker, target):
-        modified_attack_strength = select_and_apply_attack_modifier(
-            action_card["strength"]
-        )
         print(
             f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
         )
@@ -211,6 +208,9 @@ class Board:
             print("Not close enough to attack")
             return
 
+        modified_attack_strength = select_and_apply_attack_modifier(
+            action_card["strength"]
+        )
         if modified_attack_strength <= 0:
             print("Darn, attack missed!")
             return
@@ -398,13 +398,14 @@ def select_and_apply_attack_modifier(initial_attack_strength):
     def add(x, y):
         return x + y
 
-    attack_modifier_deck = [partial(multiply, 2), partial(multiply, 0)]
+    attack_modifier_deck = [(partial(multiply, 2), "2x"), (partial(multiply, 0), "Null")]
     for modifier in [-2, -1, 0, 1, 2]:
-        attack_modifier_deck.append(partial(add, modifier))
+        attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
     attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
 
-    attack_modifier_function = random.choices(
+    attack_modifier_function, modifier_string = random.choices(
         attack_modifier_deck, attack_modifier_weights
     )[0]
+    print(f"Attack modifier: {modifier_string}")
     return attack_modifier_function(initial_attack_strength)
