@@ -78,10 +78,14 @@ class Board:
         Returns path as list of coordinates.
         """
         directions = [
-            (1, 0),  # Up
+            (1, 0),  # Down
             (0, 1),  # Right
-            (-1, 0),  # Down
+            (-1, 0),  # Up
             (0, -1),  # Left
+            (-1, 1), # NE
+            (1, 1), # SE
+            (1, -1), # SW
+            (-1, -1), # NW
         ]
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
@@ -105,7 +109,7 @@ class Board:
                     and 0 <= new_col < max_col
                     and new_pos not in visited
                 ):
-                    if self.check_if_legal_move(new_row, new_col) or new_pos == end:
+                    if self.is_legal_move(new_row, new_col) or new_pos == end:
                         queue.append(new_pos)
                         visited.add(new_pos)
                         previous_cell[new_pos] = current
@@ -118,6 +122,7 @@ class Board:
             path.append(current)
             current = previous_cell.get(current)
         path.reverse()
+        path = path[1:] # drop the starting position
         return path
 
     def pick_unoccupied_location(self, actor):
@@ -236,10 +241,10 @@ class Board:
             # randomly pick who starts the round
 
             # For testing pathfinding. should create debug mode
-            monster_pos = self.find_location_of_target(self.characters[0])
-            player_pos = self.find_location_of_target(self.characters[1])
-            print(f"{player_pos=} - {monster_pos=}")
-            optimal_path = self.get_shortest_valid_path(player_pos, monster_pos)
+            character1_pos = self.find_location_of_target(self.characters[0])
+            character2_pos = self.find_location_of_target(self.characters[1])
+            print(f"{character1_pos=} - {character2_pos=}")
+            optimal_path = self.get_shortest_valid_path(character1_pos, character2_pos)
             print(f"{optimal_path=}")
             # end pathfinding test
 
@@ -323,7 +328,7 @@ class Board:
     def check_legality_and_move_character_in_direction(self, actor, direction):
         old_location = self.find_location_of_target(actor)
         new_location = [a + b for a, b in zip(old_location, direction)]
-        if not self.check_if_legal_move(new_location[0], new_location[1]):
+        if not self.is_legal_move(new_location[0], new_location[1]):
             return False
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
@@ -335,8 +340,9 @@ class Board:
             self.modify_target_health(actor, terrain_damage)
         return True
 
-    def check_if_legal_move(self, row, col):
-        return self.locations[row][col] is None
+    def is_legal_move(self, row, col):
+        is_position_within_board = row >= 0 and col >= 0 and row < self.size and col < self.size
+        return is_position_within_board and self.locations[row][col] is None
 
     def get_terrain_damage(self, row, col):
         if self.terrain[row][col] == "FIRE":
