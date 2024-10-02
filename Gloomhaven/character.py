@@ -72,18 +72,22 @@ class Player(Character):
         if remaining_movement == 0:
             print("No movement!")
             return
+        
         print("\nNow it's time to move!")
         while remaining_movement > 0:
             self.print_action_card(action_card, is_performing=True)
             print(f"\nMovement remaining: {remaining_movement}")
             direction = input(
-                "Type w for up, a for left, d for right, s for down, or f to finish. "
-                "If you move off the map, you'll disappear!")
+                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. ")
             direction_map = {
                 "w": [-1, 0],
                 "s": [1, 0],
                 "a": [0, -1],
-                "d": [0, 1]
+                "d": [0, 1],
+                "q": [-1, -1],
+                "e": [-1, 1],
+                "z": [1, -1],
+                "c": [1, 1]
             }
             if direction == "f":
                 break
@@ -92,7 +96,12 @@ class Player(Character):
                 print("Incorrect input. Try again!")
                 continue
 
-            if board.check_legality_and_move_character_in_direction(self, direction_map[direction]):
+            # get your currnet and new locations, then find out if the move is legal
+            current_loc = board.find_location_of_target(self)
+            new_row, new_col = [a+b for a, b in zip(current_loc, direction_map[direction])]
+            if board.is_legal_move(new_row, new_col):
+                # do this instead of update location because it deals with terrain
+                board.move_character_toward_location(self, [new_row, new_col], 1)
                 remaining_movement -= 1
                 continue
             else:
@@ -111,7 +120,12 @@ class Player(Character):
             print(f"{i}: {opponent.name}")
 
         target_num = input("Please type the number of the opponent you want to attack")
-        while int(target_num) not in range(len(in_range_opponents)):
+        while True:
+            try:
+                if int(target_num) in range(len(in_range_opponents)):
+                    break
+            except ValueError:
+                pass
             target_num = input("invalid number, try again")
         # ask the player who they want to attack
         # ask the board to attack that person
@@ -128,9 +142,11 @@ class Monster(Character):
         return True
 
     def perform_movement(self, action_card, board):
+        if action_card["distance"] == 0:
+            return
         targets = board.find_opponents(self)
         target_loc = board.find_location_of_target(random.choice(targets))
-        board.walk_character_to_location(self,target_loc, action_card["distance"])
+        board.move_character_toward_location(self,target_loc, action_card["distance"])
 
     def select_attack_target(self, in_range_opponents):
         # monster picks a random opponent
