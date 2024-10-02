@@ -10,7 +10,9 @@ def main():
         os.environ["TERM"] = "xterm"
 
     # get some user input before starting the game
-    player_name = input("What's your character's name? ")
+    player_name = input("What's your character's name? ") 
+    # default to happy :D
+    player_name = "Happy" if player_name == '' else player_name
     helpers.clear_terminal()
     want_help = input("Hit enter to start or type help for instructions ")
     helpers.clear_terminal()
