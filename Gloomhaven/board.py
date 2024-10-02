@@ -296,7 +296,7 @@ class Board:
 
     # !!! this is very dumb movement - could make smarter
     # also could make cleaner!
-    def walk_character_to_location(self, acting_character, target_location, movement):
+    def move_character_toward_location(self, acting_character, target_location, movement):
         old_location = self.find_location_of_target(acting_character)
         while movement > 0:
             y_movement, x_movement = [
