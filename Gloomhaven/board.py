@@ -305,26 +305,32 @@ class Board:
             # check if end is occupied
             # update movement to end of path or -1 if occupied
         # find the point on the path that's movement away and move there
-
+        print(acting_character_loc)
+        print(target_location)
         path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
         path_traveled = []
-        new_loc = []
         # if we can't go all the way, get the furthest position we can go
+        print(path_to_target)
+
         if len(path_to_target) > movement:
-            path_traveled = path_to_target[:movement-1] 
+            path_traveled = path_to_target[:movement] 
         # check if the end point is unoccupied 
         elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
-            path_traveled = path_to_target[:-1] 
-        # if it's occupied, go one less
+            path_traveled = path_to_target 
+        # if it's occupied and one square away, you don't need to move
+        elif len(path_to_target) == 1:
+            return
+        # if it's occupied and you need to move, move to one away
         else:
-            path_traveled = path_to_target[:-2] 
-        
+            path_traveled = path_to_target[:-1] 
+        print(f"path traveled: {path_traveled}, movement:{movement}")
         # go along the path and take any terrain damage!
         for loc in path_traveled:
-            damage = self.get_terrain_damage[loc[0],loc[1]]
+            damage = self.get_terrain_damage(loc[0],loc[1])
             if damage:
                 self.modify_target_health(acting_character, damage)
 
+        print(f"path just before update: {path_traveled}")
         # put the character in the new location
         self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
 
