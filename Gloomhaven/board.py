@@ -237,7 +237,7 @@ class Board:
         # randomize who starts the turn
         random.shuffle(self.characters)
         print("Start of Round!\n")
-        for i, acting_character in enumerate(self.character):
+        for i, acting_character in enumerate(self.characters):
             # randomly pick who starts the round
             if is_debug:
                 # For testing pathfinding. should create debug mode
