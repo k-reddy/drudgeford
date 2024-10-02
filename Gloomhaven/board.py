@@ -233,20 +233,20 @@ class Board:
             self.game_status = "player_loss"
         return
 
-    def run_round(self):
+    def run_round(self, is_debug=False):
         # randomize who starts the turn
         random.shuffle(self.characters)
         print("Start of Round!\n")
-        for i, acting_character in enumerate(self.characters):
+        for i, acting_character in enumerate(self.character):
             # randomly pick who starts the round
-
-            # For testing pathfinding. should create debug mode
-            character1_pos = self.find_location_of_target(self.characters[0])
-            character2_pos = self.find_location_of_target(self.characters[1])
-            print(f"{character1_pos=} - {character2_pos=}")
-            optimal_path = self.get_shortest_valid_path(character1_pos, character2_pos)
-            print(f"{optimal_path=}")
-            # end pathfinding test
+            if is_debug:
+                # For testing pathfinding. should create debug mode
+                character1_pos = self.find_location_of_target(self.characters[0])
+                character2_pos = self.find_location_of_target(self.characters[1])
+                print(f"{character1_pos=} - {character2_pos=}")
+                optimal_path = self.get_shortest_valid_path(character1_pos, character2_pos)
+                print(f"{optimal_path=}")
+                # end pathfinding test
 
             print(f"It's {acting_character.name}'s turn!")
             self.run_turn(acting_character)
@@ -325,6 +325,7 @@ class Board:
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
 
+    # !!! refactor this - does 2 things - yucky!
     def check_legality_and_move_character_in_direction(self, actor, direction):
         old_location = self.find_location_of_target(actor)
         new_location = [a + b for a, b in zip(old_location, direction)]
