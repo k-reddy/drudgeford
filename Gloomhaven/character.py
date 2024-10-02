@@ -78,8 +78,7 @@ class Player(Character):
             self.print_action_card(action_card, is_performing=True)
             print(f"\nMovement remaining: {remaining_movement}")
             direction = input(
-                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-                "If you move off the map, you'll disappear!")
+                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. ")
             direction_map = {
                 "w": [-1, 0],
                 "s": [1, 0],
@@ -121,7 +120,12 @@ class Player(Character):
             print(f"{i}: {opponent.name}")
 
         target_num = input("Please type the number of the opponent you want to attack")
-        while int(target_num) not in range(len(in_range_opponents)):
+        while True:
+            try:
+                if int(target_num) in range(len(in_range_opponents)):
+                    break
+            except ValueError:
+                pass
             target_num = input("invalid number, try again")
         # ask the player who they want to attack
         # ask the board to attack that person
