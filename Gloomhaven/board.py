@@ -262,6 +262,11 @@ class Board:
 
     def run_turn(self, acting_character):
         self.draw()
+        
+        # if you start in fire, take damage first
+        row, col = self.find_location_of_target(acting_character)
+        self.deal_terrain_damage(acting_character, row, col)
+
         action_card = acting_character.select_action_card()
         self.draw()
         move_first = acting_character.decide_if_move_first(action_card, self)
@@ -319,13 +324,16 @@ class Board:
             path_traveled = path_to_target[:-1] 
         # go along the path and take any terrain damage!
         for loc in path_traveled:
-            damage = self.get_terrain_damage(loc[0],loc[1])
-            if damage:
-                print(f"{acting_character.name} took {damage} damage from terrain")
-                self.modify_target_health(acting_character, damage)
+            self.deal_terrain_damage(acting_character, loc[0],loc[1])
 
         # put the character in the new location
         self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
+
+    def deal_terrain_damage(self, acting_character, row, col):
+        damage = self.get_terrain_damage(row, col)
+        if damage:
+            print(f"{acting_character.name} took {damage} damage from terrain")
+            self.modify_target_health(acting_character, damage)
 
     def update_character_location(self, actor, old_location, new_location):
         self.locations[old_location[0]][old_location[1]] = None
