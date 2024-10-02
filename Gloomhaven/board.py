@@ -25,9 +25,9 @@ class Board:
         self.characters = [monster, player]
         self.locations = initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
-        self.add_fire_to_terrain()
         self.add_obstacles()
         self.set_character_starting_locations()
+        self.add_fire_to_terrain()
         self.game_status = "running"
 
         print(
@@ -47,9 +47,11 @@ class Board:
     def add_fire_to_terrain(self):
         max_loc = self.size - 1
         for i in range(10):
-            self.terrain[random.randint(0, max_loc)][
-                random.randint(0, max_loc)
-            ] = "FIRE"
+            row = random.randint(0, max_loc)
+            col = random.randint(0, max_loc)
+            # don't put fire on characters or map edge
+            if self.locations[row][col] == None:
+                self.terrain[row][col] = "FIRE"
         return
 
     def add_obstacles(self):
