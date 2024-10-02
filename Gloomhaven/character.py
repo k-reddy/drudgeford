@@ -101,7 +101,8 @@ class Player(Character):
             current_loc = board.find_location_of_target(self)
             new_row, new_col = [a+b for a, b in zip(current_loc, direction_map[direction])]
             if board.is_legal_move(new_row, new_col):
-                board.update_character_location(self, current_loc, [new_row, new_col])
+                # do this instead of update location because it deals with terrain
+                board.move_character_toward_location(self, [new_row, new_col], 1)
                 remaining_movement -= 1
                 continue
             else:
