@@ -1,4 +1,7 @@
 *.venv
 Gloomhaven/__pycache__/
 .ipynb_checkpoints/
+env/
+.env
+.DS_Store
 .vscode/
