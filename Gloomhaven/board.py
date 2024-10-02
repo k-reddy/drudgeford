@@ -19,10 +19,12 @@ class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
-        self, size: int, monster: character.Monster, player: character.Player
+        self, size: int, monsters: list[character.Monster], player: character.Player
     ) -> None:
         self.size = size
-        self.characters = [monster, player]
+        self.characters = [player]
+        for m in monsters:
+            self.characters.append(m)
         self.locations = initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
         self.add_obstacles()
