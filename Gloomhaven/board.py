@@ -294,36 +294,36 @@ class Board:
                 opponents.remove(opponent)
         return opponents
 
-    # !!! this is very dumb movement - could make smarter
-    # also could make cleaner!
+
     def move_character_toward_location(self, acting_character, target_location, movement):
-        old_location = self.find_location_of_target(acting_character)
-        while movement > 0:
-            y_movement, x_movement = [
-                b - a for a, b, in zip(old_location, target_location)
-            ]
-            if y_movement != 0:
-                direction = [1 if y_movement > 0 else -1, 0]
+        if movement == 0:
+            return
+        
+        acting_character_loc = self.find_location_of_target(acting_character)
+        # get path 
+        # if len path <= movement
+            # check if end is occupied
+            # update movement to end of path or -1 if occupied
+        # find the point on the path that's movement away and move there
 
-                # check if move is legal and move if so
-                if self.check_legality_and_move_character_in_direction(
-                    acting_character, direction
-                ):
-                    movement -= 1
-                    continue
+        path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
+        new_loc = []
+        # if we can't go all the way, get the furthest position we can go
+        if len(path_to_target) > movement:
+            new_loc = path_to_target[movement-1] 
+        # check if the end point is unoccupied 
+        elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
+            new_loc = path_to_target[-1]
+        # if it's occupied, go one less
+        else:
+            new_loc = path_to_target[-2]
 
-            # can't have them move to the same row and same col, b/c that's the same spot!
-            if x_movement > 1:
-                direction = [0, 1 if x_movement > 0 else -1]
-                if self.check_legality_and_move_character_in_direction(
-                    acting_character, direction
-                ):
-                    movement -= 1
-                    continue
+        # put the character in the new location
+        self.update_character_location(acting_character, acting_character_loc, new_loc)
 
-            # if there's no more movement options, break
-            else:
-                break
+    def update_character_location(self, actor, old_location, new_location):
+        self.locations[old_location[0]][old_location[1]] = None
+        self.locations[new_location[0]][new_location[1]] = actor
 
     def check_legality_and_move_character_in_direction(self, actor, direction):
         old_location = self.find_location_of_target(actor)
