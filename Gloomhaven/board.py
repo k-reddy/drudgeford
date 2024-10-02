@@ -93,7 +93,7 @@ class Board:
             current = queue.popleft()
 
             if current == end:
-                return self.generate_path()
+                return self.generate_path(previous_cell, end)
 
             for direction in directions:
                 new_row = current[0] + direction[0]
@@ -103,14 +103,22 @@ class Board:
                 if (
                     0 <= new_row < max_row
                     and 0 <= new_col < max_col
-                    and (new_row, new_col) not in visited
+                    and new_pos not in visited
                 ):
-                    pass
-
+                    if self.check_if_legal_move(new_row, new_col) or new_pos == end:
+                        queue.append(new_pos)
+                        visited.add(new_pos)
+                        previous_cell[new_pos] = current
         return []
 
-    def generate_path():
-        pass
+    def generate_path(self, previous_cell, end):
+        path = []
+        current = end
+        while current:
+            path.append(current)
+            current = previous_cell.get(current)
+        path.reverse()
+        return path
 
     def pick_unoccupied_location(self, actor):
         while True:
@@ -231,6 +239,8 @@ class Board:
             monster_pos = self.find_location_of_target(self.characters[0])
             player_pos = self.find_location_of_target(self.characters[1])
             print(f"{player_pos=} - {monster_pos=}")
+            optimal_path = self.get_shortest_valid_path(player_pos, monster_pos)
+            print(f"{optimal_path=}")
             # end pathfinding test
 
             print(f"It's {acting_character.name}'s turn!")
