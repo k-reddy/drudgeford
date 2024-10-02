@@ -307,39 +307,30 @@ class Board:
         # find the point on the path that's movement away and move there
 
         path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
+        path_traveled = []
         new_loc = []
         # if we can't go all the way, get the furthest position we can go
         if len(path_to_target) > movement:
-            new_loc = path_to_target[movement-1] 
+            path_traveled = path_to_target[:movement-1] 
         # check if the end point is unoccupied 
         elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
-            new_loc = path_to_target[-1]
+            path_traveled = path_to_target[:-1] 
         # if it's occupied, go one less
         else:
-            new_loc = path_to_target[-2]
+            path_traveled = path_to_target[:-2] 
+        
+        # go along the path and take any terrain damage!
+        for loc in path_traveled:
+            damage = self.get_terrain_damage[loc[0],loc[1]]
+            if damage:
+                self.modify_target_health(acting_character, damage)
 
         # put the character in the new location
-        self.update_character_location(acting_character, acting_character_loc, new_loc)
+        self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
 
     def update_character_location(self, actor, old_location, new_location):
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
-
-    # !!! refactor this - does 2 things - yucky!
-    def check_legality_and_move_character_in_direction(self, actor, direction):
-        old_location = self.find_location_of_target(actor)
-        new_location = [a + b for a, b in zip(old_location, direction)]
-        if not self.is_legal_move(new_location[0], new_location[1]):
-            return False
-        self.locations[old_location[0]][old_location[1]] = None
-        self.locations[new_location[0]][new_location[1]] = actor
-        terrain_damage = self.get_terrain_damage(new_location[0], new_location[1])
-        if terrain_damage:
-            print(
-                f"{actor.name} was damaged by the terrain for {terrain_damage} health"
-            )
-            self.modify_target_health(actor, terrain_damage)
-        return True
 
     def is_legal_move(self, row, col):
         is_position_within_board = row >= 0 and col >= 0 and row < self.size and col < self.size
