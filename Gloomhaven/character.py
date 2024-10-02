@@ -77,13 +77,17 @@ class Player(Character):
             self.print_action_card(action_card, is_performing=True)
             print(f"\nMovement remaining: {remaining_movement}")
             direction = input(
-                "Type w for up, a for left, d for right, s for down, or f to finish. "
+                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
                 "If you move off the map, you'll disappear!")
             direction_map = {
                 "w": [-1, 0],
                 "s": [1, 0],
                 "a": [0, -1],
-                "d": [0, 1]
+                "d": [0, 1],
+                "q": [-1, -1],
+                "e": [-1, 1],
+                "z": [1, -1],
+                "c": [1, 1]
             }
             if direction == "f":
                 break
