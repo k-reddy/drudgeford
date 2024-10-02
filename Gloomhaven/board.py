@@ -41,7 +41,6 @@ class Board:
             print(self.game_status)
         # once we're no longer playing, end the game
         if self.game_status != "running":
-            print("what")
             print(self.game_status)
             self.end_game()
 
@@ -77,6 +76,7 @@ class Board:
 
         Returns path as list of coordinates.
         """
+        end = tuple(end)
         directions = [
             (1, 0),  # Down
             (0, 1),  # Right
@@ -103,13 +103,12 @@ class Board:
                 new_row = current[0] + direction[0]
                 new_col = current[1] + direction[1]
                 new_pos = (new_row, new_col)
-
                 if (
                     0 <= new_row < max_row
                     and 0 <= new_col < max_col
                     and new_pos not in visited
                 ):
-                    if self.is_legal_move(new_row, new_col) or new_pos == end:
+                    if (self.is_legal_move(new_row, new_col) or new_pos == end):
                         queue.append(new_pos)
                         visited.add(new_pos)
                         previous_cell[new_pos] = current
@@ -301,16 +300,9 @@ class Board:
         
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path 
-        # if len path <= movement
-            # check if end is occupied
-            # update movement to end of path or -1 if occupied
-        # find the point on the path that's movement away and move there
-        print(acting_character_loc)
-        print(target_location)
         path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
         path_traveled = []
         # if we can't go all the way, get the furthest position we can go
-        print(path_to_target)
 
         if len(path_to_target) > movement:
             path_traveled = path_to_target[:movement] 
@@ -323,14 +315,13 @@ class Board:
         # if it's occupied and you need to move, move to one away
         else:
             path_traveled = path_to_target[:-1] 
-        print(f"path traveled: {path_traveled}, movement:{movement}")
         # go along the path and take any terrain damage!
         for loc in path_traveled:
             damage = self.get_terrain_damage(loc[0],loc[1])
             if damage:
+                print(f"{acting_character.name} took {damage} damage from terrain")
                 self.modify_target_health(acting_character, damage)
 
-        print(f"path just before update: {path_traveled}")
         # put the character in the new location
         self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
 
