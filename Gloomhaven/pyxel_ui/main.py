@@ -57,7 +57,9 @@ class Wall:
 
     def pixels(self):
         if self.direction is Direction.NORTH:
-            return range(self.u, CANVAS_WIDTH, self.thickness), itertools.repeat(0, CANVAS_WIDTH // self.thickness)
+            return range(self.u, CANVAS_WIDTH, self.thickness), itertools.repeat(
+                0, CANVAS_WIDTH // self.thickness
+            )
 
 
 # 32, 32
