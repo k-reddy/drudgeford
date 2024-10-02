@@ -59,7 +59,9 @@ class Board:
     def carve_room(self, start_x, start_y, width, height):
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
-                self.locations[x][y] = None  # Carving walkable room (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable room (None represents open space)
 
     def carve_hallway(self, start_x, start_y, end_x, end_y):
         # Horizontal movement first, then vertical
@@ -67,12 +69,16 @@ class Board:
 
         while x != end_x:
             if 0 <= x < self.size:
-                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable hallway (None represents open space)
             x += 1 if end_x > x else -1
 
         while y != end_y:
             if 0 <= y < self.size:
-                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable hallway (None represents open space)
             y += 1 if end_y > y else -1
 
     def reshape_board(self, num_rooms=4):
@@ -88,16 +94,22 @@ class Board:
             self.carve_room(start_x, start_y, room_width, room_height)
 
             # Get the center of the current room
-            current_room_center = (start_x + room_width // 2, start_y + room_height // 2)
+            current_room_center = (
+                start_x + room_width // 2,
+                start_y + room_height // 2,
+            )
 
             # Connect this room to the last room with a hallway if it's not the first room
             if last_room_center:
-                self.carve_hallway(last_room_center[0], last_room_center[1], current_room_center[0], current_room_center[1])
+                self.carve_hallway(
+                    last_room_center[0],
+                    last_room_center[1],
+                    current_room_center[0],
+                    current_room_center[1],
+                )
 
             # Update last_room_center for the next iteration
             last_room_center = current_room_center
-
-
 
         # self.locations[0][0] = "X"
         # for i in range(3):
@@ -128,10 +140,10 @@ class Board:
             (0, 1),  # Right
             (-1, 0),  # Up
             (0, -1),  # Left
-            (-1, 1), # NE
-            (1, 1), # SE
-            (1, -1), # SW
-            (-1, -1), # NW
+            (-1, 1),  # NE
+            (1, 1),  # SE
+            (1, -1),  # SW
+            (-1, -1),  # NW
         ]
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
@@ -154,7 +166,7 @@ class Board:
                     and 0 <= new_col < max_col
                     and new_pos not in visited
                 ):
-                    if (self.is_legal_move(new_row, new_col) or new_pos == end):
+                    if self.is_legal_move(new_row, new_col) or new_pos == end:
                         queue.append(new_pos)
                         visited.add(new_pos)
                         previous_cell[new_pos] = current
@@ -167,7 +179,7 @@ class Board:
             path.append(current)
             current = previous_cell.get(current)
         path.reverse()
-        path = path[1:] # drop the starting position
+        path = path[1:]  # drop the starting position
         return path
 
     def pick_unoccupied_location(self, actor):
@@ -223,9 +235,9 @@ class Board:
     def is_attack_in_range(self, attack_distance, attacker, target):
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
-        dist_to_target = len(self.get_shortest_valid_path(
-            attacker_location, target_location
-        ))
+        dist_to_target = len(
+            self.get_shortest_valid_path(attacker_location, target_location)
+        )
         return attack_distance >= dist_to_target
 
     def find_location_of_target(self, target):
@@ -289,7 +301,9 @@ class Board:
                 character1_pos = self.find_location_of_target(self.characters[0])
                 character2_pos = self.find_location_of_target(self.characters[1])
                 print(f"{character1_pos=} - {character2_pos=}")
-                optimal_path = self.get_shortest_valid_path(character1_pos, character2_pos)
+                optimal_path = self.get_shortest_valid_path(
+                    character1_pos, character2_pos
+                )
                 print(f"{optimal_path=}")
                 # end pathfinding test
 
@@ -306,7 +320,7 @@ class Board:
 
     def run_turn(self, acting_character):
         self.draw()
-        
+
         # if you start in fire, take damage first
         row, col = self.find_location_of_target(acting_character)
         self.deal_terrain_damage(acting_character, row, col)
@@ -344,34 +358,39 @@ class Board:
                 opponents.remove(opponent)
         return opponents
 
-
-    def move_character_toward_location(self, acting_character, target_location, movement):
+    def move_character_toward_location(
+        self, acting_character, target_location, movement
+    ):
         if movement == 0:
             return
-        
+
         acting_character_loc = self.find_location_of_target(acting_character)
-        # get path 
-        path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
+        # get path
+        path_to_target = self.get_shortest_valid_path(
+            start=acting_character_loc, end=target_location
+        )
         path_traveled = []
         # if we can't go all the way, get the furthest position we can go
 
         if len(path_to_target) > movement:
-            path_traveled = path_to_target[:movement] 
-        # check if the end point is unoccupied 
+            path_traveled = path_to_target[:movement]
+        # check if the end point is unoccupied
         elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
-            path_traveled = path_to_target 
+            path_traveled = path_to_target
         # if it's occupied and one square away, you don't need to move
         elif len(path_to_target) == 1:
             return
         # if it's occupied and you need to move, move to one away
         else:
-            path_traveled = path_to_target[:-1] 
+            path_traveled = path_to_target[:-1]
         # go along the path and take any terrain damage!
         for loc in path_traveled:
-            self.deal_terrain_damage(acting_character, loc[0],loc[1])
+            self.deal_terrain_damage(acting_character, loc[0], loc[1])
 
         # put the character in the new location
-        self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
+        self.update_character_location(
+            acting_character, acting_character_loc, path_traveled[-1]
+        )
 
     def deal_terrain_damage(self, acting_character, row, col):
         damage = self.get_terrain_damage(row, col)
@@ -384,7 +403,9 @@ class Board:
         self.locations[new_location[0]][new_location[1]] = actor
 
     def is_legal_move(self, row, col):
-        is_position_within_board = row >= 0 and col >= 0 and row < self.size and col < self.size
+        is_position_within_board = (
+            row >= 0 and col >= 0 and row < self.size and col < self.size
+        )
         return is_position_within_board and self.locations[row][col] is None
 
     def get_terrain_damage(self, row, col):
@@ -442,7 +463,10 @@ def select_and_apply_attack_modifier(initial_attack_strength):
     def add(x, y):
         return x + y
 
-    attack_modifier_deck = [(partial(multiply, 2), "2x"), (partial(multiply, 0), "Null")]
+    attack_modifier_deck = [
+        (partial(multiply, 2), "2x"),
+        (partial(multiply, 0), "Null"),
+    ]
     for modifier in [-2, -1, 0, 1, 2]:
         attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
