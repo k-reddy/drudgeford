@@ -178,9 +178,9 @@ class Board:
     def check_attack_in_range(self, attack_distance, attacker, target):
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
-        dist_to_target = get_distance_between_locations(
+        dist_to_target = len(self.get_shortest_valid_path(
             attacker_location, target_location
-        )
+        ))
         return attack_distance >= dist_to_target
 
     def find_location_of_target(self, target):
@@ -409,9 +409,3 @@ def select_and_apply_attack_modifier(initial_attack_strength):
         attack_modifier_deck, attack_modifier_weights
     )[0]
     return attack_modifier_function(initial_attack_strength)
-
-
-def get_distance_between_locations(location1, location2):
-    print(location1)
-    print(location2)
-    return sum(abs(a - b) for a, b in zip(location1, location2))
