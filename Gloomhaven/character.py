@@ -110,7 +110,6 @@ class Player(Character):
         print("movement done!")
 
     def select_attack_target(self, in_range_opponents):
-        # ask the board who's in range
         if not in_range_opponents:
             print("No opponents in range")
             return None
