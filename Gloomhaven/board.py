@@ -175,7 +175,7 @@ class Board:
         print(to_draw)
 
     # is the attack in range?
-    def check_attack_in_range(self, attack_distance, attacker, target):
+    def is_attack_in_range(self, attack_distance, attacker, target):
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         dist_to_target = len(self.get_shortest_valid_path(
@@ -205,7 +205,7 @@ class Board:
         )
 
         if target is None or (
-            not self.check_attack_in_range(action_card["distance"], attacker, target)
+            not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
             print("Not close enough to attack")
             return
@@ -290,7 +290,7 @@ class Board:
     def find_in_range_opponents(self, actor, action_card):
         opponents = self.find_opponents(actor)
         for opponent in opponents:
-            if not self.check_attack_in_range(action_card["distance"], actor, opponent):
+            if not self.is_attack_in_range(action_card["distance"], actor, opponent):
                 opponents.remove(opponent)
         return opponents
 
