@@ -72,6 +72,7 @@ class Player(Character):
         if remaining_movement == 0:
             print("No movement!")
             return
+        
         print("\nNow it's time to move!")
         while remaining_movement > 0:
             self.print_action_card(action_card, is_performing=True)
@@ -96,7 +97,11 @@ class Player(Character):
                 print("Incorrect input. Try again!")
                 continue
 
-            if board.check_legality_and_move_character_in_direction(self, direction_map[direction]):
+            # get your currnet and new locations, then find out if the move is legal
+            current_loc = board.find_location_of_target(self)
+            new_row, new_col = [a+b for a, b in zip(current_loc, direction_map[direction])]
+            if board.is_legal_move(new_row, new_col):
+                board.update_character_location(self, current_loc, [new_row, new_col])
                 remaining_movement -= 1
                 continue
             else:
@@ -132,6 +137,8 @@ class Monster(Character):
         return True
 
     def perform_movement(self, action_card, board):
+        if action_card["distance"] == 0:
+            return
         targets = board.find_opponents(self)
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(self,target_loc, action_card["distance"])
