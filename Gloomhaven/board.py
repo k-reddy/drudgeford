@@ -27,7 +27,7 @@ class Board:
             self.characters.append(m)
         self.locations = initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
-        self.add_obstacles()
+        self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
         self.game_status = "running"
@@ -56,7 +56,7 @@ class Board:
                 self.terrain[row][col] = "FIRE"
         return
 
-    def add_obstacles(self):
+    def reshape_board(self):
         self.locations[0][0] = "X"
         for i in range(3):
             for j in range(3):
