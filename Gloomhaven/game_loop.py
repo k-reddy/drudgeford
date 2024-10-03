@@ -1,5 +1,5 @@
 import random
-import character
+from character import CharacterType, Monster, Player
 import helpers
 from enum import Enum, auto
 from config import DEBUG
@@ -35,7 +35,7 @@ class GameLoop:
             print(f"{self.game_state.name=}")
             self._end_game()
 
-    def run_round(self):
+    def run_round(self) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         print("Start of Round!\n")
@@ -67,7 +67,7 @@ class GameLoop:
         input("End of round. Hit Enter to continue")
         helpers.clear_terminal()
 
-    def run_turn(self, acting_character):
+    def run_turn(self, acting_character: CharacterType) -> None:
         self.board.draw()
         # if you start in fire, take damage first
         row, col = self.board.find_location_of_target(acting_character)
@@ -98,27 +98,27 @@ class GameLoop:
 
         self._end_turn()
 
-    def check_and_update_game_state(self):
+    def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins
-        if all(not isinstance(x, character.Monster) for x in self.board.characters):
+        if all(not isinstance(x, Monster) for x in self.board.characters):
             self.game_state = GameState.WIN
         # if all the players are dead, player loses
-        elif all(not isinstance(x, character.Player) for x in self.board.characters):
+        elif all(not isinstance(x, Player) for x in self.board.characters):
             self.game_state = GameState.GAME_OVER
-        return
 
-    def _end_game(self):
-        if self.game_status == GameState.GAME_OVER:
+    def _end_game(self) -> None:
+        if self.game_state == GameState.GAME_OVER:
             self._lose_game()
-        elif self.game_status == GameState.WIN:
+        elif self.game_state == GameState.WIN:
             self._win_game()
         else:
-            raise ValueError(f"trying to end game when status is {self.game_status}")
+            raise ValueError(
+                f"trying to end game when status is {self.game_state.name}"
+            )
 
-    def _end_turn(self):
+    def _end_turn(self) -> None:
         input("End of turn. Hit enter to continue")
         helpers.clear_terminal()
-        return
 
     def _lose_game(self):
         helpers.clear_terminal()
@@ -131,12 +131,10 @@ class GameLoop:
     |     |
     \\___/"""
         )
-        return None
 
-    def _win_game(self):
+    def _win_game(self) -> None:
         helpers.clear_terminal()
         print("You defeated the monster!!")
         print(
             "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
         )
-        return None
