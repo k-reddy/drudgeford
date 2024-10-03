@@ -4,12 +4,11 @@ import character
 import helpers
 import copy
 from collections import deque
+from typing import TypeVar
+
+Char = TypeVar("Char", bound=character.Character, covariant=False)
 
 EMPTY_CELL = "|      "
-
-
-def initialize_board(width=5, height=5):
-    return [["X" for _ in range(width)] for _ in range(height)]
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -22,29 +21,25 @@ class Board:
         self, size: int, monsters: list[character.Monster], player: character.Player
     ) -> None:
         self.size = size
-        self.characters = [player]
-        for m in monsters:
-            self.characters.append(m)
-        self.locations = initialize_board(self.size, self.size)
+        # TODO(john) - discuss with group whether to turn this into tuple
+        # Possibly do not remove characters from tuple, just update statuses
+        self.characters: list[character.Monster | character.Player] = [
+            player
+        ] + monsters
+        self.locations = self._initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
-        self.game_status = "running"
 
-        print(
-            "Welcome to your quest, " + player.name + ". \n",
-            "As you enter the dungeon, you see a terrifying monster ahead! \n",
-            "Kill it or be killed...\n",
-        )
-        input("Time to start the game! Hit enter to continue\n")
-        while self.game_status == "running":
-            self.run_round()
-            print(self.game_status)
-        # once we're no longer playing, end the game
-        if self.game_status != "running":
-            print(self.game_status)
-            self.end_game()
+    def get_player(self) -> character.Player:
+        for char in self.characters:
+            if isinstance(char, character.Player):
+                return char
+        raise ValueError("Player not found on the board")
+
+    def _initialize_board(self, width: int = 5, height=5):
+        return [["X" for _ in range(width)] for _ in range(height)]
 
     def add_fire_to_terrain(self):
         max_loc = self.size - 1
@@ -56,23 +51,29 @@ class Board:
                 self.terrain[row][col] = "FIRE"
         return
 
-    def carve_room(self, start_x, start_y, width, height):
+    def carve_room(self, start_x, start_y, width, height) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
-                self.locations[x][y] = None  # Carving walkable room (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable room (None represents open space)
 
-    def carve_hallway(self, start_x, start_y, end_x, end_y):
+    def carve_hallway(self, start_x, start_y, end_x, end_y) -> None:
         # Horizontal movement first, then vertical
         x, y = start_x, start_y
 
         while x != end_x:
             if 0 <= x < self.size:
-                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable hallway (None represents open space)
             x += 1 if end_x > x else -1
 
         while y != end_y:
             if 0 <= y < self.size:
-                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][
+                    y
+                ] = None  # Carving walkable hallway (None represents open space)
             y += 1 if end_y > y else -1
 
     def reshape_board(self, num_rooms=4):
@@ -88,16 +89,22 @@ class Board:
             self.carve_room(start_x, start_y, room_width, room_height)
 
             # Get the center of the current room
-            current_room_center = (start_x + room_width // 2, start_y + room_height // 2)
+            current_room_center = (
+                start_x + room_width // 2,
+                start_y + room_height // 2,
+            )
 
             # Connect this room to the last room with a hallway if it's not the first room
             if last_room_center:
-                self.carve_hallway(last_room_center[0], last_room_center[1], current_room_center[0], current_room_center[1])
+                self.carve_hallway(
+                    last_room_center[0],
+                    last_room_center[1],
+                    current_room_center[0],
+                    current_room_center[1],
+                )
 
             # Update last_room_center for the next iteration
             last_room_center = current_room_center
-
-
 
         # self.locations[0][0] = "X"
         # for i in range(3):
@@ -122,16 +129,15 @@ class Board:
 
         Returns path as list of coordinates.
         """
-        end = tuple(end)
         directions = [
             (1, 0),  # Down
             (0, 1),  # Right
             (-1, 0),  # Up
             (0, -1),  # Left
-            (-1, 1), # NE
-            (1, 1), # SE
-            (1, -1), # SW
-            (-1, -1), # NW
+            (-1, 1),  # NE
+            (1, 1),  # SE
+            (1, -1),  # SW
+            (-1, -1),  # NW
         ]
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
@@ -154,7 +160,7 @@ class Board:
                     and 0 <= new_col < max_col
                     and new_pos not in visited
                 ):
-                    if (self.is_legal_move(new_row, new_col) or new_pos == end):
+                    if self.is_legal_move(new_row, new_col) or new_pos == end:
                         queue.append(new_pos)
                         visited.add(new_pos)
                         previous_cell[new_pos] = current
@@ -167,7 +173,7 @@ class Board:
             path.append(current)
             current = previous_cell.get(current)
         path.reverse()
-        path = path[1:] # drop the starting position
+        path = path[1:]  # drop the starting position
         return path
 
     def pick_unoccupied_location(self, actor):
@@ -180,7 +186,7 @@ class Board:
                 self.locations[rand_location[0]][rand_location[1]] = actor
                 break
 
-    def print_healths(self):
+    def _print_healths(self):
         print_str = ""
         for x in self.characters:
             print_str += f"{x.name} Health: {x.health}\n"
@@ -188,7 +194,7 @@ class Board:
 
     # draw the game board and display stats
     def draw(self):
-        self.print_healths()
+        self._print_healths()
         to_draw = ""
         top = ""
         for i in range(self.size):
@@ -223,16 +229,17 @@ class Board:
     def is_attack_in_range(self, attack_distance, attacker, target):
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
-        dist_to_target = len(self.get_shortest_valid_path(
-            attacker_location, target_location
-        ))
+        dist_to_target = len(
+            self.get_shortest_valid_path(attacker_location, target_location)
+        )
         return attack_distance >= dist_to_target
 
-    def find_location_of_target(self, target):
+    def find_location_of_target(self, target) -> tuple[int, int] | None:
         for row_num, row in enumerate(self.locations):
             for column_num, item_in_locations in enumerate(row):
                 if target == item_in_locations:
-                    return row_num, column_num
+                    return (row_num, column_num)
+        return None
 
     def find_opponents(self, actor):
         return [
@@ -269,74 +276,6 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.locations[row][col] = None
 
-    def check_and_update_game_status(self):
-        # if all the monsters are dead, player wins
-        if all(not isinstance(x, character.Monster) for x in self.characters):
-            self.game_status = "player_win"
-        # if all the players are dead, player loses
-        elif all(not isinstance(x, character.Player) for x in self.characters):
-            self.game_status = "player_loss"
-        return
-
-    def run_round(self, is_debug=False):
-        # randomize who starts the turn
-        random.shuffle(self.characters)
-        print("Start of Round!\n")
-        for i, acting_character in enumerate(self.characters):
-            # randomly pick who starts the round
-            if is_debug:
-                # For testing pathfinding. should create debug mode
-                character1_pos = self.find_location_of_target(self.characters[0])
-                character2_pos = self.find_location_of_target(self.characters[1])
-                print(f"{character1_pos=} - {character2_pos=}")
-                optimal_path = self.get_shortest_valid_path(character1_pos, character2_pos)
-                print(f"{optimal_path=}")
-                # end pathfinding test
-
-            print(f"It's {acting_character.name}'s turn!")
-            self.run_turn(acting_character)
-            # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
-            # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
-            # move after acting, which is not ideal
-            self.check_and_update_game_status()
-            if self.game_status != "running":
-                return
-        input("End of round. Hit Enter to continue")
-        helpers.clear_terminal()
-
-    def run_turn(self, acting_character):
-        self.draw()
-        
-        # if you start in fire, take damage first
-        row, col = self.find_location_of_target(acting_character)
-        self.deal_terrain_damage(acting_character, row, col)
-
-        action_card = acting_character.select_action_card()
-        self.draw()
-        move_first = acting_character.decide_if_move_first(action_card, self)
-
-        # !!! check if there's a cleaner way to implement this
-        if move_first:
-            self.draw()
-            acting_character.perform_movement(action_card, self)
-            in_range_opponents = self.find_in_range_opponents(
-                acting_character, action_card
-            )
-            self.draw()
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.attack_target(action_card, acting_character, target)
-        else:
-            self.draw()
-            in_range_opponents = self.find_in_range_opponents(
-                acting_character, action_card
-            )
-            self.draw()
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.attack_target(action_card, acting_character, target)
-            acting_character.perform_movement(action_card, self)
-
-        end_turn()
-
     def find_in_range_opponents(self, actor, action_card):
         opponents = self.find_opponents(actor)
         for opponent in opponents:
@@ -344,36 +283,41 @@ class Board:
                 opponents.remove(opponent)
         return opponents
 
-
-    def move_character_toward_location(self, acting_character, target_location, movement):
+    def move_character_toward_location(
+        self, acting_character, target_location, movement
+    ):
         if movement == 0:
             return
-        
+
         acting_character_loc = self.find_location_of_target(acting_character)
-        # get path 
-        path_to_target = self.get_shortest_valid_path(start=acting_character_loc, end=target_location)
+        # get path
+        path_to_target = self.get_shortest_valid_path(
+            start=acting_character_loc, end=target_location
+        )
         path_traveled = []
         # if we can't go all the way, get the furthest position we can go
 
         if len(path_to_target) > movement:
-            path_traveled = path_to_target[:movement] 
-        # check if the end point is unoccupied 
+            path_traveled = path_to_target[:movement]
+        # check if the end point is unoccupied
         elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
-            path_traveled = path_to_target 
+            path_traveled = path_to_target
         # if it's occupied and one square away, you don't need to move
         elif len(path_to_target) == 1:
             return
         # if it's occupied and you need to move, move to one away
         else:
-            path_traveled = path_to_target[:-1] 
+            path_traveled = path_to_target[:-1]
         # go along the path and take any terrain damage!
         for loc in path_traveled:
-            self.deal_terrain_damage(acting_character, loc[0],loc[1])
+            self.deal_terrain_damage(acting_character, loc[0], loc[1])
 
         # put the character in the new location
-        self.update_character_location(acting_character, acting_character_loc, path_traveled[-1])
+        self.update_character_location(
+            acting_character, acting_character_loc, path_traveled[-1]
+        )
 
-    def deal_terrain_damage(self, acting_character, row, col):
+    def deal_terrain_damage(self, acting_character: Char, row, col):
         damage = self.get_terrain_damage(row, col)
         if damage:
             print(f"{acting_character.name} took {damage} damage from terrain")
@@ -384,7 +328,9 @@ class Board:
         self.locations[new_location[0]][new_location[1]] = actor
 
     def is_legal_move(self, row, col):
-        is_position_within_board = row >= 0 and col >= 0 and row < self.size and col < self.size
+        is_position_within_board = (
+            row >= 0 and col >= 0 and row < self.size and col < self.size
+        )
         return is_position_within_board and self.locations[row][col] is None
 
     def get_terrain_damage(self, row, col):
@@ -399,41 +345,6 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
 
-    def end_game(self):
-        if self.game_status == "player_loss":
-            lose_game()
-        elif self.game_status == "player_win":
-            win_game()
-        else:
-            raise ValueError(f"trying to end game when status is {self.game_status}")
-
-
-def lose_game():
-    helpers.clear_terminal()
-    print(
-        """You died...GAME OVER
-.-.
-(o o)  
-|-|  
-/   \\
-|     |
-\\___/"""
-    )
-    return None
-
-
-def win_game():
-    helpers.clear_terminal()
-    print("You defeated the monster!!")
-    print("\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        ")
-    return None
-
-
-def end_turn():
-    input("End of turn. Hit enter to continue")
-    helpers.clear_terminal()
-    return
-
 
 def select_and_apply_attack_modifier(initial_attack_strength):
     def multiply(x, y):
@@ -442,7 +353,10 @@ def select_and_apply_attack_modifier(initial_attack_strength):
     def add(x, y):
         return x + y
 
-    attack_modifier_deck = [(partial(multiply, 2), "2x"), (partial(multiply, 0), "Null")]
+    attack_modifier_deck = [
+        (partial(multiply, 2), "2x"),
+        (partial(multiply, 0), "Null"),
+    ]
     for modifier in [-2, -1, 0, 1, 2]:
         attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
