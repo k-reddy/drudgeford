@@ -281,10 +281,14 @@ class Board:
 
         self.modify_target_health(target, modified_attack_strength)
 
+    def update_locations(self, row, col, new_item):
+        self.locations[row][col] = new_item
+        self.disp.update_locations(self.locations)
+
     def kill_target(self, target: CharacterType) -> None:
         self.characters.remove(target)
         row, col = self.find_location_of_target(target)
-        self.locations[row][col] = None
+        self.update_locations(row, col, None)
 
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
@@ -346,8 +350,8 @@ class Board:
         old_location: tuple[int, int],
         new_location: tuple[int, int],
     ) -> None:
-        self.locations[old_location[0]][old_location[1]] = None
-        self.locations[new_location[0]][new_location[1]] = actor
+        self.update_locations(old_location[0], old_location[1], None)
+        self.update_locations(new_location[0], new_location[1], actor)
 
     def is_legal_move(self, row: int, col: int) -> bool:
         is_position_within_board = (
