@@ -30,6 +30,7 @@ class Board:
         self.disp = disp
         disp.locations = self.locations
         disp.terrain = self.terrain
+        disp.characters = self.characters 
 
     def get_player(self) -> Player:
         for char in self.characters:
