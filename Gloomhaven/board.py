@@ -193,12 +193,6 @@ class Board:
                 self.locations[rand_location[0]][rand_location[1]] = actor
                 break
 
-    def _print_healths(self) -> None:
-        print_str = ""
-        for x in self.characters:
-            print_str += f"{x.name} Health: {x.health}\n"
-        print(print_str)
-
     # is the attack in range?
     def is_attack_in_range(
         self, attack_distance: int, attacker: CharacterType, target: CharacterType
