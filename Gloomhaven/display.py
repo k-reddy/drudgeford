@@ -1,4 +1,5 @@
 import helpers 
+from gh_types import ActionCard
 
 class Display:
     def __init__(self) -> None:
