@@ -13,3 +13,6 @@ class ActionCard:
 
     def __setitem__(self, key, value):
         return setattr(self, key, value)
+    
+    def __str__(self):
+        return f"{self.attack_name}: Strength {self.strength}, Range {self.distance}, Movement {self.movement}"
