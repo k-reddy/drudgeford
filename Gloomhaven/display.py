@@ -1,3 +1,5 @@
+import helpers 
+
 class Display:
     def __init__(self) -> None:
         self.log = []
@@ -21,4 +23,18 @@ class Display:
         self.add_to_log("Your action cards are: ")
         for i, action_card in enumerate(action_cards):
             self.add_to_log(f"{i}: {action_card}")
+
+    def ask_user_to_select_action_cards(self, action_card) -> ActionCard:
+        while True:
+            user_input = input(
+                "\nWhich action card would you like to pick? Type the number exactly."
+            )
+            try:
+                action_card_num = int(user_input)
+                helpers.clear_terminal()
+                action_card_to_perform = self.action_cards.pop(action_card_num)
+                break
+            except (ValueError, IndexError):
+                print("Oops, typo! Try typing the number again.")
+
 
