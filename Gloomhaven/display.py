@@ -7,26 +7,33 @@ EMPTY_CELL = "|      "
 class Display:
     def __init__(self) -> None:
         self.log = []
-        pass
+        self.locations = [[]]
+        self.terrain = [[]]
 
     def reload_display(self) -> None:
         self._print_healths()
         self.draw_board()
         self.print_log()
 
+    def update_locations(self, locations):
+        self.locations = locations
+    
+    def update_terrain(self, terrain):
+        self.terrain = terrain
+
     # draw the game board and display stats
-    def draw_board(self, board) -> None:
+    def draw_board(self) -> None:
         to_draw = ""
         top = ""
-        for i in range(board.size):
-            top = " ------" * board.size + "\n"
+        for i, row in enumerate(self.locations):
+            top = " ------" * len(row) + "\n"
             sides = ""
-            for j in range(board.size):
-                if isinstance(board.locations[i][j], Player):
+            for el in row:
+                if isinstance(el, Player):
                     sides += "|  🧙  "
-                elif isinstance(board.locations[i][j], Monster):
+                elif isinstance(el, Monster):
                     sides += "|  🤖  "
-                elif board.locations[i][j] == "X":
+                elif el == "X":
                     sides += "|  🪨   "
                 else:
                     sides += EMPTY_CELL
@@ -35,8 +42,8 @@ class Display:
             to_draw += sides + "\n"
 
             fire_sides = ""
-            for j in range(board.size):
-                if self.terrain[i][j] == "FIRE":
+            for el in enumerate(self.terrain[i]):
+                if el == "FIRE":
                     fire_sides += "|  🔥  "
                 else:
                     fire_sides += EMPTY_CELL
