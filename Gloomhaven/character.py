@@ -10,10 +10,11 @@ from gh_types import ActionCard
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health):
+    def __init__(self, name, health, disp):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
+        self.disp = disp
 
     def select_action_card(self):
         pass
@@ -36,10 +37,9 @@ class Player(Character):
             print("Oh no! You have no more action cards left!")
             # !!! implement ending the game here more gracefully
             sys.exit()
-        # if they have action cards, show them what they have
-        print("Your action cards are: ")
-        for i, action_card in enumerate(self.action_cards):
-            print(f"{i}: {action_card}")
+        # if they have action cards, add those to the log and reload game display
+        self.disp.log_action_cards(self.action_cards)
+        self.disp.print_log()
         # let them pick a valid action_card
         while True:
             user_input = input(

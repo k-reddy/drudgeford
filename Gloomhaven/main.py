@@ -3,6 +3,7 @@ import character
 from board import Board
 import os
 from game_loop import GameLoop
+import display
 
 
 def main():
@@ -21,10 +22,12 @@ def main():
         helpers.give_help()
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton"]
+    disp = display.Display()
+
     for i in range(3):
-        monster = character.Monster(names[i], 10)
+        monster = character.Monster(names[i], 10, disp)
         monsters.append(monster)
-    player = character.Player(player_name, 10)
+    player = character.Player(player_name, 10, disp)
     board = Board(10, monsters, player)
     game = GameLoop(board)
     game.start()
