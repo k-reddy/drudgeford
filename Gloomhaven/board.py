@@ -4,6 +4,7 @@ from character import CharacterType, Monster, Player
 import copy
 from collections import deque
 from gh_types import ActionCard
+from display import Display
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -15,7 +16,7 @@ TERRAIN_DAMAGE = 1
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(self, size: int, monsters: list[Monster], player: Player) -> None:
+    def __init__(self, size: int, monsters: list[Monster], player: Player, disp: Display) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
@@ -25,6 +26,10 @@ class Board:
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
+        # keep track of the display, and update it with the newly created locations and terrain
+        self.disp = disp
+        disp.locations = self.locations
+        disp.terrain = self.terrain
 
     def get_player(self) -> Player:
         for char in self.characters:
@@ -134,6 +139,7 @@ class Board:
             (1, -1),  # SW
             (-1, -1),  # NW
         ]
+        end = tuple(end)
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
 
