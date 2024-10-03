@@ -37,15 +37,13 @@ class Player(Character):
             print("Oh no! You have no more action cards left!")
             # !!! implement ending the game here more gracefully
             sys.exit()
-        # if they have action cards, add those to the log and reload game display
-        self.disp.log_action_cards(self.action_cards)
-        self.disp.print_log()
         # let them pick a valid action_card
-        return self.disp.ask_user_to_select_action_cards(self.action_cards)
+        action_card_to_perform = self.disp.ask_user_to_select_action_cards(self.action_cards)
+        self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
+        self.disp.print_log()
+        return 
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        print(action_card)
-        print(f"{self.name} is performing {action_card.attack_name}")
         print(action_card)
         action_num = input("Type 1 to move first or 2 to attack first. ")
         while action_num not in ["1", "2"]:
