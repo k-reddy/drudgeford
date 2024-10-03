@@ -249,6 +249,7 @@ class Board:
 
     def kill_target(self, target: CharacterType) -> None:
         self.characters.remove(target)
+        self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
 
