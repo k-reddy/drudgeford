@@ -10,27 +10,14 @@ from gh_types import ActionCard
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health):
+    def __init__(self, name, health, disp):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
+        self.disp = disp
 
     def select_action_card(self):
         pass
-
-    def print_action_card(self, action_card, is_performing):
-        print_str = (
-            action_card["attack_name"]
-            + ": Attack "
-            + str(action_card["strength"])
-            + ", Range "
-            + str(action_card["distance"])
-            + ", Movement "
-            + str(action_card["movement"])
-        )
-        if is_performing:
-            print_str = f"{self.name} is performing " + print_str
-        print(print_str)
 
     def decide_if_move_first(self, action_card, board):
         pass
@@ -50,27 +37,16 @@ class Player(Character):
             print("Oh no! You have no more action cards left!")
             # !!! implement ending the game here more gracefully
             sys.exit()
-        # if they have action cards, show them what they have
-        print("Your action cards are: ")
-        for i, action_card in enumerate(self.action_cards):
-            print(i)
-            self.print_action_card(action_card, is_performing=False)
+        # if they have action cards, add those to the log and reload game display
+        self.disp.log_action_cards(self.action_cards)
+        self.disp.print_log()
         # let them pick a valid action_card
-        while True:
-            user_input = input(
-                "\nWhich action card would you like to pick? Type the number exactly."
-            )
-            try:
-                action_card_num = int(user_input)
-                helpers.clear_terminal()
-                action_card_to_perform = self.action_cards.pop(action_card_num)
-                break
-            except (ValueError, IndexError):
-                print("Oops, typo! Try typing the number again.")
-        return action_card_to_perform
+        return self.disp.ask_user_to_select_action_cards(self.action_cards)
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        self.print_action_card(action_card, is_performing=True)
+        print(action_card)
+        print(f"{self.name} is performing {action_card.attack_name}")
+        print(action_card)
         action_num = input("Type 1 to move first or 2 to attack first. ")
         while action_num not in ["1", "2"]:
             action_num = input("Invalid input. Please type 1 or 2. ")
@@ -84,7 +60,8 @@ class Player(Character):
 
         print("\nNow it's time to move!")
         while remaining_movement > 0:
-            self.print_action_card(action_card, is_performing=True)
+            print(f"{self.name} is performing {action_card.attack_name}")
+            print(action_card)
             print(f"\nMovement remaining: {remaining_movement}")
             direction = input(
                 "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
@@ -150,7 +127,8 @@ class Monster(Character):
         return random.choice(self.action_cards)
 
     def decide_if_move_first(self, action_card: ActionCard, board):
-        self.print_action_card(action_card, is_performing=True)
+        print(f"{self.name} is performing {action_card.attack_name}")
+        print(action_card)
         # monster always moves first - won't move if they're within range
         return True
 
