@@ -28,7 +28,7 @@ def main():
         monsters.append(monster)
     player = character.Player(player_name, 10, disp)
     board = Board(10, monsters, player, disp)
-    game = GameLoop(board)
+    game = GameLoop(board, disp)
     game.start()
 
 
