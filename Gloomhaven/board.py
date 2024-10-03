@@ -9,7 +9,7 @@ EMPTY_CELL = "|      "
 
 
 def initialize_board(width=5, height=5):
-    return [[None for _ in range(width)] for _ in range(height)]
+    return [["X" for _ in range(width)] for _ in range(height)]
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -27,7 +27,7 @@ class Board:
             self.characters.append(m)
         self.locations = initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
-        self.add_obstacles()
+        self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
         self.game_status = "running"
@@ -56,15 +56,57 @@ class Board:
                 self.terrain[row][col] = "FIRE"
         return
 
-    def add_obstacles(self):
-        self.locations[0][0] = "X"
-        for i in range(3):
-            for j in range(3):
-                if i + j < 3:
-                    self.locations[i][j] = "X"
-                    self.locations[-i - 1][-j - 1] = "X"
-                    self.locations[i][-j - 1] = "X"
-                    self.locations[-i - 1][j] = "X"
+    def carve_room(self, start_x, start_y, width, height):
+        for x in range(start_x, min(start_x + width, self.size)):
+            for y in range(start_y, min(start_y + height, self.size)):
+                self.locations[x][y] = None  # Carving walkable room (None represents open space)
+
+    def carve_hallway(self, start_x, start_y, end_x, end_y):
+        # Horizontal movement first, then vertical
+        x, y = start_x, start_y
+
+        while x != end_x:
+            if 0 <= x < self.size:
+                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+            x += 1 if end_x > x else -1
+
+        while y != end_y:
+            if 0 <= y < self.size:
+                self.locations[x][y] = None  # Carving walkable hallway (None represents open space)
+            y += 1 if end_y > y else -1
+
+    def reshape_board(self, num_rooms=4):
+        last_room_center = None
+
+        for _ in range(num_rooms):
+            # Random room size and position, ensuring it doesn't exceed map bounds
+            room_width = random.randint(3, min(6, self.size))
+            room_height = random.randint(3, min(6, self.size))
+            start_x = random.randint(0, self.size - room_width)
+            start_y = random.randint(0, self.size - room_height)
+
+            self.carve_room(start_x, start_y, room_width, room_height)
+
+            # Get the center of the current room
+            current_room_center = (start_x + room_width // 2, start_y + room_height // 2)
+
+            # Connect this room to the last room with a hallway if it's not the first room
+            if last_room_center:
+                self.carve_hallway(last_room_center[0], last_room_center[1], current_room_center[0], current_room_center[1])
+
+            # Update last_room_center for the next iteration
+            last_room_center = current_room_center
+
+
+
+        # self.locations[0][0] = "X"
+        # for i in range(3):
+        #     for j in range(3):
+        #         if i + j < 3:
+        #             self.locations[i][j] = "X"
+        #             self.locations[-i - 1][-j - 1] = "X"
+        #             self.locations[i][-j - 1] = "X"
+        #             self.locations[-i - 1][j] = "X"
 
     def set_character_starting_locations(self):
         for x in self.characters:
