@@ -25,7 +25,12 @@ class Display:
         for i, action_card in enumerate(action_cards):
             self.add_to_log(f"{i}: {action_card}")
 
-    def ask_user_to_select_action_cards(self, action_cards) -> ActionCard:
+    def clear_log(self) -> None:
+        self.log = []
+
+    def ask_user_to_select_action_cards(self, action_cards, actor_name) -> ActionCard:
+        self.log_action_cards(action_cards)
+        self.print_log()
         while True:
             user_input = input(
                 "\nWhich action card would you like to pick? Type the number exactly."
@@ -38,6 +43,10 @@ class Display:
             except (ValueError, IndexError):
                 print("Oops, typo! Try typing the number again.")
         
+        # once action card is chosen, you want to clear the log, then print the card selected
+        self.clear_log()
+        self.add_to_log(f"{actor_name} is performing {action_card_to_perform.attack_name}")
+        self.print_log()
         return action_card_to_perform
 
 
