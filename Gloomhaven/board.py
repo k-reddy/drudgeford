@@ -199,39 +199,6 @@ class Board:
             print_str += f"{x.name} Health: {x.health}\n"
         print(print_str)
 
-    # draw the game board and display stats
-    def draw(self) -> None:
-        self._print_healths()
-        to_draw = ""
-        top = ""
-        for i in range(self.size):
-            top = " ------" * self.size + "\n"
-            sides = ""
-            for j in range(self.size):
-                if isinstance(self.locations[i][j], Player):
-                    sides += "|  🧙  "
-                elif isinstance(self.locations[i][j], Monster):
-                    sides += "|  🤖  "
-                elif self.locations[i][j] == "X":
-                    sides += "|  🪨   "
-                else:
-                    sides += EMPTY_CELL
-            sides += EMPTY_CELL
-            to_draw += top
-            to_draw += sides + "\n"
-
-            fire_sides = ""
-            for j in range(self.size):
-                if self.terrain[i][j] == "FIRE":
-                    fire_sides += "|  🔥  "
-                else:
-                    fire_sides += EMPTY_CELL
-            fire_sides += EMPTY_CELL
-            to_draw += fire_sides + "\n"
-        # add the bottom
-        to_draw += top
-        print(to_draw)
-
     # is the attack in range?
     def is_attack_in_range(
         self, attack_distance: int, attacker: CharacterType, target: CharacterType
