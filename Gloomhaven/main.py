@@ -22,13 +22,12 @@ def main():
         helpers.give_help()
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton"]
-    disp = display.Display()
-
     for i in range(3):
         monster = character.Monster(names[i], 10, disp)
         monsters.append(monster)
     player = character.Player(player_name, 10, disp)
     board = Board(10, monsters, player)
+    disp = display.Display(board.locations, board.terrain)
     game = GameLoop(board)
     game.start()
 
