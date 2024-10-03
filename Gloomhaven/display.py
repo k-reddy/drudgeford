@@ -12,8 +12,10 @@ class Display:
         self.characters = []
 
     def reload_display(self) -> None:
-        self._print_healths()
+        helpers.clear_terminal()
         self.draw_board()
+        self._print_healths()
+        print("\n")
         self.print_log()
 
     def update_locations(self, locations):
@@ -55,9 +57,10 @@ class Display:
         print(to_draw)
     
     def _print_healths(self) -> None:
+        print_str = "Healths: "
         for x in self.characters:
-            self.add_to_log(f"{x.name} Health: {x.health}\n")
-        self.print_log()
+            print_str += f"{x.name}: {x.health}, "
+        print(print_str[:-2])
 
     def add_to_log(self, log_str: str) -> None:
         self.log.append(log_str)
