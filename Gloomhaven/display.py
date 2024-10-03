@@ -37,5 +37,7 @@ class Display:
                 break
             except (ValueError, IndexError):
                 print("Oops, typo! Try typing the number again.")
+        
+        return action_card_to_perform
 
 
