@@ -24,7 +24,7 @@ def main():
     names = ["Tree Man", "Evil Blob", "Living Skeleton"]
     disp = display.Display()
     for i in range(3):
-        monster = character.Monster(names[i], 10, disp)
+        monster = character.Monster(names[i], 3, disp)
         monsters.append(monster)
     player = character.Player(player_name, 10, disp)
     board = Board(10, monsters, player, disp)
