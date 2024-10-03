@@ -9,6 +9,7 @@ class Display:
         self.log = []
         self.locations = [[]]
         self.terrain = [[]]
+        self.characters = []
 
     def reload_display(self) -> None:
         self._print_healths()
@@ -53,8 +54,8 @@ class Display:
         to_draw += top
         print(to_draw)
     
-    def _print_healths(self, characters) -> None:
-        for x in characters:
+    def _print_healths(self) -> None:
+        for x in self.characters:
             self.add_to_log(f"{x.name} Health: {x.health}\n")
         self.print_log()
 
