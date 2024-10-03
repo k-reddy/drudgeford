@@ -3,6 +3,7 @@ from character import CharacterType, Monster, Player
 import helpers
 from enum import Enum, auto
 from config import DEBUG
+from display import Display
 
 
 class GameState(Enum):
@@ -13,9 +14,10 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, board):
+    def __init__(self, board, disp: Display):
         self.board = board
         self.game_state = GameState.START
+        self.disp = disp
 
     def start(self):
         self.game_state = GameState.RUNNING
