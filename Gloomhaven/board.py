@@ -1,14 +1,12 @@
 import random
 from functools import partial
-import character
-import helpers
+from character import CharacterType, Monster, Player
 import copy
 from collections import deque
-from typing import TypeVar
-
-Char = TypeVar("Char", bound=character.Character, covariant=False)
+from gh_types import ActionCard
 
 EMPTY_CELL = "|      "
+TERRAIN_DAMAGE = 1
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -17,31 +15,27 @@ EMPTY_CELL = "|      "
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(
-        self, size: int, monsters: list[character.Monster], player: character.Player
-    ) -> None:
+    def __init__(self, size: int, monsters: list[Monster], player: Player) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[character.Monster | character.Player] = [
-            player
-        ] + monsters
+        self.characters: list[CharacterType] = [player] + monsters
         self.locations = self._initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
 
-    def get_player(self) -> character.Player:
+    def get_player(self) -> Player:
         for char in self.characters:
-            if isinstance(char, character.Player):
+            if isinstance(char, Player):
                 return char
         raise ValueError("Player not found on the board")
 
     def _initialize_board(self, width: int = 5, height=5):
         return [["X" for _ in range(width)] for _ in range(height)]
 
-    def add_fire_to_terrain(self):
+    def add_fire_to_terrain(self) -> None:
         max_loc = self.size - 1
         for i in range(10):
             row = random.randint(0, max_loc)
@@ -49,16 +43,15 @@ class Board:
             # don't put fire on characters or map edge
             if self.locations[row][col] == None:
                 self.terrain[row][col] = "FIRE"
-        return
 
-    def carve_room(self, start_x, start_y, width, height) -> None:
+    def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
                 self.locations[x][
                     y
                 ] = None  # Carving walkable room (None represents open space)
 
-    def carve_hallway(self, start_x, start_y, end_x, end_y) -> None:
+    def carve_hallway(self, start_x: int, start_y: int, end_x: int, end_y: int) -> None:
         # Horizontal movement first, then vertical
         x, y = start_x, start_y
 
@@ -76,7 +69,7 @@ class Board:
                 ] = None  # Carving walkable hallway (None represents open space)
             y += 1 if end_y > y else -1
 
-    def reshape_board(self, num_rooms=4):
+    def reshape_board(self, num_rooms: int = 4) -> None:
         last_room_center = None
 
         for _ in range(num_rooms):
@@ -115,7 +108,7 @@ class Board:
         #             self.locations[i][-j - 1] = "X"
         #             self.locations[-i - 1][j] = "X"
 
-    def set_character_starting_locations(self):
+    def set_character_starting_locations(self) -> None:
         for x in self.characters:
             self.pick_unoccupied_location(x)
 
@@ -127,7 +120,9 @@ class Board:
         Valid movements are up, down, left, right.
         Will avoid non-empty cells except for end cell.
 
-        Returns path as list of coordinates.
+        Returns path as list of coordinates which includes the end cell, but not the
+        starting cell.
+        Returns empty list if it is impossible to reach the end.
         """
         directions = [
             (1, 0),  # Down
@@ -164,11 +159,16 @@ class Board:
                         queue.append(new_pos)
                         visited.add(new_pos)
                         previous_cell[new_pos] = current
+
         return []
 
-    def generate_path(self, previous_cell, end):
+    def generate_path(
+        self,
+        previous_cell: dict[tuple[int, int], tuple[int, int]],
+        end: tuple[int, int],
+    ) -> list[tuple[int, int]]:
         path = []
-        current = end
+        current: tuple[int, int] | None = end
         while current:
             path.append(current)
             current = previous_cell.get(current)
@@ -176,7 +176,7 @@ class Board:
         path = path[1:]  # drop the starting position
         return path
 
-    def pick_unoccupied_location(self, actor):
+    def pick_unoccupied_location(self, actor: CharacterType) -> None:
         while True:
             rand_location = [
                 random.randint(0, self.size - 1),
@@ -186,14 +186,14 @@ class Board:
                 self.locations[rand_location[0]][rand_location[1]] = actor
                 break
 
-    def _print_healths(self):
+    def _print_healths(self) -> None:
         print_str = ""
         for x in self.characters:
             print_str += f"{x.name} Health: {x.health}\n"
         print(print_str)
 
     # draw the game board and display stats
-    def draw(self):
+    def draw(self) -> None:
         self._print_healths()
         to_draw = ""
         top = ""
@@ -201,9 +201,9 @@ class Board:
             top = " ------" * self.size + "\n"
             sides = ""
             for j in range(self.size):
-                if isinstance(self.locations[i][j], character.Player):
+                if isinstance(self.locations[i][j], Player):
                     sides += "|  🧙  "
-                elif isinstance(self.locations[i][j], character.Monster):
+                elif isinstance(self.locations[i][j], Monster):
                     sides += "|  🤖  "
                 elif self.locations[i][j] == "X":
                     sides += "|  🪨   "
@@ -226,7 +226,9 @@ class Board:
         print(to_draw)
 
     # is the attack in range?
-    def is_attack_in_range(self, attack_distance, attacker, target):
+    def is_attack_in_range(
+        self, attack_distance: int, attacker: CharacterType, target: CharacterType
+    ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         dist_to_target = len(
@@ -234,21 +236,23 @@ class Board:
         )
         return attack_distance >= dist_to_target
 
-    def find_location_of_target(self, target) -> tuple[int, int] | None:
+    def find_location_of_target(self, target) -> tuple[int, int]:
         for row_num, row in enumerate(self.locations):
             for column_num, item_in_locations in enumerate(row):
                 if target == item_in_locations:
                     return (row_num, column_num)
-        return None
+        raise ValueError(f"Target {target} not found in locations")
 
-    def find_opponents(self, actor):
+    def find_opponents(self, actor: CharacterType) -> list[CharacterType]:
         return [
             pot_opponent
             for pot_opponent in self.characters
             if not isinstance(pot_opponent, type(actor))
         ]
 
-    def attack_target(self, action_card, attacker, target):
+    def attack_target(
+        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
+    ) -> None:
         print(
             f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
         )
@@ -271,12 +275,14 @@ class Board:
 
         self.modify_target_health(target, modified_attack_strength)
 
-    def kill_target(self, target):
+    def kill_target(self, target: CharacterType) -> None:
         self.characters.remove(target)
         row, col = self.find_location_of_target(target)
         self.locations[row][col] = None
 
-    def find_in_range_opponents(self, actor, action_card):
+    def find_in_range_opponents(
+        self, actor: CharacterType, action_card: ActionCard
+    ) -> list[CharacterType]:
         opponents = self.find_opponents(actor)
         for opponent in opponents:
             if not self.is_attack_in_range(action_card["distance"], actor, opponent):
@@ -284,8 +290,11 @@ class Board:
         return opponents
 
     def move_character_toward_location(
-        self, acting_character, target_location, movement
-    ):
+        self,
+        acting_character: CharacterType,
+        target_location: tuple[int, int],
+        movement: int,
+    ) -> None:
         if movement == 0:
             return
 
@@ -317,36 +326,43 @@ class Board:
             acting_character, acting_character_loc, path_traveled[-1]
         )
 
-    def deal_terrain_damage(self, acting_character: Char, row, col):
+    def deal_terrain_damage(
+        self, acting_character: CharacterType, row: int, col: int
+    ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
             print(f"{acting_character.name} took {damage} damage from terrain")
             self.modify_target_health(acting_character, damage)
 
-    def update_character_location(self, actor, old_location, new_location):
+    def update_character_location(
+        self,
+        actor: CharacterType,
+        old_location: tuple[int, int],
+        new_location: tuple[int, int],
+    ) -> None:
         self.locations[old_location[0]][old_location[1]] = None
         self.locations[new_location[0]][new_location[1]] = actor
 
-    def is_legal_move(self, row, col):
+    def is_legal_move(self, row: int, col: int) -> bool:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row, col):
+    def get_terrain_damage(self, row: int, col: int) -> int:
         if self.terrain[row][col] == "FIRE":
-            return 1
+            return TERRAIN_DAMAGE
         else:
-            return None
+            return 0
 
-    def modify_target_health(self, target, damage):
+    def modify_target_health(self, target: CharacterType, damage: int) -> None:
         target.health -= damage
         print(f"New health: {target.health}")
         if target.health <= 0:
             self.kill_target(target)
 
 
-def select_and_apply_attack_modifier(initial_attack_strength):
+def select_and_apply_attack_modifier(initial_attack_strength: int) -> int:
     def multiply(x, y):
         return x * y
 
