@@ -41,7 +41,7 @@ class Player(Character):
         action_card_to_perform = self.disp.ask_user_to_select_action_cards(self.action_cards)
         self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
         self.disp.print_log()
-        return 
+        return action_card_to_perform
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
         print(action_card)
