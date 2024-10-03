@@ -4,6 +4,7 @@ from character import CharacterType, Monster, Player
 import copy
 from collections import deque
 from gh_types import ActionCard
+from display import Display
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -15,7 +16,7 @@ TERRAIN_DAMAGE = 1
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(self, size: int, monsters: list[Monster], player: Player) -> None:
+    def __init__(self, size: int, monsters: list[Monster], player: Player, disp: Display) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
@@ -25,6 +26,11 @@ class Board:
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
+        # keep track of the display, and update it with the newly created locations and terrain
+        self.disp = disp
+        disp.locations = self.locations
+        disp.terrain = self.terrain
+        disp.characters = self.characters 
 
     def get_player(self) -> Player:
         for char in self.characters:
@@ -134,6 +140,7 @@ class Board:
             (1, -1),  # SW
             (-1, -1),  # NW
         ]
+        end = tuple(end)
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
 
@@ -186,45 +193,6 @@ class Board:
                 self.locations[rand_location[0]][rand_location[1]] = actor
                 break
 
-    def _print_healths(self) -> None:
-        print_str = ""
-        for x in self.characters:
-            print_str += f"{x.name} Health: {x.health}\n"
-        print(print_str)
-
-    # draw the game board and display stats
-    def draw(self) -> None:
-        self._print_healths()
-        to_draw = ""
-        top = ""
-        for i in range(self.size):
-            top = " ------" * self.size + "\n"
-            sides = ""
-            for j in range(self.size):
-                if isinstance(self.locations[i][j], Player):
-                    sides += "|  🧙  "
-                elif isinstance(self.locations[i][j], Monster):
-                    sides += "|  🤖  "
-                elif self.locations[i][j] == "X":
-                    sides += "|  🪨   "
-                else:
-                    sides += EMPTY_CELL
-            sides += EMPTY_CELL
-            to_draw += top
-            to_draw += sides + "\n"
-
-            fire_sides = ""
-            for j in range(self.size):
-                if self.terrain[i][j] == "FIRE":
-                    fire_sides += "|  🔥  "
-                else:
-                    fire_sides += EMPTY_CELL
-            fire_sides += EMPTY_CELL
-            to_draw += fire_sides + "\n"
-        # add the bottom
-        to_draw += top
-        print(to_draw)
-
     # is the attack in range?
     def is_attack_in_range(
         self, attack_distance: int, attacker: CharacterType, target: CharacterType
@@ -275,10 +243,15 @@ class Board:
 
         self.modify_target_health(target, modified_attack_strength)
 
+    def update_locations(self, row, col, new_item):
+        self.locations[row][col] = new_item
+        self.disp.update_locations(self.locations)
+
     def kill_target(self, target: CharacterType) -> None:
         self.characters.remove(target)
+        self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
-        self.locations[row][col] = None
+        self.update_locations(row, col, None)
 
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
@@ -340,8 +313,8 @@ class Board:
         old_location: tuple[int, int],
         new_location: tuple[int, int],
     ) -> None:
-        self.locations[old_location[0]][old_location[1]] = None
-        self.locations[new_location[0]][new_location[1]] = actor
+        self.update_locations(old_location[0], old_location[1], None)
+        self.update_locations(new_location[0], new_location[1], actor)
 
     def is_legal_move(self, row: int, col: int) -> bool:
         is_position_within_board = (
