@@ -16,7 +16,9 @@ TERRAIN_DAMAGE = 1
 class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
-    def __init__(self, size: int, monsters: list[Monster], player: Player, disp: Display) -> None:
+    def __init__(
+        self, size: int, monsters: list[Monster], player: Player, disp: Display
+    ) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
@@ -30,7 +32,8 @@ class Board:
         self.disp = disp
         disp.locations = self.locations
         disp.terrain = self.terrain
-        disp.characters = self.characters 
+        disp.characters = self.characters
+
 
     def get_player(self) -> Player:
         for char in self.characters:
@@ -140,7 +143,6 @@ class Board:
             (1, -1),  # SW
             (-1, -1),  # NW
         ]
-        end = tuple(end)
         max_row = max_col = self.size
         visited: set[tuple[int, int]] = set()
 
