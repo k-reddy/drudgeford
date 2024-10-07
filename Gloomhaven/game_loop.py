@@ -69,7 +69,6 @@ class GameLoop:
             if self.game_state != GameState.RUNNING:
                 return
         self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
-        helpers.clear_terminal()
 
     def run_turn(self, acting_character: CharacterType) -> None:
         # if you start in fire, take damage first
