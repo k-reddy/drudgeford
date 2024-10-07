@@ -72,7 +72,7 @@ class Display:
         print(print_str[:-2])
     
     def _print_round_and_turn_info(self) -> None:
-        print(f"Round {self.round_number}, {self.acting_character_name}'s turn.")
+        print(f"Round {self.round_number}, {self.acting_character_name}'s turn")
 
 
     def add_to_log(self, log_str: str) -> None:
