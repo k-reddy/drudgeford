@@ -11,18 +11,32 @@ def main():
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
 
+    help_message = '''Welcome to the game! Here's how it works:
+- You and the monster will attack each other once per turn in a random order
+- You can only attack if you are within range of your enemy
+- You pick your attacks, and the monster's are randomly generated
+- Each attack has a movement associated with it. If you're not in range, you'll move that amount toward your enemy
+- If you end in range, you will attack. If not, you won't attack this turn.
+- Whoever runs out of health first loses
+
+Good luck!'''
+
+    
+    disp = display.Display()
+
     # get some user input before starting the game
-    player_name = input("What's your character's name? ")
+    player_name = disp.get_user_input(prompt="What's your character's name? ")
     # default to happy :D
     player_name = "Happy" if player_name == "" else player_name
-    helpers.clear_terminal()
-    want_help = input("Hit enter to start or type help for instructions ")
-    helpers.clear_terminal()
+    disp.clear_display()
+    want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
     if want_help == "help":
-        helpers.give_help()
+        disp.clear_display_and_print_message(help_message)
+        disp.get_user_input(prompt="Hit enter to continue")
+        disp.clear_display()
+
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton"]
-    disp = display.Display()
     for i in range(3):
         monster = character.Monster(names[i], 3, disp)
         monsters.append(monster)
