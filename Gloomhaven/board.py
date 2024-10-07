@@ -223,9 +223,8 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        print(
-            f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
-        )
+        self.disp.add_to_log(f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n")
+        self.disp.reload_display()
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
