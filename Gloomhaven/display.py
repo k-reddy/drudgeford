@@ -10,10 +10,13 @@ class Display:
         self.locations = [[]]
         self.terrain = [[]]
         self.characters = []
+        self.acting_character_name = ""
+        self.round_number = None
 
     def reload_display(self) -> None:
         helpers.clear_terminal()
         self.draw_board()
+        self._print_round_and_turn_info()
         self._print_healths()
         print("\n")
         self.print_log()
@@ -23,6 +26,12 @@ class Display:
     
     def update_terrain(self, terrain):
         self.terrain = terrain
+
+    def update_acting_character_name(self, new_acting_character_name: str) -> None:
+        self.acting_character_name = new_acting_character_name
+
+    def update_round_number(self, new_round_number: int) -> None:
+        self.round_number = new_round_number
 
     # draw the game board and display stats
     def draw_board(self) -> None:
@@ -61,6 +70,10 @@ class Display:
         for x in self.characters:
             print_str += f"{x.name}: {x.health}, "
         print(print_str[:-2])
+    
+    def _print_round_and_turn_info(self) -> None:
+        print(f"Round {self.round_number}, {self.acting_character_name}'s turn.")
+
 
     def add_to_log(self, log_str: str) -> None:
         self.log.append(log_str)
