@@ -102,6 +102,9 @@ class Display:
             user_input = input("Invalid key pressed. Try again.")
         
         return user_input
-
+    
+    def clear_display_and_print_message(self, message):
+        helpers.clear_terminal()
+        print(message)
 
 
