@@ -308,7 +308,8 @@ class Board:
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
-            print(f"{acting_character.name} took {damage} damage from terrain")
+            self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
+            self.disp.reload_display()
             self.modify_target_health(acting_character, damage)
 
     def update_character_location(
