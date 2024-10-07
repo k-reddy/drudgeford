@@ -120,7 +120,7 @@ class Monster(Character):
 
     def decide_if_move_first(self, action_card: ActionCard, board):
         self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
-        print(action_card)
+        self.disp.add_to_log(action_card)
         # monster always moves first - won't move if they're within range
         return True
 
