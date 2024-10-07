@@ -1,6 +1,6 @@
-import helpers 
 from gh_types import ActionCard
 from character import Player, Monster
+import os
 
 EMPTY_CELL = "|      "
 
@@ -14,7 +14,7 @@ class Display:
         self.round_number = None
 
     def reload_display(self) -> None:
-        helpers.clear_terminal()
+        self.clear_display()
         self.draw_board()
         self._print_round_and_turn_info()
         self._print_healths()
@@ -103,8 +103,16 @@ class Display:
         
         return user_input
     
-    def clear_display_and_print_message(self, message):
-        helpers.clear_terminal()
+    def clear_display_and_print_message(self, message) -> None:
+        self.clear_display()
         print(message)
+
+    def clear_display(self) -> None:
+        # Check if the system is Windows
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
+        return
 
 
