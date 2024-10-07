@@ -77,24 +77,6 @@ class Display:
 
     def clear_log(self) -> None:
         self.log = []
-
-    def ask_user_to_select_action_cards(self, action_cards) -> ActionCard:
-        self.log_action_cards(action_cards)
-        while True:
-            user_input = input(
-                "\nWhich action card would you like to pick? Type the number exactly."
-            )
-            try:
-                action_card_num = int(user_input)
-                helpers.clear_terminal()
-                action_card_to_perform = action_cards.pop(action_card_num)
-                break
-            except (ValueError, IndexError):
-                print("Oops, typo! Try typing the number again.")
-        
-        # once action card is chosen, you want to clear the log
-        self.clear_log()
-        return action_card_to_perform
     
     def get_user_input(self, prompt: str, valid_inputs=None):
         user_input = input(prompt)
