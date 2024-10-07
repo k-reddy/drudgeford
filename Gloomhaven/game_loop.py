@@ -68,7 +68,7 @@ class GameLoop:
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
-        self.get_user_input(prompt="End of round. Hit Enter to continue")
+        self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
         helpers.clear_terminal()
 
     def run_turn(self, acting_character: CharacterType) -> None:
