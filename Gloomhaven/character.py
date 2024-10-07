@@ -34,7 +34,7 @@ class Player(Character):
     def select_action_card(self) -> ActionCard:
         # if you run out of actions without killing the monster, you get exhausted
         if len(self.action_cards) == 0:
-            print("Oh no! You have no more action cards left!")
+            self.disp.add_to_log("Oh no! You have no more action cards left!")
             # !!! implement ending the game here more gracefully
             sys.exit()
         # let them pick a valid action_card
@@ -53,14 +53,14 @@ class Player(Character):
     def perform_movement(self, action_card, board):
         remaining_movement = action_card["movement"]
         if remaining_movement == 0:
-            print("No movement!")
+            self.disp.add_to_log("No movement!")
             return
 
-        print("\nNow it's time to move!")
+        self.disp.add_to_log("\nNow it's time to move!")
         while remaining_movement > 0:
-            print(f"{self.name} is performing {action_card.attack_name}")
+            self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
             print(action_card)
-            print(f"\nMovement remaining: {remaining_movement}")
+            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")
             direction = input(
                 "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
             )
@@ -78,7 +78,7 @@ class Player(Character):
                 break
 
             if direction not in direction_map:
-                print("Incorrect input. Try again!")
+                self.disp.add_to_log("Incorrect input. Try again!")
                 continue
 
             # get your currnet and new locations, then find out if the move is legal
@@ -92,20 +92,20 @@ class Player(Character):
                 remaining_movement -= 1
                 continue
             else:
-                print(
+                self.disp.add_to_log(
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
 
-        print("movement done!")
+        self.disp.add_to_log("movement done!")
 
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
-            print("No opponents in range")
+            self.disp.add_to_log("No opponents in range")
             return None
 
-        print("Opponents in range: ")
+        self.disp.add_to_log("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            print(f"{i}: {opponent.name}")
+            self.disp.add_to_log(f"{i}: {opponent.name}")
 
         target_num = input("Please type the number of the opponent you want to attack")
         while True:
@@ -125,7 +125,7 @@ class Monster(Character):
         return random.choice(self.action_cards)
 
     def decide_if_move_first(self, action_card: ActionCard, board):
-        print(f"{self.name} is performing {action_card.attack_name}")
+        self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
         print(action_card)
         # monster always moves first - won't move if they're within range
         return True

@@ -80,7 +80,6 @@ class Display:
 
     def ask_user_to_select_action_cards(self, action_cards) -> ActionCard:
         self.log_action_cards(action_cards)
-        self.print_log()
         while True:
             user_input = input(
                 "\nWhich action card would you like to pick? Type the number exactly."
