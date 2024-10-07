@@ -15,16 +15,16 @@ class Display:
 
     def reload_display(self) -> None:
         self.clear_display()
-        self.draw_board()
+        self._draw_board()
         self._print_round_and_turn_info()
         self._print_healths()
         print("\n")
-        self.print_log()
+        self._print_log()
 
-    def update_locations(self, locations):
+    def update_locations(self, locations) -> None:
         self.locations = locations
     
-    def update_terrain(self, terrain):
+    def update_terrain(self, terrain) -> None:
         self.terrain = terrain
 
     def update_acting_character_name(self, new_acting_character_name: str) -> None:
@@ -34,7 +34,7 @@ class Display:
         self.round_number = new_round_number
 
     # draw the game board and display stats
-    def draw_board(self) -> None:
+    def _draw_board(self) -> None:
         to_draw = ""
         top = ""
         for i, row in enumerate(self.locations):
@@ -79,7 +79,7 @@ class Display:
         self.log.append(log_str)
         self.reload_display()
 
-    def print_log(self, num_lines = 10) -> None:
+    def _print_log(self, num_lines = 10) -> None:
         for line in self.log[-num_lines:]:
             print(line)
 
