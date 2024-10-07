@@ -22,12 +22,11 @@ class GameLoop:
     def start(self):
         self.game_state = GameState.RUNNING
 
-        print(
-            "Welcome to your quest, " + self.board.get_player().name + ". \n",
-            "As you enter the dungeon, you see a terrifying monster ahead! \n",
-            "Kill it or be killed...\n",
-        )
-        input("Time to start the game! Hit enter to continue\n")
+        message = f'''Welcome to your quest, {self.board.get_player().name}
+As you enter the dungeon, you see a terrifying monster ahead! 
+Kill it or be killed...'''
+        self.disp.clear_display_and_print_message(message=message)
+        self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
         
         round_number = 1
         while self.game_state == GameState.RUNNING:
@@ -119,20 +118,24 @@ class GameLoop:
         self.disp.clear_log()
 
     def _lose_game(self):
-        helpers.clear_terminal()
-        print(
-            """You died...GAME OVER
-    .-.
+        message='''You died...GAME OVER
+     .-.
     (o o)  
-    |-|  
+     |-|  
     /   \\
-    |     |
-    \\___/"""
-        )
+   |     |
+    \\___/'''
+        self.disp.clear_display_and_print_message(message)
+
+        
 
     def _win_game(self) -> None:
-        helpers.clear_terminal()
-        print("You defeated the monster!!")
-        print(
-            "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
-        )
+        message = '''You defeated the monster!! Victory!
+    \o/   Victory!
+     |
+    / \\
+   /   \\
+        '''
+        # couldn't get this to work with the new print method
+        #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
+        self.disp.clear_display_and_print_message(message=message)
