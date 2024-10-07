@@ -64,6 +64,7 @@ class Display:
 
     def add_to_log(self, log_str: str) -> None:
         self.log.append(log_str)
+        self.reload_display()
 
     def print_log(self, num_lines = 10) -> None:
         for line in self.log[-num_lines:]:

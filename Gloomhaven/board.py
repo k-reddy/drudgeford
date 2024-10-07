@@ -224,13 +224,11 @@ class Board:
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
         self.disp.add_to_log(f"{attacker.name} attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n")
-        self.disp.reload_display()
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
             self.disp.add_to_log("Not close enough to attack")
-            self.disp.reload_display()
             return
 
         modified_attack_strength = select_and_apply_attack_modifier(
@@ -238,12 +236,10 @@ class Board:
         )
         if modified_attack_strength <= 0:
             self.disp.add_to_log("Darn, attack missed!")
-            self.disp.reload_display()
             return
 
         self.disp.add_to_log("Attack hits!\n")
         self.disp.add_to_log(f"After the modifier, attack strength is: {modified_attack_strength}")
-        self.disp.reload_display()
 
         self.modify_target_health(target, modified_attack_strength)
 
