@@ -3,7 +3,17 @@ import sys
 
 import helpers
 from gh_types import ActionCard
-
+DIRECTION_MAP = {
+    "w": [-1, 0],
+    "s": [1, 0],
+    "a": [0, -1],
+    "d": [0, 1],
+    "q": [-1, -1],
+    "e": [-1, 1],
+    "z": [1, -1],
+    "c": [1, 1],
+    "f": None
+}
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
@@ -55,32 +65,15 @@ class Player(Character):
         self.disp.add_to_log("\nNow it's time to move!")
         while remaining_movement > 0:
             self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
-            print(action_card)
-            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")
-            direction = input(
-                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            )
-            direction_map = {
-                "w": [-1, 0],
-                "s": [1, 0],
-                "a": [0, -1],
-                "d": [0, 1],
-                "q": [-1, -1],
-                "e": [-1, 1],
-                "z": [1, -1],
-                "c": [1, 1],
-            }
+            direction = self.disp.ask_user_for_movement_direction(action_card, remaining_movement, acceptable_inputs=DIRECTION_MAP.keys())
+            
             if direction == "f":
                 break
-
-            if direction not in direction_map:
-                self.disp.add_to_log("Incorrect input. Try again!")
-                continue
 
             # get your currnet and new locations, then find out if the move is legal
             current_loc = board.find_location_of_target(self)
             new_row, new_col = [
-                a + b for a, b in zip(current_loc, direction_map[direction])
+                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
             ]
             if board.is_legal_move(new_row, new_col):
                 # do this instead of update location because it deals with terrain
