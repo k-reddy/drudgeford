@@ -252,6 +252,7 @@ class Board:
         self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
+        self.disp.add_to_log(f"{target.name} has been killed.")
 
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
