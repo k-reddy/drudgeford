@@ -88,7 +88,7 @@ class Player(Character):
             ]
             if board.is_legal_move(new_row, new_col):
                 # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(self, [new_row, new_col], 1)
+                board.move_character_toward_location(self, (new_row, new_col), 1)
                 remaining_movement -= 1
                 continue
             else:
