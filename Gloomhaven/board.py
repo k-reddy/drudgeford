@@ -223,7 +223,7 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        self.disp.add_to_log(f"{attacker.name} attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n")
+        self.disp.add_to_log(f"{attacker.name} is attempting to attack")
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
@@ -334,7 +334,7 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
         else:
-            self.disp.add_to_log(f"New health: {target.health}")
+            self.disp.add_to_log(f"{target.name}'s new health: {target.health}")
 
 
 
