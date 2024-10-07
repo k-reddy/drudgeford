@@ -70,31 +70,25 @@ class GameLoop:
         helpers.clear_terminal()
 
     def run_turn(self, acting_character: CharacterType) -> None:
-        self.disp.reload_display()
         # if you start in fire, take damage first
         row, col = self.board.find_location_of_target(acting_character)
         self.board.deal_terrain_damage(acting_character, row, col)
 
         action_card = acting_character.select_action_card()
-        self.disp.reload_display()
 
         move_first = acting_character.decide_if_move_first(action_card, self.board)
 
         if move_first:
-            self.disp.reload_display()
             acting_character.perform_movement(action_card, self.board)
             in_range_opponents = self.board.find_in_range_opponents(
                 acting_character, action_card
             )
-            self.disp.reload_display()
             target = acting_character.select_attack_target(in_range_opponents)
             self.board.attack_target(action_card, acting_character, target)
         else:
-            self.disp.reload_display()
             in_range_opponents = self.board.find_in_range_opponents(
                 acting_character, action_card
             )
-            self.disp.reload_display()
             target = acting_character.select_attack_target(in_range_opponents)
             self.board.attack_target(action_card, acting_character, target)
             acting_character.perform_movement(action_card, self.board)
