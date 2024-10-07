@@ -114,8 +114,8 @@ class GameLoop:
             )
 
     def _end_turn(self) -> None:
-        input("End of turn. Hit enter to continue")
-        helpers.clear_terminal()
+        self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
+        self.disp.clear_log()
 
     def _lose_game(self):
         helpers.clear_terminal()
