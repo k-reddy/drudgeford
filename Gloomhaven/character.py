@@ -19,11 +19,12 @@ DIRECTION_MAP = {
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, disp):
+    def __init__(self, name, health, disp, emoji):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
         self.disp = disp
+        self.emoji = emoji
 
     def select_action_card(self):
         pass
@@ -104,7 +105,7 @@ class Player(Character):
 
         self.disp.add_to_log("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            self.disp.add_to_log(f"{i}: {opponent.name}")
+            self.disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
 
         prompt = "Please type the number of the opponent you want to attack"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
