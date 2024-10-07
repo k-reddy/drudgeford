@@ -1,4 +1,3 @@
-import helpers
 import character
 from board import Board
 import os

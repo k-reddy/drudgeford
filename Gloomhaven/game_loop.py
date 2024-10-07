@@ -1,6 +1,5 @@
 import random
 from character import CharacterType, Monster, Player
-import helpers
 from enum import Enum, auto
 from config import DEBUG
 from display import Display
