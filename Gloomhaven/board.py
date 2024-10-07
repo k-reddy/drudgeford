@@ -331,9 +331,11 @@ class Board:
 
     def modify_target_health(self, target: CharacterType, damage: int) -> None:
         target.health -= damage
-        self.disp.add_to_log(f"New health: {target.health}")
         if target.health <= 0:
             self.kill_target(target)
+        else:
+            self.disp.add_to_log(f"New health: {target.health}")
+
 
 
     def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
