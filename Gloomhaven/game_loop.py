@@ -28,10 +28,13 @@ class GameLoop:
             "Kill it or be killed...\n",
         )
         input("Time to start the game! Hit enter to continue\n")
-
+        
+        round_number = 1
         while self.game_state == GameState.RUNNING:
+            self.disp.update_round_number(round_number)
             self.run_round()
             print(self.game_state)
+            round_number += 1
         # once we're no longer playing, end the game
         if self.game_state != GameState.RUNNING:
             print(f"{self.game_state.name=}")
@@ -40,7 +43,6 @@ class GameLoop:
     def run_round(self) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
-        print("Start of Round!\n")
         for i, acting_character in enumerate(self.board.characters):
             # randomly pick who starts the round
             if DEBUG:
@@ -58,7 +60,7 @@ class GameLoop:
                 print(f"{optimal_path=}")
                 # end pathfinding test
 
-            print(f"It's {acting_character.name}'s turn!")
+            self.disp.update_acting_character_name(acting_character.name)
             self.run_turn(acting_character)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
@@ -66,7 +68,7 @@ class GameLoop:
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
-        input("End of round. Hit Enter to continue")
+        self.get_user_input(prompt="End of round. Hit Enter to continue")
         helpers.clear_terminal()
 
     def run_turn(self, acting_character: CharacterType) -> None:
