@@ -103,6 +103,16 @@ class Display:
             action_num = input("Invalid input. Please type 1 or 2. ")
         return action_num == "1"
 
+    def ask_user_for_movement_direction(self, action_card, remaining_movement, acceptable_inputs):
+        print(action_card)
+        self.add_to_log(f"\nMovement remaining: {remaining_movement}")         
+        direction = input(
+            "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+        )
+        while direction not in acceptable_inputs:
+            direction = input("Invalid key pressed. Try again.")
+        
+        return direction
 
 
 
