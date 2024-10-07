@@ -96,7 +96,7 @@ class Display:
         self.clear_log()
         return action_card_to_perform
 
-    def ask_user_if_move_first(self, action_card):
+    def ask_user_if_move_first(self, action_card: ActionCard) -> None:
         print(action_card)
         action_num = input("Type 1 to move first or 2 to attack first. ")
         while action_num not in ["1", "2"]:
