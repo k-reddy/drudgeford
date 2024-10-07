@@ -72,6 +72,7 @@ class Player(Character):
             self.disp.add_to_log("No movement!")
             return
 
+        self.disp.add_to_log(f"\n{self.name} is moving")
         while remaining_movement > 0:
             self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
             prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
@@ -95,7 +96,7 @@ class Player(Character):
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
 
-        self.disp.add_to_log("movement done!")
+        self.disp.add_to_log("Movement done! \n")
 
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
@@ -109,6 +110,7 @@ class Player(Character):
         prompt = "Please type the number of the opponent you want to attack"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         target_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        self.disp.add_to_log("")
         # ask the player who they want to attack
         # ask the board to attack that person
         return in_range_opponents[int(target_num)]
@@ -119,17 +121,19 @@ class Monster(Character):
         return random.choice(self.action_cards)
 
     def decide_if_move_first(self, action_card: ActionCard, board):
-        self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
-        self.disp.add_to_log(action_card)
+        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
         # monster always moves first - won't move if they're within range
         return True
 
     def perform_movement(self, action_card: ActionCard, board):
         if action_card["distance"] == 0:
             return
+        self.disp.add_to_log(f"{self.name} is moving")
         targets = board.find_opponents(self)
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(self, target_loc, action_card["distance"])
+        # add some space between the movement and attack
+        self.disp.add_to_log("")
 
     def select_attack_target(self, in_range_opponents: list["Character"]):
         # monster picks a random opponent
