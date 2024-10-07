@@ -54,7 +54,9 @@ class Player(Character):
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        return self.disp.ask_user_if_move_first(action_card)
+        self.disp.add_to_log(action_card)
+        key_press = self.disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
+        return key_press == "1"
 
     def perform_movement(self, action_card, board):
         remaining_movement = action_card["movement"]
@@ -62,10 +64,10 @@ class Player(Character):
             self.disp.add_to_log("No movement!")
             return
 
-        self.disp.add_to_log("\nNow it's time to move!")
         while remaining_movement > 0:
-            self.disp.add_to_log(f"{self.name} is performing {action_card.attack_name}")
-            direction = self.disp.ask_user_for_movement_direction(action_card, remaining_movement, acceptable_inputs=DIRECTION_MAP.keys())
+            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
+            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+            direction = self.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
             
             if direction == "f":
                 break

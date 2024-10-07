@@ -95,24 +95,18 @@ class Display:
         # once action card is chosen, you want to clear the log
         self.clear_log()
         return action_card_to_perform
+    
+    def get_user_input(self, prompt: str, valid_inputs=None):
+        user_input = input(prompt)
 
-    def ask_user_if_move_first(self, action_card: ActionCard) -> None:
-        print(action_card)
-        action_num = input("Type 1 to move first or 2 to attack first. ")
-        while action_num not in ["1", "2"]:
-            action_num = input("Invalid input. Please type 1 or 2. ")
-        return action_num == "1"
-
-    def ask_user_for_movement_direction(self, action_card, remaining_movement, acceptable_inputs):
-        print(action_card)
-        self.add_to_log(f"\nMovement remaining: {remaining_movement}")         
-        direction = input(
-            "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-        )
-        while direction not in acceptable_inputs:
-            direction = input("Invalid key pressed. Try again.")
+        # if there's no validation, return any input given
+        if valid_inputs is None:
+            return user_input
         
-        return direction
+        while user_input not in valid_inputs:
+            user_input = input("Invalid key pressed. Try again.")
+        
+        return user_input
 
 
 
