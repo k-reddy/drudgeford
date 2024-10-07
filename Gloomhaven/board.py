@@ -231,7 +231,7 @@ class Board:
             self.disp.add_to_log("Not close enough to attack")
             return
 
-        modified_attack_strength = select_and_apply_attack_modifier(
+        modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
         if modified_attack_strength <= 0:
@@ -305,7 +305,6 @@ class Board:
         damage = self.get_terrain_damage(row, col)
         if damage:
             self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
-            self.disp.reload_display()
             self.modify_target_health(acting_character, damage)
 
     def update_character_location(
@@ -331,29 +330,29 @@ class Board:
 
     def modify_target_health(self, target: CharacterType, damage: int) -> None:
         target.health -= damage
-        print(f"New health: {target.health}")
+        self.disp.add_to_log(f"New health: {target.health}")
         if target.health <= 0:
             self.kill_target(target)
 
 
-def select_and_apply_attack_modifier(initial_attack_strength: int) -> int:
-    def multiply(x, y):
-        return x * y
+    def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
+        def multiply(x, y):
+            return x * y
 
-    def add(x, y):
-        return x + y
+        def add(x, y):
+            return x + y
 
-    attack_modifier_deck = [
-        (partial(multiply, 2), "2x"),
-        (partial(multiply, 0), "Null"),
-    ]
-    for modifier in [-2, -1, 0, 1, 2]:
-        attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
+        attack_modifier_deck = [
+            (partial(multiply, 2), "2x"),
+            (partial(multiply, 0), "Null"),
+        ]
+        for modifier in [-2, -1, 0, 1, 2]:
+            attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
-    attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
+        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
 
-    attack_modifier_function, modifier_string = random.choices(
-        attack_modifier_deck, attack_modifier_weights
-    )[0]
-    print(f"Attack modifier: {modifier_string}")
-    return attack_modifier_function(initial_attack_strength)
+        attack_modifier_function, modifier_string = random.choices(
+            attack_modifier_deck, attack_modifier_weights
+        )[0]
+        self.disp.add_to_log(f"Attack modifier: {modifier_string}")
+        return attack_modifier_function(initial_attack_strength)
