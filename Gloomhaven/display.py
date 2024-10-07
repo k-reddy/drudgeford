@@ -42,9 +42,9 @@ class Display:
             sides = ""
             for el in row:
                 if isinstance(el, Player):
-                    sides += "|  🧙  "
+                    sides += f"|  {el.emoji}  "
                 elif isinstance(el, Monster):
-                    sides += "|  🤖  "
+                    sides += f"|  {el.emoji}  "
                 elif el == "X":
                     sides += "|  🪨   "
                 else:

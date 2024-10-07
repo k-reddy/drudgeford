@@ -36,10 +36,11 @@ Good luck!'''
 
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton"]
+    emoji = ["🌵", "🪼 ", "💀"]
     for i in range(3):
-        monster = character.Monster(names[i], 3, disp)
+        monster = character.Monster(names[i], 3, disp, emoji[i])
         monsters.append(monster)
-    player = character.Player(player_name, 10, disp)
+    player = character.Player(player_name, 10, disp, "🧙")
     board = Board(10, monsters, player, disp)
     game = GameLoop(board, disp)
     game.start()
