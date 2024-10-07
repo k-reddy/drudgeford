@@ -83,7 +83,7 @@ class Display:
         for line in self.log[-num_lines:]:
             print(line)
 
-    def log_action_cards(self, action_cards) -> None:
+    def log_action_cards(self, action_cards: list[ActionCard]) -> None:
         self.add_to_log("Your action cards are: ")
         for i, action_card in enumerate(action_cards):
             self.add_to_log(f"{i}: {action_card}")
