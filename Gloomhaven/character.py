@@ -48,10 +48,15 @@ class Player(Character):
             # !!! implement ending the game here more gracefully
             sys.exit()
         # let them pick a valid action_card
-        action_card_to_perform = self.disp.ask_user_to_select_action_cards(self.action_cards)
+        self.disp.log_action_cards(self.action_cards)
+        prompt = "Which action card would you like to pick? Type the number exactly."
+        valid_inputs = [str(i) for i, _ in enumerate(self.action_cards)]
+        action_card_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        action_card_to_perform = self.action_cards.pop(int(action_card_num))
+        self.disp.clear_log()
         self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
-        self.disp.print_log()
         return action_card_to_perform
+    
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
         self.disp.add_to_log(action_card)
