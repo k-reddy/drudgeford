@@ -67,7 +67,7 @@ Kill it or be killed...'''
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
-        self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
+        self._end_round()
 
     def run_turn(self, acting_character: CharacterType) -> None:
         # if you start in fire, take damage first
@@ -115,6 +115,10 @@ Kill it or be killed...'''
 
     def _end_turn(self) -> None:
         self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
+        self.disp.clear_log()
+
+    def _end_round(self) -> None:
+        self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
         self.disp.clear_log()
 
     def _lose_game(self):
