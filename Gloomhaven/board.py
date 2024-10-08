@@ -50,7 +50,7 @@ class Board:
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.locations[row][col] == None:
+            if self.locations[row][col] is None:
                 self.terrain[row][col] = "FIRE"
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:

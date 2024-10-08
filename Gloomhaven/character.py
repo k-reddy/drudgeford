@@ -1,5 +1,4 @@
 import random
-import sys
 
 from gh_types import ActionCard
 DIRECTION_MAP = {
