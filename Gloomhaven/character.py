@@ -173,7 +173,7 @@ def create_action_cards() -> list[ActionCard]:
         movement = random.choices(movements, movement_weights)[0]
         distance = random.randint(1, max_distance)
         action_card = ActionCard(
-            attack_name=f"{adjectives.pop()} {elements.pop()} {actions.pop()}",
+            attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
             strength=strength,
             distance=distance,
             movement=movement,
