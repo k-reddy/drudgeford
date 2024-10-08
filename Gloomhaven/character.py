@@ -100,7 +100,7 @@ class Player(Character):
 
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
-            self.disp.add_to_log("No opponents in range")
+            self.disp.add_to_log("No opponents in range\n")
             return None
 
         self.disp.add_to_log("Opponents in range: ")

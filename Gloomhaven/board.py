@@ -258,10 +258,11 @@ class Board:
         self, actor: CharacterType, action_card: ActionCard
     ) -> list[CharacterType]:
         opponents = self.find_opponents(actor)
+        in_range_opponents = []
         for opponent in opponents:
-            if not self.is_attack_in_range(action_card["distance"], actor, opponent):
-                opponents.remove(opponent)
-        return opponents
+            if self.is_attack_in_range(action_card["distance"], actor, opponent):
+                in_range_opponents.append(opponent)
+        return in_range_opponents
 
     def move_character_toward_location(
         self,
