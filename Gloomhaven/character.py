@@ -168,8 +168,7 @@ def create_action_cards() -> list[ActionCard]:
         random.shuffle(item)
 
     # generate each attack card
-    # for i in range(num_action_cards):
-    for i in range(2):
+    for i in range(num_action_cards):
         strength = random.choices(strengths, strength_weights)[0]
         movement = random.choices(movements, movement_weights)[0]
         distance = random.randint(1, max_distance)
