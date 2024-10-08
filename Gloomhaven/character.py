@@ -23,6 +23,8 @@ class Character:
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
+        self.killed_action_cards = []
+        self.available_action_cards = self.action_cards.copy()
         self.disp = disp
         self.emoji = emoji
 
@@ -42,23 +44,27 @@ class Character:
 class Player(Character):
     # asks player what card they want to play
     def select_action_card(self) -> ActionCard:
-        # if you run out of actions without killing the monster, you get exhausted
-        if len(self.action_cards) == 0:
-            self.disp.add_to_log("Oh no! You have no more action cards left!")
-            # !!! implement ending the game here more gracefully
-            sys.exit()
         # let them pick a valid action_card
-        self.disp.log_action_cards(self.action_cards)
+        self.disp.log_action_cards(self.available_action_cards)
         prompt = "Which action card would you like to pick? Type the number exactly."
-        valid_inputs = [str(i) for i, _ in enumerate(self.action_cards)]
+        valid_inputs = [str(i) for i, _ in enumerate(self.available_action_cards)]
 
         action_card_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        action_card_to_perform = self.action_cards.pop(int(action_card_num))
+        action_card_to_perform = self.available_action_cards.pop(int(action_card_num))
 
         self.disp.clear_log()
         self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
 
         return action_card_to_perform
+    
+    def short_rest(self) -> None:
+        # reset our available cards
+        self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
+        # kill a random card, update the user, remove it from play, and keep track for next round
+        killed_card = random.choice(self.available_action_cards)
+        self.disp.add_to_log(f"You lost {killed_card}")
+        self.available_action_cards.remove(killed_card)
+        self.killed_action_cards.append(killed_card)
     
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
@@ -162,7 +168,8 @@ def create_action_cards() -> list[ActionCard]:
         random.shuffle(item)
 
     # generate each attack card
-    for i in range(num_action_cards):
+    # for i in range(num_action_cards):
+    for i in range(2):
         strength = random.choices(strengths, strength_weights)[0]
         movement = random.choices(movements, movement_weights)[0]
         distance = random.randint(1, max_distance)

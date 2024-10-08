@@ -1,5 +1,5 @@
 import random
-from character import CharacterType, Monster, Player
+from character import CharacterType, Monster, Player, Character
 from enum import Enum, auto
 from config import DEBUG
 from display import Display
@@ -10,6 +10,7 @@ class GameState(Enum):
     RUNNING = auto()
     WIN = auto()
     GAME_OVER = auto()
+    EXHAUSTED = auto()
 
 
 class GameLoop:
@@ -104,9 +105,11 @@ Kill it or be killed...'''
 
     def _end_game(self) -> None:
         if self.game_state == GameState.GAME_OVER:
-            self._lose_game()
+            self._lose_game_dead()
         elif self.game_state == GameState.WIN:
             self._win_game()
+        elif self.game_state == GameState.EXHAUSTED:
+            self._lose_game_exhausted()
         else:
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
@@ -117,10 +120,27 @@ Kill it or be killed...'''
         self.disp.clear_log()
 
     def _end_round(self) -> None:
+        for char in self.board.characters:
+            self.refresh_character_cards(char)
+
         self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
         self.disp.clear_log()
 
-    def _lose_game(self):
+    def refresh_character_cards(self, char: Character) -> None:
+        # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
+        if len(char.available_action_cards) == 0:
+            self.disp.add_to_log("No more action cards left, time to short rest!")
+            char.short_rest()
+        
+        # if player has no cards after short resting, they're done!
+        if len(char.available_action_cards) == 0:
+            if isinstance(char, Player):
+                self.disp.add_to_log("Drat, you ran out of cards and got exhausted")
+                self.game_state = GameState.EXHAUSTED
+            else:
+                raise ValueError("Monsters getting exhausted...")
+
+    def _lose_game_dead(self):
         message='''You died...GAME OVER
      .-.
     (o o)  
@@ -130,11 +150,20 @@ Kill it or be killed...'''
     \\___/'''
         self.disp.clear_display_and_print_message(message)
 
+    def _lose_game_exhausted(self):
+        message='''You got exhausted...GAME OVER
+     .-.
+    (o o)  
+     |-|  
+    /   \\
+   |     |
+    \\___/'''
+        self.disp.clear_display_and_print_message(message)
         
 
     def _win_game(self) -> None:
         message = '''You defeated the monster!! Victory!
-    \o/   Victory!
+    \\o/   Victory!
      |
     / \\
    /   \\
