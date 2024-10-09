@@ -1,20 +1,31 @@
 import random
-import sys
 
-import helpers
 from gh_types import ActionCard
-
+DIRECTION_MAP = {
+    "w": [-1, 0],
+    "s": [1, 0],
+    "a": [0, -1],
+    "d": [0, 1],
+    "q": [-1, -1],
+    "e": [-1, 1],
+    "z": [1, -1],
+    "c": [1, 1],
+    "f": None
+}
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, disp):
+    def __init__(self, name, health, disp, emoji):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
+        self.killed_action_cards = []
+        self.available_action_cards = self.action_cards.copy()
         self.disp = disp
+        self.emoji = emoji
 
     def select_action_card(self):
         pass
@@ -32,59 +43,53 @@ class Character:
 class Player(Character):
     # asks player what card they want to play
     def select_action_card(self) -> ActionCard:
-        # if you run out of actions without killing the monster, you get exhausted
-        if len(self.action_cards) == 0:
-            print("Oh no! You have no more action cards left!")
-            # !!! implement ending the game here more gracefully
-            sys.exit()
         # let them pick a valid action_card
-        action_card_to_perform = self.disp.ask_user_to_select_action_cards(self.action_cards)
+        self.disp.log_action_cards(self.available_action_cards)
+        prompt = "Which action card would you like to pick? Type the number exactly."
+        valid_inputs = [str(i) for i, _ in enumerate(self.available_action_cards)]
+
+        action_card_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        action_card_to_perform = self.available_action_cards.pop(int(action_card_num))
+
+        self.disp.clear_log()
         self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
-        self.disp.print_log()
+
         return action_card_to_perform
+    
+    def short_rest(self) -> None:
+        # reset our available cards
+        self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
+        # kill a random card, update the user, remove it from play, and keep track for next round
+        killed_card = random.choice(self.available_action_cards)
+        self.disp.add_to_log(f"You lost {killed_card}")
+        self.available_action_cards.remove(killed_card)
+        self.killed_action_cards.append(killed_card)
+    
 
     def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        print(action_card)
-        action_num = input("Type 1 to move first or 2 to attack first. ")
-        while action_num not in ["1", "2"]:
-            action_num = input("Invalid input. Please type 1 or 2. ")
-        return action_num == "1"
+        self.disp.add_to_log(action_card)
+        key_press = self.disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
+        return key_press == "1"
 
     def perform_movement(self, action_card, board):
         remaining_movement = action_card["movement"]
         if remaining_movement == 0:
-            print("No movement!")
+            self.disp.add_to_log("No movement!")
             return
 
-        print("\nNow it's time to move!")
+        self.disp.add_to_log(f"\n{self.name} is moving")
         while remaining_movement > 0:
-            print(f"{self.name} is performing {action_card.attack_name}")
-            print(action_card)
-            print(f"\nMovement remaining: {remaining_movement}")
-            direction = input(
-                "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            )
-            direction_map = {
-                "w": [-1, 0],
-                "s": [1, 0],
-                "a": [0, -1],
-                "d": [0, 1],
-                "q": [-1, -1],
-                "e": [-1, 1],
-                "z": [1, -1],
-                "c": [1, 1],
-            }
+            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
+            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+            direction = self.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
+            
             if direction == "f":
                 break
-
-            if direction not in direction_map:
-                print("Incorrect input. Try again!")
-                continue
 
             # get your currnet and new locations, then find out if the move is legal
             current_loc = board.find_location_of_target(self)
             new_row, new_col = [
-                a + b for a, b in zip(current_loc, direction_map[direction])
+                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
             ]
             if board.is_legal_move(new_row, new_col):
                 # do this instead of update location because it deals with terrain
@@ -92,29 +97,25 @@ class Player(Character):
                 remaining_movement -= 1
                 continue
             else:
-                print(
+                self.disp.add_to_log(
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
 
-        print("movement done!")
+        self.disp.add_to_log("Movement done! \n")
 
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
-            print("No opponents in range")
+            self.disp.add_to_log("No opponents in range\n")
             return None
 
-        print("Opponents in range: ")
+        self.disp.add_to_log("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            print(f"{i}: {opponent.name}")
+            self.disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
 
-        target_num = input("Please type the number of the opponent you want to attack")
-        while True:
-            try:
-                if int(target_num) in range(len(in_range_opponents)):
-                    break
-            except ValueError:
-                pass
-            target_num = input("invalid number, try again")
+        prompt = "Please type the number of the opponent you want to attack"
+        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
+        target_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        self.disp.add_to_log("")
         # ask the player who they want to attack
         # ask the board to attack that person
         return in_range_opponents[int(target_num)]
@@ -125,17 +126,19 @@ class Monster(Character):
         return random.choice(self.action_cards)
 
     def decide_if_move_first(self, action_card: ActionCard, board):
-        print(f"{self.name} is performing {action_card.attack_name}")
-        print(action_card)
+        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
         # monster always moves first - won't move if they're within range
         return True
 
     def perform_movement(self, action_card: ActionCard, board):
         if action_card["distance"] == 0:
             return
+        self.disp.add_to_log(f"{self.name} is moving")
         targets = board.find_opponents(self)
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(self, target_loc, action_card["distance"])
+        # add some space between the movement and attack
+        self.disp.add_to_log("")
 
     def select_attack_target(self, in_range_opponents: list["Character"]):
         # monster picks a random opponent
@@ -169,7 +172,7 @@ def create_action_cards() -> list[ActionCard]:
         movement = random.choices(movements, movement_weights)[0]
         distance = random.randint(1, max_distance)
         action_card = ActionCard(
-            attack_name=f"{adjectives.pop()} {elements.pop()} {actions.pop()}",
+            attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
             strength=strength,
             distance=distance,
             movement=movement,

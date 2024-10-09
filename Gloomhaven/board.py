@@ -50,7 +50,7 @@ class Board:
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.locations[row][col] == None:
+            if self.locations[row][col] is None:
                 self.terrain[row][col] = "FIRE"
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
@@ -223,25 +223,23 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        print(
-            f"Attempting attack with strength {action_card['strength']} and range {action_card['distance']}\n"
-        )
+        self.disp.add_to_log(f"{attacker.name} is attempting to attack")
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
-            print("Not close enough to attack")
+            self.disp.add_to_log("Not close enough to attack")
             return
 
-        modified_attack_strength = select_and_apply_attack_modifier(
+        modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
         if modified_attack_strength <= 0:
-            print("Darn, attack missed!")
+            self.disp.add_to_log("Darn, attack missed!")
             return
 
-        print("Attack hits!\n")
-        print(f"After the modifier, attack strength is: {modified_attack_strength}")
+        self.disp.add_to_log("Attack hits!\n")
+        self.disp.add_to_log(f"After the modifier, attack strength is: {modified_attack_strength}")
 
         self.modify_target_health(target, modified_attack_strength)
 
@@ -254,15 +252,21 @@ class Board:
         self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
+        self.disp.add_to_log(f"{target.name} has been killed.")
+        # !!! for pair coding
+        # !!! if the target is the player, end game
+        # !!! if the target is the acting_character, end turn
+        # - to do this, end turn and end game need to actually work, not just be place holders
 
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
     ) -> list[CharacterType]:
         opponents = self.find_opponents(actor)
+        in_range_opponents = []
         for opponent in opponents:
-            if not self.is_attack_in_range(action_card["distance"], actor, opponent):
-                opponents.remove(opponent)
-        return opponents
+            if self.is_attack_in_range(action_card["distance"], actor, opponent):
+                in_range_opponents.append(opponent)
+        return in_range_opponents
 
     def move_character_toward_location(
         self,
@@ -306,7 +310,7 @@ class Board:
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
-            print(f"{acting_character.name} took {damage} damage from terrain")
+            self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
             self.modify_target_health(acting_character, damage)
 
     def update_character_location(
@@ -332,29 +336,31 @@ class Board:
 
     def modify_target_health(self, target: CharacterType, damage: int) -> None:
         target.health -= damage
-        print(f"New health: {target.health}")
         if target.health <= 0:
             self.kill_target(target)
+        else:
+            self.disp.add_to_log(f"{target.name}'s new health: {target.health}")
 
 
-def select_and_apply_attack_modifier(initial_attack_strength: int) -> int:
-    def multiply(x, y):
-        return x * y
 
-    def add(x, y):
-        return x + y
+    def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
+        def multiply(x, y):
+            return x * y
 
-    attack_modifier_deck = [
-        (partial(multiply, 2), "2x"),
-        (partial(multiply, 0), "Null"),
-    ]
-    for modifier in [-2, -1, 0, 1, 2]:
-        attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
+        def add(x, y):
+            return x + y
 
-    attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
+        attack_modifier_deck = [
+            (partial(multiply, 2), "2x"),
+            (partial(multiply, 0), "Null"),
+        ]
+        for modifier in [-2, -1, 0, 1, 2]:
+            attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
-    attack_modifier_function, modifier_string = random.choices(
-        attack_modifier_deck, attack_modifier_weights
-    )[0]
-    print(f"Attack modifier: {modifier_string}")
-    return attack_modifier_function(initial_attack_strength)
+        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
+
+        attack_modifier_function, modifier_string = random.choices(
+            attack_modifier_deck, attack_modifier_weights
+        )[0]
+        self.disp.add_to_log(f"Attack modifier: {modifier_string}")
+        return attack_modifier_function(initial_attack_strength)
