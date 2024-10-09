@@ -1,6 +1,5 @@
 import random
-from character import CharacterType, Monster, Player
-import helpers
+from character import CharacterType, Monster, Player, Character
 from enum import Enum, auto
 from config import DEBUG
 from display import Display
@@ -11,6 +10,7 @@ class GameState(Enum):
     RUNNING = auto()
     WIN = auto()
     GAME_OVER = auto()
+    EXHAUSTED = auto()
 
 
 class GameLoop:
@@ -22,16 +22,18 @@ class GameLoop:
     def start(self):
         self.game_state = GameState.RUNNING
 
-        print(
-            "Welcome to your quest, " + self.board.get_player().name + ". \n",
-            "As you enter the dungeon, you see a terrifying monster ahead! \n",
-            "Kill it or be killed...\n",
-        )
-        input("Time to start the game! Hit enter to continue\n")
-
+        message = f'''Welcome to your quest, {self.board.get_player().name}
+As you enter the dungeon, you see a terrifying monster ahead! 
+Kill it or be killed...'''
+        self.disp.clear_display_and_print_message(message=message)
+        self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
+        
+        round_number = 1
         while self.game_state == GameState.RUNNING:
+            self.disp.update_round_number(round_number)
             self.run_round()
             print(self.game_state)
+            round_number += 1
         # once we're no longer playing, end the game
         if self.game_state != GameState.RUNNING:
             print(f"{self.game_state.name=}")
@@ -40,7 +42,6 @@ class GameLoop:
     def run_round(self) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
-        print("Start of Round!\n")
         for i, acting_character in enumerate(self.board.characters):
             # randomly pick who starts the round
             if DEBUG:
@@ -58,7 +59,7 @@ class GameLoop:
                 print(f"{optimal_path=}")
                 # end pathfinding test
 
-            print(f"It's {acting_character.name}'s turn!")
+            self.disp.update_acting_character_name(acting_character.name)
             self.run_turn(acting_character)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
@@ -66,35 +67,28 @@ class GameLoop:
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
-        input("End of round. Hit Enter to continue")
-        helpers.clear_terminal()
+        self._end_round()
 
     def run_turn(self, acting_character: CharacterType) -> None:
-        self.disp.reload_display()
         # if you start in fire, take damage first
         row, col = self.board.find_location_of_target(acting_character)
         self.board.deal_terrain_damage(acting_character, row, col)
 
         action_card = acting_character.select_action_card()
-        self.disp.reload_display()
 
         move_first = acting_character.decide_if_move_first(action_card, self.board)
 
         if move_first:
-            self.disp.reload_display()
             acting_character.perform_movement(action_card, self.board)
             in_range_opponents = self.board.find_in_range_opponents(
                 acting_character, action_card
             )
-            self.disp.reload_display()
             target = acting_character.select_attack_target(in_range_opponents)
             self.board.attack_target(action_card, acting_character, target)
         else:
-            self.disp.reload_display()
             in_range_opponents = self.board.find_in_range_opponents(
                 acting_character, action_card
             )
-            self.disp.reload_display()
             target = acting_character.select_attack_target(in_range_opponents)
             self.board.attack_target(action_card, acting_character, target)
             acting_character.perform_movement(action_card, self.board)
@@ -111,33 +105,69 @@ class GameLoop:
 
     def _end_game(self) -> None:
         if self.game_state == GameState.GAME_OVER:
-            self._lose_game()
+            self._lose_game_dead()
         elif self.game_state == GameState.WIN:
             self._win_game()
+        elif self.game_state == GameState.EXHAUSTED:
+            self._lose_game_exhausted()
         else:
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
             )
 
     def _end_turn(self) -> None:
-        input("End of turn. Hit enter to continue")
-        helpers.clear_terminal()
+        self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
+        self.disp.clear_log()
 
-    def _lose_game(self):
-        helpers.clear_terminal()
-        print(
-            """You died...GAME OVER
-    .-.
+    def _end_round(self) -> None:
+        for char in self.board.characters:
+            self.refresh_character_cards(char)
+
+        self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
+        self.disp.clear_log()
+
+    def refresh_character_cards(self, char: Character) -> None:
+        # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
+        if len(char.available_action_cards) == 0:
+            self.disp.add_to_log("No more action cards left, time to short rest!")
+            char.short_rest()
+        
+        # if player has no cards after short resting, they're done!
+        if len(char.available_action_cards) == 0:
+            if isinstance(char, Player):
+                self.disp.add_to_log("Drat, you ran out of cards and got exhausted")
+                self.game_state = GameState.EXHAUSTED
+            else:
+                raise ValueError("Monsters getting exhausted...")
+
+    def _lose_game_dead(self):
+        message='''You died...GAME OVER
+     .-.
     (o o)  
-    |-|  
+     |-|  
     /   \\
-    |     |
-    \\___/"""
-        )
+   |     |
+    \\___/'''
+        self.disp.clear_display_and_print_message(message)
+
+    def _lose_game_exhausted(self):
+        message='''You got exhausted...GAME OVER
+     .-.
+    (o o)  
+     |-|  
+    /   \\
+   |     |
+    \\___/'''
+        self.disp.clear_display_and_print_message(message)
+        
 
     def _win_game(self) -> None:
-        helpers.clear_terminal()
-        print("You defeated the monster!!")
-        print(
-            "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
-        )
+        message = '''You defeated the monster!! Victory!
+    \\o/   Victory!
+     |
+    / \\
+   /   \\
+        '''
+        # couldn't get this to work with the new print method
+        #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
+        self.disp.clear_display_and_print_message(message=message)

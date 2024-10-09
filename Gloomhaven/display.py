@@ -1,6 +1,6 @@
-import helpers 
 from gh_types import ActionCard
 from character import Player, Monster
+import os
 
 EMPTY_CELL = "|      "
 
@@ -10,22 +10,31 @@ class Display:
         self.locations = [[]]
         self.terrain = [[]]
         self.characters = []
+        self.acting_character_name = ""
+        self.round_number = None
 
     def reload_display(self) -> None:
-        helpers.clear_terminal()
-        self.draw_board()
+        self.clear_display()
+        self._draw_board()
+        self._print_round_and_turn_info()
         self._print_healths()
         print("\n")
-        self.print_log()
+        self._print_log()
 
-    def update_locations(self, locations):
+    def update_locations(self, locations) -> None:
         self.locations = locations
     
-    def update_terrain(self, terrain):
+    def update_terrain(self, terrain) -> None:
         self.terrain = terrain
 
+    def update_acting_character_name(self, new_acting_character_name: str) -> None:
+        self.acting_character_name = new_acting_character_name
+
+    def update_round_number(self, new_round_number: int) -> None:
+        self.round_number = new_round_number
+
     # draw the game board and display stats
-    def draw_board(self) -> None:
+    def _draw_board(self) -> None:
         to_draw = ""
         top = ""
         for i, row in enumerate(self.locations):
@@ -33,9 +42,9 @@ class Display:
             sides = ""
             for el in row:
                 if isinstance(el, Player):
-                    sides += "|  🧙  "
+                    sides += f"|  {el.emoji}  "
                 elif isinstance(el, Monster):
-                    sides += "|  🤖  "
+                    sides += f"|  {el.emoji}  "
                 elif el == "X":
                     sides += "|  🪨   "
                 else:
@@ -61,39 +70,49 @@ class Display:
         for x in self.characters:
             print_str += f"{x.name}: {x.health}, "
         print(print_str[:-2])
+    
+    def _print_round_and_turn_info(self) -> None:
+        print(f"Round {self.round_number}, {self.acting_character_name}'s turn")
+
 
     def add_to_log(self, log_str: str) -> None:
         self.log.append(log_str)
+        self.reload_display()
 
-    def print_log(self, num_lines = 10) -> None:
+    def _print_log(self, num_lines = 10) -> None:
         for line in self.log[-num_lines:]:
             print(line)
 
-    def log_action_cards(self, action_cards) -> None:
+    def log_action_cards(self, action_cards: list[ActionCard]) -> None:
         self.add_to_log("Your action cards are: ")
         for i, action_card in enumerate(action_cards):
             self.add_to_log(f"{i}: {action_card}")
 
     def clear_log(self) -> None:
         self.log = []
+    
+    def get_user_input(self, prompt: str, valid_inputs=None):
+        user_input = input(prompt)
 
-    def ask_user_to_select_action_cards(self, action_cards) -> ActionCard:
-        self.log_action_cards(action_cards)
-        self.print_log()
-        while True:
-            user_input = input(
-                "\nWhich action card would you like to pick? Type the number exactly."
-            )
-            try:
-                action_card_num = int(user_input)
-                helpers.clear_terminal()
-                action_card_to_perform = action_cards.pop(action_card_num)
-                break
-            except (ValueError, IndexError):
-                print("Oops, typo! Try typing the number again.")
+        # if there's no validation, return any input given
+        if valid_inputs is None:
+            return user_input
         
-        # once action card is chosen, you want to clear the log
-        self.clear_log()
-        return action_card_to_perform
+        while user_input not in valid_inputs:
+            user_input = input("Invalid key pressed. Try again.")
+        
+        return user_input
+    
+    def clear_display_and_print_message(self, message) -> None:
+        self.clear_display()
+        print(message)
+
+    def clear_display(self) -> None:
+        # Check if the system is Windows
+        if os.name == 'nt':
+            os.system('cls')
+        else:
+            os.system('clear')
+        return
 
 
