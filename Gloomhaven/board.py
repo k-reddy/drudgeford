@@ -313,6 +313,12 @@ class Board:
             self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
             self.modify_target_health(acting_character, damage)
 
+    def deal_terrain_damage_current_location(
+            self, acting_character: CharacterType
+    ):
+        row, col = self.find_location_of_target(acting_character)
+        self.deal_terrain_damage(acting_character, row, col)
+
     def update_character_location(
         self,
         actor: CharacterType,
