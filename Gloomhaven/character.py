@@ -131,12 +131,12 @@ class Monster(Character):
         return True
 
     def perform_movement(self, action_card: ActionCard, board):
-        if action_card["distance"] == 0:
+        if action_card["movement"] == 0:
             return
         self.disp.add_to_log(f"{self.name} is moving")
         targets = board.find_opponents(self)
         target_loc = board.find_location_of_target(random.choice(targets))
-        board.move_character_toward_location(self, target_loc, action_card["distance"])
+        board.move_character_toward_location(self, target_loc, action_card["movement"])
         # add some space between the movement and attack
         self.disp.add_to_log("")
 
