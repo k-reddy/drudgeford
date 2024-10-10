@@ -17,12 +17,12 @@ class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
-        self, size: int, monsters: list[Monster], player: Player, disp: Display
+        self, size: int, monsters: list[Monster], players: list[Player], disp: Display
     ) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[CharacterType] = [player] + monsters
+        self.characters: list[CharacterType] = players + monsters
         self.locations = self._initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
         self.reshape_board()
