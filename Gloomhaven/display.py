@@ -54,7 +54,7 @@ class Display:
             to_draw += sides + "\n"
 
             fire_sides = ""
-            for el in enumerate(self.terrain[i]):
+            for el in self.terrain[i]:
                 if el == "FIRE":
                     fire_sides += "|  🔥  "
                 else:
