@@ -24,9 +24,11 @@ Good luck!'''
     disp = display.Display()
 
     # get some user input before starting the game
-    player_name = disp.get_user_input(prompt="What's your character's name? ")
+    player_name = disp.get_user_input(prompt="What's player 1's character's name? ")
+    player_name_2 = disp.get_user_input(prompt="What's player 2's character's name? ")
     # default to happy :D
     player_name = "Happy" if player_name == "" else player_name
+    player_name_2 = "Glad" if player_name_2 == "" else player_name_2
     disp.clear_display()
     want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
     if want_help == "help":
@@ -40,8 +42,9 @@ Good luck!'''
     for i in range(3):
         monster = character.Monster(names[i], 3, disp, emoji[i])
         monsters.append(monster)
-    player = character.Player(player_name, 10, disp, "🧙")
-    board = Board(10, monsters, player, disp)
+    player_1 = character.Player(player_name, 10, disp, "🧙")
+    player_2 = character.Player(player_name_2, 10, disp, "🕺")
+    board = Board(10, monsters, [player_1, player_2], disp)
     game = GameLoop(board, disp)
     game.start()
 
