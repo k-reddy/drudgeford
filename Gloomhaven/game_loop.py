@@ -70,28 +70,22 @@ Kill it or be killed...'''
         self._end_round()
 
     def run_turn(self, acting_character: CharacterType) -> None:
-        # if you start in fire, take damage first
-        row, col = self.board.find_location_of_target(acting_character)
-        self.board.deal_terrain_damage(acting_character, row, col)
-
         action_card = acting_character.select_action_card()
-
         move_first = acting_character.decide_if_move_first(action_card, self.board)
 
-        if move_first:
-            acting_character.perform_movement(action_card, self.board)
-            in_range_opponents = self.board.find_in_range_opponents(
-                acting_character, action_card
-            )
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.board.attack_target(action_card, acting_character, target)
-        else:
-            in_range_opponents = self.board.find_in_range_opponents(
-                acting_character, action_card
-            )
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.board.attack_target(action_card, acting_character, target)
-            acting_character.perform_movement(action_card, self.board)
+        actions = [
+            # if you start in fire, take damage first
+            lambda: self.board.deal_terrain_damage_current_location(acting_character),
+            lambda: acting_character.perform_movement(action_card, self.board),
+            lambda: acting_character.perform_attack(action_card, self.board)
+            ]
+        # if not move_first, swap item 1 and 2
+
+        for action in actions:
+            action()
+            # update game status
+            # check if game is over, return if so
+            # !!! in perform movement, check after each movement if the player has died, return if so
 
         self._end_turn()
 
