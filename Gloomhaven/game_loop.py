@@ -22,7 +22,7 @@ class GameLoop:
     def start(self):
         self.game_state = GameState.RUNNING
 
-        message = f'''Welcome to your quest, {self.board.get_player().name}
+        message = f'''Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed...'''
         self.disp.clear_display_and_print_message(message=message)
