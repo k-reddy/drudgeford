@@ -216,7 +216,7 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        self.disp.add_to_log(f"{attacker.name} is attempting to attack")
+        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
