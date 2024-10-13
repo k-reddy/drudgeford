@@ -35,10 +35,11 @@ class Board:
         disp.characters = self.characters
 
 
-    def get_player(self) -> Player:
+    def get_players(self) -> Player:
+        players = []
         for char in self.characters:
             if isinstance(char, Player):
-                return char
+                players.append(char)
         raise ValueError("Player not found on the board")
 
     def _initialize_board(self, width: int = 5, height=5):
