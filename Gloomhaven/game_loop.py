@@ -22,7 +22,7 @@ class GameLoop:
     def start(self):
         self.game_state = GameState.RUNNING
 
-        message = f'''Welcome to your quest, {self.board.get_player().name}
+        message = f'''Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed...'''
         self.disp.clear_display_and_print_message(message=message)
@@ -42,7 +42,12 @@ Kill it or be killed...'''
     def run_round(self) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
-        for i, acting_character in enumerate(self.board.characters):
+        # using this copy, since we can edit this list during a round, messing up indexing
+        round_character_list = self.board.characters
+        for acting_character in round_character_list:
+            # since we use a copy, we need to make sure the character is still alive
+            if acting_character not in self.board.characters:
+                return
             # randomly pick who starts the round
             if DEBUG:
                 # For testing pathfinding. should create debug mode
@@ -70,29 +75,29 @@ Kill it or be killed...'''
         self._end_round()
 
     def run_turn(self, acting_character: CharacterType) -> None:
-        # if you start in fire, take damage first
-        row, col = self.board.find_location_of_target(acting_character)
-        self.board.deal_terrain_damage(acting_character, row, col)
-
         action_card = acting_character.select_action_card()
-
         move_first = acting_character.decide_if_move_first(action_card, self.board)
 
-        if move_first:
-            acting_character.perform_movement(action_card, self.board)
-            in_range_opponents = self.board.find_in_range_opponents(
-                acting_character, action_card
-            )
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.board.attack_target(action_card, acting_character, target)
-        else:
-            in_range_opponents = self.board.find_in_range_opponents(
-                acting_character, action_card
-            )
-            target = acting_character.select_attack_target(in_range_opponents)
-            self.board.attack_target(action_card, acting_character, target)
-            acting_character.perform_movement(action_card, self.board)
+        actions = [
+            # if you start in fire, take damage first
+            lambda: self.board.deal_terrain_damage_current_location(acting_character),
+            lambda: acting_character.perform_movement(action_card, self.board),
+            lambda: acting_character.perform_attack(action_card, self.board)
+            ]
+        # if not move_first, swap the order of movement and attack
+        if not move_first:
+            actions[1], actions[2] = actions[2], actions[1]
 
+        for action in actions:
+            action()
+            # after every action, make sure that we shouldn't end the game now
+            self.check_and_update_game_state()
+            if self.game_state != GameState.RUNNING:
+                return
+            # make sure we shouldn't end the player's turn now - if they died, they won't be in characters list
+            if acting_character not in self.board.characters:
+                self._end_turn()
+                return
         self._end_turn()
 
     def check_and_update_game_state(self) -> None:

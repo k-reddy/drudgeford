@@ -17,12 +17,12 @@ class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
-        self, size: int, monsters: list[Monster], player: Player, disp: Display
+        self, size: int, monsters: list[Monster], players: list[Player], disp: Display
     ) -> None:
         self.size = size
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[CharacterType] = [player] + monsters
+        self.characters: list[CharacterType] = players + monsters
         self.locations = self._initialize_board(self.size, self.size)
         self.terrain = copy.deepcopy(self.locations)
         self.reshape_board()
@@ -33,13 +33,6 @@ class Board:
         disp.locations = self.locations
         disp.terrain = self.terrain
         disp.characters = self.characters
-
-
-    def get_player(self) -> Player:
-        for char in self.characters:
-            if isinstance(char, Player):
-                return char
-        raise ValueError("Player not found on the board")
 
     def _initialize_board(self, width: int = 5, height=5):
         return [["X" for _ in range(width)] for _ in range(height)]
@@ -223,7 +216,7 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        self.disp.add_to_log(f"{attacker.name} is attempting to attack")
+        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
 
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
@@ -312,6 +305,12 @@ class Board:
         if damage:
             self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
             self.modify_target_health(acting_character, damage)
+
+    def deal_terrain_damage_current_location(
+            self, acting_character: CharacterType
+    ):
+        row, col = self.find_location_of_target(acting_character)
+        self.deal_terrain_damage(acting_character, row, col)
 
     def update_character_location(
         self,

@@ -68,7 +68,7 @@ class Display:
     def _print_healths(self) -> None:
         print_str = "Healths: "
         for x in self.characters:
-            print_str += f"{x.name}: {x.health}, "
+            print_str += f"{x.name} {x.emoji}: {x.health}, "
         print(print_str[:-2])
     
     def _print_round_and_turn_info(self) -> None:

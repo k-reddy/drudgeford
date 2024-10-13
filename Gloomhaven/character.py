@@ -27,6 +27,13 @@ class Character:
         self.disp = disp
         self.emoji = emoji
 
+    def perform_attack(self, action_card, board):
+        in_range_opponents = board.find_in_range_opponents(
+            self, action_card
+        )
+        target = self.select_attack_target(in_range_opponents)
+        board.attack_target(action_card, self, target)
+
     def select_action_card(self):
         pass
 
@@ -159,9 +166,23 @@ def create_action_cards() -> list[ActionCard]:
     action_cards = []
 
     # some things for attack names
-    adjectives = ["Shadowed", "Infernal", "Venomous", "Blazing", "Cursed"]
-    elements = ["Fang", "Storm", "Flame", "Void", "Thorn"]
-    actions = ["Strike", "Surge", "Rend", "Burst", "Reaver"]
+    adjectives = [
+        "Shadowed", "Infernal", "Venomous", "Blazing", "Cursed", 
+        "Frozen", "Eternal", "Bloodthirsty", "Savage", "Dreadful",
+        "Ancient", "Malevolent", "Spectral", "Dire", "Enraged"
+    ]
+
+    elements = [
+        "Fang", "Storm", "Flame", "Void", "Thorn", 
+        "Frost", "Stone", "Ember", "Blade", "Hollow",
+        "Spirit", "Tide", "Wind", "Ash", "Grave"
+    ]
+
+    actions = [
+        "Strike", "Surge", "Rend", "Burst", "Reaver", 
+        "Crush", "Slash", "Howl", "Smite", "Rampage", 
+        "Sunder", "Devour", "Shatter", "Lash", "Tremor"
+    ]
 
     for item in [adjectives, elements, actions]:
         random.shuffle(item)
