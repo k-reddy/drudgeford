@@ -22,13 +22,19 @@ Good luck!'''
 
     
     disp = display.Display()
+    num_players = 1
+    players = []
 
     # get some user input before starting the game
-    player_name = disp.get_user_input(prompt="What's player 1's character's name? ")
-    player_name_2 = disp.get_user_input(prompt="What's player 2's character's name? ")
-    # default to happy :D
-    player_name = "Happy" if player_name == "" else player_name
-    player_name_2 = "Glad" if player_name_2 == "" else player_name_2
+    multi_player = True if disp.get_user_input("Would you like to play multi-player? (y)es or (n)o ", ["y", "n"]) == "y" else False
+    if multi_player:
+        num_players = int(disp.get_user_input("How many players? Type 1, 2, or 3.", ["1", "2", "3"]))
+    for i in range(num_players):
+        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
+        # default to happy :D
+        player_name = f"Happy {i}" if player_name == "" else player_name
+        player_emoji = disp.get_user_input(prompt=f"What's player {i+1}'s emoji? On mac, press control+command+sp to pick emoji ")
+        players.append(character.Player(player_name, 10, disp, player_emoji))
     disp.clear_display()
     want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
     if want_help == "help":
@@ -37,14 +43,13 @@ Good luck!'''
         disp.clear_display()
 
     monsters = []
-    names = ["Tree Man", "Evil Blob", "Living Skeleton"]
-    emoji = ["🌵", "🪼 ", "💀"]
-    for i in range(3):
-        monster = character.Monster(names[i], 3, disp, emoji[i])
+    names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
+    emoji = ["🌵", "🪼 ", "💀", "🧿"]
+    healths = [3,3,5,5]
+    for i in range(num_players+1):
+        monster = character.Monster(names[i], healths[i], disp, emoji[i])
         monsters.append(monster)
-    player_1 = character.Player(player_name, 10, disp, "🧙")
-    player_2 = character.Player(player_name_2, 10, disp, "🕺")
-    board = Board(10, monsters, [player_1, player_2], disp)
+    board = Board(10, monsters, players, disp)
     game = GameLoop(board, disp)
     game.start()
 
