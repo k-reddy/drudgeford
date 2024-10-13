@@ -79,14 +79,16 @@ Kill it or be killed...'''
             lambda: acting_character.perform_movement(action_card, self.board),
             lambda: acting_character.perform_attack(action_card, self.board)
             ]
-        # if not move_first, swap item 1 and 2
+        # if not move_first, swap the order of movement and attack
+        if not move_first:
+            actions[1], actions[2] = actions[2], actions[1]
 
         for action in actions:
             action()
-            # update game status
-            # check if game is over, return if so
-            # !!! in perform movement, check after each movement if the player has died, return if so
-
+            # after every action, make sure that we shouldn't end the game now
+            self.check_and_update_game_state()
+            if self.game_state != GameState.RUNNING:
+                return
         self._end_turn()
 
     def check_and_update_game_state(self) -> None:
