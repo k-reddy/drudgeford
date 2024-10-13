@@ -166,9 +166,23 @@ def create_action_cards() -> list[ActionCard]:
     action_cards = []
 
     # some things for attack names
-    adjectives = ["Shadowed", "Infernal", "Venomous", "Blazing", "Cursed"]
-    elements = ["Fang", "Storm", "Flame", "Void", "Thorn"]
-    actions = ["Strike", "Surge", "Rend", "Burst", "Reaver"]
+    adjectives = [
+        "Shadowed", "Infernal", "Venomous", "Blazing", "Cursed", 
+        "Frozen", "Eternal", "Bloodthirsty", "Savage", "Dreadful",
+        "Ancient", "Malevolent", "Spectral", "Dire", "Enraged"
+    ]
+
+    elements = [
+        "Fang", "Storm", "Flame", "Void", "Thorn", 
+        "Frost", "Stone", "Ember", "Blade", "Hollow",
+        "Spirit", "Tide", "Wind", "Ash", "Grave"
+    ]
+
+    actions = [
+        "Strike", "Surge", "Rend", "Burst", "Reaver", 
+        "Crush", "Slash", "Howl", "Smite", "Rampage", 
+        "Sunder", "Devour", "Shatter", "Lash", "Tremor"
+    ]
 
     for item in [adjectives, elements, actions]:
         random.shuffle(item)
