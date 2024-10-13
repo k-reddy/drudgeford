@@ -34,14 +34,6 @@ class Board:
         disp.terrain = self.terrain
         disp.characters = self.characters
 
-
-    def get_players(self) -> Player:
-        players = []
-        for char in self.characters:
-            if isinstance(char, Player):
-                players.append(char)
-        raise ValueError("Player not found on the board")
-
     def _initialize_board(self, width: int = 5, height=5):
         return [["X" for _ in range(width)] for _ in range(height)]
 
