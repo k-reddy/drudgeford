@@ -89,6 +89,10 @@ Kill it or be killed...'''
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
+            # make sure we shouldn't end the player's turn now - if they died, they won't be in characters list
+            if acting_character not in self.board.characters:
+                self._end_turn()
+                return
         self._end_turn()
 
     def check_and_update_game_state(self) -> None:
