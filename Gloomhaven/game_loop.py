@@ -42,7 +42,12 @@ Kill it or be killed...'''
     def run_round(self) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
-        for i, acting_character in enumerate(self.board.characters):
+        # using this copy, since we can edit this list during a round, messing up indexing
+        round_character_list = self.board.characters
+        for acting_character in round_character_list:
+            # since we use a copy, we need to make sure the character is still alive
+            if acting_character not in self.board.characters:
+                return
             # randomly pick who starts the round
             if DEBUG:
                 # For testing pathfinding. should create debug mode
