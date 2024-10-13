@@ -24,6 +24,8 @@ Good luck!'''
     disp = display.Display()
     num_players = 1
     players = []
+    emoji = ["🧙", "🕺", "🐣"]
+    default_names = ["Happy", "Glad", "Jolly"]
 
     # get some user input before starting the game
     multi_player = True if disp.get_user_input("Would you like to play multi-player? (y)es or (n)o ", ["y", "n"]) == "y" else False
@@ -32,9 +34,8 @@ Good luck!'''
     for i in range(num_players):
         player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
         # default to happy :D
-        player_name = f"Happy {i}" if player_name == "" else player_name
-        player_emoji = disp.get_user_input(prompt=f"What's player {i+1}'s emoji? On mac, press control+command+sp to pick emoji ")
-        players.append(character.Player(player_name, 10, disp, player_emoji))
+        player_name = player_name if player_name != "" else default_names[i]
+        players.append(character.Player(player_name, 10, disp, emoji[i]))
     disp.clear_display()
     want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
     if want_help == "help":
