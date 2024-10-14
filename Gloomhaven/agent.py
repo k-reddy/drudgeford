@@ -2,39 +2,15 @@ import abc
 import random
 from gh_types import ActionCard
 
-DIRECTION_MAP = {
-    "w": [-1, 0],
-    "s": [1, 0],
-    "a": [0, -1],
-    "d": [0, 1],
-    "q": [-1, -1],
-    "e": [-1, 1],
-    "z": [1, -1],
-    "c": [1, 1],
-    "f": None
-}
-
 class Agent(abc.ABC):
-    @abc.abstractmethod
     @staticmethod
-    def select_action_card(disp, available_action_cards):
-        pass
-
     @abc.abstractmethod
-    def decide_if_move_first(self, action_card, board):
-        pass
-
-    @abc.abstractmethod
-    def perform_movement(self, action_card, board):
-        pass
-
-    @abc.abstractmethod
-    def select_attack_target(self, in_range_opponents):
+    def select_action_card(disp, available_action_cards) -> ActionCard:
         pass
 
 class Ai(Agent):
     @staticmethod
-    def select_action_card(disp, available_action_cards):
+    def select_action_card(disp, available_action_cards) -> ActionCard:
         return random.choice(available_action_cards)
     
 class Human:
