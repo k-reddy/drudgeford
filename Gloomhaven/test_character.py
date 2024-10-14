@@ -25,4 +25,13 @@ def test_human_select_action_card():
 
 def test_ai_decide_if_move_first():
     for char in ai_board.characters:
-        assert char.decide_if_move_first() is True
+        assert char.decide_if_move_first(disp) is True
+
+def test_human_decide_if_move_first():
+    with patch('display.Display.get_user_input', return_value = '1'):
+        for char in human_board.characters:
+            assert char.decide_if_move_first(disp) is True
+
+    with patch('display.Display.get_user_input', return_value = '2'):
+        for char in human_board.characters:
+            assert char.decide_if_move_first(disp) is False
