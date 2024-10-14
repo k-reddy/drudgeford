@@ -6,11 +6,12 @@ from agent import Agent, Ai, Human
 from display import Display
 
 disp = Display()
-monsters = [Monster("Monster", 10, disp, "🦁", Ai())]
+ai_monsters = [Monster("Monster", 10, disp, "🦁", Ai())]
 ai_players = [Player("Player", 10, disp, "🐷", Ai())]
 human_players = [Player("Player", 10, disp, "🐷", Human())]
-ai_board = Board(10, monsters, ai_players, disp)
-human_board = Board(10, monsters, human_players, disp)
+human_monsters = [Monster("Player", 10, disp, "🐷", Human())]
+ai_board = Board(10, ai_monsters, ai_players, disp)
+human_board = Board(10, human_monsters, human_players, disp)
 
 def test_ai_select_action_card():
     for char in ai_board.characters:
@@ -21,3 +22,7 @@ def test_human_select_action_card():
         for char in human_board.characters:
             avail_cards = char.available_action_cards.copy()
             assert char.select_action_card() in avail_cards
+
+def test_ai_decide_if_move_first():
+    for char in ai_board.characters:
+        assert char.decide_if_move_first() is True
