@@ -42,8 +42,9 @@ class Character:
         self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
         return action_card_to_perform
 
-    def decide_if_move_first(self, action_card, board):
-        pass
+    def decide_if_move_first(self, action_card):
+        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
+        return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, action_card, board):
         pass
@@ -61,12 +62,6 @@ class Player(Character):
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
-    
-
-    def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        self.disp.add_to_log(action_card)
-        key_press = self.disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
-        return key_press == "1"
 
     def perform_movement(self, action_card, board):
         remaining_movement = action_card["movement"]
@@ -119,11 +114,6 @@ class Player(Character):
 
 
 class Monster(Character):
-    def decide_if_move_first(self, action_card: ActionCard, board):
-        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
-        # monster always moves first - won't move if they're within range
-        return True
-
     def perform_movement(self, action_card: ActionCard, board):
         if action_card["movement"] == 0:
             return
