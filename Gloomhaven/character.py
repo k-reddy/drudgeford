@@ -18,7 +18,7 @@ DIRECTION_MAP = {
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, disp, emoji):
+    def __init__(self, name, health, disp, emoji, agent):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
@@ -26,6 +26,7 @@ class Character:
         self.available_action_cards = self.action_cards.copy()
         self.disp = disp
         self.emoji = emoji
+        self.agent = agent
 
     def perform_attack(self, action_card, board):
         in_range_opponents = board.find_in_range_opponents(
@@ -35,7 +36,11 @@ class Character:
         board.attack_target(action_card, self, target)
 
     def select_action_card(self):
-        pass
+        action_card_to_perform = self.agent.select_action_card(
+                self.disp, self.available_action_cards
+            )
+        self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
+        return action_card_to_perform
 
     def decide_if_move_first(self, action_card, board):
         pass
@@ -47,22 +52,7 @@ class Character:
         pass
 
 
-class Player(Character):
-    # asks player what card they want to play
-    def select_action_card(self) -> ActionCard:
-        # let them pick a valid action_card
-        self.disp.log_action_cards(self.available_action_cards)
-        prompt = "Which action card would you like to pick? Type the number exactly."
-        valid_inputs = [str(i) for i, _ in enumerate(self.available_action_cards)]
-
-        action_card_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        action_card_to_perform = self.available_action_cards.pop(int(action_card_num))
-
-        self.disp.clear_log()
-        self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
-
-        return action_card_to_perform
-    
+class Player(Character):    
     def short_rest(self) -> None:
         # reset our available cards
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
@@ -129,9 +119,6 @@ class Player(Character):
 
 
 class Monster(Character):
-    def select_action_card(self):
-        return random.choice(self.action_cards)
-
     def decide_if_move_first(self, action_card: ActionCard, board):
         self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
         # monster always moves first - won't move if they're within range
