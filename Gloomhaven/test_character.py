@@ -4,6 +4,7 @@ from board import Board
 from character import Monster, Player
 from agent import Agent, Ai, Human
 from display import Display
+from gh_types import ActionCard
 
 disp = Display()
 ai_monsters = [Monster("Monster", 10, disp, "🦁", Ai())]
@@ -50,3 +51,32 @@ def test_ai_select_attack_target():
     char = ai_monsters[0]
     assert char.select_attack_target([]) is None
     assert char.select_attack_target(ai_players) in ai_players
+
+def test_ai_perform_movement():
+    print(ai_monsters, ai_players)
+    action_card = ActionCard(
+        attack_name="test",
+        strength=1,
+        distance=2,
+        movement=1
+    )
+    # put the characters in known locations
+    ai_board.update_character_location(
+        ai_monsters[0],
+        ai_board.find_location_of_target(ai_monsters[0]),
+        [0,0]
+    )
+    ai_board.update_character_location(
+        ai_players[0],
+        ai_board.find_location_of_target(ai_players[0]),
+        [2,2]
+    )
+    # move
+    ai_monsters[0].perform_movement(action_card, ai_board)
+    # check new loc
+    assert ai_board.find_location_of_target(ai_monsters[0]) == (1,1)
+    # move again
+    ai_monsters[0].perform_movement(action_card, ai_board)
+    # check new loc
+    assert ai_board.find_location_of_target(ai_monsters[0]) == (1,1)
+

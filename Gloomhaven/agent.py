@@ -20,6 +20,12 @@ class Agent(abc.ABC):
     def select_attack_target(disp, in_range_opponents: list):
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def perform_movement(char, action_card: ActionCard, board):
+        pass 
+
+
 class Ai(Agent):
     @staticmethod
     def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
@@ -34,6 +40,12 @@ class Ai(Agent):
     def select_attack_target(disp, in_range_opponents: list):
         # monster picks a random opponent
         return random.choice(in_range_opponents)
+    
+    @staticmethod
+    def perform_movement(char, action_card: ActionCard, board):
+        targets = board.find_opponents(char)
+        target_loc = board.find_location_of_target(random.choice(targets))
+        board.move_character_toward_location(char, target_loc, action_card["movement"])
     
 class Human:
     @staticmethod
