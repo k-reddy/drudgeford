@@ -47,7 +47,14 @@ class Character:
         return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, action_card, board):
-        pass
+        if action_card["movement"] == 0:
+            self.disp.add_to_log("No movement!")
+            return
+        self.disp.add_to_log(f"{self.name} is moving")
+        self.agent.perform_movement(self, action_card, board)
+        # add some space between the movement and attack
+        self.disp.add_to_log("")
+
 
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
@@ -100,15 +107,7 @@ class Player(Character):
 
 
 class Monster(Character):
-    def perform_movement(self, action_card: ActionCard, board):
-        if action_card["movement"] == 0:
-            return
-        self.disp.add_to_log(f"{self.name} is moving")
-        targets = board.find_opponents(self)
-        target_loc = board.find_location_of_target(random.choice(targets))
-        board.move_character_toward_location(self, target_loc, action_card["movement"])
-        # add some space between the movement and attack
-        self.disp.add_to_log("")
+    pass
 
 def create_action_cards() -> list[ActionCard]:
     # each attack card will be generated with a strength, distance, and number of targets, so set
