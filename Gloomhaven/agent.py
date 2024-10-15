@@ -15,6 +15,11 @@ class Agent(abc.ABC):
     def decide_if_move_first(disp: Display) -> bool:
         pass
 
+    @staticmethod
+    @abc.abstractmethod
+    def select_attack_target(disp, in_range_opponents: list):
+        pass
+
 class Ai(Agent):
     @staticmethod
     def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
@@ -24,6 +29,11 @@ class Ai(Agent):
     def decide_if_move_first(disp: Display) -> bool:
         # monster always moves first - won't move if they're within range
         return True
+    
+    @staticmethod
+    def select_attack_target(disp, in_range_opponents: list):
+        # monster picks a random opponent
+        return random.choice(in_range_opponents)
     
 class Human:
     @staticmethod
@@ -43,3 +53,17 @@ class Human:
     def decide_if_move_first(disp: Display) -> bool:
         key_press = disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
         return key_press == "1"
+    
+    @staticmethod
+    def select_attack_target(disp, in_range_opponents):
+        # show in range opponents
+        disp.add_to_log("Opponents in range: ")
+        for i, opponent in enumerate(in_range_opponents):
+            disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
+
+        # get user input on which to attack
+        prompt = "Please type the number of the opponent you want to attack"
+        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
+        target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        disp.add_to_log("")
+        return in_range_opponents[int(target_num)]
