@@ -35,3 +35,8 @@ def test_human_decide_if_move_first():
     with patch('display.Display.get_user_input', return_value = '2'):
         for char in human_board.characters:
             assert char.decide_if_move_first(disp) is False
+
+def test_ai_select_attack_target():
+    char = ai_monsters[0]
+    assert char.select_attack_target([]) is None
+    assert char.select_attack_target(ai_players) in ai_players
