@@ -50,7 +50,10 @@ class Character:
         pass
 
     def select_attack_target(self, in_range_opponents):
-        pass
+        if not in_range_opponents:
+            self.disp.add_to_log("No opponents in range\n")
+            return None
+        return self.agent.select_attack_target(self.disp, in_range_opponents)
 
 
 class Player(Character):    
@@ -95,23 +98,6 @@ class Player(Character):
 
         self.disp.add_to_log("Movement done! \n")
 
-    def select_attack_target(self, in_range_opponents):
-        if not in_range_opponents:
-            self.disp.add_to_log("No opponents in range\n")
-            return None
-
-        self.disp.add_to_log("Opponents in range: ")
-        for i, opponent in enumerate(in_range_opponents):
-            self.disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
-
-        prompt = "Please type the number of the opponent you want to attack"
-        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        self.disp.add_to_log("")
-        # ask the player who they want to attack
-        # ask the board to attack that person
-        return in_range_opponents[int(target_num)]
-
 
 class Monster(Character):
     def perform_movement(self, action_card: ActionCard, board):
@@ -123,13 +109,6 @@ class Monster(Character):
         board.move_character_toward_location(self, target_loc, action_card["movement"])
         # add some space between the movement and attack
         self.disp.add_to_log("")
-
-    def select_attack_target(self, in_range_opponents: list["Character"]):
-        # monster picks a random opponent
-        if not in_range_opponents:
-            return None
-        return random.choice(in_range_opponents)
-
 
 def create_action_cards() -> list[ActionCard]:
     # each attack card will be generated with a strength, distance, and number of targets, so set
