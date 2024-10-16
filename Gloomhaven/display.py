@@ -16,6 +16,8 @@ class Display:
         self.ai_mode_log_path = "ai_mode_log.txt"
 
     def reload_display(self) -> None:
+        if ALL_AI_MODE:
+            return
         self.clear_display()
         self._draw_board()
         self._print_round_and_turn_info()
