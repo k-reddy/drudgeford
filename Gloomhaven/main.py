@@ -5,6 +5,7 @@ from game_loop import GameLoop
 import display
 import agent
 from config import ALL_AI_MODE
+import random
 
 
 def main():
@@ -31,9 +32,9 @@ def set_up_players(disp):
     default_names = ["Happy", "Glad", "Jolly"]
 
     # get some user input before starting the game
-    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"]))
+    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not ALL_AI_MODE else random.choice([1,2,3])
     for i in range(num_players):
-        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
+        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ") if not ALL_AI_MODE else ""
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if ALL_AI_MODE else agent.Human()
@@ -52,7 +53,7 @@ def provide_help_if_desired(disp):
 
 Good luck!'''
 
-    want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
+    want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ") if not ALL_AI_MODE else False
     if want_help == "help":
         disp.clear_display_and_print_message(help_message)
         disp.get_user_input(prompt="Hit enter to continue")
