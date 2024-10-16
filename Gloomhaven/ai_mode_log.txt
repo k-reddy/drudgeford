@@ -1,0 +1,179 @@
+Living Skeleton is performing Cursed Blade Smite: Strength 2, Range 3, Movement 1
+
+Living Skeleton is moving
+
+Living Skeleton is attempting to attack Happy
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Happy's new health: 7
+Happy is performing Venomous Fang Slash: Strength 1, Range 2, Movement 2
+
+Happy is moving
+
+Happy is attempting to attack Evil Blob
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 1
+Evil Blob's new health: 2
+Tree Man is performing Eternal Fang Crush: Strength 3, Range 1, Movement 3
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 3
+Happy's new health: 4
+Evil Blob is performing Dire Grave Tremor: Strength 2, Range 3, Movement 3
+
+Evil Blob is moving
+
+Evil Blob is attempting to attack Happy
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 1
+Happy's new health: 3
+Glad is performing Dreadful Grave Strike: Strength 1, Range 2, Movement 3
+
+Glad is moving
+
+Glad is attempting to attack Tree Man
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 2
+Tree Man's new health: 1
+Tree Man is performing Dreadful Spirit Rampage: Strength 5, Range 2, Movement 2
+
+Tree Man is moving
+
+Tree Man is attempting to attack Glad
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 6
+Glad's new health: 4
+Living Skeleton is performing Shadowed Spirit Burst: Strength 2, Range 1, Movement 3
+
+Living Skeleton is moving
+
+Living Skeleton is attempting to attack Happy
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Happy has been killed.
+Glad is performing Frozen Tide Tremor: Strength 4, Range 3, Movement 2
+
+Glad is moving
+
+Glad is attempting to attack Tree Man
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Tree Man has been killed.
+Glad is performing Eternal Ember Rend: Strength 2, Range 3, Movement 4
+
+Glad is moving
+
+Glad is attempting to attack Living Skeleton
+Attack modifier: +2
+Attack hits!
+
+After the modifier, attack strength is: 4
+Living Skeleton's new health: 1
+Evil Blob is performing Enraged Tide Burst: Strength 4, Range 1, Movement 1
+
+Evil Blob is moving
+
+Evil Blob is attempting to attack Glad
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Glad's new health: 1
+Living Skeleton is performing Malevolent Ash Lash: Strength 3, Range 3, Movement 2
+
+Living Skeleton is moving
+
+Living Skeleton is attempting to attack Glad
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 3
+Glad has been killed.
+Tree Man is performing Infernal Blade Lash: Strength 4, Range 2, Movement 3
+
+Tree Man is moving
+
+No opponents in range
+
+Not close enough to attack
+Happy is performing Frozen Storm Shatter: Strength 3, Range 1, Movement 3
+
+Happy is moving
+
+No opponents in range
+
+Not close enough to attack
+Evil Blob is performing Venomous Hollow Burst: Strength 1, Range 1, Movement 0
+
+No movement!
+No opponents in range
+
+Not close enough to attack
+Happy is performing Bloodthirsty Tide Slash: Strength 3, Range 3, Movement 3
+
+Happy is moving
+
+Happy is attempting to attack Evil Blob
+Attack modifier: 2x
+Attack hits!
+
+After the modifier, attack strength is: 6
+Evil Blob has been killed.
+Tree Man is performing Spectral Thorn Shatter: Strength 2, Range 2, Movement 3
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 2
+Happy's new health: 8
+Happy is performing Eternal Thorn Lash: Strength 1, Range 3, Movement 4
+
+Happy is moving
+
+Happy is attempting to attack Tree Man
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 1
+Tree Man's new health: 2
+Tree Man is performing Malevolent Wind Rend: Strength 2, Range 2, Movement 2
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 2
+Happy's new health: 6
+Happy is performing Dire Hollow Crush: Strength 5, Range 1, Movement 0
+
+No movement!
+Happy is attempting to attack Tree Man
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 4
+Tree Man has been killed.

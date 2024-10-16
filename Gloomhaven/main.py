@@ -8,14 +8,14 @@ from config import ALL_AI_MODE
 import random
 
 
-def main():
+def main(num_players = int | None):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
     
     disp = display.Display()
     # get user input and set up number of players and names
-    players = set_up_players(disp)
+    players = set_up_players(disp, num_players)
     # if players want game help, display instructions
     provide_help_if_desired(disp)
     # set up monsters
@@ -25,14 +25,14 @@ def main():
     game = GameLoop(board, disp)
     game.start()
 
-def set_up_players(disp):
+def set_up_players(disp, num_players):
     num_players = 1
     players = []
     emoji = ["🧙", "🕺", "🐣"]
     default_names = ["Happy", "Glad", "Jolly"]
 
     # get some user input before starting the game
-    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not ALL_AI_MODE else random.choice([1,2,3])
+    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not ALL_AI_MODE else num_players
     for i in range(num_players):
         player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ") if not ALL_AI_MODE else ""
         # default to happy :D
