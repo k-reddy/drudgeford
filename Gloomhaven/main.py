@@ -23,7 +23,7 @@ def main(num_players = int | None):
     
     board = Board(10, monsters, players, disp)
     game = GameLoop(board, disp)
-    game.start()
+    return game.start()
 
 def set_up_players(disp, num_players):
     num_players = 1

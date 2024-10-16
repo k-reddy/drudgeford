@@ -19,7 +19,7 @@ class GameLoop:
         self.game_state = GameState.START
         self.disp = disp
 
-    def start(self):
+    def start(self) -> GameState:
         self.game_state = GameState.RUNNING
 
         message = f'''Welcome to your quest.
@@ -35,10 +35,9 @@ Kill it or be killed...'''
             self.run_round()
             print(self.game_state)
             round_number += 1
-        # once we're no longer playing, end the game
-        if self.game_state != GameState.RUNNING:
-            print(f"{self.game_state.name=}")
-            self._end_game()
+        # once we're no longer playing, end the game 
+        print(f"{self.game_state.name=}")
+        return self._end_game()
 
     def run_round(self) -> None:
         # randomize who starts the turn
@@ -120,6 +119,7 @@ Kill it or be killed...'''
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
             )
+        return self.game_state
 
     def _end_turn(self) -> None:
         if not ALL_AI_MODE:
@@ -156,7 +156,6 @@ Kill it or be killed...'''
    |     |
     \\___/'''
         self.disp.clear_display_and_print_message(message)
-        return GameState.GAME_OVER
 
     def _lose_game_exhausted(self):
         message='''You got exhausted...GAME OVER
@@ -167,7 +166,6 @@ Kill it or be killed...'''
    |     |
     \\___/'''
         self.disp.clear_display_and_print_message(message)
-        return GameState.EXHAUSTED
 
         
 
@@ -181,5 +179,4 @@ Kill it or be killed...'''
         # couldn't get this to work with the new print method
         #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
         self.disp.clear_display_and_print_message(message=message)
-        return GameState.WIN
 
