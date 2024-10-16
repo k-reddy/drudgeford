@@ -55,7 +55,6 @@ class Character:
         # add some space between the movement and attack
         self.disp.add_to_log("")
 
-
     def select_attack_target(self, in_range_opponents):
         if not in_range_opponents:
             self.disp.add_to_log("No opponents in range\n")
