@@ -38,7 +38,7 @@ def set_up_players(disp, num_players):
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if ALL_AI_MODE else agent.Human()
-        players.append(character.Player(player_name, 10, disp, emoji[i], player_agent))
+        players.append(character.Player(player_name, 8, disp, emoji[i], player_agent))
     disp.clear_display()
     return players
 
