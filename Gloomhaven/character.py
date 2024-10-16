@@ -28,7 +28,6 @@ class Character:
         action_card_to_perform = self.agent.select_action_card(
                 self.disp, self.available_action_cards
             )
-        self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):

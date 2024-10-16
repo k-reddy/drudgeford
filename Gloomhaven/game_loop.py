@@ -156,6 +156,7 @@ Kill it or be killed...'''
    |     |
     \\___/'''
         self.disp.clear_display_and_print_message(message)
+        return GameState.GAME_OVER
 
     def _lose_game_exhausted(self):
         message='''You got exhausted...GAME OVER
@@ -166,6 +167,8 @@ Kill it or be killed...'''
    |     |
     \\___/'''
         self.disp.clear_display_and_print_message(message)
+        return GameState.EXHAUSTED
+
         
 
     def _win_game(self) -> None:
@@ -178,3 +181,5 @@ Kill it or be killed...'''
         # couldn't get this to work with the new print method
         #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
         self.disp.clear_display_and_print_message(message=message)
+        return GameState.WIN
+

@@ -1,2 +1,2 @@
 DEBUG = False
-ALL_AI_MODE = False
+ALL_AI_MODE = True
