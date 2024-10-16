@@ -3,7 +3,8 @@ from character import CharacterType, Monster, Player, Character
 from enum import Enum, auto
 from config import DEBUG, ALL_AI_MODE
 from display import Display
-
+import agent
+from board import Board
 
 class GameState(Enum):
     START = auto()
@@ -14,8 +15,10 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, board, disp: Display):
-        self.board = board
+    def __init__(self, disp: Display, num_players: int):
+        players = set_up_players(disp, num_players)
+        monsters = set_up_monsters(disp, len(players))
+        self.board = Board(10, monsters, players, disp)
         self.game_state = GameState.START
         self.disp = disp
 
@@ -180,3 +183,29 @@ Kill it or be killed...'''
         #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
         self.disp.clear_display_and_print_message(message=message)
 
+def set_up_players(disp, num_players):
+    num_players = 1 if num_players is None else num_players
+    players = []
+    emoji = ["🧙", "🕺", "🐣"]
+    default_names = ["Happy", "Glad", "Jolly"]
+
+    # get some user input before starting the game
+    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not ALL_AI_MODE else num_players
+    for i in range(num_players):
+        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ") if not ALL_AI_MODE else ""
+        # default to happy :D
+        player_name = player_name if player_name != "" else default_names[i]
+        player_agent = agent.Ai() if ALL_AI_MODE else agent.Human()
+        players.append(Player(player_name, 8, disp, emoji[i], player_agent))
+    disp.clear_display()
+    return players
+
+def set_up_monsters(disp, num_players):
+    monsters = []
+    names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
+    emoji = ["🌵", "🪼 ", "💀", "🧿"]
+    healths = [3,3,5,5]
+    for i in range(num_players+1):
+        monster = Monster(names[i], healths[i], disp, emoji[i], agent.Ai())
+        monsters.append(monster)
+    return monsters

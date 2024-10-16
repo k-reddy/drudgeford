@@ -9,7 +9,7 @@ losses = 0
 other = 0
 with open(LOG_PATH, 'w'):
     pass 
-for i in range(100):
+for i in range(20):
     num_players = random.choice([1,2,3])
     end_state = main.main(num_players)
     with open(LOG_PATH, 'a') as log_file:
