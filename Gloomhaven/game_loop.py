@@ -76,7 +76,7 @@ Kill it or be killed...'''
 
     def run_turn(self, acting_character: CharacterType) -> None:
         action_card = acting_character.select_action_card()
-        move_first = acting_character.decide_if_move_first(action_card, self.board)
+        move_first = acting_character.decide_if_move_first(action_card)
 
         actions = [
             # if you start in fire, take damage first
