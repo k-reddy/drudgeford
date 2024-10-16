@@ -50,8 +50,6 @@ class Character:
             return None
         return self.agent.select_attack_target(self.disp, in_range_opponents)
 
-
-class Player(Character):    
     def short_rest(self) -> None:
         # reset our available cards
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
@@ -60,6 +58,9 @@ class Player(Character):
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
+
+class Player(Character):    
+    pass
 
 class Monster(Character):
     pass
