@@ -17,7 +17,8 @@ human_board = Board(10, human_monsters, human_players, disp)
 
 def test_ai_select_action_card():
     for char in ai_board.characters:
-        assert char.select_action_card() in char.available_action_cards
+        avail_cards = char.available_action_cards.copy()
+        assert char.select_action_card() in avail_cards
 
 
 def test_human_select_action_card():

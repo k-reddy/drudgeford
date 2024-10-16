@@ -41,7 +41,8 @@ class Agent(abc.ABC):
 class Ai(Agent):
     @staticmethod
     def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
-        return random.choice(available_action_cards)
+        action_card_num = random.randrange(len(available_action_cards))
+        return available_action_cards.pop(action_card_num)
     
     @staticmethod
     def decide_if_move_first(disp: Display) -> bool:
