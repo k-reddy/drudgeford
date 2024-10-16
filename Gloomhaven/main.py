@@ -35,7 +35,7 @@ def set_up_players(disp):
         player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
-        players.append(character.Player(player_name, 10, disp, emoji[i], agent.Human()))
+        players.append(character.Player(player_name, 10, disp, emoji[i], agent.Ai()))
     disp.clear_display()
     return players
 
