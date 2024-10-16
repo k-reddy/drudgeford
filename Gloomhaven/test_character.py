@@ -52,6 +52,9 @@ def test_ai_select_attack_target():
     assert char.select_attack_target([]) is None
     assert char.select_attack_target(ai_players) in ai_players
 
+# !!! I should clear all obstacles from the board or this will mess up
+# !!! all these tests feel really messy - lots of failure points unrelated to what we're testing
+# !!! they also just check the most base cases - but doing otherwise feels like it'd be a ton of work
 def test_ai_perform_movement():
     print(ai_monsters, ai_players)
     action_card = ActionCard(
@@ -60,7 +63,12 @@ def test_ai_perform_movement():
         distance=2,
         movement=1
     )
-    # put the characters in known locations
+    # clear a spot on the board
+    for i in range(2):
+        for j in range(2):
+            ai_board.update_locations(i,j,None)
+    
+    # put the characters in known, clear locations
     ai_board.update_character_location(
         ai_monsters[0],
         ai_board.find_location_of_target(ai_monsters[0]),
@@ -77,6 +85,5 @@ def test_ai_perform_movement():
     assert ai_board.find_location_of_target(ai_monsters[0]) == (1,1)
     # move again
     ai_monsters[0].perform_movement(action_card, ai_board)
-    # check new loc
+    # check new loc - shouldn't move
     assert ai_board.find_location_of_target(ai_monsters[0]) == (1,1)
-
