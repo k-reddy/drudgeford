@@ -1,17 +1,6 @@
 import random
 
 from gh_types import ActionCard
-DIRECTION_MAP = {
-    "w": [-1, 0],
-    "s": [1, 0],
-    "a": [0, -1],
-    "d": [0, 1],
-    "q": [-1, -1],
-    "e": [-1, 1],
-    "z": [1, -1],
-    "c": [1, 1],
-    "f": None
-}
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
@@ -71,39 +60,6 @@ class Player(Character):
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
-
-    def perform_movement(self, action_card, board):
-        remaining_movement = action_card["movement"]
-        if remaining_movement == 0:
-            self.disp.add_to_log("No movement!")
-            return
-
-        self.disp.add_to_log(f"\n{self.name} is moving")
-        while remaining_movement > 0:
-            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
-            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            direction = self.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
-            
-            if direction == "f":
-                break
-
-            # get your currnet and new locations, then find out if the move is legal
-            current_loc = board.find_location_of_target(self)
-            new_row, new_col = [
-                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
-            ]
-            if board.is_legal_move(new_row, new_col):
-                # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(self, (new_row, new_col), 1)
-                remaining_movement -= 1
-                continue
-            else:
-                self.disp.add_to_log(
-                    "Invalid movement direction (obstacle, character, or board edge) - try again"
-                )
-
-        self.disp.add_to_log("Movement done! \n")
-
 
 class Monster(Character):
     pass
