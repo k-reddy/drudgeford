@@ -277,7 +277,7 @@ class Board:
         )
         path_traveled = []
         # if we can't go all the way, get the furthest position we can go
-
+        
         if len(path_to_target) > movement:
             path_traveled = path_to_target[:movement]
         # check if the end point is unoccupied
