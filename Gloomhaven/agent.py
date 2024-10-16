@@ -4,6 +4,18 @@ from gh_types import ActionCard
 from board import Board
 from display import Display
 
+DIRECTION_MAP = {
+    "w": [-1, 0],
+    "s": [1, 0],
+    "a": [0, -1],
+    "d": [0, 1],
+    "q": [-1, -1],
+    "e": [-1, 1],
+    "z": [1, -1],
+    "c": [1, 1],
+    "f": None
+}
+
 class Agent(abc.ABC):
     @staticmethod
     @abc.abstractmethod
@@ -79,3 +91,31 @@ class Human:
         target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
         disp.add_to_log("")
         return in_range_opponents[int(target_num)]
+    
+    @staticmethod
+    def perform_movement(char, action_card, board):
+        remaining_movement = action_card["movement"]
+        while remaining_movement > 0:
+            char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
+            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+            direction = char.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
+            
+            if direction == "f":
+                break
+
+            # get your currnet and new locations, then find out if the move is legal
+            current_loc = board.find_location_of_target(char)
+            new_row, new_col = [
+                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
+            ]
+            if board.is_legal_move(new_row, new_col):
+                # do this instead of update location because it deals with terrain
+                board.move_character_toward_location(char, (new_row, new_col), 1)
+                remaining_movement -= 1
+                continue
+            else:
+                char.disp.add_to_log(
+                    "Invalid movement direction (obstacle, character, or board edge) - try again"
+                )
+
+        char.disp.add_to_log("Movement done! \n")
