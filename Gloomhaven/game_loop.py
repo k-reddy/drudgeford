@@ -1,7 +1,7 @@
 import random
 from character import CharacterType, Monster, Player, Character
 from enum import Enum, auto
-from config import DEBUG
+from config import DEBUG, ALL_AI_MODE
 from display import Display
 
 
@@ -26,7 +26,8 @@ class GameLoop:
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed...'''
         self.disp.clear_display_and_print_message(message=message)
-        self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
+        if not ALL_AI_MODE:
+            self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
         
         round_number = 1
         while self.game_state == GameState.RUNNING:
@@ -121,14 +122,15 @@ Kill it or be killed...'''
             )
 
     def _end_turn(self) -> None:
-        self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
+        if not ALL_AI_MODE:
+            self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
         self.disp.clear_log()
 
     def _end_round(self) -> None:
         for char in self.board.characters:
             self.refresh_character_cards(char)
-
-        self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
+        if not ALL_AI_MODE:
+            self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
         self.disp.clear_log()
 
     def refresh_character_cards(self, char: Character) -> None:
