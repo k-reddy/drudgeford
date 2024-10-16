@@ -1,24 +1,13 @@
 import random
 
 from gh_types import ActionCard
-DIRECTION_MAP = {
-    "w": [-1, 0],
-    "s": [1, 0],
-    "a": [0, -1],
-    "d": [0, 1],
-    "q": [-1, -1],
-    "e": [-1, 1],
-    "z": [1, -1],
-    "c": [1, 1],
-    "f": None
-}
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, disp, emoji):
+    def __init__(self, name, health, disp, emoji, agent):
         self.health = health
         self.name = name
         self.action_cards = create_action_cards()
@@ -26,6 +15,7 @@ class Character:
         self.available_action_cards = self.action_cards.copy()
         self.disp = disp
         self.emoji = emoji
+        self.agent = agent
 
     def perform_attack(self, action_card, board):
         in_range_opponents = board.find_in_range_opponents(
@@ -35,34 +25,30 @@ class Character:
         board.attack_target(action_card, self, target)
 
     def select_action_card(self):
-        pass
+        action_card_to_perform = self.agent.select_action_card(
+                self.disp, self.available_action_cards
+            )
+        return action_card_to_perform
 
-    def decide_if_move_first(self, action_card, board):
-        pass
+    def decide_if_move_first(self, action_card):
+        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
+        return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, action_card, board):
-        pass
+        if action_card["movement"] == 0:
+            self.disp.add_to_log("No movement!")
+            return
+        self.disp.add_to_log(f"{self.name} is moving")
+        self.agent.perform_movement(self, action_card, board)
+        # add some space between the movement and attack
+        self.disp.add_to_log("")
 
     def select_attack_target(self, in_range_opponents):
-        pass
+        if not in_range_opponents:
+            self.disp.add_to_log("No opponents in range\n")
+            return None
+        return self.agent.select_attack_target(self.disp, in_range_opponents)
 
-
-class Player(Character):
-    # asks player what card they want to play
-    def select_action_card(self) -> ActionCard:
-        # let them pick a valid action_card
-        self.disp.log_action_cards(self.available_action_cards)
-        prompt = "Which action card would you like to pick? Type the number exactly."
-        valid_inputs = [str(i) for i, _ in enumerate(self.available_action_cards)]
-
-        action_card_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        action_card_to_perform = self.available_action_cards.pop(int(action_card_num))
-
-        self.disp.clear_log()
-        self.disp.add_to_log(f"{self.name} is performing {action_card_to_perform.attack_name}")
-
-        return action_card_to_perform
-    
     def short_rest(self) -> None:
         # reset our available cards
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
@@ -71,88 +57,12 @@ class Player(Character):
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
-    
 
-    def decide_if_move_first(self, action_card: ActionCard, board) -> bool:
-        self.disp.add_to_log(action_card)
-        key_press = self.disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
-        return key_press == "1"
-
-    def perform_movement(self, action_card, board):
-        remaining_movement = action_card["movement"]
-        if remaining_movement == 0:
-            self.disp.add_to_log("No movement!")
-            return
-
-        self.disp.add_to_log(f"\n{self.name} is moving")
-        while remaining_movement > 0:
-            self.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
-            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            direction = self.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
-            
-            if direction == "f":
-                break
-
-            # get your currnet and new locations, then find out if the move is legal
-            current_loc = board.find_location_of_target(self)
-            new_row, new_col = [
-                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
-            ]
-            if board.is_legal_move(new_row, new_col):
-                # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(self, (new_row, new_col), 1)
-                remaining_movement -= 1
-                continue
-            else:
-                self.disp.add_to_log(
-                    "Invalid movement direction (obstacle, character, or board edge) - try again"
-                )
-
-        self.disp.add_to_log("Movement done! \n")
-
-    def select_attack_target(self, in_range_opponents):
-        if not in_range_opponents:
-            self.disp.add_to_log("No opponents in range\n")
-            return None
-
-        self.disp.add_to_log("Opponents in range: ")
-        for i, opponent in enumerate(in_range_opponents):
-            self.disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
-
-        prompt = "Please type the number of the opponent you want to attack"
-        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = self.disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        self.disp.add_to_log("")
-        # ask the player who they want to attack
-        # ask the board to attack that person
-        return in_range_opponents[int(target_num)]
-
+class Player(Character):    
+    pass
 
 class Monster(Character):
-    def select_action_card(self):
-        return random.choice(self.action_cards)
-
-    def decide_if_move_first(self, action_card: ActionCard, board):
-        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
-        # monster always moves first - won't move if they're within range
-        return True
-
-    def perform_movement(self, action_card: ActionCard, board):
-        if action_card["movement"] == 0:
-            return
-        self.disp.add_to_log(f"{self.name} is moving")
-        targets = board.find_opponents(self)
-        target_loc = board.find_location_of_target(random.choice(targets))
-        board.move_character_toward_location(self, target_loc, action_card["movement"])
-        # add some space between the movement and attack
-        self.disp.add_to_log("")
-
-    def select_attack_target(self, in_range_opponents: list["Character"]):
-        # monster picks a random opponent
-        if not in_range_opponents:
-            return None
-        return random.choice(in_range_opponents)
-
+    pass
 
 def create_action_cards() -> list[ActionCard]:
     # each attack card will be generated with a strength, distance, and number of targets, so set

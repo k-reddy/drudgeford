@@ -1,6 +1,7 @@
 from gh_types import ActionCard
 from character import Player, Monster
 import os
+from config import ALL_AI_MODE
 
 EMPTY_CELL = "|      "
 
@@ -12,8 +13,11 @@ class Display:
         self.characters = []
         self.acting_character_name = ""
         self.round_number = None
+        self.ai_mode_log_path = "ai_mode_log.txt"
 
     def reload_display(self) -> None:
+        if ALL_AI_MODE:
+            return
         self.clear_display()
         self._draw_board()
         self._print_round_and_turn_info()
@@ -76,7 +80,11 @@ class Display:
 
 
     def add_to_log(self, log_str: str) -> None:
-        self.log.append(log_str)
+        if not ALL_AI_MODE:
+            self.log.append(log_str)
+        else:
+            with open(self.ai_mode_log_path, 'a') as log_file:
+                log_file.write(log_str + '\n') 
         self.reload_display()
 
     def _print_log(self, num_lines = 10) -> None:

@@ -6,3 +6,5 @@ env/
 .DS_Store
 __pycache__/
 .vscode/
+Gloomhaven/ai_mode_condensed_log.txt
+Gloomhaven/ai_mode_log.txt

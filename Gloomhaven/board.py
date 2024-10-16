@@ -216,13 +216,13 @@ class Board:
     def attack_target(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
     ) -> None:
-        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
-
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
             self.disp.add_to_log("Not close enough to attack")
             return
+
+        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
 
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
@@ -277,7 +277,7 @@ class Board:
         )
         path_traveled = []
         # if we can't go all the way, get the furthest position we can go
-
+        
         if len(path_to_target) > movement:
             path_traveled = path_to_target[:movement]
         # check if the end point is unoccupied
