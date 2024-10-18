@@ -39,12 +39,14 @@ instead of y is magic value,
 might wanna go back to actually having
 """
 
-MAP_TILE_WIDTH = 4
-MAP_TILE_HEIGHT = 4
+MAP_TILE_WIDTH = 5
+MAP_TILE_HEIGHT = 5
 WALL_THICKNESS = 32
+GRID_COLOR = 11
 
-test_map = [[None for _ in range(4)] for _ in range(4)]  # test with 4 x 4 map
+
 # phase 1, generate play space based on 64x64 character. add wall boundaries
+# phase 2, create move queue and read from them to move character around on grid
 
 """
 for every cell, check all directions to see if there is a tile there.
@@ -108,14 +110,21 @@ class Canvas:
         self.board_height_px = board_tile_height * tile_height_px
         self.canvas_width_px = self.board_width_px + wall_sprite_thickness_px
         self.canvas_height_px = self.board_height_px + (2 * wall_sprite_thickness_px)
+        self.board_end_pos = (self.canvas_width_px - wall_sprite_thickness_px // 2, self.canvas_height_px - wall_sprite_thickness_px)
+
+    def grid_pixels(self):
+        x_values = range(self.board_start_pos[0], self.board_end_pos[0], self.tile_width_px)
+        y_values = range(self.board_start_pos[1], self.board_end_pos[1], self.tile_height_px)
+
+        return itertools.product(x_values, y_values)
 
 
 @dataclass
 class Wall:
-    u: int
-    v: int
-    thickness: int
-    direction: Direction
+    u: int # x coord of where to start this particular wall
+    v: int # y coord of where to start this wall
+    thickness: int # in px, what size chunk to take out of sprite sheet
+    direction: Direction # NSwE 
     canvas: Canvas
 
     def pixels(
@@ -213,13 +222,13 @@ def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
 class PyxelView:
     def __init__(self):
         test_map = [
-            [None for _ in range(MAP_TILE_WIDTH)] for _ in range(MAP_TILE_HEIGHT)
+            [None for _ in range(MAP_TILE_HEIGHT)] for _ in range(MAP_TILE_WIDTH)
         ]
         # add 32 to top and bottom for wall
         # add 16 to sides for wall
         pyxel.init(len(test_map) * 64 + 32, len(test_map[0]) * 64 + 64)
         # pyxel.init(256, 256)  # test
-        canvas = Canvas(
+        self.canvas = Canvas(
             board_tile_width=MAP_TILE_WIDTH,
             board_tile_height=MAP_TILE_HEIGHT,
             tile_width_px=64,
@@ -228,19 +237,25 @@ class PyxelView:
         )
 
         self.dungeon_walls = {
-            "north": Wall(0, 0, canvas.board_tile_height, Direction.NORTH, canvas),
+            "north": Wall(0, 0, self.canvas.wall_sprite_thickness_px, Direction.NORTH, self.canvas),
             "south": Wall(
                 0,
-                canvas.canvas_height_px - canvas.tile_height_px,
-                canvas.board_tile_height,
+                self.canvas.canvas_height_px - self.canvas.wall_sprite_thickness_px,
+                self.canvas.wall_sprite_thickness_px,
                 Direction.SOUTH,
-                canvas,
+                self.canvas,
             ),
-            "west": Wall(0, 0, 32, Direction.WEST, canvas),
-            "east": Wall(canvas.canvas_width_px - 32, 0, 32, Direction.EAST, canvas),
+            "west": Wall(0, 0, 32, Direction.WEST, self.canvas),
+            "east": Wall(self.canvas.canvas_width_px - 32, 0, 32, Direction.EAST, self.canvas),
         }
-        self.x = 64
-        self.y = 64
+        self.x = self.canvas.board_start_pos[0]
+        self.y = self.canvas.board_start_pos[1] + self.canvas.tile_height_px
+        # temp values
+        self.x_min = self.canvas.board_start_pos[0]
+        self.x_max = self.canvas.board_start_pos[0] + self.canvas.board_width_px - self.canvas.tile_width_px
+        self.direction = 1
+        # end temp values
+
         pyxel.load("../my_resource.pyxres")
         pyxel.run(self.update, self.draw)
 
@@ -248,7 +263,11 @@ class PyxelView:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
-        self.x = (self.x + 1) % pyxel.width
+        
+        self.x += self.direction
+        if self.x <= self.x_min or self.x >= self.x_max:
+            self.direction *= -1
+
 
     def draw(self):
         pyxel.cls(0)
@@ -259,29 +278,19 @@ class PyxelView:
         for cardinal_direction, wall in self.dungeon_walls.items():
             if wall is not None:
                 assert isinstance(wall, Wall)
-                if cardinal_direction == "north" or cardinal_direction == "south":
-                    pixels = itertools.product(*wall.pixels())
-                    for x, y in pixels:
-                        draw_tile(
-                            x,
-                            y,
-                            **BACKGROUND_TILES[f"dungeon_wall_{cardinal_direction}"],
-                        )
-                        occupied_coordinates[(x, y)] = True
-                if cardinal_direction == "west" or cardinal_direction == "east":
-                    pixels = itertools.product(*wall.pixels())
-
-                    for x, y in pixels:
-                        if (x, y) in occupied_coordinates:
-                            continue
-                        draw_tile(
-                            x,
-                            y,
-                            **BACKGROUND_TILES[f"dungeon_wall_{cardinal_direction}"],
-                        )
-                        occupied_coordinates[(x, y)] = True
-                else:
-                    ...
+                if cardinal_direction not in self.dungeon_walls.keys():
+                    raise ValueError('invalid cardinal_directiona')
+                
+                pixels = itertools.product(*wall.pixels())
+                for x, y in pixels:
+                    if (x, y) in occupied_coordinates:
+                        continue
+                    draw_tile(
+                        x,
+                        y,
+                        **BACKGROUND_TILES[f"dungeon_wall_{cardinal_direction}"],
+                    )
+                    occupied_coordinates[(x, y)] = True
 
         # Draw background
         for x in range(0, pyxel.width, BACKGROUND_TILES["dungeon_floor"]["w"]):
@@ -291,6 +300,10 @@ class PyxelView:
 
         # Draw characters
         draw_tile(self.x, self.y, **SPRITE_TILES["knight"][AnimationFrame.SOUTH])
+
+        # Draw grids
+        for tile_x, tile_y in self.canvas.grid_pixels():
+            pyxel.rectb(tile_x, tile_y, self.canvas.tile_width_px, self.canvas.tile_height_px, GRID_COLOR)
 
 
 PyxelView()
