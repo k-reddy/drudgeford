@@ -5,6 +5,7 @@ from collections import deque
 from character import CharacterType, Monster, Player
 from gh_types import ActionCard
 from display import Display
+from log import Log
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -33,6 +34,8 @@ class Board:
         disp.locations = self.locations
         disp.terrain = self.terrain
         disp.characters = self.characters
+        self.log = Log()
+        self.log.add_observer(disp.add_to_log)
 
     def _initialize_board(self, width: int = 5, height=5):
         return [["X" for _ in range(width)] for _ in range(height)]
@@ -219,20 +222,20 @@ class Board:
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
-            self.disp.add_to_log("Not close enough to attack")
+            self.log.add("Not close enough to attack")
             return
 
-        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
+        self.log.add(f"{attacker.name} is attempting to attack {target.name}")
 
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
         if modified_attack_strength <= 0:
-            self.disp.add_to_log("Darn, attack missed!")
+            self.log.add("Darn, attack missed!")
             return
 
-        self.disp.add_to_log("Attack hits!\n")
-        self.disp.add_to_log(
+        self.log.add("Attack hits!\n")
+        self.log.add(
             f"After the modifier, attack strength is: {modified_attack_strength}"
         )
 
@@ -255,7 +258,7 @@ class Board:
         self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
-        self.disp.add_to_log(f"{target.name} has been killed.")
+        self.log.add(f"{target.name} has been killed.")
         # !!! for pair coding
         # !!! if the target is the player, end game
         # !!! if the target is the acting_character, end turn
@@ -316,9 +319,7 @@ class Board:
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
-            self.disp.add_to_log(
-                f"{acting_character.name} took {damage} damage from terrain"
-            )
+            self.log.add(f"{acting_character.name} took {damage} damage from terrain")
             self.modify_target_health(acting_character, damage)
 
     def deal_terrain_damage_current_location(self, acting_character: CharacterType):
@@ -351,7 +352,7 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
         else:
-            self.disp.add_to_log(f"{target.name}'s new health: {target.health}")
+            self.log.add(f"{target.name}'s new health: {target.health}")
 
     def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
         def multiply(x, y):
@@ -372,5 +373,5 @@ class Board:
         attack_modifier_function, modifier_string = random.choices(
             attack_modifier_deck, attack_modifier_weights
         )[0]
-        self.disp.add_to_log(f"Attack modifier: {modifier_string}")
+        self.log.add(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
