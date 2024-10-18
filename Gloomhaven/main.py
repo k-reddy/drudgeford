@@ -8,7 +8,7 @@ from config import ALL_AI_MODE
 import random
 
 
-def main(num_players = int | None):
+def main(num_players: int | None = None):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
