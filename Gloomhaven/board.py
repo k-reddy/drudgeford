@@ -6,6 +6,7 @@ from character import CharacterType, Monster, Player
 from gh_types import ActionCard
 from display import Display
 from log import Log
+from observable import Observable
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -14,40 +15,68 @@ TERRAIN_DAMAGE = 1
 # the board holds all the game metadata including the monster and player who are playing
 # it adjudicates actions and ends the game
 # the board draws itself as well!
-class Board:
+class Board(Observable):
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
         self, size: int, monsters: list[Monster], players: list[Player], disp: Display
     ) -> None:
+        super().__init__()
         self.size = size
+        # add observers before initializing
+        self.add_observer("locations", disp.update_locations)
+        self.add_observer("characters", disp.update_characters)
+        self.add_observer("terrain", disp.update_terrain)
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         self.characters: list[CharacterType] = players + monsters
         self.locations = self._initialize_board(self.size, self.size)
-        self.terrain = copy.deepcopy(self.locations)
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
-        # keep track of the display, and update it with the newly created locations and terrain
-        self.disp = disp
-        disp.locations = self.locations
-        disp.terrain = self.terrain
-        disp.characters = self.characters
         self.log = Log()
         self.log.add_observer(disp.add_to_log)
+
+    @property
+    def locations(self):
+        return self.__locations
+
+    @locations.setter
+    def locations(self, locations):
+        self.__locations = locations
+        self.notify_observers("locations", locations)
+
+    @property
+    def terrain(self):
+        return self.__terrain
+
+    @terrain.setter
+    def terrain(self, terrain):
+        self.__terrain = terrain
+        self.notify_observers("terrain", terrain)
+
+    @property
+    def characters(self):
+        return self.__characters
+
+    @characters.setter
+    def characters(self, characters):
+        self.__characters = characters
+        self.notify_observers("characters", characters)
 
     def _initialize_board(self, width: int = 5, height=5):
         return [["X" for _ in range(width)] for _ in range(height)]
 
     def add_fire_to_terrain(self) -> None:
+        terrain = copy.deepcopy(self.locations)
         max_loc = self.size - 1
         for _ in range(10):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
-                self.terrain[row][col] = "FIRE"
+                terrain[row][col] = "FIRE"
+        self.terrain = terrain
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -197,6 +226,7 @@ class Board:
     ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
+        # BUG path_to_target might be [], which would make dist_to_target 0 and return True
         dist_to_target = len(
             self.get_shortest_valid_path(attacker_location, target_location)
         )
@@ -243,7 +273,12 @@ class Board:
 
     def update_locations(self, row, col, new_item):
         self.locations[row][col] = new_item
-        self.disp.update_locations(self.locations)
+        # not really necessary! self.notify_observers("locations", self.locations)
+
+    def remove_character(self, target):
+        self.characters.remove(target)
+        # not really necessary! self.notify_observers("characters", self.characters)
+        # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: CharacterType) -> None:
         # !!! to fix
@@ -254,8 +289,7 @@ class Board:
         # not by ending turn after each action
         if target not in self.characters:
             return
-        self.characters.remove(target)
-        self.disp.characters = self.characters
+        self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.log.add(f"{target.name} has been killed.")
@@ -285,6 +319,11 @@ class Board:
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
+        # BUG path_to_target might be [] leading to an error in is_legal_move's arguments below
+        # discuss how we want to proceed if there is no path to chosen target
+        # found this error when running simulations (uncommon even then)
+        # human players will probably not pick an inaccessible target?
+
         path_to_target = self.get_shortest_valid_path(
             start=acting_character_loc, end=target_location
         )
