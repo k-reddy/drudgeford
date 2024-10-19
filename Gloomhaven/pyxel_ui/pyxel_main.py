@@ -328,7 +328,7 @@ class PyxelView:
             - self.canvas.tile_width_px
         )
         self.direction = 1
-        test_duration = 300
+        test_duration = 700
         test_action = Action(
             character="knight",
             animation_type="walk",
@@ -353,9 +353,18 @@ class PyxelView:
             to_grid_pos=(1, 2),
             duration_ms=test_duration,
         )
+        test_action4 = Action(
+            character="knight",
+            animation_type="walk",
+            direction="east",
+            from_grid_pos=(1, 2),
+            to_grid_pos=(2, 2),
+            duration_ms=test_duration,
+        )
         self.action_queue.enqueue(test_action)
         self.action_queue.enqueue(test_action2)
         self.action_queue.enqueue(test_action3)
+        self.action_queue.enqueue(test_action4)
         # end temp values
 
         pyxel.load("../my_resource.pyxres")
@@ -376,6 +385,8 @@ class PyxelView:
         end_tile_pos: tuple[int, int],
         tween_time: int,
     ) -> deque[tuple[int, int]]:
+        assert tween_time > FRAME_DURATION_MS, "action smaller than frame rate"
+
         start_px_x, start_px_y = self.convert_grid_to_pixel_pos(
             start_tile_pos[0], start_tile_pos[1]
         )
@@ -383,21 +394,21 @@ class PyxelView:
             end_tile_pos[0], end_tile_pos[1]
         )
 
-        assert tween_time > FRAME_DURATION_MS, "action smaller than frame rate"
         step_count = tween_time // FRAME_DURATION_MS
         diff_px_x = end_px_x - start_px_x
         step_px_x = diff_px_x // step_count
         diff_px_y = end_px_y - start_px_y
         step_px_y = diff_px_y // step_count
-        steps: deque = deque([])
 
+        steps: deque = deque([])
         for step in range(step_count + 1):
             steps.append(
                 (start_px_x + (step * step_px_x), start_px_y + (step * step_px_y))
             )
 
-        # This guarantees that the sprite will end up on correct position
+        # This guarantees that the sprite will end up at the correct position
         steps.append((end_px_x, end_px_y))
+
         return steps
 
     def convert_and_append_move_steps_to_action(self, action: Action) -> Action:
