@@ -5,11 +5,14 @@ from dataclasses import dataclass
 from enum import auto, Enum
 import itertools
 from typing import Optional
+import time
+import statistics
 # from board import Board
 
 """
-colors
-0,0,0
+average frame time = 0.0343 sec
+colors (for aseprite use)
+0,0,0 this is transparency
 43,51,95
 126,32,114
 25,149,156
@@ -32,17 +35,11 @@ colors
 
 """
 
-
-"""
-optimizations
-instead of y is magic value,
-might wanna go back to actually having
-"""
-
 MAP_TILE_WIDTH = 5
 MAP_TILE_HEIGHT = 5
 WALL_THICKNESS = 32
 GRID_COLOR = 11
+FRAME_DURATION_MS = 34
 
 
 # phase 1, generate play space based on 64x64 character. add wall boundaries
@@ -83,6 +80,8 @@ class Action:
     direction: Direction
     from_grid_pos: tuple
     to_grid_pos: tuple
+    duration_ms: int = 1000
+    action_steps: Optional[deque[tuple[int, int]]] = None
 
 
 class PyxelActionQueue:
@@ -241,16 +240,25 @@ class AnimationFrame(Enum):
     IDLE_2 = auto()
 
 
+@dataclass
+class Sprite:
+    img_bank: int  # spriate sheet, 0-3
+    u: int  # x-coord, pyxel nomenclature
+    v: int  # y-coord, pyxel nomenclature
+    w: int  # width
+    h: int  # height
+
+
 # sprites are currently 64x64
 SPRITE_TILES = {
     "knight": {
-        AnimationFrame.SOUTH: {
-            "img_bank": 0,
-            "u": 0,
-            "v": 0,
-            "w": 64,
-            "h": 64,
-        }
+        AnimationFrame.SOUTH: Sprite(
+            img_bank=0,
+            u=0,
+            v=0,
+            w=64,
+            h=64,
+        )
     }
 }
 
@@ -295,9 +303,24 @@ class PyxelView:
                 self.canvas.canvas_width_px - 32, 0, 32, Direction.EAST, self.canvas
             ),
         }
+        self.characters = {
+            "knight": {
+                "animation_frame": AnimationFrame.SOUTH,
+                "x": self.canvas.board_start_pos[0],
+                "y": self.canvas.board_start_pos[1] + self.canvas.tile_height_px,
+                "alive": True,
+            }
+        }
         self.x = self.canvas.board_start_pos[0]
         self.y = self.canvas.board_start_pos[1] + self.canvas.tile_height_px
+
+        # Init action queue system
+        self.action_queue = PyxelActionQueue()
+        self.current_action = None
+
         # temp values
+        self.start_time = time.time()
+        self.time_diffs = []
         self.x_min = self.canvas.board_start_pos[0]
         self.x_max = (
             self.canvas.board_start_pos[0]
@@ -305,18 +328,107 @@ class PyxelView:
             - self.canvas.tile_width_px
         )
         self.direction = 1
+        test_duration = 300
+        test_action = Action(
+            character="knight",
+            animation_type="walk",
+            direction="east",
+            from_grid_pos=(0, 0),
+            to_grid_pos=(1, 0),
+            duration_ms=test_duration,
+        )
+        test_action2 = Action(
+            character="knight",
+            animation_type="walk",
+            direction="east",
+            from_grid_pos=(1, 0),
+            to_grid_pos=(1, 1),
+            duration_ms=test_duration,
+        )
+        test_action3 = Action(
+            character="knight",
+            animation_type="walk",
+            direction="east",
+            from_grid_pos=(1, 1),
+            to_grid_pos=(1, 2),
+            duration_ms=test_duration,
+        )
+        self.action_queue.enqueue(test_action)
+        self.action_queue.enqueue(test_action2)
+        self.action_queue.enqueue(test_action3)
         # end temp values
 
         pyxel.load("../my_resource.pyxres")
         pyxel.run(self.update, self.draw)
 
+    def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
+        pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
+
+    # start with way to turn grid position to pixels within board
+    def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
+        pixel_x = self.canvas.board_start_pos[0] + (tile_x * self.canvas.tile_width_px)
+        pixel_y = self.canvas.board_start_pos[1] + (tile_y * self.canvas.tile_height_px)
+        return (pixel_x, pixel_y)
+
+    def get_px_move_steps_between_tiles(
+        self,
+        start_tile_pos: tuple[int, int],
+        end_tile_pos: tuple[int, int],
+        tween_time: int,
+    ) -> deque[tuple[int, int]]:
+        start_px_x, start_px_y = self.convert_grid_to_pixel_pos(
+            start_tile_pos[0], start_tile_pos[1]
+        )
+        end_px_x, end_px_y = self.convert_grid_to_pixel_pos(
+            end_tile_pos[0], end_tile_pos[1]
+        )
+
+        assert tween_time > FRAME_DURATION_MS, "action smaller than frame rate"
+        step_count = tween_time // FRAME_DURATION_MS
+        diff_px_x = end_px_x - start_px_x
+        step_px_x = diff_px_x // step_count
+        diff_px_y = end_px_y - start_px_y
+        step_px_y = diff_px_y // step_count
+        steps: deque = deque([])
+
+        for step in range(step_count + 1):
+            steps.append(
+                (start_px_x + (step * step_px_x), start_px_y + (step * step_px_y))
+            )
+
+        # This guarantees that the sprite will end up on correct position
+        steps.append((end_px_x, end_px_y))
+        return steps
+
+    def convert_and_append_move_steps_to_action(self, action: Action) -> Action:
+        action.action_steps = self.get_px_move_steps_between_tiles(
+            action.from_grid_pos, action.to_grid_pos, action.duration_ms
+        )
+        return action
+
+    def process_action(self) -> None:
+        print(f"{self.current_action.action_steps=}")
+        if not self.current_action.action_steps:
+            self.current_action = None  # better than del; no dangling logic
+            return
+
+        px_pos_x, px_pos_y = self.current_action.action_steps.popleft()
+        action = self.current_action
+        self.characters[action.character]["x"] = px_pos_x
+        self.characters[action.character]["y"] = px_pos_y
+
     def update(self):
         if pyxel.btnp(pyxel.KEY_Q):
+            print(f"{statistics.mean(self.time_diffs)=}")
             pyxel.quit()
 
-        self.x += self.direction
-        if self.x <= self.x_min or self.x >= self.x_max:
-            self.direction *= -1
+        if not self.current_action and not self.action_queue.is_empty():
+            self.current_action = self.convert_and_append_move_steps_to_action(
+                self.action_queue.dequeue()
+            )
+
+        if self.current_action:
+            self.process_action()
 
     def draw(self):
         pyxel.cls(0)
@@ -347,8 +459,13 @@ class PyxelView:
                 if (x, y) not in occupied_coordinates:
                     draw_tile(x, y, **BACKGROUND_TILES["dungeon_floor"])
 
-        # Draw characters
-        draw_tile(self.x, self.y, **SPRITE_TILES["knight"][AnimationFrame.SOUTH])
+        # Draw sprites
+        for character, attributes in self.characters.items():
+            self.draw_sprite(
+                attributes["x"],
+                attributes["y"],
+                SPRITE_TILES[character][attributes["animation_frame"]],
+            )
 
         # Draw grids
         for tile_x, tile_y in self.canvas.grid_pixels():
