@@ -5,6 +5,8 @@ from pyxel_main import (
     PyxelActionQueue,
 )
 
+# python3 -m unittest discover -s tests
+
 
 class TestPyxelActionQueue(unittest.TestCase):
     def setUp(self):
