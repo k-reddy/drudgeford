@@ -3,6 +3,7 @@ from observable import Observable
 
 class Log(Observable):
     def __init__(self):
+        super().__init__()
         self.observers = {"log": []}
         self.log = []
 
