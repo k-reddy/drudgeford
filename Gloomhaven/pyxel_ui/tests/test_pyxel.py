@@ -1,5 +1,5 @@
 import unittest
-from pyxel_main import (
+from ..pyxel_main import (
     Action,
     Direction,
     PyxelActionQueue,
