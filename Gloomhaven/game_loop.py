@@ -1,7 +1,7 @@
 import random
 from character import CharacterType, Monster, Player, Character
 from enum import Enum, auto
-from config import DEBUG, ALL_AI_MODE
+from config import DEBUG
 from display import Display
 import agent
 from board import Board
@@ -15,12 +15,13 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int):
-        players = set_up_players(disp, num_players)
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool):
+        players = set_up_players(disp, num_players, all_ai_mode)
         monsters = set_up_monsters(disp, len(players))
         self.board = Board(10, monsters, players, disp)
         self.game_state = GameState.START
         self.disp = disp
+        self.all_ai_mode = all_ai_mode
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
@@ -28,7 +29,7 @@ class GameLoop:
         message = f'''Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed...'''
-        if not ALL_AI_MODE:
+        if not self.all_ai_mode:
             self.disp.clear_display_and_print_message(message=message)
             self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
         
@@ -123,19 +124,19 @@ Kill it or be killed...'''
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
             )
-        if not ALL_AI_MODE:
+        if not self.all_ai_mode:
             self.disp.clear_display_and_print_message(message)
         return self.game_state
 
     def _end_turn(self) -> None:
-        if not ALL_AI_MODE:
+        if not self.all_ai_mode:
             self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
             self.disp.clear_log()
 
     def _end_round(self) -> None:
         for char in self.board.characters:
             self.refresh_character_cards(char)
-        if not ALL_AI_MODE:
+        if not self.all_ai_mode:
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
             self.disp.clear_log()
 
@@ -184,20 +185,20 @@ Kill it or be killed...'''
         '''
         return message
 
-def set_up_players(disp, num_players):
+def set_up_players(disp, num_players, all_ai_mode):
     players = []
     emoji = ["🧙", "🕺", "🐣"]
     default_names = ["Happy", "Glad", "Jolly"]
 
     # get some user input before starting the game
-    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not ALL_AI_MODE else num_players
+    num_players = int(disp.get_user_input("How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"])) if not all_ai_mode else num_players
     for i in range(num_players):
-        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ") if not ALL_AI_MODE else ""
+        player_name = disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ") if not all_ai_mode else ""
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
-        player_agent = agent.Ai() if ALL_AI_MODE else agent.Human()
+        player_agent = agent.Ai() if all_ai_mode else agent.Human()
         players.append(Player(player_name, 8, disp, emoji[i], player_agent))
-    if not ALL_AI_MODE:
+    if not all_ai_mode:
         disp.clear_display()
     return players
 
