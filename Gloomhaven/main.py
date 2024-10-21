@@ -7,7 +7,7 @@ def main(num_players: int = 1):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
-    
+
     disp = display.Display()
     # if players want game help, display instructions
     provide_help_if_desired(disp)
@@ -25,9 +25,12 @@ def provide_help_if_desired(disp):
 - Whoever runs out of health first loses
 
 Good luck!'''
-
-    want_help = disp.get_user_input(prompt="Hit enter to start or type help for instructions ") if not ALL_AI_MODE else False
-    if want_help == "help":
+    want_help = False
+    if not ALL_AI_MODE:
+        user_input = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
+        if user_input == "help":
+            want_help = True
+    if want_help:
         disp.clear_display_and_print_message(help_message)
         disp.get_user_input(prompt="Hit enter to continue")
         disp.clear_display()
