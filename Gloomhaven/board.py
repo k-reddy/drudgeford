@@ -256,11 +256,7 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.disp.add_to_log(f"{target.name} has been killed.")
-        # !!! for pair coding
-        # !!! if the target is the player, end game
-        # !!! if the target is the acting_character, end turn
-        # - to do this, end turn and end game need to actually work, not just be place holders
-
+        
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
     ) -> list[CharacterType]:
