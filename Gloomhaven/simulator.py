@@ -6,6 +6,7 @@ import pandas as pd
 # setup variables
 LOG_PATH = "ai_mode_condensed_log.txt"
 game_data = []
+num_games = 1000
 # helper function
 def classify_game(end_state):
     if end_state == GameState.WIN:
@@ -16,9 +17,9 @@ def classify_game(end_state):
         return 'other'
 
 # run simulation and gather data
-for i in range(200):
+for i in range(num_games):
     if i % 10 == 0:
-        print(f"Running game {i}")
+        print(f"Running game {i}/{num_games}")
     num_players = random.choice([1,2,3])
     end_state = main.main(num_players)
     game_data.append({
