@@ -28,18 +28,18 @@ class GameLoop:
         message = f'''Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed...'''
-        self.disp.clear_display_and_print_message(message=message)
         if not ALL_AI_MODE:
+            self.disp.clear_display_and_print_message(message=message)
             self.disp.get_user_input(prompt="Time to start the game! Hit enter to continue\n")
         
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.disp.update_round_number(round_number)
             self.run_round()
-            print(self.game_state)
+            # print(self.game_state)
             round_number += 1
         # once we're no longer playing, end the game 
-        print(f"{self.game_state.name=}")
+        # print(f"{self.game_state.name=}")
         return self._end_game()
 
     def run_round(self) -> None:
@@ -112,29 +112,32 @@ Kill it or be killed...'''
             self.game_state = GameState.GAME_OVER
 
     def _end_game(self) -> None:
+        message = ''
         if self.game_state == GameState.GAME_OVER:
-            self._lose_game_dead()
+            message = self._lose_game_dead()
         elif self.game_state == GameState.WIN:
-            self._win_game()
+            message = self._win_game()
         elif self.game_state == GameState.EXHAUSTED:
-            self._lose_game_exhausted()
+            message = self._lose_game_exhausted()
         else:
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
             )
+        if not ALL_AI_MODE:
+            self.disp.clear_display_and_print_message(message)
         return self.game_state
 
     def _end_turn(self) -> None:
         if not ALL_AI_MODE:
             self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
-        self.disp.clear_log()
+            self.disp.clear_log()
 
     def _end_round(self) -> None:
         for char in self.board.characters:
             self.refresh_character_cards(char)
         if not ALL_AI_MODE:
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
-        self.disp.clear_log()
+            self.disp.clear_log()
 
     def refresh_character_cards(self, char: Character) -> None:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
@@ -158,7 +161,7 @@ Kill it or be killed...'''
     /   \\
    |     |
     \\___/'''
-        self.disp.clear_display_and_print_message(message)
+        return message
 
     def _lose_game_exhausted(self):
         message='''You got exhausted...GAME OVER
@@ -168,7 +171,7 @@ Kill it or be killed...'''
     /   \\
    |     |
     \\___/'''
-        self.disp.clear_display_and_print_message(message)
+        return message
 
         
 
@@ -179,9 +182,7 @@ Kill it or be killed...'''
     / \\
    /   \\
         '''
-        # couldn't get this to work with the new print method
-        #  "\n" r"    \o/   Victory!\n" "     |\n" "    / \\n" "   /   \\n" "        "
-        self.disp.clear_display_and_print_message(message=message)
+        return message
 
 def set_up_players(disp, num_players):
     num_players = 1 if num_players is None else num_players
@@ -197,14 +198,15 @@ def set_up_players(disp, num_players):
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if ALL_AI_MODE else agent.Human()
         players.append(Player(player_name, 8, disp, emoji[i], player_agent))
-    disp.clear_display()
+    if not ALL_AI_MODE:
+        disp.clear_display()
     return players
 
 def set_up_monsters(disp, num_players):
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
     emoji = ["🌵", "🪼 ", "💀", "🧿"]
-    healths = [3,3,5,5]
+    healths = [3,3,6,7]
     for i in range(num_players+1):
         monster = Monster(names[i], healths[i], disp, emoji[i], agent.Ai())
         monsters.append(monster)
