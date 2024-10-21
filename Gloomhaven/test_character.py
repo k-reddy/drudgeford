@@ -1,12 +1,11 @@
-import pytest
 from unittest.mock import patch
 from board import Board
 from character import Monster, Player
-from agent import Agent, Ai, Human
+from agent import Ai, Human
 from display import Display
 from gh_types import ActionCard
 
-disp = Display()
+disp = Display(False)
 ai_monsters = [Monster("Monster", 10, disp, "🦁", Ai())]
 ai_players = [Player("Player", 10, disp, "🐷", Ai())]
 human_players = [Player("Player", 10, disp, "🐷", Human())]
@@ -85,7 +84,7 @@ def test_ai_perform_movement():
             [2,2]
         )
     except ValueError:
-        ai_board.update_location(
+        ai_board.update_locations(
             2,2, ai_players[0]
         )
     # move
