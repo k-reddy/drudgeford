@@ -206,7 +206,7 @@ def set_up_monsters(disp, num_players):
     monsters = []
     names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
     emoji = ["🌵", "🪼 ", "💀", "🧿"]
-    healths = [3,3,6,7]
+    healths = [3,3,7,8]
     for i in range(num_players+1):
         monster = Monster(names[i], healths[i], disp, emoji[i], agent.Ai())
         monsters.append(monster)
