@@ -241,6 +241,14 @@ class Board:
         self.disp.update_locations(self.locations)
 
     def kill_target(self, target: CharacterType) -> None:
+        # !!! to fix
+        # weird bug where you can kill someone who's already killed 
+        # by walking through fire after you're dead since 
+        # movement doesn't auto-end 
+        # we need to fix this upstream by ending turn immediately when die,
+        # not by ending turn after each action
+        if not target in self.characters:
+            return
         self.characters.remove(target)
         self.disp.characters = self.characters
         row, col = self.find_location_of_target(target)
