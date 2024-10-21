@@ -1,17 +1,18 @@
+import os
 from gh_types import ActionCard
 from character import Player, Monster
-import os
 
 EMPTY_CELL = "|      "
 
+
 class Display:
     def __init__(self, all_ai_mode: bool) -> None:
-        self.log = []
-        self.locations = [[]]
-        self.terrain = [[]]
-        self.characters = []
+        self.log: list = []
+        self.locations: list = [[]]
+        self.terrain: list = [[]]
+        self.characters: list = []
         self.acting_character_name = ""
-        self.round_number = None
+        self.round_number = 0
         self.ai_mode_log_path = "ai_mode_log.txt"
         self.all_ai_mode = all_ai_mode
 
@@ -27,7 +28,7 @@ class Display:
 
     def update_locations(self, locations) -> None:
         self.locations = locations
-    
+
     def update_terrain(self, terrain) -> None:
         self.terrain = terrain
 
@@ -68,26 +69,25 @@ class Display:
         # add the bottom
         to_draw += top
         print(to_draw)
-    
+
     def _print_healths(self) -> None:
         print_str = "Healths: "
         for x in self.characters:
             print_str += f"{x.name} {x.emoji}: {x.health}, "
         print(print_str[:-2])
-    
+
     def _print_round_and_turn_info(self) -> None:
         print(f"Round {self.round_number}, {self.acting_character_name}'s turn")
-
 
     def add_to_log(self, log_str: str) -> None:
         if not self.all_ai_mode:
             self.log.append(log_str)
         else:
-            with open(self.ai_mode_log_path, 'a') as log_file:
-                log_file.write(log_str + '\n') 
+            with open(self.ai_mode_log_path, "a") as log_file:
+                log_file.write(log_str + "\n")
         self.reload_display()
 
-    def _print_log(self, num_lines = 10) -> None:
+    def _print_log(self, num_lines=10) -> None:
         for line in self.log[-num_lines:]:
             print(line)
 
@@ -98,29 +98,27 @@ class Display:
 
     def clear_log(self) -> None:
         self.log = []
-    
+
     def get_user_input(self, prompt: str, valid_inputs=None):
         user_input = input(prompt)
 
         # if there's no validation, return any input given
         if valid_inputs is None:
             return user_input
-        
+
         while user_input not in valid_inputs:
             user_input = input("Invalid key pressed. Try again.")
-        
+
         return user_input
-    
+
     def clear_display_and_print_message(self, message) -> None:
         self.clear_display()
         print(message)
 
     def clear_display(self) -> None:
         # Check if the system is Windows
-        if os.name == 'nt':
-            os.system('cls')
+        if os.name == "nt":
+            os.system("cls")
         else:
-            os.system('clear')
+            os.system("clear")
         return
-
-
