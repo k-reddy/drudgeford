@@ -1,8 +1,8 @@
 import random
 from functools import partial
-from character import CharacterType, Monster, Player
 import copy
 from collections import deque
+from character import CharacterType, Monster, Player
 from gh_types import ActionCard
 from display import Display
 
@@ -39,7 +39,7 @@ class Board:
 
     def add_fire_to_terrain(self) -> None:
         max_loc = self.size - 1
-        for i in range(10):
+        for _ in range(10):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
@@ -49,9 +49,9 @@ class Board:
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
-                self.locations[x][
-                    y
-                ] = None  # Carving walkable room (None represents open space)
+                self.locations[x][y] = (
+                    None  # Carving walkable room (None represents open space)
+                )
 
     def carve_hallway(self, start_x: int, start_y: int, end_x: int, end_y: int) -> None:
         # Horizontal movement first, then vertical
@@ -59,16 +59,16 @@ class Board:
 
         while x != end_x:
             if 0 <= x < self.size:
-                self.locations[x][
-                    y
-                ] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][y] = (
+                    None  # Carving walkable hallway (None represents open space)
+                )
             x += 1 if end_x > x else -1
 
         while y != end_y:
             if 0 <= y < self.size:
-                self.locations[x][
-                    y
-                ] = None  # Carving walkable hallway (None represents open space)
+                self.locations[x][y] = (
+                    None  # Carving walkable hallway (None represents open space)
+                )
             y += 1 if end_y > y else -1
 
     def reshape_board(self, num_rooms: int = 4) -> None:
@@ -232,7 +232,9 @@ class Board:
             return
 
         self.disp.add_to_log("Attack hits!\n")
-        self.disp.add_to_log(f"After the modifier, attack strength is: {modified_attack_strength}")
+        self.disp.add_to_log(
+            f"After the modifier, attack strength is: {modified_attack_strength}"
+        )
 
         self.modify_target_health(target, modified_attack_strength)
 
@@ -242,12 +244,12 @@ class Board:
 
     def kill_target(self, target: CharacterType) -> None:
         # !!! to fix
-        # weird bug where you can kill someone who's already killed 
-        # by walking through fire after you're dead since 
-        # movement doesn't auto-end 
+        # weird bug where you can kill someone who's already killed
+        # by walking through fire after you're dead since
+        # movement doesn't auto-end
         # we need to fix this upstream by ending turn immediately when die,
         # not by ending turn after each action
-        if not target in self.characters:
+        if target not in self.characters:
             return
         self.characters.remove(target)
         self.disp.characters = self.characters
@@ -284,7 +286,7 @@ class Board:
             start=acting_character_loc, end=target_location
         )
         path_traveled = []
-        
+
         # if there's not a way to get to target, don't move
         if not path_to_target:
             return
@@ -314,12 +316,12 @@ class Board:
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
-            self.disp.add_to_log(f"{acting_character.name} took {damage} damage from terrain")
+            self.disp.add_to_log(
+                f"{acting_character.name} took {damage} damage from terrain"
+            )
             self.modify_target_health(acting_character, damage)
 
-    def deal_terrain_damage_current_location(
-            self, acting_character: CharacterType
-    ):
+    def deal_terrain_damage_current_location(self, acting_character: CharacterType):
         row, col = self.find_location_of_target(acting_character)
         self.deal_terrain_damage(acting_character, row, col)
 
@@ -350,8 +352,6 @@ class Board:
             self.kill_target(target)
         else:
             self.disp.add_to_log(f"{target.name}'s new health: {target.health}")
-
-
 
     def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
         def multiply(x, y):
