@@ -1,14 +1,9 @@
-import character
-from board import Board
 import os
 from game_loop import GameLoop
 import display
-import agent
 from config import ALL_AI_MODE
-import random
 
-
-def main(num_players: int | None = None):
+def main(num_players: int = 1):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
