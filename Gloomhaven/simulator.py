@@ -16,7 +16,9 @@ def classify_game(end_state):
         return 'other'
 
 # run simulation and gather data
-for i in range(100):
+for i in range(200):
+    if i % 10 == 0:
+        print(f"Running game {i}")
     num_players = random.choice([1,2,3])
     end_state = main.main(num_players)
     game_data.append({
