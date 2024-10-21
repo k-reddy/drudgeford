@@ -246,11 +246,7 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.disp.add_to_log(f"{target.name} has been killed.")
-        # !!! for pair coding
-        # !!! if the target is the player, end game
-        # !!! if the target is the acting_character, end turn
-        # - to do this, end turn and end game need to actually work, not just be place holders
-
+        
     def find_in_range_opponents(
         self, actor: CharacterType, action_card: ActionCard
     ) -> list[CharacterType]:
@@ -276,9 +272,12 @@ class Board:
             start=acting_character_loc, end=target_location
         )
         path_traveled = []
-        # if we can't go all the way, get the furthest position we can go
         
-        if len(path_to_target) > movement:
+        # if there's not a way to get to target, don't move
+        if not path_to_target:
+            return
+        # if we can't go all the way, get the furthest position we can go
+        elif len(path_to_target) > movement:
             path_traveled = path_to_target[:movement]
         # check if the end point is unoccupied
         elif self.is_legal_move(path_to_target[-1][0], path_to_target[-1][1]):
