@@ -185,7 +185,6 @@ Kill it or be killed...'''
         return message
 
 def set_up_players(disp, num_players):
-    num_players = 1 if num_players is None else num_players
     players = []
     emoji = ["🧙", "🕺", "🐣"]
     default_names = ["Happy", "Glad", "Jolly"]
