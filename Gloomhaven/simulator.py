@@ -10,7 +10,7 @@ game_data = []
 def classify_game(end_state):
     if end_state == GameState.WIN:
         return 'win'
-    elif end_state in [GameState.EXHAUSTED, GameState.GAMEOVER]:
+    elif end_state in [GameState.EXHAUSTED, GameState.GAME_OVER]:
         return 'loss'
     else:
         return 'other'
