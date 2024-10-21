@@ -21,7 +21,7 @@ for i in range(num_games):
     if i % 10 == 0:
         print(f"Running game {i}/{num_games}")
     num_players = random.choice([1,2,3])
-    end_state = main.main(num_players)
+    end_state = main.main(num_players, all_ai_mode=True)
     game_data.append({
         "end_state": end_state,
         "num_players": num_players

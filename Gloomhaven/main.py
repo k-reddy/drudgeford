@@ -1,21 +1,20 @@
 import os
 from game_loop import GameLoop
 import display
-from config import ALL_AI_MODE
 
-def main(num_players: int = 1):
+def main(num_players: int = 1, all_ai_mode = False):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
 
-    disp = display.Display()
+    disp = display.Display(all_ai_mode)
     # if players want game help, display instructions
-    provide_help_if_desired(disp)
+    provide_help_if_desired(disp, all_ai_mode)
 
-    game = GameLoop(disp, num_players)
+    game = GameLoop(disp, num_players, all_ai_mode)
     return game.start()
 
-def provide_help_if_desired(disp):
+def provide_help_if_desired(disp, all_ai_mode):
     help_message = '''Welcome to the game! Here's how it works:
 - You and the monster will attack each other once per turn in a random order
 - You can only attack if you are within range of your enemy
@@ -26,7 +25,7 @@ def provide_help_if_desired(disp):
 
 Good luck!'''
     want_help = False
-    if not ALL_AI_MODE:
+    if not all_ai_mode:
         user_input = disp.get_user_input(prompt="Hit enter to start or type help for instructions ")
         if user_input == "help":
             want_help = True
