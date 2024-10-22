@@ -5,6 +5,9 @@ from agent import Ai, Human
 from display import Display
 from gh_types import ActionCard
 
+# !!! implement pytest fixtures 
+# !!! try parameterizing tests 
+# !!! property based testing - hypothesis? python library
 disp = Display(False)
 ai_monsters = [Monster("Monster", 10, disp, "🦁", Ai())]
 ai_players = [Player("Player", 10, disp, "🐷", Ai())]
