@@ -80,6 +80,10 @@ class Board:
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
                 self.terrain[row][col] = "FIRE"
+    
+    def add_fire_to_terrain_for_attack(self, row, col) -> None:
+        self.terrain[row][col] = "FIRE"
+
 
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, radius: int
