@@ -1,7 +1,6 @@
 import abc
 import random
 from .gh_types import ActionCard
-from .board import Board
 from .display import Display
 
 DIRECTION_MAP = {
