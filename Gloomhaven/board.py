@@ -14,13 +14,12 @@ TERRAIN_DAMAGE = 1
 # the board holds all the game metadata including the monster and player who are playing
 # it adjudicates actions and ends the game
 # the board draws itself as well!
-class Board(Observable):
+class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
         self, size: int, monsters: list[Monster], players: list[Player], disp: Display
     ) -> None:
-        super().__init__()
         self.size = size
         self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
@@ -74,15 +73,13 @@ class Board(Observable):
         ]
 
     def add_fire_to_terrain(self) -> None:
-        terrain = copy.deepcopy(self.locations)
         max_loc = self.size - 1
         for _ in range(10):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
-                terrain[row][col] = "FIRE"
-        self.terrain = terrain
+                self.terrain[row][col] = "FIRE"
 
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, radius: int
