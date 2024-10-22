@@ -80,6 +80,10 @@ class Board:
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
                 self.terrain[row][col] = "FIRE"
+    
+    def add_fire_to_terrain_for_attack(self, row, col) -> None:
+        self.terrain[row][col] = "FIRE"
+
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
