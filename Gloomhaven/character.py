@@ -112,7 +112,7 @@ def create_action_cards() -> list[ActionCard]:
         )
         if i == 2:
             action_card.status_effect = "Fire"
-            action_card.radius = 1
+            action_card.radius = 4
         action_cards.append(action_card)
     return action_cards
 
