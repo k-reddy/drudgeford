@@ -19,6 +19,9 @@ class Display:
     def reload_display(self) -> None:
         if self.all_ai_mode:
             return
+        if self.round_number is None:
+            return
+        breakpoint()
         self.clear_display()
         self._draw_board()
         self._print_round_and_turn_info()
