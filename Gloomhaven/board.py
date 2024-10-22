@@ -92,7 +92,11 @@ class Board:
         for direction in directions:
             fire_row = row+direction[0]
             fire_col = col+direction[1]
-            self.terrain[fire_row][fire_col] = "FIRE"
+            # check if row and col are in bounds
+            if 0 <= fire_row < len(self.terrain):
+                if 0 <= fire_col < len(self.terrain[fire_row]):
+                    self.terrain[fire_row][fire_col] = "FIRE"
+
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
