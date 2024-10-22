@@ -13,8 +13,6 @@ from .utils import BACKGROUND_TILES
 from .views.sprites import Sprite, SpriteManager
 
 
-MAP_TILE_WIDTH = 5
-MAP_TILE_HEIGHT = 5
 WALL_THICKNESS = 32
 GRID_COLOR = 11
 FRAME_DURATION_MS = 34
@@ -35,12 +33,16 @@ class PyxelView:
     def __init__(
         self, board: List[List[Optional[str]]], action_queue: PyxelActionQueue
     ):
-        pyxel.init(len(board) * 64 + 32, len(board[0]) * 64 + 64)
+        self.board_tile_width = len(board[0])
+        self.board_tile_height = len(board)
+
+        # TODO(John): replace these hardcoded numbers.
+        pyxel.init(self.board_tile_width * 64 + 32, self.board_tile_height * 64 + 64)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
-            board_tile_width=MAP_TILE_WIDTH,
-            board_tile_height=MAP_TILE_HEIGHT,
+            board_tile_width=self.board_tile_width,
+            board_tile_height=self.board_tile_height,
             tile_width_px=64,
             tile_height_px=64,
             wall_sprite_thickness_px=32,
