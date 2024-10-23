@@ -2,12 +2,19 @@ import random
 
 from . import agent
 from enum import Enum, auto
+<<<<<<< HEAD
 
 from . import agent
 from .board import Board, SlipAndLoseTurn
 from .character import CharacterType, Monster, Player, Character
 from .config import DEBUG
 from .display import Display
+=======
+from .character import CharacterType, Monster, Player, Character
+from .config import DEBUG
+from .display import Display
+from .board import Board, SlipAndLoseTurn
+>>>>>>> 1d49426 (updating shortest path algo to use a* chebyshev)
 
 
 class GameState(Enum):
