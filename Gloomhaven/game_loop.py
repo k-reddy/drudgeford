@@ -91,12 +91,18 @@ Kill it or be killed..."""
             actions = [
                 # if you start in fire, take damage first
 <<<<<<< HEAD
+<<<<<<< HEAD
                 lambda: self.board.deal_terrain_damage_current_location(
                     acting_character
                 ),
 =======
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
 >>>>>>> c612a91 (characters now have 1 in 4 chance of slipping on ice and losing rest of turn)
+=======
+                lambda: self.board.deal_terrain_damage_current_location(
+                    acting_character
+                ),
+>>>>>>> cef373a (updating shortest path algo to use a* chebyshev)
                 lambda: acting_character.perform_movement(action_card, self.board),
                 lambda: acting_character.perform_attack(action_card, self.board),
             ]
