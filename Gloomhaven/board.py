@@ -114,6 +114,67 @@ class Board:
         for x in self.characters:
             self.pick_unoccupied_location(x)
 
+    def get_shortest_valid_path_chebyshev(
+        self, start: tuple[int, int], end: tuple[int, int]
+    ) -> list[tuple[int, int]]:
+        import heapq
+
+        # breakpoint()
+        directions = [
+            (1, 0),  # Down
+            (0, 1),  # Right
+            (-1, 0),  # Up
+            (0, -1),  # Left
+            (-1, 1),  # NE
+            (1, 1),  # SE
+            (1, -1),  # SW
+            (-1, -1),  # NW
+        ]
+        closed: set[tuple[int, int]] = set()
+
+        previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
+        priority_queue: list = []
+        heapq.heappush(priority_queue, (0, start))
+
+        g_score = {start: 0}
+
+        def calculate_chebyshev_distance(
+            pos_a: tuple[int, int], pos_b: tuple[int, int]
+        ) -> int:
+            return max(abs(pos_a[0] - pos_b[0]), abs(pos_a[1] - pos_b[1]))
+
+        # add start to closed
+        # get all of starts neighbours and calculate chebyshev and push into heap
+        # heappop and move to that position
+        while priority_queue:
+            _, current = heapq.heappop(priority_queue)
+
+            if current == end:
+                return self.generate_path(previous_cell, end)
+
+            if current in closed:
+                continue
+
+            closed.add(current)
+            # potentialy empty priority queue here?
+            priority_queue = []
+            for direction in directions:
+                new_row = current[0] + direction[0]
+                new_col = current[1] + direction[1]
+                new_pos = (new_row, new_col)
+                if new_pos not in closed and (
+                    self.is_legal_move(new_row, new_col) or new_pos == end
+                ):
+                    g = g_score[current] + 1
+                    if new_pos not in g_score or g < g_score[new_pos]:
+                        h = calculate_chebyshev_distance(new_pos, end)
+                        g_score[new_pos] = g
+                        f = g + h
+                        heapq.heappush(priority_queue, (f, new_pos))
+                        previous_cell[new_pos] = current
+
+        return []
+
     def get_shortest_valid_path(
         self, start: tuple[int, int], end: tuple[int, int]
     ) -> list[tuple[int, int]]:
@@ -126,6 +187,7 @@ class Board:
         starting cell.
         Returns empty list if it is impossible to reach the end.
         """
+        return self.get_shortest_valid_path_chebyshev(start, end)
         directions = [
             (1, 0),  # Down
             (0, 1),  # Right
