@@ -21,7 +21,6 @@ class Display:
             return
         if self.round_number is None:
             return
-        breakpoint()
         self.clear_display()
         self._draw_board()
         self._print_round_and_turn_info()
