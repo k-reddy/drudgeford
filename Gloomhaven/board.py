@@ -27,8 +27,8 @@ class Board:
         self.characters: list[CharacterType] = ListWithUpdate(
             players + monsters, self.disp.reload_display
         )
-        self.locations = self._initialize_nested_list_with_update(self.size, self.size)
-        self.terrain = self._initialize_nested_list_with_update(self.size, self.size)
+        self.locations = self._initialize_map(self.size, self.size)
+        self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
@@ -64,14 +64,13 @@ class Board:
         self.disp.characters = characters
         self.disp.reload_display()
 
-    def _initialize_nested_list_with_update(self, width: int = 5, height=5):
-        nested_list = []
-        for _ in range(height):
-            inner_list = ListWithUpdate(
-                ["X" for _ in range(width)], self.disp.reload_display
-            )
-            nested_list.append(inner_list)
-        return nested_list
+    # initializes a game map which is a list of ListWithUpdate
+    # game maps are used to represent locations and terrain
+    def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
+        return [
+            ListWithUpdate(["X" for _ in range(width)], self.disp.reload_display)
+            for _ in range(height)
+        ]
 
     def add_fire_to_terrain(self) -> None:
         max_loc = self.size - 1
