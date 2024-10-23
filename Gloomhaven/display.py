@@ -1,6 +1,6 @@
 import os
-from gh_types import ActionCard
-from character import Player, Monster
+from .gh_types import ActionCard
+from .character import Player, Monster
 
 EMPTY_CELL = "|      "
 

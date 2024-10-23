@@ -1,10 +1,10 @@
 import random
 from enum import Enum, auto
-from character import CharacterType, Monster, Player, Character
-from config import DEBUG
-from display import Display
-import agent
-from board import Board
+from .character import CharacterType, Monster, Player, Character
+from .config import DEBUG
+from .display import Display
+from . import agent
+from .board import Board
 
 
 class GameState(Enum):
@@ -214,6 +214,18 @@ def set_up_players(disp, num_players, all_ai_mode):
         players.append(Player(player_name, 8, disp, emoji[i], player_agent))
     if not all_ai_mode:
         disp.clear_display()
+    return players
+
+
+def set_up_players_test(disp, num_players, all_ai_mode):
+    """Simplified setup for testing"""
+    players = []
+    emoji = ["🧙", "🕺", "🐣"]
+
+    player_name = "happy"
+    player_agent = agent.Human()
+    players.append(Player(player_name, 8, disp, emoji[1], player_agent))
+
     return players
 
 

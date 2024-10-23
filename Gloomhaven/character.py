@@ -1,6 +1,7 @@
 import random
 
-from gh_types import ActionCard
+from .gh_types import ActionCard
+
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
@@ -18,16 +19,14 @@ class Character:
         self.agent = agent
 
     def perform_attack(self, action_card, board):
-        in_range_opponents = board.find_in_range_opponents(
-            self, action_card
-        )
+        in_range_opponents = board.find_in_range_opponents(self, action_card)
         target = self.select_attack_target(in_range_opponents)
         board.attack_target(action_card, self, target)
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
-                self.disp, self.available_action_cards
-            )
+            self.disp, self.available_action_cards
+        )
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
@@ -51,18 +50,23 @@ class Character:
 
     def short_rest(self) -> None:
         # reset our available cards
-        self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
+        self.available_action_cards = [
+            card for card in self.action_cards if card not in self.killed_action_cards
+        ]
         # kill a random card, update the user, remove it from play, and keep track for next round
         killed_card = random.choice(self.available_action_cards)
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
 
-class Player(Character):    
+
+class Player(Character):
     pass
+
 
 class Monster(Character):
     pass
+
 
 def create_action_cards() -> list[ActionCard]:
     # each attack card will be generated with a strength, distance, and number of targets, so set
@@ -77,21 +81,57 @@ def create_action_cards() -> list[ActionCard]:
 
     # some things for attack names
     adjectives = [
-        "Shadowed", "Infernal", "Venomous", "Blazing", "Cursed", 
-        "Frozen", "Eternal", "Bloodthirsty", "Savage", "Dreadful",
-        "Ancient", "Malevolent", "Spectral", "Dire", "Enraged"
+        "Shadowed",
+        "Infernal",
+        "Venomous",
+        "Blazing",
+        "Cursed",
+        "Frozen",
+        "Eternal",
+        "Bloodthirsty",
+        "Savage",
+        "Dreadful",
+        "Ancient",
+        "Malevolent",
+        "Spectral",
+        "Dire",
+        "Enraged",
     ]
 
     elements = [
-        "Fang", "Storm", "Flame", "Void", "Thorn", 
-        "Frost", "Stone", "Ember", "Blade", "Hollow",
-        "Spirit", "Tide", "Wind", "Ash", "Grave"
+        "Fang",
+        "Storm",
+        "Flame",
+        "Void",
+        "Thorn",
+        "Frost",
+        "Stone",
+        "Ember",
+        "Blade",
+        "Hollow",
+        "Spirit",
+        "Tide",
+        "Wind",
+        "Ash",
+        "Grave",
     ]
 
     actions = [
-        "Strike", "Surge", "Rend", "Burst", "Reaver", 
-        "Crush", "Slash", "Howl", "Smite", "Rampage", 
-        "Sunder", "Devour", "Shatter", "Lash", "Tremor"
+        "Strike",
+        "Surge",
+        "Rend",
+        "Burst",
+        "Reaver",
+        "Crush",
+        "Slash",
+        "Howl",
+        "Smite",
+        "Rampage",
+        "Sunder",
+        "Devour",
+        "Shatter",
+        "Lash",
+        "Tremor",
     ]
 
     for item in [adjectives, elements, actions]:
