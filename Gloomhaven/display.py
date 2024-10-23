@@ -19,7 +19,7 @@ class Display:
     def reload_display(self) -> None:
         if self.all_ai_mode:
             return
-        if self.round_number is None:
+        if self.round_number == 0:
             return
         self.clear_display()
         self._draw_board()
