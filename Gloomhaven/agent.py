@@ -65,7 +65,7 @@ class Ai(Agent):
         board.move_character_toward_location(char, target_loc, action_card["movement"])
 
 
-class Human:
+class Human(Agent):
     @staticmethod
     def select_action_card(
         disp: Display, available_action_cards: list[ActionCard]
