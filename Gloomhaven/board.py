@@ -5,6 +5,7 @@ from collections import deque
 from character import CharacterType, Monster, Player
 from gh_types import ActionCard
 from display import Display
+from listwithupdate import ListWithUpdate
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -20,22 +21,56 @@ class Board:
         self, size: int, monsters: list[Monster], players: list[Player], disp: Display
     ) -> None:
         self.size = size
+        self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[CharacterType] = players + monsters
-        self.locations = self._initialize_board(self.size, self.size)
-        self.terrain = copy.deepcopy(self.locations)
+        self.characters: list[CharacterType] = ListWithUpdate(
+            players + monsters, self.disp.reload_display
+        )
+        self.locations = self._initialize_map(self.size, self.size)
+        self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_fire_to_terrain()
-        # keep track of the display, and update it with the newly created locations and terrain
-        self.disp = disp
-        disp.locations = self.locations
-        disp.terrain = self.terrain
-        disp.characters = self.characters
+        self.log = ListWithUpdate([], self.disp.add_to_log)
 
-    def _initialize_board(self, width: int = 5, height=5):
-        return [["X" for _ in range(width)] for _ in range(height)]
+    @property
+    def locations(self):
+        return self.__locations
+
+    @locations.setter
+    def locations(self, locations):
+        self.__locations = locations
+        self.disp.locations = locations
+        self.disp.reload_display()
+
+    @property
+    def terrain(self):
+        return self.__terrain
+
+    @terrain.setter
+    def terrain(self, terrain):
+        self.__terrain = terrain
+        self.disp.terrain = terrain
+        self.disp.reload_display()
+
+    @property
+    def characters(self):
+        return self.__characters
+
+    @characters.setter
+    def characters(self, characters):
+        self.__characters = characters
+        self.disp.characters = characters
+        self.disp.reload_display()
+
+    # initializes a game map which is a list of ListWithUpdate
+    # game maps are used to represent locations and terrain
+    def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
+        return [
+            ListWithUpdate(["X" for _ in range(width)], self.disp.reload_display)
+            for _ in range(height)
+        ]
 
     def add_fire_to_terrain(self) -> None:
         max_loc = self.size - 1
@@ -49,9 +84,8 @@ class Board:
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
-                self.locations[x][y] = (
-                    None  # Carving walkable room (None represents open space)
-                )
+                # Carving walkable room (None represents open space)
+                self.locations[x][y] = None
 
     def carve_hallway(self, start_x: int, start_y: int, end_x: int, end_y: int) -> None:
         # Horizontal movement first, then vertical
@@ -59,16 +93,14 @@ class Board:
 
         while x != end_x:
             if 0 <= x < self.size:
-                self.locations[x][y] = (
-                    None  # Carving walkable hallway (None represents open space)
-                )
+                # Carving walkable hallway (None represents open space)
+                self.locations[x][y] = None
             x += 1 if end_x > x else -1
 
         while y != end_y:
             if 0 <= y < self.size:
-                self.locations[x][y] = (
-                    None  # Carving walkable hallway (None represents open space)
-                )
+                # Carving walkable hallway (None represents open space)
+                self.locations[x][y] = None
             y += 1 if end_y > y else -1
 
     def reshape_board(self, num_rooms: int = 4) -> None:
@@ -194,6 +226,7 @@ class Board:
     ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
+        # BUG path_to_target might be [], which would make dist_to_target 0 and return True
         dist_to_target = len(
             self.get_shortest_valid_path(attacker_location, target_location)
         )
@@ -219,20 +252,20 @@ class Board:
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
         ):
-            self.disp.add_to_log("Not close enough to attack")
+            self.log.append("Not close enough to attack")
             return
 
-        self.disp.add_to_log(f"{attacker.name} is attempting to attack {target.name}")
+        self.log.append(f"{attacker.name} is attempting to attack {target.name}")
 
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
         if modified_attack_strength <= 0:
-            self.disp.add_to_log("Darn, attack missed!")
+            self.log.append("Darn, attack missed!")
             return
 
-        self.disp.add_to_log("Attack hits!\n")
-        self.disp.add_to_log(
+        self.log.append("Attack hits!\n")
+        self.log.append(
             f"After the modifier, attack strength is: {modified_attack_strength}"
         )
 
@@ -240,7 +273,10 @@ class Board:
 
     def update_locations(self, row, col, new_item):
         self.locations[row][col] = new_item
-        self.disp.update_locations(self.locations)
+
+    def remove_character(self, target):
+        self.characters.remove(target)
+        # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: CharacterType) -> None:
         # !!! to fix
@@ -251,11 +287,10 @@ class Board:
         # not by ending turn after each action
         if target not in self.characters:
             return
-        self.characters.remove(target)
-        self.disp.characters = self.characters
+        self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
-        self.disp.add_to_log(f"{target.name} has been killed.")
+        self.log.append(f"{target.name} has been killed.")
         # !!! for pair coding
         # !!! if the target is the player, end game
         # !!! if the target is the acting_character, end turn
@@ -282,6 +317,11 @@ class Board:
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
+        # BUG path_to_target might be [] leading to an error in is_legal_move's arguments below
+        # discuss how we want to proceed if there is no path to chosen target
+        # found this error when running simulations (uncommon even then)
+        # human players will probably not pick an inaccessible target?
+
         path_to_target = self.get_shortest_valid_path(
             start=acting_character_loc, end=target_location
         )
@@ -316,7 +356,7 @@ class Board:
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
-            self.disp.add_to_log(
+            self.log.append(
                 f"{acting_character.name} took {damage} damage from terrain"
             )
             self.modify_target_health(acting_character, damage)
@@ -351,7 +391,7 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
         else:
-            self.disp.add_to_log(f"{target.name}'s new health: {target.health}")
+            self.log.append(f"{target.name}'s new health: {target.health}")
 
     def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
         def multiply(x, y):
@@ -372,5 +412,5 @@ class Board:
         attack_modifier_function, modifier_string = random.choices(
             attack_modifier_deck, attack_modifier_weights
         )[0]
-        self.disp.add_to_log(f"Attack modifier: {modifier_string}")
+        self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
