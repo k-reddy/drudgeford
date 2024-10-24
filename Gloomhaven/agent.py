@@ -60,7 +60,7 @@ class Ai(Agent):
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(char, target_loc, action_card["movement"])
     
-class Human:
+class Human(Agent):
     @staticmethod
     def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
         # let them pick a valid action_card

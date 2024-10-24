@@ -84,7 +84,6 @@ Kill it or be killed..."""
     def run_turn(self, acting_character: CharacterType) -> None:
         action_card = acting_character.select_action_card()
         move_first = acting_character.decide_if_move_first(action_card)
-
         actions = [
             # if you start in fire, take damage first
             lambda: self.board.deal_terrain_damage_current_location(acting_character),
@@ -211,7 +210,8 @@ def set_up_players(disp, num_players, all_ai_mode):
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if all_ai_mode else agent.Human()
-        players.append(Player(player_name, 8, disp, emoji[i], player_agent))
+        is_wizard = True if i == num_players-1 else False
+        players.append(Player(player_name, 8, disp, emoji[i], player_agent, is_wizard))
     if not all_ai_mode:
         disp.clear_display()
     return players

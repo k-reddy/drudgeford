@@ -1,5 +1,5 @@
 import random
-
+from class_cards import wizard_cards
 from gh_types import ActionCard
 
 # characters are our actors
@@ -7,10 +7,10 @@ from gh_types import ActionCard
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character:
     # basic monster setup
-    def __init__(self, name, health, disp, emoji, agent):
+    def __init__(self, name, health, disp, emoji, agent, is_wizard=False):
         self.health = health
         self.name = name
-        self.action_cards = create_action_cards()
+        self.action_cards = create_action_cards(is_wizard)
         self.killed_action_cards = []
         self.available_action_cards = self.action_cards.copy()
         self.disp = disp
@@ -64,7 +64,9 @@ class Player(Character):
 class Monster(Character):
     pass
 
-def create_action_cards() -> list[ActionCard]:
+def create_action_cards(isWizard) -> list[ActionCard]:
+    if isWizard:
+        return wizard_cards
     # each attack card will be generated with a strength, distance, and number of targets, so set
     # some values to pull from
     strengths = [1, 2, 3, 4, 5]
@@ -107,7 +109,12 @@ def create_action_cards() -> list[ActionCard]:
             strength=strength,
             distance=distance,
             movement=movement,
+            status_effect=None,
+            radius=None
         )
+        if i == 2:
+            action_card.status_effect = "Fire"
+            action_card.radius = 4
         action_cards.append(action_card)
     return action_cards
 
