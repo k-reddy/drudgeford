@@ -19,6 +19,8 @@ class Display:
     def reload_display(self) -> None:
         if self.all_ai_mode:
             return
+        if self.round_number == 0:
+            return
         self.clear_display()
         self._draw_board()
         self._print_round_and_turn_info()
@@ -28,6 +30,9 @@ class Display:
 
     def update_locations(self, locations) -> None:
         self.locations = locations
+
+    def update_characters(self, characters: list) -> None:
+        self.characters = characters
 
     def update_terrain(self, terrain) -> None:
         self.terrain = terrain
