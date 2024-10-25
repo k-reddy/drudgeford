@@ -63,14 +63,16 @@ class Display:
             to_draw += top
             to_draw += sides + "\n"
 
-            fire_sides = ""
+            effect_sides = ""
             for el in self.terrain[i]:
                 if el == "FIRE":
-                    fire_sides += "|  🔥  "
+                    effect_sides += "|  🔥  "
+                elif el == "ICE":
+                    effect_sides += "|  🧊  "
                 else:
-                    fire_sides += EMPTY_CELL
-            fire_sides += EMPTY_CELL
-            to_draw += fire_sides + "\n"
+                    effect_sides += EMPTY_CELL
+            effect_sides += EMPTY_CELL
+            to_draw += effect_sides + "\n"
         # add the bottom
         to_draw += top
         print(to_draw)
