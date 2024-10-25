@@ -90,9 +90,13 @@ Kill it or be killed..."""
             move_first = acting_character.decide_if_move_first(action_card)
             actions = [
                 # if you start in fire, take damage first
+<<<<<<< HEAD
                 lambda: self.board.deal_terrain_damage_current_location(
                     acting_character
                 ),
+=======
+                lambda: self.board.deal_terrain_damage_current_location(acting_character),
+>>>>>>> c612a91 (characters now have 1 in 4 chance of slipping on ice and losing rest of turn)
                 lambda: acting_character.perform_movement(action_card, self.board),
                 lambda: acting_character.perform_attack(action_card, self.board),
             ]

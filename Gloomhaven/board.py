@@ -420,11 +420,6 @@ class Board:
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
-        # BUG path_to_target might be [] leading to an error in is_legal_move's arguments below
-        # discuss how we want to proceed if there is no path to chosen target
-        # found this error when running simulations (uncommon even then)
-        # human players will probably not pick an inaccessible target?
-
         path_to_target = self.get_shortest_valid_path(
             start=acting_character_loc, end=target_location
         )
