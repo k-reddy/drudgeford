@@ -80,23 +80,24 @@ class Board:
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
                 self.terrain[row][col] = "FIRE"
-    
-    def add_fire_to_terrain_for_attack(self, row: int, col: int, radius: int) -> None:
-        directions = []
-        for i in range(radius+1):
-            for j in range(radius+1):
-                directions.append((i,j))
-                directions.append((-i,-j))
-                directions.append((i,-j))
-                directions.append((-i,j))
-        for direction in directions:
-            fire_row = row+direction[0]
-            fire_col = col+direction[1]
-            # check if row and col are in bounds
-            if 0 <= fire_row < len(self.terrain):
-                if 0 <= fire_col < len(self.terrain[fire_row]):
-                    self.terrain[fire_row][fire_col] = "FIRE"
 
+    def add_effect_to_terrain_for_attack(
+        self, effect: str, row: int, col: int, radius: int
+    ) -> None:
+        directions = []
+        for i in range(radius + 1):
+            for j in range(radius + 1):
+                directions.append((i, j))
+                directions.append((-i, -j))
+                directions.append((i, -j))
+                directions.append((-i, j))
+        for direction in directions:
+            effect_row = row + direction[0]
+            effect_col = col + direction[1]
+            # check if row and col are in bounds
+            if 0 <= effect_row < len(self.terrain):
+                if 0 <= effect_col < len(self.terrain[effect_row]):
+                    self.terrain[effect_row][effect_col] = effect
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -275,13 +276,15 @@ class Board:
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
 
         if action_card.status_effect and action_card.radius:
-            self.log.append(f"{attacker.name} is throwing a fireball!")
+            self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
-            self.add_fire_to_terrain_for_attack(row,col,action_card.radius)
+            self.add_effect_to_terrain_for_attack(
+                action_card.status_effect.upper(), row, col, action_card.radius
+            )
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
-        if modified_attack_strength <= 0:
+        if action_card.status_effect is None and modified_attack_strength <= 0:
             self.log.append("Darn, attack missed!")
             return
 
