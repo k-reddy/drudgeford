@@ -5,6 +5,7 @@ from config import DEBUG
 from display import Display
 import agent
 from board import Board
+from board import SlipAndLoseTurn
 
 
 class GameState(Enum):
@@ -82,28 +83,34 @@ Kill it or be killed..."""
         self._end_round()
 
     def run_turn(self, acting_character: CharacterType) -> None:
-        action_card = acting_character.select_action_card()
-        move_first = acting_character.decide_if_move_first(action_card)
-        actions = [
-            # if you start in fire, take damage first
-            lambda: self.board.deal_terrain_damage_current_location(acting_character),
-            lambda: acting_character.perform_movement(action_card, self.board),
-            lambda: acting_character.perform_attack(action_card, self.board),
-        ]
-        # if not move_first, swap the order of movement and attack
-        if not move_first:
-            actions[1], actions[2] = actions[2], actions[1]
+        try:
+            action_card = acting_character.select_action_card()
+            move_first = acting_character.decide_if_move_first(action_card)
+            actions = [
+                # if you start in fire, take damage first
+                lambda: self.board.deal_terrain_damage_current_location(acting_character),
+                lambda: acting_character.perform_movement(action_card, self.board),
+                lambda: acting_character.perform_attack(action_card, self.board),
+            ]
+            # if not move_first, swap the order of movement and attack
+            if not move_first:
+                actions[1], actions[2] = actions[2], actions[1]
 
-        for action in actions:
-            action()
-            # after every action, make sure that we shouldn't end the game now
-            self.check_and_update_game_state()
-            if self.game_state != GameState.RUNNING:
-                return
-            # make sure we shouldn't end the player's turn now - if they died, they won't be in characters list
-            if acting_character not in self.board.characters:
-                self._end_turn()
-                return
+            for action in actions:
+                action()
+                # after every action, make sure that we shouldn't end the game now
+                self.check_and_update_game_state()
+                if self.game_state != GameState.RUNNING:
+                    return
+                # make sure we shouldn't end the player's turn now - if they died, they won't be in characters list
+                if acting_character not in self.board.characters:
+                    self._end_turn()
+                    return
+        except SlipAndLoseTurn:
+            self.disp.get_user_input(
+                prompt=f"{acting_character.name} slipped! Hit enter to continue"
+            )
+
         self._end_turn()
 
     def check_and_update_game_state(self) -> None:
