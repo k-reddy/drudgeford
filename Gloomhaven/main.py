@@ -8,7 +8,8 @@ def main(num_players: int = 1, all_ai_mode = False):
         os.environ["TERM"] = "xterm"
 
     disp = display.Display(all_ai_mode)
-    disp.clear_display()
+    if not all_ai_mode:
+        disp.clear_display()
     # if players want game help, display instructions
     provide_help_if_desired(disp, all_ai_mode)
 

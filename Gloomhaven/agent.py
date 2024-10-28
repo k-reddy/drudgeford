@@ -58,7 +58,7 @@ class Ai(Agent):
     def perform_movement(char, action_card: ActionCard, board):
         targets = board.find_opponents(char)
         target_loc = board.find_location_of_target(random.choice(targets))
-        board.move_character_toward_location(char, target_loc, action_card["movement"])
+        board.move_character_toward_location(char, target_loc, action_card["movement"], action_card["jump"])
     
 class Human(Agent):
     @staticmethod

@@ -110,7 +110,8 @@ def create_action_cards(isWizard) -> list[ActionCard]:
             distance=distance,
             movement=movement,
             status_effect=None,
-            radius=None
+            radius=None,
+            jump=True
         )
         action_cards.append(action_card)
     return action_cards
