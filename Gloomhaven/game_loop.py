@@ -48,6 +48,8 @@ Kill it or be killed..."""
         return self._end_game()
 
     def run_round(self, round_num: int) -> None:
+        # clear the elements from the board that have "expired"
+        self.board.update_terrain(round_num)
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
