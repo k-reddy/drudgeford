@@ -6,6 +6,7 @@ from character import CharacterType, Monster, Player
 from gh_types import ActionCard
 from display import Display
 from listwithupdate import ListWithUpdate
+import agent
 
 EMPTY_CELL = "|      "
 TERRAIN_DAMAGE = 1
@@ -367,10 +368,12 @@ class Board:
         else:
             path_traveled = path_to_target[:-1]
         # go along the path and take any terrain damage! if you jump, go straight to end
-        if is_jump:
+        if is_jump and isinstance(acting_character.agent, agent.Ai):
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
-            self.deal_terrain_damage(acting_character, loc[0], loc[1])
+            # humans move step by step, so they should not take damage on a jump
+            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
+                self.deal_terrain_damage(acting_character, loc[0], loc[1])
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc

@@ -111,12 +111,14 @@ class Human(Agent):
             ]
             if board.is_legal_move(new_row, new_col):
                 # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(char, (new_row, new_col), 1)
+                board.move_character_toward_location(char, (new_row, new_col), 1, action_card["jump"])
                 remaining_movement -= 1
                 continue
             else:
                 char.disp.add_to_log(
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
-
+        # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
+        if action_card["jump"]:
+            board.deal_terrain_damage_current_location(char)
         char.disp.add_to_log("Movement done! \n")
