@@ -72,17 +72,17 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_fire_to_terrain(self) -> None:
+    def add_fire_to_terrain(self,round_num=0) -> None:
         max_loc = self.size - 1
         for _ in range(10):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
-                self.terrain[row][col] = "FIRE"
+                self.terrain[row][col] = ("FIRE", round_num)
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, radius: int
+        self, effect: str, row: int, col: int, radius: int, round_num: int
     ) -> None:
         directions = []
         for i in range(radius + 1):
@@ -97,7 +97,7 @@ class Board:
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
-                    self.terrain[effect_row][effect_col] = effect
+                    self.terrain[effect_row][effect_col] = (effect, round_num)
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -279,7 +279,7 @@ class Board:
             self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
             self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.radius
+                action_card.status_effect.upper(), row, col, action_card.radius, round_num=0
             )
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
@@ -398,9 +398,9 @@ class Board:
         return is_position_within_board and self.locations[row][col] is None
 
     def get_terrain_damage(self, row: int, col: int) -> int:
-        if self.terrain[row][col] == "FIRE":
+        if self.terrain[row][col][0] == "FIRE":
             return TERRAIN_DAMAGE
-        elif self.terrain[row][col] == "ICE":
+        elif self.terrain[row][col][0] == "ICE":
             if random.random() < 0.25:
                 raise SlipAndLoseTurn("Slipped!")
             else:
