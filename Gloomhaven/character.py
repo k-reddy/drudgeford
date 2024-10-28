@@ -112,9 +112,6 @@ def create_action_cards(isWizard) -> list[ActionCard]:
             status_effect=None,
             radius=None
         )
-        if i == 2:
-            action_card.status_effect = "Fire"
-            action_card.radius = 4
         action_cards.append(action_card)
     return action_cards
 
