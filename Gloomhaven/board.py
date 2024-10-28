@@ -281,6 +281,10 @@ class Board:
             self.add_effect_to_terrain_for_attack(
                 action_card.status_effect.upper(), row, col, action_card.radius, round_num
             )
+            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
+        # some cards have no attack, don't want to attack if we hit a good modifier
+        if action_card.strength == 0:
+            return
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
         )
