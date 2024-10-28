@@ -83,7 +83,8 @@ class Board:
                 self.terrain[row][col] = ("FIRE", round_num)
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, radius: int, round_num: int
+        self, effect: str, row: int, col: int, radius: int, round_num: int,
+        can_overlap_with_characters=True
     ) -> None:
         directions = set()
         for i in range(radius + 1):
@@ -98,8 +99,10 @@ class Board:
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
-                    self.terrain[effect_row][effect_col] = (effect, round_num)
                     potential_char = self.locations[effect_row][effect_col]
+                    if (not can_overlap_with_characters) and potential_char:
+                        continue
+                    self.terrain[effect_row][effect_col] = (effect, round_num)
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, CharacterType):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
