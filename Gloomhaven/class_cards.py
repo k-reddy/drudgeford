@@ -8,6 +8,7 @@ wizard_cards = [
         movement=2,
         status_effect="Fire",
         radius=1,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Cursed Frost Surge",
@@ -16,6 +17,7 @@ wizard_cards = [
         movement=2,
         status_effect="Ice",
         radius=1,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Elementary Missile",
@@ -24,6 +26,7 @@ wizard_cards = [
         movement=0,
         status_effect=None,
         radius=None,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Quick Retreat",
@@ -32,6 +35,7 @@ wizard_cards = [
         movement=5,
         status_effect=None,
         radius=None,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Masochistic Explosion",
@@ -40,6 +44,7 @@ wizard_cards = [
         movement=0,
         status_effect="Fire",
         radius=2,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Magic Blast",
@@ -48,5 +53,6 @@ wizard_cards = [
         movement=4,
         status_effect=None,
         radius=None,
+        jump=False
     ),
 ]

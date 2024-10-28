@@ -109,9 +109,10 @@ Kill it or be killed..."""
                     self._end_turn()
                     return
         except SlipAndLoseTurn:
-            self.disp.get_user_input(
-                prompt=f"{acting_character.name} slipped! Hit enter to continue"
-            )
+            if not self.all_ai_mode:
+                self.disp.get_user_input(
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                )
 
         self._end_turn()
 

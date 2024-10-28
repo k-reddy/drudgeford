@@ -9,6 +9,7 @@ class ActionCard:
     movement: int
     status_effect: str | None
     radius: int | None
+    jump: bool
 
     def __getitem__(self, key):
         return getattr(self, key)
@@ -18,6 +19,8 @@ class ActionCard:
     
     def __str__(self):
         str = f"{self.attack_name}: Strength {self.strength}, Range {self.distance}, Movement {self.movement}"
+        if self.jump:
+            str+= ", Jump"
         if self.status_effect:
             str += f"\n\tStatus Effect: {self.status_effect} with Radius {self.radius}"
         return str

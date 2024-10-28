@@ -339,6 +339,7 @@ class Board:
         acting_character: CharacterType,
         target_location: tuple[int, int],
         movement: int,
+        is_jump=False
     ) -> None:
         if movement == 0:
             return
@@ -365,7 +366,9 @@ class Board:
         # if it's occupied and you need to move, move to one away
         else:
             path_traveled = path_to_target[:-1]
-        # go along the path and take any terrain damage!
+        # go along the path and take any terrain damage! if you jump, go straight to end
+        if is_jump:
+            path_traveled = path_traveled[-1:]
         for loc in path_traveled:
             self.deal_terrain_damage(acting_character, loc[0], loc[1])
             # move character one step
