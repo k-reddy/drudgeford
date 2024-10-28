@@ -436,7 +436,16 @@ class Board:
         )[0]
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
-
+    
+    def update_terrain(self, round_num: int):
+        for i, _ in enumerate(self.terrain):
+            for j, el in enumerate(self.terrain[i]):
+                # x is the default initialization
+                if el == 'X':
+                    continue 
+                # if the terrain item was placed 2 or more rounds ago, clear it
+                if round_num-el[1] >= 2:
+                    self.terrain[i][j] = 'X'
 
 class SlipAndLoseTurn(Exception):
     pass
