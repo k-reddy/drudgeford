@@ -53,6 +53,6 @@ wizard_cards = [
         movement=4,
         status_effect=None,
         radius=None,
-        jump=False
+        jump=True
     ),
 ]
