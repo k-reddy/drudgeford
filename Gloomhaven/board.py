@@ -32,7 +32,8 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain("FIRE")
+        self.add_starting_effect_to_terrain("FIRE", False, 10)
+        self.add_starting_effect_to_terrain("ICE", True, 3)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -73,14 +74,22 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_starting_effect_to_terrain(self,effect: str) -> None:
+    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int) -> None:
         max_loc = self.size - 1
-        for _ in range(10):
+        for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.locations[row][col] is None:
-                self.terrain[row][col] = (effect, 0)
+            self.add_effect_if_valid_square(row, col, effect, round_num=0)
+            if is_contiguous:
+                for i in [-1,0,1]:
+                    self.add_effect_if_valid_square(row+i, col, effect, round_num=0)
+
+    def add_effect_if_valid_square(self, row, col, effect, round_num):
+        if row >= self.size or col >= self.size:
+            return
+        if self.locations[row][col] is None:
+            self.terrain[row][col] = (effect, round_num)
 
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, radius: int, round_num: int,
