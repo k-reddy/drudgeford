@@ -32,7 +32,7 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_fire_to_terrain()
+        self.add_starting_effect_to_terrain("FIRE")
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -73,14 +73,14 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_fire_to_terrain(self,round_num=0) -> None:
+    def add_starting_effect_to_terrain(self,effect: str) -> None:
         max_loc = self.size - 1
         for _ in range(10):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
             if self.locations[row][col] is None:
-                self.terrain[row][col] = ("FIRE", round_num)
+                self.terrain[row][col] = (effect, 0)
 
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, radius: int, round_num: int,
