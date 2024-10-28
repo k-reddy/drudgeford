@@ -118,8 +118,9 @@ class Display:
 
         return user_input
 
-    def clear_display_and_print_message(self, message) -> None:
-        self.clear_display()
+    def print_message(self, message, clear_display=True) -> None:
+        if clear_display:
+            self.clear_display()
         print(message)
 
     def clear_display(self) -> None:

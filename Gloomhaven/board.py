@@ -2,7 +2,7 @@ import random
 from functools import partial
 import copy
 from collections import deque
-from character import CharacterType, Monster, Player
+from character import CharacterType, Monster, Player, Character
 from gh_types import ActionCard
 from display import Display
 from listwithupdate import ListWithUpdate
@@ -85,13 +85,13 @@ class Board:
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, radius: int, round_num: int
     ) -> None:
-        directions = []
+        directions = set()
         for i in range(radius + 1):
             for j in range(radius + 1):
-                directions.append((i, j))
-                directions.append((-i, -j))
-                directions.append((i, -j))
-                directions.append((-i, j))
+                directions.add((i, j))
+                directions.add((-i, -j))
+                directions.add((i, -j))
+                directions.add((-i, j))
         for direction in directions:
             effect_row = row + direction[0]
             effect_col = col + direction[1]
@@ -99,6 +99,10 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     self.terrain[effect_row][effect_col] = (effect, round_num)
+                    potential_char = self.locations[effect_row][effect_col]
+                    # if there's a character there, deal damage to them
+                    if isinstance(potential_char, CharacterType):
+                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -279,10 +283,10 @@ class Board:
         if action_card.status_effect and action_card.radius:
             self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
+            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
             self.add_effect_to_terrain_for_attack(
                 action_card.status_effect.upper(), row, col, action_card.radius, round_num
             )
-            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
         # some cards have no attack, don't want to attack if we hit a good modifier
         if action_card.strength == 0:
             return
