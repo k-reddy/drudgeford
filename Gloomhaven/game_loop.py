@@ -32,7 +32,7 @@ class GameLoop:
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed..."""
         if not self.all_ai_mode:
-            self.disp.clear_display_and_print_message(message=message)
+            self.disp.print_message(message=message, clear_display=True)
             self.disp.get_user_input(
                 prompt="Time to start the game! Hit enter to continue\n"
             )
@@ -137,7 +137,7 @@ Kill it or be killed..."""
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.disp.clear_display_and_print_message(message)
+            self.disp.print_message(message, clear_display=False)
         return self.game_state
 
     def _end_turn(self) -> None:
