@@ -40,14 +40,14 @@ Kill it or be killed..."""
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.disp.update_round_number(round_number)
-            self.run_round()
+            self.run_round(round_number)
             # print(self.game_state)
             round_number += 1
         # once we're no longer playing, end the game
         # print(f"{self.game_state.name=}")
         return self._end_game()
 
-    def run_round(self) -> None:
+    def run_round(self, round_num: int) -> None:
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
@@ -73,7 +73,7 @@ Kill it or be killed..."""
                 # end pathfinding test
 
             self.disp.update_acting_character_name(acting_character.name)
-            self.run_turn(acting_character)
+            self.run_turn(acting_character, round_num)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
             # move after acting, which is not ideal
@@ -82,7 +82,7 @@ Kill it or be killed..."""
                 return
         self._end_round()
 
-    def run_turn(self, acting_character: CharacterType) -> None:
+    def run_turn(self, acting_character: CharacterType, round_num: int) -> None:
         try:
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
@@ -90,7 +90,7 @@ Kill it or be killed..."""
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
                 lambda: acting_character.perform_movement(action_card, self.board),
-                lambda: acting_character.perform_attack(action_card, self.board, ),
+                lambda: acting_character.perform_attack(action_card, self.board, round_num),
             ]
             # if not move_first, swap the order of movement and attack
             if not move_first:
