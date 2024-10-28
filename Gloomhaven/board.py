@@ -32,8 +32,8 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain("FIRE", False, 10)
-        self.add_starting_effect_to_terrain("ICE", True, 3)
+        self.add_starting_effect_to_terrain("FIRE", False, random.randint(0,10))
+        self.add_starting_effect_to_terrain("ICE", random.choice([True,False]), random.randint(0,5))
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
