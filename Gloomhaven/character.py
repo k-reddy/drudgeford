@@ -17,12 +17,12 @@ class Character:
         self.emoji = emoji
         self.agent = agent
 
-    def perform_attack(self, action_card, board):
+    def perform_attack(self, action_card, board, round_num: int):
         in_range_opponents = board.find_in_range_opponents(
             self, action_card
         )
         target = self.select_attack_target(in_range_opponents)
-        board.attack_target(action_card, self, target)
+        board.attack_target(action_card, self, target, round_num)
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(

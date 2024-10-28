@@ -265,7 +265,7 @@ class Board:
         ]
 
     def attack_target(
-        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
+        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType, round_num: int
     ) -> None:
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
@@ -279,7 +279,7 @@ class Board:
             self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
             self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.radius, round_num=0
+                action_card.status_effect.upper(), row, col, action_card.radius, round_num
             )
         modified_attack_strength = self.select_and_apply_attack_modifier(
             action_card["strength"]
