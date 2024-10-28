@@ -65,9 +65,9 @@ class Display:
 
             effect_sides = ""
             for el in self.terrain[i]:
-                if el == "FIRE":
+                if el[0] == "FIRE":
                     effect_sides += "|  🔥  "
-                elif el == "ICE":
+                elif el[0] == "ICE":
                     effect_sides += "|  🧊  "
                 else:
                     effect_sides += EMPTY_CELL

@@ -90,7 +90,7 @@ Kill it or be killed..."""
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
                 lambda: acting_character.perform_movement(action_card, self.board),
-                lambda: acting_character.perform_attack(action_card, self.board),
+                lambda: acting_character.perform_attack(action_card, self.board, ),
             ]
             # if not move_first, swap the order of movement and attack
             if not move_first:
