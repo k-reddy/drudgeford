@@ -14,3 +14,10 @@ def line(direction: tuple, length: int):
         coord_to_add = [dir_coord*i for dir_coord in direction]
         directions.add(tuple(coord_to_add))
     return directions
+
+def bar(offset: int, depth: int):
+    directions = set()
+    for i in range(offset, depth+offset):
+        for j in range(-1, 2):
+            directions.add((i, j))
+    return directions
