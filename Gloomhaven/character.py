@@ -19,6 +19,7 @@ class Character(abc.ABC):
         self.emoji = emoji
         self.agent = agent
         self.backstory = self.set_backstory()
+        self.attack_modifier_deck = self.make_attack_modifier_deck()
 
     @abc.abstractmethod
     def set_health(self):
@@ -91,7 +92,7 @@ class Character(abc.ABC):
         for modifier in [-2, -1, 0, 1, 2]:
             attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
 
-        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
+        attack_modifier_weights = [1, 1, 1, 3, 3, 3, 1]
         for i, weight in enumerate(attack_modifier_weights):
             for _ in range(weight+1):
                 attack_modifier_deck.append(attack_modifier_deck[i])
