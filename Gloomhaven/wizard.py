@@ -3,7 +3,7 @@ import attack_shapes as shapes
 
 cards = [
     ActionCard(
-        attack_name=f"Fireball",
+        attack_name=f"Firebolt",
         strength=0,
         distance=4,
         movement=2,
@@ -17,7 +17,7 @@ cards = [
         distance=4,
         movement=2,
         status_effect="Ice",
-        status_shape=shapes.circle(1),
+        status_shape=shapes.bar(1,2),
         jump=False
     ),
     ActionCard(
@@ -48,7 +48,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Magic Blast",
+        attack_name=f"Lightning Bolt",
         strength=4,
         distance=4,
         movement=4,
