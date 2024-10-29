@@ -40,7 +40,7 @@ hate their sibling but sibling knows where the family treasure is buried
 treasure isn't valuable but sentimental - kitchen implement (tortilla press) that's been passed down for generations
 banished from town 
 - find a corpse and come back as a skeleton 
-- fear - all enemies run away from you for a couple turns
+- fear - all enemies run away from you for a couple turns - push 
 - curse the enemy
 - place shadow - dark cloud of nothingness 
 - summon spirit as wraith but leaves cloud of nothingness for a couple turns 
@@ -59,6 +59,7 @@ learned farming at monastery
 - weaker side 
 - food to better food that improves healing potential of that food
 - fermentation - booze that confuses enemy 
+- push
 
 miner in the mountains
 new age crystal person, not a lot of crystals on surface
@@ -78,6 +79,7 @@ maybe it's like rose quartz is the most powerful one, maybe called placebo power
 - let them build stone structures 
 - area of effect attack - 2 enemies side by side - pickaxe swipe 
 - tax collector card  
+- pull
 
 wizard ->  mage
 had really intense parents from when they're little 
