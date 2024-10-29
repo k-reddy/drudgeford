@@ -508,6 +508,17 @@ class Board:
     def append_to_attack_modifier_deck(self, target: CharacterType, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)
 
+    def push(self, target: CharacterType, direction, squares):
+        '''pushes characters in a straight line'''
+        starting_location = self.find_location_of_target(target)
+        destinations = []
+        for i in range(squares):
+            # scale the movement then add it to starting location
+            destination = tuple([a*(i+1)+b for a, b in zip(direction, starting_location)])
+            destinations.append(destination)
+        for destination in destinations:
+            # force the algo to move the way we want, square by square
+            self.move_character_toward_location(target, destination, 1, is_jump=False)
 
 class SlipAndLoseTurn(Exception):
     pass

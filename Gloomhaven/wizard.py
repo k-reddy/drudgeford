@@ -3,7 +3,7 @@ import attack_shapes as shapes
 
 cards = [
     ActionCard(
-        attack_name=f"Firebolt",
+        attack_name="Fireball",
         attack_shape=None,
         strength=0,
         distance=4,
@@ -13,7 +13,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Cursed Frost Surge",
+        attack_name="Cursed Frost Surge",
         attack_shape=None,
         strength=0,
         distance=4,
@@ -23,7 +23,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Elementary Missile",
+        attack_name="Elementary Missile",
         attack_shape=None,
         strength=5,
         distance=4,
@@ -33,7 +33,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Quick Retreat",
+        attack_name="Quick Retreat",
         attack_shape=None,
         strength=1,
         distance=1,
@@ -43,7 +43,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Masochistic Explosion",
+        attack_name="Masochistic Explosion",
         attack_shape=None,
         strength=0,
         distance=1,
@@ -53,7 +53,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name=f"Lightning Bolt",
+        attack_name="Lightning Bolt",
         attack_shape=shapes.line((1,0), 3),
         strength=4,
         distance=4,
