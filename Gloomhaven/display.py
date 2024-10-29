@@ -69,6 +69,8 @@ class Display:
                     effect_sides += "|  🔥  "
                 elif el[0] == "ICE":
                     effect_sides += "|  🧊  "
+                elif el[0] == "TRAP":
+                    effect_sides+= "|  🗯️   "
                 else:
                     effect_sides += EMPTY_CELL
             effect_sides += EMPTY_CELL

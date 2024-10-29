@@ -33,7 +33,7 @@ class Board:
         self.reshape_board()
         self.set_character_starting_locations()
         self.add_starting_effect_to_terrain("FIRE", False, random.randint(0,10))
-        self.add_starting_effect_to_terrain("ICE", random.choice([True,False]), random.randint(0,5))
+        self.add_starting_effect_to_terrain("ICE", True, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, random.randint(0,3))
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
@@ -422,13 +422,16 @@ class Board:
         return is_position_within_board and self.locations[row][col] is None
 
     def get_terrain_damage(self, row: int, col: int) -> int:
-        if self.terrain[row][col][0] == "FIRE":
+        el = self.terrain[row][col][0]
+        if el == "FIRE":
             return TERRAIN_DAMAGE
-        elif self.terrain[row][col][0] == "ICE":
+        elif el == "ICE":
             if random.random() < 0.25:
                 raise SlipAndLoseTurn("Slipped!")
             else:
                 return 0
+        elif el == "TRAP":
+            pass
         else:
             return 0
 
