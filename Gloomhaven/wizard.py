@@ -1,52 +1,69 @@
 from gh_types import ActionCard
+import attack_shapes as shapes
 
-wizard_cards = [
+cards = [
     ActionCard(
-        attack_name=f"Fireball",
+        attack_name=f"Firebolt",
+        attack_shape=None,
         strength=0,
         distance=4,
         movement=2,
         status_effect="Fire",
-        radius=1,
+        status_shape=shapes.circle(1),
+        jump=False
     ),
     ActionCard(
         attack_name=f"Cursed Frost Surge",
+        attack_shape=None,
         strength=0,
         distance=4,
         movement=2,
         status_effect="Ice",
-        radius=1,
+        status_shape=shapes.bar(1,2),
+        jump=False
     ),
     ActionCard(
         attack_name=f"Elementary Missile",
+        attack_shape=None,
         strength=5,
         distance=4,
         movement=0,
         status_effect=None,
-        radius=None,
+        status_shape=None,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Quick Retreat",
+        attack_shape=None,
         strength=1,
         distance=1,
         movement=5,
         status_effect=None,
-        radius=None,
+        status_shape=None,
+        jump=False
     ),
     ActionCard(
         attack_name=f"Masochistic Explosion",
+        attack_shape=None,
         strength=0,
         distance=1,
         movement=0,
         status_effect="Fire",
-        radius=2,
+        status_shape=shapes.circle(2),
+        jump=False
     ),
     ActionCard(
-        attack_name=f"Magic Blast",
+        attack_name=f"Lightning Bolt",
+        attack_shape=shapes.line((1,0), 3),
         strength=4,
         distance=4,
         movement=4,
         status_effect=None,
-        radius=None,
+        status_shape=None,
+        jump=True
     ),
 ]
+
+backstory = ""
+
+health = 6

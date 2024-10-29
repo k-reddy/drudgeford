@@ -1,6 +1,6 @@
 import random
 from enum import Enum, auto
-from character import CharacterType, Monster, Player, Character
+from character import CharacterType, Monster, Player, Character, Wizard
 from config import DEBUG
 from display import Display
 import agent
@@ -32,7 +32,7 @@ class GameLoop:
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed..."""
         if not self.all_ai_mode:
-            self.disp.clear_display_and_print_message(message=message)
+            self.disp.print_message(message=message, clear_display=True)
             self.disp.get_user_input(
                 prompt="Time to start the game! Hit enter to continue\n"
             )
@@ -40,14 +40,16 @@ Kill it or be killed..."""
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.disp.update_round_number(round_number)
-            self.run_round()
+            self.run_round(round_number)
             # print(self.game_state)
             round_number += 1
         # once we're no longer playing, end the game
         # print(f"{self.game_state.name=}")
         return self._end_game()
 
-    def run_round(self) -> None:
+    def run_round(self, round_num: int) -> None:
+        # clear the elements from the board that have "expired"
+        self.board.update_terrain(round_num)
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
@@ -73,7 +75,7 @@ Kill it or be killed..."""
                 # end pathfinding test
 
             self.disp.update_acting_character_name(acting_character.name)
-            self.run_turn(acting_character)
+            self.run_turn(acting_character, round_num)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
             # move after acting, which is not ideal
@@ -82,7 +84,7 @@ Kill it or be killed..."""
                 return
         self._end_round()
 
-    def run_turn(self, acting_character: CharacterType) -> None:
+    def run_turn(self, acting_character: CharacterType, round_num: int) -> None:
         try:
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
@@ -90,7 +92,7 @@ Kill it or be killed..."""
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
                 lambda: acting_character.perform_movement(action_card, self.board),
-                lambda: acting_character.perform_attack(action_card, self.board),
+                lambda: acting_character.perform_attack(action_card, self.board, round_num),
             ]
             # if not move_first, swap the order of movement and attack
             if not move_first:
@@ -107,9 +109,10 @@ Kill it or be killed..."""
                     self._end_turn()
                     return
         except SlipAndLoseTurn:
-            self.disp.get_user_input(
-                prompt=f"{acting_character.name} slipped! Hit enter to continue"
-            )
+            if not self.all_ai_mode:
+                self.disp.get_user_input(
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                )
 
         self._end_turn()
 
@@ -134,7 +137,7 @@ Kill it or be killed..."""
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.disp.clear_display_and_print_message(message)
+            self.disp.print_message(message, clear_display=False)
         return self.game_state
 
     def _end_turn(self) -> None:
@@ -217,8 +220,10 @@ def set_up_players(disp, num_players, all_ai_mode):
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if all_ai_mode else agent.Human()
-        is_wizard = True if i == num_players-1 else False
-        players.append(Player(player_name, 8, disp, emoji[i], player_agent, is_wizard))
+        if i == num_players - 1:
+            players.append(Wizard(player_name, 8, disp, emoji[i], player_agent))
+        else:
+            players.append(Player(player_name, 8, disp, emoji[i], player_agent))
     if not all_ai_mode:
         disp.clear_display()
     return players
