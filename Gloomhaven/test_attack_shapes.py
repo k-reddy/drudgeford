@@ -45,3 +45,8 @@ def test_circle_2():
         (-1,-2)
     }
     assert circle_dirs == expected
+
+def test_line():
+    line_dirs = shapes.line((0,1), 3)
+    expected = {(0,1), (0,2), (0,3)}
+    assert line_dirs == expected
