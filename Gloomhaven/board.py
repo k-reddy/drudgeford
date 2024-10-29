@@ -7,6 +7,7 @@ from gh_types import ActionCard
 from display import Display
 from listwithupdate import ListWithUpdate
 import agent
+import attack_shapes as shapes
 
 EMPTY_CELL = "|      "
 FIRE_DAMAGE = 1
@@ -96,18 +97,11 @@ class Board:
             self.terrain[row][col] = (effect, round_num)
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, radius: int, round_num: int
+        self, effect: str, row: int, col: int, shape: set, round_num: int
     ) -> None:
-        directions = set()
-        for i in range(radius + 1):
-            for j in range(radius + 1):
-                directions.add((i, j))
-                directions.add((-i, -j))
-                directions.add((i, -j))
-                directions.add((-i, j))
-        for direction in directions:
-            effect_row = row + direction[0]
-            effect_col = col + direction[1]
+        for coordinate in shape:
+            effect_row = row + coordinate[0]
+            effect_col = col + coordinate[1]
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
@@ -298,7 +292,7 @@ class Board:
             row, col = self.find_location_of_target(target)
             self.log.append(f"{attacker.name} throws {action_card.status_effect}")
             self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.radius, round_num
+                action_card.status_effect.upper(), row, col, shapes.circle(action_card.radius), round_num
             )
         # some cards have no attack, don't want to attack if we hit a good modifier
         if action_card.strength == 0:
