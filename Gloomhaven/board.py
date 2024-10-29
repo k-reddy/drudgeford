@@ -287,12 +287,12 @@ class Board:
 
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
 
-        if action_card.status_effect and action_card.radius:
+        if action_card.status_effect and action_card.status_shape:
             self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
             self.log.append(f"{attacker.name} throws {action_card.status_effect}")
             self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, shapes.circle(action_card.radius), round_num
+                action_card.status_effect.upper(), row, col, action_card.status_shape, round_num
             )
         # some cards have no attack, don't want to attack if we hit a good modifier
         if action_card.strength == 0:
