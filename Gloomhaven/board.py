@@ -133,7 +133,7 @@ class Board:
                     # if there's a character there, deal damage to them 
                     # note: this allows friendly fire, which I think is fun
                     if isinstance(potential_char, Monster):
-                        self.attack_target(strength, potential_char)
+                        self.attack_target(attacker, strength, potential_char)
 
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
@@ -334,10 +334,11 @@ class Board:
         # some cards have no attack, don't want to attack if we hit a good modifier
         if action_card.strength == 0:
             return
-        self.attack_target(action_card["strength"], target)
+        self.attack_target(attacker, action_card["strength"], target)
 
-    def attack_target(self, strength, target):
+    def attack_target(self, attacker, strength, target):
         modified_attack_strength = self.select_and_apply_attack_modifier(
+            attacker,
             strength
         )
         if modified_attack_strength <= 0:
@@ -487,25 +488,10 @@ class Board:
         else:
             self.log.append(f"{target.name}'s new health: {target.health}")
 
-    def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
-        def multiply(x, y):
-            return x * y
-
-        def add(x, y):
-            return x + y
-
-        attack_modifier_deck = [
-            (partial(multiply, 2), "2x"),
-            (partial(multiply, 0), "Null"),
-        ]
-        for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
-
-        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
-
-        attack_modifier_function, modifier_string = random.choices(
-            attack_modifier_deck, attack_modifier_weights
-        )[0]
+    def select_and_apply_attack_modifier(self, attacker, initial_attack_strength: int) -> int:
+        attack_modifier_function, modifier_string = attacker.attack_modifier_deck.pop()
+        if len(attacker.attack_modifier_deck) == 0:
+            attacker.make_attack_modifier_deck()
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
     
