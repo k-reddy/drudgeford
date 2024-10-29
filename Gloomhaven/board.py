@@ -504,6 +504,10 @@ class Board:
                 # if the terrain item was placed 2 or more rounds ago, clear it
                 if round_num-el[1] >= 2:
                     self.terrain[i][j] = 'X'
+    
+    def append_to_attack_modifier_deck(self, target: CharacterType, modifier_card: tuple):
+        target.attack_modifier_deck.append(modifier_card)
+
 
 class SlipAndLoseTurn(Exception):
     pass

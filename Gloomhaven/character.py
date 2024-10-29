@@ -78,24 +78,13 @@ class Character(abc.ABC):
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
 
-    def make_multiply_modifier(self, multiplier: int, multiplier_text: str) -> tuple:
-        def multiply(x, y):
-            return x * y
-        return (partial(multiply, multiplier), multiplier_text)
-
-    def make_additive_modifier(self, modifier_num) -> tuple:
-        def add(x, y):
-            return x + y
-        return (partial(add, modifier_num), f"{modifier_num:+d}")
-
     def make_attack_modifier_deck(self) -> list:
-
         attack_modifier_deck = [
-            self.make_multiply_modifier(2, "2x"),
-            self.make_multiply_modifier(0, "Null"),
+            make_multiply_modifier(2, "2x"),
+            make_multiply_modifier(0, "Null"),
         ]
         for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append(self.make_additive_modifier(modifier))
+            attack_modifier_deck.append(make_additive_modifier(modifier))
 
         attack_modifier_weights = [1, 1, 1, 3, 3, 3, 1]
         for i, weight in enumerate(attack_modifier_weights):
@@ -222,3 +211,13 @@ class Wizard(Player):
         return wizard.backstory
     
 CharacterType = Player | Monster
+
+def make_multiply_modifier(multiplier: int, multiplier_text: str) -> tuple:
+    def multiply(x, y):
+        return x * y
+    return (partial(multiply, multiplier), multiplier_text)
+
+def make_additive_modifier(modifier_num) -> tuple:
+    def add(x, y):
+        return x + y
+    return (partial(add, modifier_num), f"{modifier_num:+d}")
