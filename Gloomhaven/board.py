@@ -109,7 +109,7 @@ class Board:
                     self.terrain[effect_row][effect_col] = (effect, round_num)
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, CharacterType):
-                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
+                        self.deal_terrain_damage(potential_char, effect_row, effect_col, round_num)
 
     def attack_area(
         self, attacker: CharacterType, shape: set, strength: int
@@ -408,9 +408,9 @@ class Board:
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: CharacterType, row: int, col: int
+        self, acting_character: CharacterType, row: int, col: int, round_num: int
     ) -> None:
-        damage = self.get_terrain_damage(row, col)
+        damage = self.get_terrain_damage(row, col, round_num)
         if damage:
             self.log.append(
                 f"{acting_character.name} took {damage} damage from terrain"
@@ -436,7 +436,7 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int) -> int:
+    def get_terrain_damage(self, row: int, col: int, round_num: int) -> int:
         el = self.terrain[row][col][0]
         if el == "FIRE":
             return FIRE_DAMAGE
@@ -450,7 +450,8 @@ class Board:
             return TRAP_DAMAGE
         elif el == 'TOXIC_MUSHROOM':
             self.terrain[row][col] = 'X'
-            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), 4)
+            self.log.append("The mushroom exploded into spores!")
+            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), round_num)
             return
         elif el == 'SPORE':
             return SPORE_DAMAGE
