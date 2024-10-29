@@ -1,10 +1,11 @@
-import random
 from functools import partial
-import copy
-from collections import deque
 from character import CharacterType, Monster, Player, Character
-from gh_types import ActionCard
+from collections import deque
+import copy
+import heapq
+import random
 from display import Display
+from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
 import agent
 import attack_shapes as shapes
@@ -205,8 +206,7 @@ class Board:
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
-        Valid movements are up, down, left, right.
-        Will avoid non-empty cells except for end cell.
+        Can move in all 8 directions.
 
         Returns path as list of coordinates which includes the end cell, but not the
         starting cell.
@@ -222,30 +222,43 @@ class Board:
             (1, -1),  # SW
             (-1, -1),  # NW
         ]
-        max_row = max_col = self.size
-        visited: set[tuple[int, int]] = set()
+        closed: set[tuple[int, int]] = set()
 
         previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
-        queue = deque([start])
+        priority_queue: list = []
+        heapq.heappush(priority_queue, (0, start))
 
-        while queue:
-            current = queue.popleft()
+        g_scores = {start: 0}
+
+        def calculate_chebyshev_distance(
+            pos_a: tuple[int, int], pos_b: tuple[int, int]
+        ) -> int:
+            return max(abs(pos_a[0] - pos_b[0]), abs(pos_a[1] - pos_b[1]))
+
+        while priority_queue:
+            _, current = heapq.heappop(priority_queue)
 
             if current == end:
                 return self.generate_path(previous_cell, end)
+
+            if current in closed:
+                continue
+
+            closed.add(current)
 
             for direction in directions:
                 new_row = current[0] + direction[0]
                 new_col = current[1] + direction[1]
                 new_pos = (new_row, new_col)
-                if (
-                    0 <= new_row < max_row
-                    and 0 <= new_col < max_col
-                    and new_pos not in visited
+                if new_pos not in closed and (
+                    self.is_legal_move(new_row, new_col) or new_pos == end
                 ):
-                    if self.is_legal_move(new_row, new_col) or new_pos == end:
-                        queue.append(new_pos)
-                        visited.add(new_pos)
+                    new_g_score = g_scores[current] + 1
+                    if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
+                        h_score = calculate_chebyshev_distance(new_pos, end)
+                        g_scores[new_pos] = new_g_score
+                        f_score = new_g_score + h_score
+                        heapq.heappush(priority_queue, (f_score, new_pos))
                         previous_cell[new_pos] = current
 
         return []
