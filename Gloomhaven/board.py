@@ -439,6 +439,7 @@ class Board:
         elif el == 'TOXIC_MUSHROOM':
             self.terrain[row][col] = 'X'
             self.add_effect_to_terrain_for_attack("SPORE", row, col, 1, 4)
+            return
         elif el == 'SPORE':
             return SPORE_DAMAGE
         else:

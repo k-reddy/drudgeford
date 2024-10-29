@@ -1,6 +1,6 @@
 import random
 from enum import Enum, auto
-from character import CharacterType, Monster, Player, Character
+from character import CharacterType, Monster, Player, Character, Wizard
 from config import DEBUG
 from display import Display
 import agent
@@ -220,8 +220,10 @@ def set_up_players(disp, num_players, all_ai_mode):
         # default to happy :D
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if all_ai_mode else agent.Human()
-        is_wizard = True if i == num_players-1 else False
-        players.append(Player(player_name, 8, disp, emoji[i], player_agent, is_wizard))
+        if i == num_players - 1:
+            players.append(Wizard(player_name, 8, disp, emoji[i], player_agent))
+        else:
+            players.append(Player(player_name, 8, disp, emoji[i], player_agent))
     if not all_ai_mode:
         disp.clear_display()
     return players
