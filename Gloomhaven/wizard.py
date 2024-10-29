@@ -1,6 +1,6 @@
 from gh_types import ActionCard
 
-wizard_cards = [
+cards = [
     ActionCard(
         attack_name=f"Fireball",
         strength=0,
@@ -56,3 +56,7 @@ wizard_cards = [
         jump=True
     ),
 ]
+
+backstory = ""
+
+health = 6
