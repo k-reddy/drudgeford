@@ -9,7 +9,8 @@ from listwithupdate import ListWithUpdate
 import agent
 
 EMPTY_CELL = "|      "
-TERRAIN_DAMAGE = 1
+FIRE_DAMAGE = 1
+TRAP_DAMAGE = 3
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -424,14 +425,15 @@ class Board:
     def get_terrain_damage(self, row: int, col: int) -> int:
         el = self.terrain[row][col][0]
         if el == "FIRE":
-            return TERRAIN_DAMAGE
+            return FIRE_DAMAGE
         elif el == "ICE":
             if random.random() < 0.25:
                 raise SlipAndLoseTurn("Slipped!")
             else:
                 return 0
         elif el == "TRAP":
-            pass
+            self.terrain[row][col] = 'X'
+            return TRAP_DAMAGE
         else:
             return 0
 
