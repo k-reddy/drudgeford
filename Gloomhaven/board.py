@@ -35,10 +35,10 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain("FIRE", False, random.randint(0,10))
-        self.add_starting_effect_to_terrain("ICE", True, random.randint(0,5))
-        self.add_starting_effect_to_terrain("TRAP", True, random.randint(0,3))
-        self.terrain[3][3] = ("TOXIC_MUSHROOM", 1)
+        self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0,10))
+        self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
+        self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -79,22 +79,29 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int) -> None:
+    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int) -> None:
         max_loc = self.size - 1
+        counter = 0
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            self.add_effect_if_valid_square(row, col, effect, round_num=0)
+            if self.add_effect_if_valid_square(row, col, effect, round_num=0):
+                counter+=1
             if is_contiguous:
                 for i in [-1,0,1]:
-                    self.add_effect_if_valid_square(row+i, col, effect, round_num=0)
+                    if self.add_effect_if_valid_square(row+i, col, effect, round_num=0):
+                        counter+=1
+            if counter >= target_num:
+                return
 
-    def add_effect_if_valid_square(self, row, col, effect, round_num):
+    def add_effect_if_valid_square(self, row, col, effect, round_num) -> bool:
         if row >= self.size or col >= self.size:
-            return
+            return False
         if self.locations[row][col] is None:
             self.terrain[row][col] = (effect, round_num)
+            return True
+        return False
 
     def add_effect_to_terrain_for_attack(
         self, effect: str, row: int, col: int, shape: set, round_num: int
