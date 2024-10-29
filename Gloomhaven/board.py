@@ -1,14 +1,19 @@
 from functools import partial
+from character import CharacterType, Monster, Player, Character
+from collections import deque
+import copy
 import heapq
 import random
-
-from character import CharacterType, Monster, Player
 from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
+import agent
+import attack_shapes as shapes
 
 EMPTY_CELL = "|      "
-TERRAIN_DAMAGE = 1
+FIRE_DAMAGE = 1
+TRAP_DAMAGE = 3
+SPORE_DAMAGE = 1
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -31,7 +36,10 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_fire_to_terrain()
+        self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0,10))
+        self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
+        self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -72,32 +80,61 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_fire_to_terrain(self) -> None:
+    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int) -> None:
         max_loc = self.size - 1
-        for _ in range(10):
+        counter = 0
+        for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.locations[row][col] is None:
-                self.terrain[row][col] = "FIRE"
+            if self.add_effect_if_valid_square(row, col, effect, round_num=0):
+                counter+=1
+            if is_contiguous:
+                for i in [-1,0,1]:
+                    if self.add_effect_if_valid_square(row+i, col, effect, round_num=0):
+                        counter+=1
+            if counter >= target_num:
+                return
+
+    def add_effect_if_valid_square(self, row, col, effect, round_num) -> bool:
+        if row >= self.size or col >= self.size:
+            return False
+        if self.locations[row][col] is None:
+            self.terrain[row][col] = (effect, round_num)
+            return True
+        return False
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, radius: int
+        self, effect: str, row: int, col: int, shape: set, round_num: int
     ) -> None:
-        directions = []
-        for i in range(radius + 1):
-            for j in range(radius + 1):
-                directions.append((i, j))
-                directions.append((-i, -j))
-                directions.append((i, -j))
-                directions.append((-i, j))
-        for direction in directions:
-            effect_row = row + direction[0]
-            effect_col = col + direction[1]
+        for coordinate in shape:
+            effect_row = row + coordinate[0]
+            effect_col = col + coordinate[1]
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
-                    self.terrain[effect_row][effect_col] = effect
+                    potential_char = self.locations[effect_row][effect_col]
+                    self.terrain[effect_row][effect_col] = (effect, round_num)
+                    # if there's a character there, deal damage to them
+                    if isinstance(potential_char, CharacterType):
+                        self.deal_terrain_damage(potential_char, effect_row, effect_col, round_num)
+
+    def attack_area(
+        self, attacker: CharacterType, shape: set, strength: int
+    ) -> None:
+        starting_coord = self.find_location_of_target(attacker)
+        for coordinate in shape:
+            attack_row = starting_coord[0] + coordinate[0]
+            attack_col = starting_coord[1] + coordinate[1]
+            # check if row and col are in bounds
+            if 0 <= attack_row < len(self.locations):
+                if 0 <= attack_col < len(self.locations[attack_row]):
+                    potential_char = self.locations[attack_row][attack_col]
+                    # if there's a character there, deal damage to them 
+                    # note: this allows friendly fire, which I think is fun
+                    if isinstance(potential_char, Monster):
+                        self.attack_target(strength, potential_char)
+
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -276,8 +313,8 @@ class Board:
             if not isinstance(pot_opponent, type(actor))
         ]
 
-    def attack_target(
-        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType
+    def perform_attack_card(
+        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType, round_num: int
     ) -> None:
         if target is None or (
             not self.is_attack_in_range(action_card["distance"], attacker, target)
@@ -287,22 +324,27 @@ class Board:
 
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
 
-        if action_card.status_effect and action_card.radius:
+        if action_card.status_effect and action_card.status_shape:
             self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
             row, col = self.find_location_of_target(target)
+            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
             self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.radius
+                action_card.status_effect.upper(), row, col, action_card.status_shape, round_num
             )
+        # some cards have no attack, don't want to attack if we hit a good modifier
+        if action_card.strength == 0:
+            return
+        self.attack_target(action_card["strength"], target)
+
+    def attack_target(self, strength, target):
         modified_attack_strength = self.select_and_apply_attack_modifier(
-            action_card["strength"]
+            strength
         )
-        if action_card.status_effect is None and modified_attack_strength <= 0:
+        if modified_attack_strength <= 0:
             self.log.append("Darn, attack missed!")
             return
-
-        self.log.append("Attack hits!\n")
         self.log.append(
-            f"After the modifier, attack strength is: {modified_attack_strength}"
+            f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
         )
 
         self.modify_target_health(target, modified_attack_strength)
@@ -347,6 +389,7 @@ class Board:
         acting_character: CharacterType,
         target_location: tuple[int, int],
         movement: int,
+        is_jump=False
     ) -> None:
         if movement == 0:
             return
@@ -373,17 +416,21 @@ class Board:
         # if it's occupied and you need to move, move to one away
         else:
             path_traveled = path_to_target[:-1]
-        # go along the path and take any terrain damage!
+        # go along the path and take any terrain damage! if you jump, go straight to end
+        if is_jump and isinstance(acting_character.agent, agent.Ai):
+            path_traveled = path_traveled[-1:]
         for loc in path_traveled:
-            self.deal_terrain_damage(acting_character, loc[0], loc[1])
+            # humans move step by step, so they should not take damage on a jump
+            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
+                self.deal_terrain_damage(acting_character, loc[0], loc[1])
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: CharacterType, row: int, col: int
+        self, acting_character: CharacterType, row: int, col: int, round_num: int
     ) -> None:
-        damage = self.get_terrain_damage(row, col)
+        damage = self.get_terrain_damage(row, col, round_num)
         if damage:
             self.log.append(
                 f"{acting_character.name} took {damage} damage from terrain"
@@ -409,14 +456,25 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int) -> int:
-        if self.terrain[row][col] == "FIRE":
-            return TERRAIN_DAMAGE
-        elif self.terrain[row][col] == "ICE":
+    def get_terrain_damage(self, row: int, col: int, round_num: int) -> int:
+        el = self.terrain[row][col][0]
+        if el == "FIRE":
+            return FIRE_DAMAGE
+        elif el == "ICE":
             if random.random() < 0.25:
                 raise SlipAndLoseTurn("Slipped!")
             else:
                 return 0
+        elif el == "TRAP":
+            self.terrain[row][col] = 'X'
+            return TRAP_DAMAGE
+        elif el == 'TOXIC_MUSHROOM':
+            self.terrain[row][col] = 'X'
+            self.log.append("The mushroom exploded into spores!")
+            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), round_num)
+            return
+        elif el == 'SPORE':
+            return SPORE_DAMAGE
         else:
             return 0
 
@@ -448,7 +506,16 @@ class Board:
         )[0]
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
-
+    
+    def update_terrain(self, round_num: int):
+        for i, _ in enumerate(self.terrain):
+            for j, el in enumerate(self.terrain[i]):
+                # x is the default initialization
+                if el == 'X':
+                    continue 
+                # if the terrain item was placed 2 or more rounds ago, clear it
+                if round_num-el[1] >= 2:
+                    self.terrain[i][j] = 'X'
 
 class SlipAndLoseTurn(Exception):
     pass

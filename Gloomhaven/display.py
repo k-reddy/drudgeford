@@ -65,10 +65,16 @@ class Display:
 
             effect_sides = ""
             for el in self.terrain[i]:
-                if el == "FIRE":
+                if el[0] == "FIRE":
                     effect_sides += "|  🔥  "
-                elif el == "ICE":
+                elif el[0] == "ICE":
                     effect_sides += "|  🧊  "
+                elif el[0] == "TRAP":
+                    effect_sides+= "|  🗯️   "
+                elif el[0] == "TOXIC_MUSHROOM":
+                    effect_sides+="|  🍄  "
+                elif el[0] == "SPORE":
+                    effect_sides+="|  🦠  "
                 else:
                     effect_sides += EMPTY_CELL
             effect_sides += EMPTY_CELL
@@ -118,8 +124,9 @@ class Display:
 
         return user_input
 
-    def clear_display_and_print_message(self, message) -> None:
-        self.clear_display()
+    def print_message(self, message, clear_display=True) -> None:
+        if clear_display:
+            self.clear_display()
         print(message)
 
     def clear_display(self) -> None:
