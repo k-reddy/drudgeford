@@ -428,7 +428,7 @@ class Board:
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: CharacterType, row: int, col: int, round_num: int
+        self, acting_character: CharacterType, row: int, col: int, round_num: int | None = None
     ) -> None:
         damage = self.get_terrain_damage(row, col, round_num)
         if damage:
@@ -456,7 +456,7 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int, round_num: int) -> int:
+    def get_terrain_damage(self, row: int, col: int, round_num: int | None = None) -> int:
         el = self.terrain[row][col][0]
         if el == "FIRE":
             return FIRE_DAMAGE
@@ -471,6 +471,8 @@ class Board:
         elif el == 'TOXIC_MUSHROOM':
             self.terrain[row][col] = 'X'
             self.log.append("The mushroom exploded into spores!")
+            if not round_num:
+                raise ValueError("No round num for spores")
             self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), round_num)
             return
         elif el == 'SPORE':
