@@ -2,6 +2,7 @@ import random
 import abc
 import wizard
 from gh_types import ActionCard
+from functools import partial
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
@@ -75,6 +76,28 @@ class Character(abc.ABC):
         self.disp.add_to_log(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
+
+    def make_attack_modifier_deck(self) -> list:
+        def multiply(x, y):
+            return x * y
+
+        def add(x, y):
+            return x + y
+
+        attack_modifier_deck = [
+            (partial(multiply, 2), "2x"),
+            (partial(multiply, 0), "Null"),
+        ]
+        for modifier in [-2, -1, 0, 1, 2]:
+            attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
+
+        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
+        for i, weight in enumerate(attack_modifier_weights):
+            for _ in range(weight+1):
+                attack_modifier_deck.append(attack_modifier_deck[i])
+        random.shuffle(attack_modifier_deck)
+        return attack_modifier_deck
+
 
 class Player(Character):    
     def set_health(self):
