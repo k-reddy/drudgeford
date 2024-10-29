@@ -50,3 +50,13 @@ def test_line():
     line_dirs = shapes.line((0,1), 3)
     expected = {(0,1), (0,2), (0,3)}
     assert line_dirs == expected
+
+def test_line_2():
+    line_dirs = shapes.line((-1,0), 2)
+    expected = {(-1,0), (-2,0)}
+    assert line_dirs == expected
+
+def test_line_3():
+    line_dirs = shapes.line((-1,-1), 2)
+    expected = {(-1,-1), (-2,-2)}
+    assert line_dirs == expected
