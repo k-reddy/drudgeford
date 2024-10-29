@@ -21,3 +21,20 @@ def bar(offset: int, depth: int):
         for j in range(-1, 2):
             directions.add((i, j))
     return directions
+
+def print_shape(shape):
+    print_str = ''
+    ymin = min([y for y, _ in shape])
+    xmin = min([x for _, x in shape])
+    ymax = max([y for y, _ in shape])
+    xmax = max([x for _, x in shape])
+    for i in range(max(0,ymax), min(0,ymin)-1, -1):
+        for j in range(min(0,xmin), max(0,xmax)+1):
+            if (i,j) in shape:
+                print_str += '* '
+            elif (i,j) == (0,0):
+                print_str += "@ "
+            else:
+                print_str += "  "
+        print_str+="\n"
+    print(print_str)

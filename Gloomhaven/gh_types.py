@@ -8,7 +8,7 @@ class ActionCard:
     distance: int
     movement: int
     status_effect: str | None
-    radius: int | None
+    status_shape: set | None
     jump: bool
 
     def __getitem__(self, key):
@@ -22,5 +22,5 @@ class ActionCard:
         if self.jump:
             str+= ", Jump"
         if self.status_effect:
-            str += f"\n\tStatus Effect: {self.status_effect} with Radius {self.radius}"
+            str += f"\n\tStatus Effect: {self.status_effect} with Shape Unknown"
         return str

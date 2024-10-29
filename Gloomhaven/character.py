@@ -117,7 +117,7 @@ class Player(Character):
                 distance=distance,
                 movement=movement,
                 status_effect=None,
-                radius=None,
+                status_shape=None,
                 jump=True
             )
             action_cards.append(action_card)
@@ -170,7 +170,7 @@ class Monster(Character):
                 distance=distance,
                 movement=movement,
                 status_effect=None,
-                radius=None,
+                status_shape=None,
                 jump=True
             )
             action_cards.append(action_card)
