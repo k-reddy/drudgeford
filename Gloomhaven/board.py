@@ -111,6 +111,23 @@ class Board:
                     if isinstance(potential_char, CharacterType):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
+    def attack_area(
+        self, attacker: CharacterType, shape: set, strength: int
+    ) -> None:
+        starting_coord = self.find_location_of_target(attacker)
+        for coordinate in shape:
+            attack_row = starting_coord[0] + coordinate[0]
+            attack_col = starting_coord[1] + coordinate[1]
+            # check if row and col are in bounds
+            if 0 <= attack_row < len(self.locations):
+                if 0 <= attack_col < len(self.locations[attack_row]):
+                    potential_char = self.locations[attack_row][attack_col]
+                    # if there's a character there, deal damage to them 
+                    # note: this allows friendly fire, which I think is fun
+                    if isinstance(potential_char, Monster):
+                        self.attack_target(strength, potential_char)
+
+
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
             for y in range(start_y, min(start_y + height, self.size)):
@@ -276,7 +293,7 @@ class Board:
             if not isinstance(pot_opponent, type(actor))
         ]
 
-    def attack_target(
+    def perform_attack_card(
         self, action_card: ActionCard, attacker: CharacterType, target: CharacterType, round_num: int
     ) -> None:
         if target is None or (
@@ -297,16 +314,17 @@ class Board:
         # some cards have no attack, don't want to attack if we hit a good modifier
         if action_card.strength == 0:
             return
+        self.attack_target(action_card["strength"], target)
+
+    def attack_target(self, strength, target):
         modified_attack_strength = self.select_and_apply_attack_modifier(
-            action_card["strength"]
+            strength
         )
-        if action_card.status_effect is None and modified_attack_strength <= 0:
+        if modified_attack_strength <= 0:
             self.log.append("Darn, attack missed!")
             return
-
-        self.log.append("Attack hits!\n")
         self.log.append(
-            f"After the modifier, attack strength is: {modified_attack_strength}"
+            f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
         )
 
         self.modify_target_health(target, modified_attack_strength)

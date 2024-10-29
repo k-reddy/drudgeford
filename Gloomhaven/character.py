@@ -32,11 +32,15 @@ class Character(abc.ABC):
         pass
 
     def perform_attack(self, action_card, board, round_num: int):
-        in_range_opponents = board.find_in_range_opponents(
-            self, action_card
-        )
-        target = self.select_attack_target(in_range_opponents)
-        board.attack_target(action_card, self, target, round_num)
+        # if it's not an area of effect card, do a normal attack
+        if not action_card.attack_shape:
+            in_range_opponents = board.find_in_range_opponents(
+                self, action_card
+            )
+            target = self.select_attack_target(in_range_opponents)
+            board.perform_attack_card(action_card, self, target, round_num)
+        else:
+            board.attack_area(self, action_card.attack_shape, action_card.strength)
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
@@ -113,6 +117,7 @@ class Player(Character):
             distance = random.randint(1, max_distance)
             action_card = ActionCard(
                 attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
+                attack_shape=None,
                 strength=strength,
                 distance=distance,
                 movement=movement,
@@ -166,6 +171,7 @@ class Monster(Character):
             distance = random.randint(1, max_distance)
             action_card = ActionCard(
                 attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
+                attack_shape=None,
                 strength=strength,
                 distance=distance,
                 movement=movement,
