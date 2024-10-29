@@ -30,11 +30,11 @@ def print_shape(shape):
     xmax = max([x for _, x in shape])
     for i in range(max(0,ymax), min(0,ymin)-1, -1):
         for j in range(min(0,xmin), max(0,xmax)+1):
-            if (i,j) in shape:
-                print_str += '* '
-            elif (i,j) == (0,0):
+            if (i,j) == (0,0):
                 print_str += "@ "
+            elif (i,j) in shape:
+                print_str += '* '
             else:
                 print_str += "  "
         print_str+="\n"
-    print(print_str)
+    return print_str

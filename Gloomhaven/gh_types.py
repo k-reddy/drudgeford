@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+import attack_shapes as shapes
 
 @dataclass
 class ActionCard:
@@ -22,5 +22,5 @@ class ActionCard:
         if self.jump:
             str+= ", Jump"
         if self.status_effect:
-            str += f"\n\tStatus Effect: {self.status_effect} with Shape Unknown"
+            str += f"\n\tStatus Effect: {self.status_effect} with Shape:\n{shapes.print_shape(self.status_shape)}"
         return str
