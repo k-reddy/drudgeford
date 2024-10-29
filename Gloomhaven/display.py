@@ -71,6 +71,10 @@ class Display:
                     effect_sides += "|  🧊  "
                 elif el[0] == "TRAP":
                     effect_sides+= "|  🗯️   "
+                elif el[0] == "TOXIC_MUSHROOM":
+                    effect_sides+="|  🍄  "
+                elif el[0] == "SPORE":
+                    effect_sides+="|  🦠  "
                 else:
                     effect_sides += EMPTY_CELL
             effect_sides += EMPTY_CELL

@@ -11,6 +11,7 @@ import agent
 EMPTY_CELL = "|      "
 FIRE_DAMAGE = 1
 TRAP_DAMAGE = 3
+SPORE_DAMAGE = 1
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -36,6 +37,7 @@ class Board:
         self.add_starting_effect_to_terrain("FIRE", False, random.randint(0,10))
         self.add_starting_effect_to_terrain("ICE", True, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, random.randint(0,3))
+        self.terrain[3][3] = ("TOXIC_MUSHROOM", 1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -434,6 +436,11 @@ class Board:
         elif el == "TRAP":
             self.terrain[row][col] = 'X'
             return TRAP_DAMAGE
+        elif el == 'TOXIC_MUSHROOM':
+            self.terrain[row][col] = 'X'
+            self.add_effect_to_terrain_for_attack("SPORE", row, col, 1, 4)
+        elif el == 'SPORE':
+            return SPORE_DAMAGE
         else:
             return 0
 
