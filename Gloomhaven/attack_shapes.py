@@ -28,7 +28,7 @@ def print_shape(shape):
     xmin = min([x for _, x in shape])
     ymax = max([y for y, _ in shape])
     xmax = max([x for _, x in shape])
-    for i in range(max(0,ymax), min(0,ymin)-1, -1):
+    for i in range(min(0,ymin), max(0,ymax)+1):
         for j in range(min(0,xmin), max(0,xmax)+1):
             if (i,j) == (0,0):
                 print_str += "@ "
