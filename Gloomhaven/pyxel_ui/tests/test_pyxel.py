@@ -1,19 +1,19 @@
 import unittest
 from ..pyxel_main import (
-    Action,
+    ActionTask,
     Direction,
-    PyxelActionQueue,
+    PyxelTaskQueue,
 )
 
 # python3 -m unittest discover -s tests
 
 
-class TestPyxelActionQueue(unittest.TestCase):
+class TestPyxelTaskQueue(unittest.TestCase):
     def setUp(self):
-        self.queue = PyxelActionQueue()
+        self.queue = PyxelTaskQueue()
 
     def test_enqueue_action(self):
-        action = Action(
+        action = ActionTask(
             "knight",
             "walk",
             Direction.EAST,
@@ -27,7 +27,7 @@ class TestPyxelActionQueue(unittest.TestCase):
         )
 
     def test_dequeue_action(self):
-        action = Action(
+        action = ActionTask(
             "knight",
             "walk",
             Direction.EAST,
@@ -48,7 +48,7 @@ class TestPyxelActionQueue(unittest.TestCase):
 
     def test_peek(self):
         self.assertIsNone(self.queue.peek(), "Empty queue should return None")
-        action = Action(
+        action = ActionTask(
             "knight",
             "walk",
             Direction.EAST,
@@ -62,7 +62,7 @@ class TestPyxelActionQueue(unittest.TestCase):
             next_action,
             "Next action in queue with one action does not match.",
         )
-        action2 = Action(
+        action2 = ActionTask(
             "knight2",
             "walk",
             Direction.EAST,
@@ -77,7 +77,7 @@ class TestPyxelActionQueue(unittest.TestCase):
         )
 
     def test_clear(self):
-        action = Action(
+        action = ActionTask(
             "knight",
             "walk",
             Direction.EAST,

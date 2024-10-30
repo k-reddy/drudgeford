@@ -1,0 +1,129 @@
+Happy is performing Frozen Stone Rend: Strength 5, Range 1, Movement 2
+
+Happy is moving
+
+No opponents in range
+
+Not close enough to attack
+Evil Blob is performing Savage Flame Sunder: Strength 2, Range 1, Movement 1
+
+Evil Blob is moving
+
+No opponents in range
+
+Not close enough to attack
+Tree Man is performing Malevolent Thorn Crush: Strength 4, Range 2, Movement 3
+
+Tree Man is moving
+Tree Man took 1 damage from terrain
+Tree Man's new health: 2
+
+Tree Man is attempting to attack Happy
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Happy's new health: 5
+Tree Man is performing Blazing Hollow Slash: Strength 2, Range 3, Movement 2
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 3
+Happy's new health: 2
+Happy is performing Shadowed Storm Strike: Strength 4, Range 1, Movement 2
+
+Happy is moving
+
+Happy is attempting to attack Evil Blob
+Attack modifier: +2
+Attack hits!
+
+After the modifier, attack strength is: 6
+Evil Blob has been killed.
+Tree Man is performing Dreadful Blade Lash: Strength 5, Range 3, Movement 3
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: +2
+Attack hits!
+
+After the modifier, attack strength is: 7
+Happy has been killed.
+Evil Blob is performing Eternal Spirit Rampage: Strength 1, Range 1, Movement 4
+
+Evil Blob is moving
+Evil Blob took 1 damage from terrain
+Evil Blob's new health: 2
+
+Evil Blob is attempting to attack Happy
+Attack modifier: +1
+Attack hits!
+
+After the modifier, attack strength is: 2
+Happy's new health: 6
+Tree Man is performing Eternal Stone Howl: Strength 4, Range 2, Movement 1
+
+Tree Man is moving
+
+No opponents in range
+
+Not close enough to attack
+Happy is performing Frozen Spirit Rend: Strength 1, Range 1, Movement 1
+
+Happy is moving
+
+Happy is attempting to attack Evil Blob
+Attack modifier: +0
+Attack hits!
+
+After the modifier, attack strength is: 1
+Evil Blob's new health: 1
+Tree Man is performing Shadowed Wind Devour: Strength 3, Range 1, Movement 3
+
+Tree Man is moving
+
+No opponents in range
+
+Not close enough to attack
+Happy is performing Infernal Blade Lash: Strength 1, Range 1, Movement 1
+
+Happy is moving
+
+Happy is attempting to attack Evil Blob
+Attack modifier: 2x
+Attack hits!
+
+After the modifier, attack strength is: 2
+Evil Blob has been killed.
+Tree Man is performing Dire Fang Strike: Strength 2, Range 1, Movement 1
+
+Tree Man is moving
+
+Tree Man is attempting to attack Happy
+Attack modifier: -1
+Attack hits!
+
+After the modifier, attack strength is: 1
+Happy's new health: 5
+Happy is performing Malevolent Fang Surge: Strength 1, Range 2, Movement 4
+
+Happy is moving
+
+Happy is attempting to attack Tree Man
+Attack modifier: -1
+Darn, attack missed!
+Happy is performing Ancient Tide Slash: Strength 3, Range 3, Movement 2
+
+Happy is moving
+
+Happy is attempting to attack Tree Man
+Attack modifier: 2x
+Attack hits!
+
+After the modifier, attack strength is: 6
+Tree Man has been killed.
