@@ -14,8 +14,8 @@ cards = [
     ),
     ActionCard(
         attack_name="Cursed Frost Surge",
-        attack_shape=None,
-        strength=0,
+        attack_shape=shapes.bar(1,2),
+        strength=1,
         distance=4,
         movement=2,
         status_effect="Ice",
@@ -33,7 +33,7 @@ cards = [
         jump=False
     ),
     ActionCard(
-        attack_name="Quick Retreat",
+        attack_name="Scholar's Escape",
         attack_shape=None,
         strength=1,
         distance=1,
@@ -57,7 +57,28 @@ cards = [
         attack_shape=shapes.line((1,0), 3),
         strength=4,
         distance=0,
-        movement=4,
+        movement=1,
+        status_effect=None,
+        status_shape=None,
+        jump=False
+    ),
+    # !!! to implement - randomly teleports target 
+    # ActionCard(
+    #     attack_name="Random Teleport",
+    #     attack_shape=None,
+    #     strength=2,
+    #     distance=1,
+    #     movement=1,
+    #     status_effect=Teleport,
+    #     status_shape=None,
+    #     jump=False
+    # ),
+    ActionCard(
+        attack_name="B-Line",
+        attack_shape=shapes.line((0,1), 2),
+        strength=2,
+        distance=0,
+        movement=2,
         status_effect=None,
         status_shape=None,
         jump=True
