@@ -64,6 +64,6 @@ cards = [
     ),
 ]
 
-backstory = ""
+backstory = "wizards are cool"
 
 health = 6
