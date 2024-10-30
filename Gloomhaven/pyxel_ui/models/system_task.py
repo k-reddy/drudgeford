@@ -13,4 +13,3 @@ class SystemTask:
 
     type: str
     payload: Any
-    # action_steps: []

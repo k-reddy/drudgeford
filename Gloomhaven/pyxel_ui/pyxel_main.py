@@ -27,6 +27,11 @@ FRAME_DURATION_MS = 34
 # phase 5, add log and be able to write to it.
 # phase 6, add way to dynamically shape walls as obstacles.
 
+# TODO(john): track curr framerate to keep consistent move speeds
+# this will be a bit tricky since we need to be aware of how movement
+# affects framerate. could track high-low based on game states wait/move/log/effect
+# TODO: limit re-draw to areas that will change.
+
 
 def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
     pyxel.blt(x, y, img_bank, u, v, w, h, colkey)
@@ -59,24 +64,16 @@ class PyxelView:
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
 
-        # self.entities = {
-        #     1: Entity(
-        #         id=1,
-        #         name="knight",
-        #         x=self.canvas.board_start_pos[0],
-        #         y=self.canvas.board_start_pos[1] + self.canvas.tile_height_px,
-        #         animation_frame=AnimationFrame.SOUTH,
-        #         alive=True,
-        #     )
-        # }
-
     def start(self):
         print("Starting Pyxel game loop...")
+        # init pyxel canvas and map that align with those of GH backend
+        # canvas + map = board
         while not self.is_board_initialized:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
                 self.process_entity_loading_task()
+                self.current_task = None  # clear
                 self.is_board_initialized = True
 
         pyxel.run(self.update, self.draw)
@@ -92,16 +89,7 @@ class PyxelView:
                     draw_tile(x, y, **tile)
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
-        """
-        Converts grid-based tile coordinates to pixel coordinates on the canvas.
-
-        Args:
-            tile_x (int): The x-coordinate of the tile on the grid.
-            tile_y (int): The y-coordinate of the tile on the grid.
-
-        Returns:
-            tuple[int, int]: The pixel coordinates corresponding to the grid position.
-        """
+        """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
         pixel_x = self.canvas.board_start_pos[0] + (tile_x * self.canvas.tile_width_px)
         pixel_y = self.canvas.board_start_pos[1] + (tile_y * self.canvas.tile_height_px)
         return (pixel_x, pixel_y)
@@ -117,17 +105,6 @@ class PyxelView:
 
         Movement is broken into discrete steps, where the number of steps determines
         the speed of the animation. The steps are stored as tuples of (x, y) pixel coordinates.
-
-        Args:
-            start_tile_pos (tuple[int, int]): The starting tile coordinates on the grid.
-            end_tile_pos (tuple[int, int]): The target tile coordinates on the grid.
-            tween_time (int): The total duration of the movement in milliseconds.
-
-        Returns:
-            deque[tuple[int, int]]: A deque containing the pixel coordinates for each step.
-
-        Raises:
-            AssertionError: If the tween time is shorter than the frame duration.
         """
         assert tween_time > FRAME_DURATION_MS, "ActionTask smaller than frame rate"
 
@@ -150,12 +127,6 @@ class PyxelView:
         """
         Converts grid-based movement coordinates into pixel-based steps and
         appends them to the action.
-
-        Args:
-            action (ActionTask): The action containing the movement details.
-
-        Returns:
-            ActionTask: The updated action with pixel-based movement steps added.
         """
         action.action_steps = self.get_px_move_steps_between_tiles(
             action.from_grid_pos, action.to_grid_pos, action.duration_ms
@@ -172,25 +143,31 @@ class PyxelView:
             return
 
         px_pos_x, px_pos_y = self.current_task.action_steps.popleft()
-        # TODO(john) - update this to key off of ID
-        self.entities[self.current_task.entity].update_position(px_pos_x, px_pos_y)
+        self.entities[self.current_task.entity_id].update_position(px_pos_x, px_pos_y)
 
     def process_board_initialization_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
-        print(f"{self.current_task.payload=}")
-        # for now we're assuming system tasks have payload = locations
-        height = self.current_task.payload["height"]
-        width = self.current_task.payload["width"]
-        # initialize the pyxel map
+        height = self.current_task.payload["map_height"]
+        width = self.current_task.payload["map_width"]
         self.init_pyxel_map(width, height)
 
     def process_entity_loading_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
+        for entity in self.current_task.payload["entities"]:
+            row_px, col_px = self.convert_grid_to_pixel_pos(
+                entity["position"][0],
+                entity["position"][1],
+            )
 
-        row_px, col_px = self.convert_grid_to_pixel_pos(
-            self.current_task.payload["start_position"][0],
-            self.current_task.payload["start_position"][1],
-        )
+            self.entities[entity["id"]] = Entity(
+                id=entity["id"],
+                name=entity["name"],
+                x=row_px,
+                y=col_px,
+                z=10,
+                animation_frame=AnimationFrame.SOUTH,
+                alive=True,
+            )
 
         self.entities[self.current_task.payload["id"]] = Entity(
             id=self.current_task.payload["id"],
@@ -209,16 +186,18 @@ class PyxelView:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
+        if not self.is_board_initialized:
+            return
         # Check for new tasks here
-        # if not self.current_task and not self.task_queue.is_empty():
-        #     self.current_task = self.convert_and_append_move_steps_to_action(
-        #         self.task_queue.dequeue()
-        #     )
-        #     print(f"Has new action: {self.current_task}")
-        #     return
+        if not self.current_task and not self.task_queue.is_empty():
+            self.current_task = self.convert_and_append_move_steps_to_action(
+                self.task_queue.dequeue()
+            )
+            print(f"Has new action: {self.current_task}")
+            return
 
-        # if self.current_task:
-        #     self.process_action()
+        if self.current_task:
+            self.process_action()
 
     def draw(self):
         pyxel.cls(0)

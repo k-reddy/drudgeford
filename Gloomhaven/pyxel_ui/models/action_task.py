@@ -8,11 +8,11 @@ from ..enums import Direction
 @dataclass
 class ActionTask:
     """
-    Represents an action performed by a sprite in the game, including movement
+    Represents an action performed by a entity in the game, including movement
     and animation details.
 
     Attributes:
-        sprite (str): The name of the sprite performing the action.
+        entity (str): The name of the entity performing the action.
         animation_type (str): The type of animation for the action (e.g., 'walk', 'attack').
         direction (Direction): The direction of movement.
         from_grid_pos (tuple): The starting position on the grid (x, y).
@@ -22,7 +22,8 @@ class ActionTask:
             representing the path of the action (optional).
     """
 
-    sprite: str
+    entity: str
+    entity_id: int
     animation_type: str
     direction: Direction
     from_grid_pos: tuple
