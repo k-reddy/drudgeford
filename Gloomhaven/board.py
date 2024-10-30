@@ -39,7 +39,8 @@ class Board:
         self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0,10))
         self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
-        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
+        # set round_num to 100 so mushroom doesn't auto-expire
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1, round_num=100)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -80,18 +81,18 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int) -> None:
+    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int, round_num: int=0) -> None:
         max_loc = self.size - 1
         counter = 0
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.add_effect_if_valid_square(row, col, effect, round_num=0):
+            if self.add_effect_if_valid_square(row, col, effect, round_num):
                 counter+=1
             if is_contiguous:
                 for i in [-1,0,1]:
-                    if self.add_effect_if_valid_square(row+i, col, effect, round_num=0):
+                    if self.add_effect_if_valid_square(row+i, col, effect, round_num):
                         counter+=1
             if counter >= target_num:
                 return
@@ -116,7 +117,7 @@ class Board:
                     potential_char = self.locations[effect_row][effect_col]
                     self.terrain[effect_row][effect_col] = (effect, round_num)
                     # if there's a character there, deal damage to them
-                    if issubclass(potential_char, Character):
+                    if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col, round_num)
 
     def attack_area(
@@ -311,6 +312,7 @@ class Board:
             pot_opponent
             for pot_opponent in self.characters
             if pot_opponent.team_monster != actor.team_monster
+
         ]
 
     def perform_attack_card(
