@@ -1,6 +1,6 @@
 import random
 from enum import Enum, auto
-from character import CharacterType, Monster, Player, Character, Wizard
+from character import Character, Wizard
 from config import DEBUG
 from display import Display
 import agent
@@ -84,7 +84,7 @@ Kill it or be killed..."""
                 return
         self._end_round()
 
-    def run_turn(self, acting_character: CharacterType, round_num: int) -> None:
+    def run_turn(self, acting_character: Character, round_num: int) -> None:
         try:
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
@@ -118,10 +118,10 @@ Kill it or be killed..."""
 
     def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins
-        if all(not isinstance(x, Monster) for x in self.board.characters):
+        if all(not x.team_monster for x in self.board.characters):
             self.game_state = GameState.WIN
         # if all the players are dead, player loses
-        elif all(not isinstance(x, Player) for x in self.board.characters):
+        elif all(x.team_monster for x in self.board.characters):
             self.game_state = GameState.GAME_OVER
 
     def _end_game(self) -> GameState:
@@ -160,7 +160,7 @@ Kill it or be killed..."""
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
-            if isinstance(char, Player):
+            if not char.team_monster:
                 self.disp.add_to_log("Drat, you ran out of cards and got exhausted")
                 self.game_state = GameState.EXHAUSTED
             else:
@@ -221,9 +221,9 @@ def set_up_players(disp, num_players, all_ai_mode):
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if all_ai_mode else agent.Human()
         if i == num_players - 1:
-            players.append(Wizard(player_name, 8, disp, emoji[i], player_agent))
+            players.append(Wizard(player_name, 8, disp, emoji[i], player_agent, is_monster=False))
         else:
-            players.append(Player(player_name, 8, disp, emoji[i], player_agent))
+            players.append(Character(player_name, 8, disp, emoji[i], player_agent, is_monster=False))
     if not all_ai_mode:
         disp.clear_display()
     return players
@@ -235,6 +235,6 @@ def set_up_monsters(disp, num_players):
     emoji = ["🌵", "🪼 ", "💀", "🧿"]
     healths = [3, 3, 7, 8]
     for i in range(num_players + 1):
-        monster = Monster(names[i], healths[i], disp, emoji[i], agent.Ai())
+        monster = Character(names[i], healths[i], disp, emoji[i], agent.Ai(), is_monster=True)
         monsters.append(monster)
     return monsters
