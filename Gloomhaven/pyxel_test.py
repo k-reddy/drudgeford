@@ -57,56 +57,69 @@ def enqueue_actions():
     #     animation_frame=AnimationFrame.SOUTH,
     #     alive=True,
     # )
-    time.sleep(2)
+    time.sleep(3)
     print("Enqueuing actions...")
     payload = {
-        "width": 5,
-        "height": 5,
-        "id": 1,
-        "start_position": (1, 2),
+        "map_width": 5,
+        "map_height": 5,
+        "entities": [
+            {
+                "id": 1,
+                "position": (0, 0),
+                "name": "knight",
+            },
+            {
+                "id": 2,
+                "position": (4, 2),
+                "name": "knight",
+            },
+        ],
     }
-    task = SystemTask(type="whatever", payload=payload)
+
+    task = SystemTask(type="board_init", payload=payload)
     shared_action_queue.enqueue(task)
 
-    # # Create some test actions
-    # print("move 1")
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
-    # )
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (1, 0), (1, 1), move_duration)
-    # )
-    # time.sleep(2)
+    # Create some test actions
+    time.sleep(3)
+    print("move 1")
+    shared_action_queue.enqueue(
+        ActionTask("knight", 1, "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
+    )
+    shared_action_queue.enqueue(
+        ActionTask("knight", 1, "walk", Direction.EAST, (1, 0), (1, 1), move_duration)
+    )
+    time.sleep(2)
 
-    # print("move2")
-    # shared_action_queue.enqueue(
-    #     ActionTask(
-    #         "knight",
-    #         "walk",
-    #         Direction.EAST,
-    #         (1, 1),
-    #         (1, 2),
-    #     )
-    # )
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (1, 2), (2, 2), move_duration)
-    # )
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
-    # )
+    print("move2")
+    shared_action_queue.enqueue(
+        ActionTask(
+            "knight",
+            2,
+            "walk",
+            Direction.EAST,
+            (4, 2),
+            (3, 2),
+        )
+    )
+    shared_action_queue.enqueue(
+        ActionTask("knight", 2, "walk", Direction.EAST, (3, 2), (4, 3), move_duration)
+    )
+    shared_action_queue.enqueue(
+        ActionTask("knight", 2, "walk", Direction.EAST, (4, 3), (4, 2), move_duration)
+    )
     # time.sleep(3)
     # print("move3")
     # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (1, 2), (1, 3), move_duration)
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 2), (1, 3), move_duration)
     # )
     # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (1, 3), (2, 4), move_duration)
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 3), (2, 4), move_duration)
     # )
     # shared_action_queue.enqueue(
-    #     ActionTask("knight", "walk", Direction.EAST, (2, 4), (2, 3), move_duration)
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (2, 4), (2, 3), move_duration)
     # )
 
-    # print("ActionTasks enqueued successfully.")
+    print("ActionTasks enqueued successfully.")
     print("yaaaay")
 
 
