@@ -2,15 +2,17 @@ import pyxel
 
 from collections import defaultdict, deque
 import itertools
-from typing import List, Optional
 
-from .enums import AnimationFrame, Direction
-from .models.actions import Action, PyxelActionQueue
+from .enums import AnimationFrame
+from .models.action_task import ActionTask
+
+# from .models.system_task import SystemTask
+from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from .models.canvas import Canvas
-from .models.characters import Character
+from .models.entity import Entity
 from .models.walls import Wall
-from .utils import BACKGROUND_TILES
-from .views.sprites import Sprite, SpriteManager
+from .utils import BACKGROUND_TILES, generate_wall_bank
+from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
@@ -20,9 +22,10 @@ FRAME_DURATION_MS = 34
 
 # phase 1, generate play space based on 64x64 character. add wall boundaries
 # phase 2, create move queue and read from them to move character around on grid
-# phase 3, start UI, allow for mouse hover to highlight grid boxes
-# phase 4, add log and be able to write to it.
-# phase 5, add way to dynamically shape walls as obstacles.
+# phase 3, integrate with GH backend - set up new task types for use with message queue
+# phase 4, start UI, allow for mouse hover to highlight grid boxes
+# phase 5, add log and be able to write to it.
+# phase 6, add way to dynamically shape walls as obstacles.
 
 
 def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
@@ -30,11 +33,17 @@ def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
 
 
 class PyxelView:
-    def __init__(
-        self, board: List[List[Optional[str]]], action_queue: PyxelActionQueue
-    ):
-        self.board_tile_width = len(board[0])
-        self.board_tile_height = len(board)
+    def __init__(self, task_queue: PyxelTaskQueue):
+        # Init action queue system
+        self.task_queue = task_queue
+        self.current_task = None
+        self.entities: dict = {}
+        self.sprite_manager = SpriteManager()
+        self.is_board_initialized = False
+
+    def init_pyxel_map(self, width, height):
+        self.board_tile_width = width
+        self.board_tile_height = height
 
         # TODO(John): replace these hardcoded numbers.
         pyxel.init(self.board_tile_width * 64 + 32, self.board_tile_height * 64 + 64)
@@ -48,41 +57,28 @@ class PyxelView:
             wall_sprite_thickness_px=32,
         )
 
-        self.dungeon_walls = {
-            "north": Wall(
-                0, 0, self.canvas.wall_sprite_thickness_px, Direction.NORTH, self.canvas
-            ),
-            "south": Wall(
-                0,
-                self.canvas.canvas_height_px - self.canvas.wall_sprite_thickness_px,
-                self.canvas.wall_sprite_thickness_px,
-                Direction.SOUTH,
-                self.canvas,
-            ),
-            "west": Wall(0, 0, 32, Direction.WEST, self.canvas),
-            "east": Wall(
-                self.canvas.canvas_width_px - 32, 0, 32, Direction.EAST, self.canvas
-            ),
-        }
+        self.dungeon_walls = generate_wall_bank(self.canvas)
 
-        self.characters = {
-            "knight": Character(
-                name="knight",
-                x=self.canvas.board_start_pos[0],
-                y=self.canvas.board_start_pos[1] + self.canvas.tile_height_px,
-                animation_frame=AnimationFrame.SOUTH,
-                alive=True,
-            )
-        }
-
-        # Init action queue system
-        self.action_queue = action_queue
-        self.current_action = None
-
-        self.sprite_manager = SpriteManager()
+        # self.entities = {
+        #     1: Entity(
+        #         id=1,
+        #         name="knight",
+        #         x=self.canvas.board_start_pos[0],
+        #         y=self.canvas.board_start_pos[1] + self.canvas.tile_height_px,
+        #         animation_frame=AnimationFrame.SOUTH,
+        #         alive=True,
+        #     )
+        # }
 
     def start(self):
         print("Starting Pyxel game loop...")
+        while not self.is_board_initialized:
+            if not self.current_task and not self.task_queue.is_empty():
+                self.current_task = self.task_queue.dequeue()
+                self.process_board_initialization_task()
+                self.process_entity_loading_task()
+                self.is_board_initialized = True
+
         pyxel.run(self.update, self.draw)
 
     def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
@@ -133,7 +129,7 @@ class PyxelView:
         Raises:
             AssertionError: If the tween time is shorter than the frame duration.
         """
-        assert tween_time > FRAME_DURATION_MS, "Action smaller than frame rate"
+        assert tween_time > FRAME_DURATION_MS, "ActionTask smaller than frame rate"
 
         start_px_x, start_px_y = self.convert_grid_to_pixel_pos(*start_tile_pos)
         end_px_x, end_px_y = self.convert_grid_to_pixel_pos(*end_tile_pos)
@@ -150,16 +146,16 @@ class PyxelView:
             for i in range(step_count + 1)
         )
 
-    def convert_and_append_move_steps_to_action(self, action: Action) -> Action:
+    def convert_and_append_move_steps_to_action(self, action: ActionTask) -> ActionTask:
         """
         Converts grid-based movement coordinates into pixel-based steps and
         appends them to the action.
 
         Args:
-            action (Action): The action containing the movement details.
+            action (ActionTask): The action containing the movement details.
 
         Returns:
-            Action: The updated action with pixel-based movement steps added.
+            ActionTask: The updated action with pixel-based movement steps added.
         """
         action.action_steps = self.get_px_move_steps_between_tiles(
             action.from_grid_pos, action.to_grid_pos, action.duration_ms
@@ -167,32 +163,62 @@ class PyxelView:
         return action
 
     def process_action(self) -> None:
-        assert self.current_action, "Attempting to process empty action"
-        print(f"{self.current_action.action_steps=}")
+        assert self.current_task, "Attempting to process empty action"
+        print(f"{self.current_task.action_steps=}")
 
-        if not self.current_action.action_steps:
-            print("Action processing complete. Clearing...")
-            self.current_action = None  # better than del; no dangling logic
+        if not self.current_task.action_steps:
+            print("ActionTask processing complete. Clearing...")
+            self.current_task = None  # better than del; no dangling logic
             return
 
-        px_pos_x, px_pos_y = self.current_action.action_steps.popleft()
-        self.characters[self.current_action.character].update_position(
-            px_pos_x, px_pos_y
+        px_pos_x, px_pos_y = self.current_task.action_steps.popleft()
+        # TODO(john) - update this to key off of ID
+        self.entities[self.current_task.entity].update_position(px_pos_x, px_pos_y)
+
+    def process_board_initialization_task(self) -> None:
+        assert self.current_task, "Attempting to process empty system task"
+        print(f"{self.current_task.payload=}")
+        # for now we're assuming system tasks have payload = locations
+        height = self.current_task.payload["height"]
+        width = self.current_task.payload["width"]
+        # initialize the pyxel map
+        self.init_pyxel_map(width, height)
+
+    def process_entity_loading_task(self) -> None:
+        assert self.current_task, "Attempting to process empty system task"
+
+        row_px, col_px = self.convert_grid_to_pixel_pos(
+            self.current_task.payload["start_position"][0],
+            self.current_task.payload["start_position"][1],
         )
 
+        self.entities[self.current_task.payload["id"]] = Entity(
+            id=self.current_task.payload["id"],
+            name="knight",
+            x=row_px,
+            y=col_px,
+            z=10,
+            animation_frame=AnimationFrame.SOUTH,
+            alive=True,
+        )
+
+        # currently assuming payload is board.locations
+
     def update(self):
+        # make a pyxel board with the right shape
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
-        if not self.current_action and not self.action_queue.is_empty():
-            self.current_action = self.convert_and_append_move_steps_to_action(
-                self.action_queue.dequeue()
-            )
-            print(f"Has new action: {self.current_action}")
-            return
+        # Check for new tasks here
+        # if not self.current_task and not self.task_queue.is_empty():
+        #     self.current_task = self.convert_and_append_move_steps_to_action(
+        #         self.task_queue.dequeue()
+        #     )
+        #     print(f"Has new action: {self.current_task}")
+        #     return
 
-        if self.current_action:
-            self.process_action()
+        # if self.current_task:
+        #     self.process_action()
 
     def draw(self):
         pyxel.cls(0)
@@ -223,14 +249,12 @@ class PyxelView:
                 if (x, y) not in occupied_coordinates:
                     self.draw_background("dungeon_floor", occupied_coordinates)
 
-        # Draw sprites
-        for character_name, character in self.characters.items():
+        # Draw entity sprites
+        for _, entity in self.entities.items():
             self.draw_sprite(
-                character.x,
-                character.y,
-                self.sprite_manager.get_sprite(
-                    character_name, character.animation_frame
-                ),
+                entity.x,
+                entity.y,
+                self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
             )
 
         # Draw grids
