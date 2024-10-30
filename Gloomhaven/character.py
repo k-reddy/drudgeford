@@ -1,6 +1,6 @@
 import random
 import abc
-import wizard
+import character_classes
 from gh_types import ActionCard
 from functools import partial
 
@@ -149,11 +149,11 @@ class Character(abc.ABC):
 
 class Wizard(Character):
     def set_health(self):
-        return wizard.health
+        return character_classes.wizard.health
     def create_action_cards(self):
-        return wizard.cards
+        return character_classes.wizard.cards
     def set_backstory(self):
-        return wizard.backstory
+        return character_classes.wizard.backstory
 
 def make_multiply_modifier(multiplier: int, multiplier_text: str) -> tuple:
     def multiply(x, y):
