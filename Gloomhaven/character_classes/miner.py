@@ -100,6 +100,14 @@ cards = [
             gh_types.Pull(
                 squares=2, 
                 att_range=2
+            ),
+            gh_types.SingleTargetAttack(
+                strength=3,
+                att_range=1
+            ),
+            gh_types.WeakenEnemy(
+                strength=-2,
+                att_range=1
             )
         ],
         movement=10,
