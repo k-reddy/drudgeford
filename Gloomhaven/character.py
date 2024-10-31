@@ -4,6 +4,8 @@ import character_classes
 import gh_types 
 import utils
 
+MAX_ROUNDS = 1000
+
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
 # they will belong to a board, and they will send attacks out to the board to be carried out
@@ -21,9 +23,13 @@ class Character(abc.ABC):
         self.backstory = self.set_backstory()
         self.attack_modifier_deck = self.make_attack_modifier_deck()
         self.team_monster = is_monster
+        self.shield: tuple[int,int] = self.set_shield()
 
     def set_health(self):
         return 8
+    
+    def set_shield(self):
+        return (0, MAX_ROUNDS)
 
     def set_backstory(self):
         return "I'm a generic character, how boring"

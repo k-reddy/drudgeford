@@ -91,6 +91,17 @@ class ChargeNextAttack(ActionStep):
 
     def __str__(self):
         return f"Charge next attack {self.strength}"
+    
+@dataclass
+class ShieldSelf(ActionStep):
+    strength: int
+    duration: int
+
+    def perform(self, board, attacker, round_num):
+        attacker.shield = (self.strength, round_num+self.duration)
+    
+    def __str__(self):
+        return f"Shield {self.strength} for {self.duration} turns"
 
 @dataclass
 class ActionCard:
