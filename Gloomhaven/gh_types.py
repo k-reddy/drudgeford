@@ -102,6 +102,16 @@ class ShieldSelf(ActionStep):
     
     def __str__(self):
         return f"Shield {self.strength} for {self.duration} turns"
+    
+@dataclass
+class HealSelf(ActionStep):
+    strength: int
+
+    def perform(self, board, attacker, round_num):
+        board.modify_target_health(attacker, -self.strength)
+    
+    def __str__(self):
+        return f"Heal self for {self.strength}"
 
 @dataclass
 class ActionCard:

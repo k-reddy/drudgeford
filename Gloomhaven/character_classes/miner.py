@@ -4,13 +4,11 @@ import attack_shapes as shapes
 
 cards = [
 # Desparate Mining - Range 2, examine stone pile. If gems found, gain shield 2, bless, heal 2. If no gems, gain weaken. Move 1 
-# Stone Meditation - Skip turn, heal 4 if adjacent to stone pile, shield 2
 # Tax Assessment - Weaken target, pull 2, attack 3
-# Crystal Placebo - Attack 2, range 1, heal 4
 # Stone Foundation - Create impassable stone barrier length 2, shield all adjacent allies
 # Self Sacrifice - Attack 6, range 1, bless self but -3 health, move 1
     gh_types.ActionCard(
-        attack_name="Hevvy Hammer",
+        attack_name="Heavy Hammer",
         actions=[
             gh_types.SingleTargetAttack(
                 strength=4,
@@ -45,6 +43,32 @@ cards = [
                 strength=4,
                 att_range=1
             )
+        ],
+        movement=0,
+        jump=False
+    ),
+    gh_types.ActionCard(
+        attack_name="Stone Meditation",
+        actions=[
+            gh_types.ShieldSelf(
+                strength=2,
+                duration=1
+            ),
+            gh_types.HealSelf(
+                strength=4
+            )
+        ],
+        movement=0,
+        jump=False
+    ),
+    gh_types.ActionCard(
+        attack_name="Crystal Placebo",
+        actions=[
+            gh_types.HealSelf(strength=4),
+            gh_types.SingleTargetAttack(
+                strength=2,
+                att_range=1
+            ),
         ],
         movement=0,
         jump=False
