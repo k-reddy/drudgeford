@@ -22,6 +22,17 @@ def bar(offset: int, depth: int):
             directions.add((i, j))
     return directions
 
+def arc(length: int):
+    directions = set()
+    x = 0
+    for i in range(length):
+        directions.add((i+1, x))
+        if i < length//2:
+            x += 1
+        elif i > length//2:
+            x -= 1
+    return directions
+
 def print_shape(shape):
     print_str = ''
     ymin = min([y for y, _ in shape])
