@@ -15,29 +15,25 @@ class ActionCard:
 
     # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
-        # actions = []
-        # if self.attack_shape:
-        #     actions.append(lambda: board.attack_area(attacker, self.attack_shape, self.strength))
-        # else:
-        #     action.append(lambda: attack_single_target())
-        # if it's not an area of effect card, do a normal attack
-
+        actions = []
         # if it's a single attack target, attack a single target
         if not self.attack_shape and self.strength > 0:
-            SingleTargetAttack(strength=self.strength, att_range=self.distance).perform(board, attacker, round_num)
-
+            actions.append(SingleTargetAttack(strength=self.strength, att_range=self.distance))
 
         # if there are status effects, do that
         if self.status_effect and self.status_shape:
-            ElementAreaEffect(
+            actions.append(ElementAreaEffect(
                 shape=self.status_shape,
                 att_range=self.distance,
                 element=self.status_effect
-            ).perform(board, attacker, round_num)
+            ))
 
         
         if self.attack_shape and self.strength > 0:
-            AreaAttack(attack_shape=self.attack_shape, strength=self.strength).perform(board, attacker, round_num)
+            actions.append(AreaAttack(attack_shape=self.attack_shape, strength=self.strength))
+        
+        for action in actions:
+            action.perform(board, attacker, round_num)
 
     #     board.log.append(f"{attacker.name} is attempting to attack {target.name}")
     #     board.log.append(f"{attacker.name} is performing {self.attack_name}!")
