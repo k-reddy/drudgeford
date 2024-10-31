@@ -65,17 +65,20 @@ cards = [
         movement=1,
         jump=False
     ),
-    # !!! to implement - randomly teleports target 
-    # gh_types.ActionCard(
-    #     attack_name="Random Teleport",
-    #     attack_shape=None,
-    #     strength=2,
-    #     distance=1,
-    #     movement=1,
-    #     status_effect=Teleport,
-    #     status_shape=None,
-    #     jump=False
-    # ),
+    gh_types.ActionCard(
+        attack_name="Random Teleport",
+        actions=[
+            gh_types.Teleport(
+                att_range=1
+            ),
+            gh_types.SingleTargetAttack(
+                strength=2,
+                att_range=1
+            )
+        ],
+        movement=1,
+        jump=False
+    ),
     gh_types.ActionCard(
         attack_name="B-Line",
         actions=[gh_types.AreaAttack(

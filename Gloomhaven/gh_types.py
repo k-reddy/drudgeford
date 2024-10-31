@@ -65,6 +65,7 @@ class ElementAreaEffect(ActionStep):
     def __str__(self):
         return f"{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
+@dataclass
 class Teleport(ActionStep):
     att_range: int
 
@@ -77,7 +78,7 @@ class Teleport(ActionStep):
             board.teleport_character(target)
 
     def __str__(self):
-        return f"Teleport Another Character in range{self.att_range}"
+        return f"Teleport Another Character in range {self.att_range}"
 
 @dataclass
 class ActionCard:
