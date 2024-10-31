@@ -44,25 +44,20 @@ class ActionCard:
         return setattr(self, key, value)
     
     def __str__(self):
-        print_str = f"{self.attack_name}: Strength {self.strength}, "
-        if self.attack_shape:
-            print_str += f"Shape:\n{shapes.print_shape(self.attack_shape)}"
-        print_str += f"Range {self.distance}, Movement {self.movement}"
+        print_str = f"{self.attack_name}, Movement {self.movement}"
         if self.jump:
             print_str+= ", Jump"
-        if self.status_effect:
-            print_str += f"\n\tStatus Effect: {self.status_effect} with Shape:\n{shapes.print_shape(self.status_shape)}"
         return print_str
     
 @dataclass
 class ActionStep(abc.ABC):
     @abc.abstractmethod
-    def perform(self, board, attacker, round_num=None):
+    def perform(self, board, attacker, round_num):
         pass
 
-    # @abc.abstractmethod
-    # def __str__(self):
-    #     pass
+    @abc.abstractmethod
+    def __str__(self):
+        pass
 
 @dataclass
 class AreaAttack(ActionStep):
@@ -71,6 +66,9 @@ class AreaAttack(ActionStep):
 
     def perform(self, board, attacker, round_num):
         board.attack_area(attacker, self.attack_shape, self.strength)
+
+    def __str__(self):
+        return f"Area Attack Strength {self.strength} with Shape:\n{shapes.print_shape(self.attack_shape)}"
 
 @dataclass
 class SingleTargetAttack(ActionStep):
@@ -86,6 +84,9 @@ class SingleTargetAttack(ActionStep):
             board.attack_target(attacker, self.strength, target)
         else:
             board.log.append("Not close enough to attack")
+
+    def __str__(self):
+        return f"Single Target Attack with Strength {self.strength}, Range {self.att_range}"
 
 @dataclass
 class ElementAreaEffect(ActionStep):
@@ -106,3 +107,6 @@ class ElementAreaEffect(ActionStep):
             )
         else:
             board.log.append("Not close enough to attack")
+
+    def __str__(self):
+        return f"\n\t{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
