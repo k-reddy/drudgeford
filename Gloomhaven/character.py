@@ -1,7 +1,7 @@
 import random
 import abc
 import character_classes
-from gh_types import ActionCard
+import gh_types 
 from functools import partial
 
 # characters are our actors
@@ -121,18 +121,18 @@ class Character(abc.ABC):
             strength = random.choices(strengths, strength_weights)[0]
             movement = random.choices(movements, movement_weights)[0]
             distance = random.randint(1, max_distance)
-            action_card = ActionCard(
+            action_card = gh_types.ActionCard(
                 attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
-                attack_shape=None,
-                strength=strength,
-                distance=distance,
+                actions=[gh_types.SingleTargetAttack(
+                    strength=strength,
+                    att_range=distance
+                )],
                 movement=movement,
-                status_effect=None,
-                status_shape=None,
                 jump=True
             )
             action_cards.append(action_card)
         return action_cards
+    
     def set_backstory(self):
         return ""
 
