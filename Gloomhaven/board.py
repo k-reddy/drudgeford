@@ -138,6 +138,17 @@ class Board:
                     if isinstance(potential_char, Character):
                         self.attack_target(attacker, strength, potential_char)
 
+    def set_obstacles_in_area(self, starting_coord, shape: set, obstacle: str):
+        for coordinate in shape:
+            obstacle_row = starting_coord[0] + coordinate[0]
+            obstacle_col = starting_coord[1] + coordinate[1]
+            # check if row and col are in bounds
+            if 0 <= obstacle_row < len(self.locations):
+                if 0 <= obstacle_col < len(self.locations[obstacle_row]):
+                    # if it's unoccupied, place obstacle there
+                    if not self.locations[obstacle_row][obstacle_col]:
+                        self.locations[obstacle_row][obstacle_col] = obstacle.upper()
+
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -316,6 +327,14 @@ class Board:
             if pot_opponent.team_monster != actor.team_monster
 
         ]
+    
+    def find_allies(self, actor: Character) -> list[Character]:
+        return [
+            pot_opponent
+            for pot_opponent in self.characters
+            if pot_opponent.team_monster == actor.team_monster
+
+        ]
 
     def attack_target(self, attacker, strength, target):
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
@@ -360,15 +379,18 @@ class Board:
         # !!! if the target is the acting_character, end turn
         # - to do this, end turn and end game need to actually work, not just be place holders
 
-    def find_in_range_opponents(
-        self, actor: Character, distance: int
+    def find_in_range_opponents_or_allies(
+        self, actor: Character, distance: int, opponents=True
     ) -> list[Character]:
-        opponents = self.find_opponents(actor)
-        in_range_opponents = []
-        for opponent in opponents:
-            if self.is_attack_in_range(distance, actor, opponent):
-                in_range_opponents.append(opponent)
-        return in_range_opponents
+        if opponents:
+            chars = self.find_opponents(actor)
+        else: 
+            chars=self.find_allies(actor)
+        in_range_chars = []
+        for char in chars:
+            if self.is_attack_in_range(distance, actor, char):
+                in_range_chars.append(char)
+        return in_range_chars
 
     def move_character_toward_location(
         self,

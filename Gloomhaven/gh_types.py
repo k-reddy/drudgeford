@@ -95,8 +95,24 @@ class ShieldSelf(ActionStep):
         attacker.shield = (self.strength, round_num+self.duration)
     
     def __str__(self):
-        return f"Shield {self.strength} for {self.duration} turns"
+        return f"Shield {self.strength} self for {self.duration} turns"
+
+@dataclass
+class ShieldAllAllies(ActionStep):
+    strength: int
+    duration: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        in_range_allies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=False
+        )
+        for ally in in_range_allies:
+            ally.shield = (self.strength, round_num+self.duration)
     
+    def __str__(self):
+        return f"Shield {self.strength} for all allies in range {self.att_range} for {self.duration} turns"
+   
 @dataclass
 class ModifySelfHealth(ActionStep):
     strength: int
@@ -151,10 +167,26 @@ class Pull(ActionStep):
                 self.squares,
                 False)
 
-
     def __str__(self):
         return f"Pull {self.squares} any target in range {self.att_range}"
 
+@dataclass
+class MakeObstableArea(ActionStep):
+    '''Unlike elements, obstacles go on the locations board
+    and cannot be moved through and do not expire'''
+    obstacle_type: str
+    shape: set
+
+    def perform(self, board, attacker, round_num):
+        starting_coordinate = board.find_location_of_target(attacker)
+        board.set_obstacles_in_area(
+                starting_coordinate,
+                self.shape,
+                self.obstacle_type
+            )
+    
+    def __str__(self):
+        return f"Set {self.obstacle_type} with shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class ActionCard:
@@ -183,9 +215,9 @@ class ActionCard:
             print_str+=f"\n\t{action}"
         return print_str
 
-def select_in_range_target(board, attacker, att_range):
-    in_range_opponents = board.find_in_range_opponents(
-        attacker, att_range
+def select_in_range_target(board, attacker, att_range, opponent=True):
+    in_range_chars = board.find_in_range_opponents_or_allies(
+        attacker, att_range, opponents=opponent
     )
-    target = attacker.select_attack_target(in_range_opponents)
+    target = attacker.select_attack_target(in_range_chars)
     return target

@@ -3,7 +3,6 @@ import attack_shapes as shapes
 
 
 cards = [
-# Stone Foundation - Create impassable stone barrier length 2, shield all adjacent allies
     gh_types.ActionCard(
         attack_name="Heavy Hammer",
         actions=[
@@ -104,6 +103,22 @@ cards = [
             )
         ],
         movement=10,
+        jump=False
+    ),
+    gh_types.ActionCard(
+        attack_name="Stone Defense",
+        actions=[
+            gh_types.MakeObstableArea(
+                obstacle_type='Stone',
+                shape=shapes.bar(1,1)
+            ),
+            gh_types.ShieldAllAllies(
+                strength=2,
+                duration=1,
+                att_range=2
+            )
+        ],
+        movement=0,
         jump=False
     )
 ]
