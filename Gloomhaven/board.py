@@ -500,7 +500,7 @@ class Board:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
-    def teleport(self, target: Character):
+    def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()
         self.update_character_location(target,self.find_location_of_target(target),new_loc)
 
