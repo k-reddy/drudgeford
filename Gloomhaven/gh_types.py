@@ -24,20 +24,13 @@ class ActionCard:
 
         # if it's a single attack target, attack a single target
         if not self.attack_shape and self.strength > 0:
-            in_range_opponents = board.find_in_range_opponents(
-                attacker, self
-            )
-            target = attacker.select_attack_target(in_range_opponents)
-            if target is not None:
-                board.attack_target(attacker, self.strength, target)
-            else:
-                board.log.append("Not close enough to attack")
+            SingleTargetAttack(strength=self.strength, att_range=self.distance).perform(board, attacker)
 
 
         # if there are status effects, do that
         if self.status_effect and self.status_shape:
             in_range_opponents = board.find_in_range_opponents(
-                attacker, self
+                attacker, self.distance
             )
             target = attacker.select_attack_target(in_range_opponents)
             if target is not None:
@@ -52,7 +45,6 @@ class ActionCard:
         
         if self.attack_shape and self.strength > 0:
             AreaAttack(attack_shape=self.attack_shape, strength=self.strength).perform(board, attacker)
-            # board.attack_area(attacker, self.attack_shape, self.strength)
 
     #     board.log.append(f"{attacker.name} is attempting to attack {target.name}")
     #     board.log.append(f"{attacker.name} is performing {self.attack_name}!")
@@ -91,3 +83,18 @@ class AreaAttack(ActionStep):
 
     def perform(self, board, attacker):
         board.attack_area(attacker, self.attack_shape, self.strength)
+
+@dataclass
+class SingleTargetAttack(ActionStep):
+    strength: int
+    att_range: int
+
+    def perform(self, board, attacker):
+        in_range_opponents = board.find_in_range_opponents(
+            attacker, self.att_range
+        )
+        target = attacker.select_attack_target(in_range_opponents)
+        if target is not None:
+            board.attack_target(attacker, self.strength, target)
+        else:
+            board.log.append("Not close enough to attack")
