@@ -89,4 +89,4 @@ cards = [
 
 backstory = "wizards are cool"
 
-health = 25
+health = 6
