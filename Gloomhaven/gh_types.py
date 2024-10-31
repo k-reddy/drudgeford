@@ -15,7 +15,7 @@ class ActionCard:
 
     # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
-        actions = []
+        actions: list[ActionStep] = []
         # if it's a single attack target, attack a single target
         if not self.attack_shape and self.strength > 0:
             actions.append(SingleTargetAttack(strength=self.strength, att_range=self.distance))
@@ -28,7 +28,6 @@ class ActionCard:
                 element=self.status_effect
             ))
 
-        
         if self.attack_shape and self.strength > 0:
             actions.append(AreaAttack(attack_shape=self.attack_shape, strength=self.strength))
         
