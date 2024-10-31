@@ -34,17 +34,6 @@ class Character(abc.ABC):
     def set_backstory(self):
         pass
 
-    def perform_attack(self, action_card, board, round_num: int):
-        # if it's not an area of effect card, do a normal attack
-        if not action_card.attack_shape:
-            in_range_opponents = board.find_in_range_opponents(
-                self, action_card
-            )
-            target = self.select_attack_target(in_range_opponents)
-            board.perform_attack_card(action_card, self, target, round_num)
-        else:
-            board.attack_area(self, action_card.attack_shape, action_card.strength)
-
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
                 self.disp, self.available_action_cards

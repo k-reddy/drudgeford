@@ -315,29 +315,6 @@ class Board:
 
         ]
 
-    def perform_attack_card(
-        self, action_card: ActionCard, attacker: Character, target: Character, round_num: int
-    ) -> None:
-        if target is None or (
-            not self.is_attack_in_range(action_card["distance"], attacker, target)
-        ):
-            self.log.append("Not close enough to attack")
-            return
-
-        self.log.append(f"{attacker.name} is attempting to attack {target.name}")
-
-        if action_card.status_effect and action_card.status_shape:
-            self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
-            row, col = self.find_location_of_target(target)
-            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
-            self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.status_shape, round_num
-            )
-        # some cards have no attack, don't want to attack if we hit a good modifier
-        if action_card.strength == 0:
-            return
-        self.attack_target(attacker, action_card["strength"], target)
-
     def attack_target(self, attacker, strength, target):
         modified_attack_strength = self.select_and_apply_attack_modifier(
             attacker,

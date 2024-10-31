@@ -19,9 +19,32 @@ class ActionCard:
                 attacker, self
             )
             target = attacker.select_attack_target(in_range_opponents)
-            board.perform_attack_card(self, attacker, target, round_num)
+            self.perform_attack_card(board, attacker, target, round_num)
         else:
             board.attack_area(attacker, self.attack_shape, self.strength)
+
+    def perform_attack_card(
+        self, board, attacker, target, round_num: int
+    ) -> None:
+        if target is None or (
+            not board.is_attack_in_range(self.distance, attacker, target)
+        ):
+            board.log.append("Not close enough to attack")
+            return
+
+        board.log.append(f"{attacker.name} is attempting to attack {target.name}")
+
+        if self.status_effect and self.status_shape:
+            board.log.append(f"{attacker.name} is performing {self.attack_name}!")
+            row, col = board.find_location_of_target(target)
+            board.log.append(f"{attacker.name} throws {self.status_effect}")
+            board.add_effect_to_terrain_for_attack(
+                self.status_effect.upper(), row, col, self.status_shape, round_num
+            )
+        # some cards have no attack, don't want to attack if we hit a good modifier
+        if self.strength == 0:
+            return
+        board.attack_target(attacker, self.strength, target)
 
     def __getitem__(self, key):
         return getattr(self, key)
