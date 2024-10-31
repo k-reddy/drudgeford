@@ -2,53 +2,7 @@ from dataclasses import dataclass
 import attack_shapes as shapes
 import abc 
 
-@dataclass
-class ActionCard:
-    attack_name: str
-    attack_shape: set | None
-    strength: int
-    distance: int
-    movement: int
-    status_effect: str | None
-    status_shape: set | None
-    jump: bool
 
-    # actions = [single_target_attack, area_of_attack, status_effect]
-    def perform_attack(self, attacker, board, round_num: int):
-        actions: list[ActionStep] = []
-        # if it's a single attack target, attack a single target
-        if not self.attack_shape and self.strength > 0:
-            actions.append(SingleTargetAttack(strength=self.strength, att_range=self.distance))
-
-        # if there are status effects, do that
-        if self.status_effect and self.status_shape:
-            actions.append(ElementAreaEffect(
-                shape=self.status_shape,
-                att_range=self.distance,
-                element=self.status_effect
-            ))
-
-        if self.attack_shape and self.strength > 0:
-            actions.append(AreaAttack(attack_shape=self.attack_shape, strength=self.strength))
-        
-        for action in actions:
-            action.perform(board, attacker, round_num)
-
-    #     board.log.append(f"{attacker.name} is attempting to attack {target.name}")
-    #     board.log.append(f"{attacker.name} is performing {self.attack_name}!")
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def __setitem__(self, key, value):
-        return setattr(self, key, value)
-    
-    def __str__(self):
-        print_str = f"{self.attack_name}, Movement {self.movement}"
-        if self.jump:
-            print_str+= ", Jump"
-        return print_str
-    
 @dataclass
 class ActionStep(abc.ABC):
     @abc.abstractmethod
@@ -61,14 +15,14 @@ class ActionStep(abc.ABC):
 
 @dataclass
 class AreaAttack(ActionStep):
-    attack_shape: set
+    shape: set
     strength: int
 
     def perform(self, board, attacker, round_num):
-        board.attack_area(attacker, self.attack_shape, self.strength)
+        board.attack_area(attacker, self.shape, self.strength)
 
     def __str__(self):
-        return f"Area Attack Strength {self.strength} with Shape:\n{shapes.print_shape(self.attack_shape)}"
+        return f"Area Attack Strength {self.strength} with Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class SingleTargetAttack(ActionStep):
@@ -109,4 +63,34 @@ class ElementAreaEffect(ActionStep):
             board.log.append("Not close enough to attack")
 
     def __str__(self):
-        return f"\n\t{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+        return f"{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+
+@dataclass
+class ActionCard:
+    attack_name: str
+    actions: list[ActionStep]
+    movement: int
+    jump: bool
+
+    # actions = [single_target_attack, area_of_attack, status_effect]
+    def perform_attack(self, attacker, board, round_num: int):
+        for action in self.actions:
+            action.perform(board, attacker, round_num)
+
+    #     board.log.append(f"{attacker.name} is attempting to attack {target.name}")
+    #     board.log.append(f"{attacker.name} is performing {self.attack_name}!")
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def __setitem__(self, key, value):
+        return setattr(self, key, value)
+    
+    def __str__(self):
+        print_str = f"{self.attack_name}, Movement {self.movement}"
+        if self.jump:
+            print_str+= ", Jump"
+        for action in self.actions:
+            print_str+=f"\n\t{action}"
+        return print_str
+    
