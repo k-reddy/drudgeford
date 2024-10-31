@@ -355,12 +355,12 @@ class Board:
         # - to do this, end turn and end game need to actually work, not just be place holders
 
     def find_in_range_opponents(
-        self, actor: Character, action_card: ActionCard
+        self, actor: Character, distance: int
     ) -> list[Character]:
         opponents = self.find_opponents(actor)
         in_range_opponents = []
         for opponent in opponents:
-            if self.is_attack_in_range(action_card["distance"], actor, opponent):
+            if self.is_attack_in_range(distance, actor, opponent):
                 in_range_opponents.append(opponent)
         return in_range_opponents
 
