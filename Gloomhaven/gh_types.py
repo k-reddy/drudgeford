@@ -65,6 +65,20 @@ class ElementAreaEffect(ActionStep):
     def __str__(self):
         return f"{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
+class Teleport(ActionStep):
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        in_range_opponents = board.find_in_range_opponents(
+            attacker, self.att_range
+        )
+        target = attacker.select_attack_target(in_range_opponents)
+        if target is not None:
+            board.teleport_character(target)
+
+    def __str__(self):
+        return f"Teleport Another Character in range{self.att_range}"
+
 @dataclass
 class ActionCard:
     attack_name: str
