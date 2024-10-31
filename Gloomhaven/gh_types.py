@@ -12,6 +12,17 @@ class ActionCard:
     status_shape: set | None
     jump: bool
 
+    def perform_attack(self, attacker, board, round_num: int):
+        # if it's not an area of effect card, do a normal attack
+        if not self.attack_shape:
+            in_range_opponents = board.find_in_range_opponents(
+                attacker, self
+            )
+            target = attacker.select_attack_target(in_range_opponents)
+            board.perform_attack_card(self, attacker, target, round_num)
+        else:
+            board.attack_area(attacker, self.attack_shape, self.strength)
+
     def __getitem__(self, key):
         return getattr(self, key)
 
