@@ -1,6 +1,6 @@
 import os
 from gh_types import ActionCard
-from character import Player, Monster
+from character import Character
 
 EMPTY_CELL = "|      "
 
@@ -51,11 +51,9 @@ class Display:
             top = " ------" * len(row) + "\n"
             sides = ""
             for el in row:
-                if isinstance(el, Player):
+                if isinstance(el, Character):
                     sides += f"|  {el.emoji}  "
-                elif isinstance(el, Monster):
-                    sides += f"|  {el.emoji}  "
-                elif el == "X":
+                elif el == "X" or el=='STONE':
                     sides += "|  🪨   "
                 else:
                     sides += EMPTY_CELL

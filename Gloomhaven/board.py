@@ -1,5 +1,5 @@
 from functools import partial
-from character import CharacterType, Monster, Player, Character
+from character import Character
 from collections import deque
 import copy
 import heapq
@@ -10,6 +10,7 @@ from listwithupdate import ListWithUpdate
 import agent
 import attack_shapes as shapes
 
+MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
 FIRE_DAMAGE = 1
 TRAP_DAMAGE = 3
@@ -23,13 +24,14 @@ class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
-        self, size: int, monsters: list[Monster], players: list[Player], disp: Display
+        self, size: int, monsters: list[Character], players: list[Character], disp: Display
     ) -> None:
+        self.round_num = 0
         self.size = size
         self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[CharacterType] = ListWithUpdate(
+        self.characters: list[Character] = ListWithUpdate(
             players + monsters, self.disp.reload_display
         )
         self.locations = self._initialize_map(self.size, self.size)
@@ -39,6 +41,7 @@ class Board:
         self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0,10))
         self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
+        # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
@@ -87,25 +90,25 @@ class Board:
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.add_effect_if_valid_square(row, col, effect, round_num=0):
+            if self.add_effect_if_valid_square(row, col, effect):
                 counter+=1
             if is_contiguous:
                 for i in [-1,0,1]:
-                    if self.add_effect_if_valid_square(row+i, col, effect, round_num=0):
+                    if self.add_effect_if_valid_square(row+i, col, effect):
                         counter+=1
             if counter >= target_num:
                 return
 
-    def add_effect_if_valid_square(self, row, col, effect, round_num) -> bool:
+    def add_effect_if_valid_square(self, row, col, effect) -> bool:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
-            self.terrain[row][col] = (effect, round_num)
+            self.terrain[row][col] = (effect, self.round_num)
             return True
         return False
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, shape: set, round_num: int
+        self, effect: str, row: int, col: int, shape: set,
     ) -> None:
         for coordinate in shape:
             effect_row = row + coordinate[0]
@@ -114,13 +117,13 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    self.terrain[effect_row][effect_col] = (effect, round_num)
+                    self.terrain[effect_row][effect_col] = (effect, self.round_num)
                     # if there's a character there, deal damage to them
-                    if isinstance(potential_char, CharacterType):
-                        self.deal_terrain_damage(potential_char, effect_row, effect_col, round_num)
+                    if isinstance(potential_char, Character):
+                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
     def attack_area(
-        self, attacker: CharacterType, shape: set, strength: int
+        self, attacker: Character, shape: set, strength: int
     ) -> None:
         starting_coord = self.find_location_of_target(attacker)
         for coordinate in shape:
@@ -132,8 +135,19 @@ class Board:
                     potential_char = self.locations[attack_row][attack_col]
                     # if there's a character there, deal damage to them 
                     # note: this allows friendly fire, which I think is fun
-                    if isinstance(potential_char, Monster):
-                        self.attack_target(strength, potential_char)
+                    if isinstance(potential_char, Character):
+                        self.attack_target(attacker, strength, potential_char)
+
+    def set_obstacles_in_area(self, starting_coord, shape: set, obstacle: str):
+        for coordinate in shape:
+            obstacle_row = starting_coord[0] + coordinate[0]
+            obstacle_col = starting_coord[1] + coordinate[1]
+            # check if row and col are in bounds
+            if 0 <= obstacle_row < len(self.locations):
+                if 0 <= obstacle_col < len(self.locations[obstacle_row]):
+                    # if it's unoccupied, place obstacle there
+                    if not self.locations[obstacle_row][obstacle_col]:
+                        self.locations[obstacle_row][obstacle_col] = obstacle.upper()
 
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
@@ -199,7 +213,8 @@ class Board:
 
     def set_character_starting_locations(self) -> None:
         for x in self.characters:
-            self.pick_unoccupied_location(x)
+            row, col = self.pick_unoccupied_location()
+            self.locations[row][col] = x
 
     def get_shortest_valid_path(
         self, start: tuple[int, int], end: tuple[int, int]
@@ -277,19 +292,18 @@ class Board:
         path = path[1:]  # drop the starting position
         return path
 
-    def pick_unoccupied_location(self, actor: CharacterType) -> None:
+    def pick_unoccupied_location(self) -> tuple[int,int]:
         while True:
-            rand_location = [
+            rand_location = (
                 random.randint(0, self.size - 1),
                 random.randint(0, self.size - 1),
-            ]
+            )
             if not self.locations[rand_location[0]][rand_location[1]]:
-                self.locations[rand_location[0]][rand_location[1]] = actor
-                break
+                return rand_location
 
     # is the attack in range?
     def is_attack_in_range(
-        self, attack_distance: int, attacker: CharacterType, target: CharacterType
+        self, attack_distance: int, attacker: Character, target: Character
     ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
@@ -306,42 +320,33 @@ class Board:
                     return (row_num, column_num)
         raise ValueError(f"Target {target} not found in locations")
 
-    def find_opponents(self, actor: CharacterType) -> list[CharacterType]:
+    def find_opponents(self, actor: Character) -> list[Character]:
         return [
             pot_opponent
             for pot_opponent in self.characters
-            if not isinstance(pot_opponent, type(actor))
+            if pot_opponent.team_monster != actor.team_monster
+
+        ]
+    
+    def find_allies(self, actor: Character) -> list[Character]:
+        return [
+            pot_opponent
+            for pot_opponent in self.characters
+            if pot_opponent.team_monster == actor.team_monster
+
         ]
 
-    def perform_attack_card(
-        self, action_card: ActionCard, attacker: CharacterType, target: CharacterType, round_num: int
-    ) -> None:
-        if target is None or (
-            not self.is_attack_in_range(action_card["distance"], attacker, target)
-        ):
-            self.log.append("Not close enough to attack")
-            return
-
+    def attack_target(self, attacker, strength, target):
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
-
-        if action_card.status_effect and action_card.status_shape:
-            self.log.append(f"{attacker.name} is performing {action_card.attack_name}!")
-            row, col = self.find_location_of_target(target)
-            self.log.append(f"{attacker.name} throws {action_card.status_effect}")
-            self.add_effect_to_terrain_for_attack(
-                action_card.status_effect.upper(), row, col, action_card.status_shape, round_num
-            )
-        # some cards have no attack, don't want to attack if we hit a good modifier
-        if action_card.strength == 0:
-            return
-        self.attack_target(action_card["strength"], target)
-
-    def attack_target(self, strength, target):
         modified_attack_strength = self.select_and_apply_attack_modifier(
+            attacker,
             strength
         )
+        if target.shield[0] > 0:
+            self.log.append(f"Target has shield {target.shield[0]}")
+            modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
-            self.log.append("Darn, attack missed!")
+            self.log.append("Darn, attack does no damage!")
             return
         self.log.append(
             f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
@@ -356,7 +361,7 @@ class Board:
         self.characters.remove(target)
         # this method is not necessary as well, keeping it till we discuss
 
-    def kill_target(self, target: CharacterType) -> None:
+    def kill_target(self, target: Character) -> None:
         # !!! to fix
         # weird bug where you can kill someone who's already killed
         # by walking through fire after you're dead since
@@ -374,19 +379,22 @@ class Board:
         # !!! if the target is the acting_character, end turn
         # - to do this, end turn and end game need to actually work, not just be place holders
 
-    def find_in_range_opponents(
-        self, actor: CharacterType, action_card: ActionCard
-    ) -> list[CharacterType]:
-        opponents = self.find_opponents(actor)
-        in_range_opponents = []
-        for opponent in opponents:
-            if self.is_attack_in_range(action_card["distance"], actor, opponent):
-                in_range_opponents.append(opponent)
-        return in_range_opponents
+    def find_in_range_opponents_or_allies(
+        self, actor: Character, distance: int, opponents=True
+    ) -> list[Character]:
+        if opponents:
+            chars = self.find_opponents(actor)
+        else: 
+            chars=self.find_allies(actor)
+        in_range_chars = []
+        for char in chars:
+            if self.is_attack_in_range(distance, actor, char):
+                in_range_chars.append(char)
+        return in_range_chars
 
     def move_character_toward_location(
         self,
-        acting_character: CharacterType,
+        acting_character: Character,
         target_location: tuple[int, int],
         movement: int,
         is_jump=False
@@ -428,22 +436,22 @@ class Board:
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: CharacterType, row: int, col: int, round_num: int | None = None
+        self, acting_character: Character, row: int, col: int,
     ) -> None:
-        damage = self.get_terrain_damage(row, col, round_num)
+        damage = self.get_terrain_damage(row, col)
         if damage:
             self.log.append(
                 f"{acting_character.name} took {damage} damage from terrain"
             )
             self.modify_target_health(acting_character, damage)
 
-    def deal_terrain_damage_current_location(self, acting_character: CharacterType):
+    def deal_terrain_damage_current_location(self, acting_character: Character):
         row, col = self.find_location_of_target(acting_character)
         self.deal_terrain_damage(acting_character, row, col)
 
     def update_character_location(
         self,
-        actor: CharacterType,
+        actor: Character,
         old_location: tuple[int, int],
         new_location: tuple[int, int],
     ) -> None:
@@ -456,7 +464,7 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int, round_num: int | None = None) -> int:
+    def get_terrain_damage(self, row: int, col: int) -> int:
         el = self.terrain[row][col][0]
         if el == "FIRE":
             return FIRE_DAMAGE
@@ -471,53 +479,61 @@ class Board:
         elif el == 'TOXIC_MUSHROOM':
             self.terrain[row][col] = 'X'
             self.log.append("The mushroom exploded into spores!")
-            if not round_num:
-                raise ValueError("No round num for spores")
-            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), round_num)
-            return
+            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1))
+            return 0
         elif el == 'SPORE':
             return SPORE_DAMAGE
         else:
             return 0
 
-    def modify_target_health(self, target: CharacterType, damage: int) -> None:
+    def modify_target_health(self, target: Character, damage: int) -> None:
         target.health -= damage
         if target.health <= 0:
             self.kill_target(target)
         else:
             self.log.append(f"{target.name}'s new health: {target.health}")
 
-    def select_and_apply_attack_modifier(self, initial_attack_strength: int) -> int:
-        def multiply(x, y):
-            return x * y
-
-        def add(x, y):
-            return x + y
-
-        attack_modifier_deck = [
-            (partial(multiply, 2), "2x"),
-            (partial(multiply, 0), "Null"),
-        ]
-        for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append((partial(add, modifier), f"{modifier:+d}"))
-
-        attack_modifier_weights = [1, 1, 2, 10, 10, 10, 2]
-
-        attack_modifier_function, modifier_string = random.choices(
-            attack_modifier_deck, attack_modifier_weights
-        )[0]
+    def select_and_apply_attack_modifier(self, attacker, initial_attack_strength: int) -> int:
+        attack_modifier_function, modifier_string = attacker.attack_modifier_deck.pop()
+        if len(attacker.attack_modifier_deck) == 0:
+            attacker.make_attack_modifier_deck()
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
     
-    def update_terrain(self, round_num: int):
+    def update_terrain(self):
         for i, _ in enumerate(self.terrain):
             for j, el in enumerate(self.terrain[i]):
                 # x is the default initialization
                 if el == 'X':
                     continue 
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if round_num-el[1] >= 2:
+                if self.round_num-el[1] >= 2:
                     self.terrain[i][j] = 'X'
+    
+    def update_character_statuses(self):
+        for character in self.characters:
+            if character.shield[1] <= self.round_num:
+                # reset to shield 0 indefinitely
+                character.shield = (0, MAX_ROUNDS)
+    
+    def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
+        target.attack_modifier_deck.append(modifier_card)
+
+    def push(self, target: Character, direction, squares):
+        '''pushes characters in a straight line'''
+        starting_location = self.find_location_of_target(target)
+        destinations = []
+        for i in range(squares):
+            # scale the movement then add it to starting location
+            destination = tuple([a*(i+1)+b for a, b in zip(direction, starting_location)])
+            destinations.append(destination)
+        for destination in destinations:
+            # force the algo to move the way we want, square by square
+            self.move_character_toward_location(target, destination, 1, is_jump=False)
+
+    def teleport_character(self, target: Character):
+        new_loc = self.pick_unoccupied_location()
+        self.update_character_location(target,self.find_location_of_target(target),new_loc)
 
 class SlipAndLoseTurn(Exception):
     pass
