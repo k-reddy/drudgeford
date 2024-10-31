@@ -37,7 +37,7 @@ class SingleTargetAttack(ActionStep):
         if target is not None:
             board.attack_target(attacker, self.strength, target)
         else:
-            board.log.append("Not close enough to attack")
+            board.log.append("No targets in range")
 
     def __str__(self):
         return f"Single Target Attack with Strength {self.strength}, Range {self.att_range}"
@@ -60,7 +60,7 @@ class ElementAreaEffect(ActionStep):
                 self.element.upper(), row, col, self.shape, round_num
             )
         else:
-            board.log.append("Not close enough to attack")
+            board.log.append("No target in range")
 
     def __str__(self):
         return f"{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
@@ -75,10 +75,8 @@ class ActionCard:
     # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
         for action in self.actions:
+            board.log.append(f"{attacker.name} is performing {action}!")
             action.perform(board, attacker, round_num)
-
-    #     board.log.append(f"{attacker.name} is attempting to attack {target.name}")
-    #     board.log.append(f"{attacker.name} is performing {self.attack_name}!")
 
     def __getitem__(self, key):
         return getattr(self, key)
