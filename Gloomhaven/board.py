@@ -316,6 +316,7 @@ class Board:
         ]
 
     def attack_target(self, attacker, strength, target):
+        self.log.append(f"{attacker.name} is attempting to attack {target.name}")
         modified_attack_strength = self.select_and_apply_attack_modifier(
             attacker,
             strength
