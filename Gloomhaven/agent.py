@@ -76,7 +76,7 @@ class Human(Agent):
     
     @staticmethod
     def decide_if_move_first(disp: Display) -> bool:
-        key_press = disp.get_user_input(prompt="Type 1 to move first or 2 to attack first.", valid_inputs=["1","2"])
+        key_press = disp.get_user_input(prompt="Type 1 to move first or 2 to perform actions first.", valid_inputs=["1","2"])
         return key_press == "1"
     
     @staticmethod
