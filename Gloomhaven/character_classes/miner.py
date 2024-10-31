@@ -130,5 +130,5 @@ cards = [
         jump=False
     )
 ]
-backstory = ""
+backstory = "I'm a miner"
 health = 16
