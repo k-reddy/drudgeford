@@ -1,38 +1,44 @@
 
 Womb:
-- flesh golems
-- oozes
+- flesh golems x
+- blood oozes x
+- malformed - tissue mass 
+- blood trap
 - white blood cells giant 
 
 Graveyard:
-- living skeletons
-- zombies 
+- living skeletons x 
+- mourning spirit (wraith) x
+- corpse x
+
 - angel 
 - bats
 - troll
 
 Forest:
-- tree man 
+- tree warrior x
+- mushroom man x
+- fairy x
+
 - spore traps
-- fairys
+
 - boar
 - snake 
 - cockroach 
 
 Inferno:
-- gin / genie 
-- big mean dog 
-- fire sprites 
+- demon2 x
+- demon x
+- fire sprites x
 
 Orchestrator:
-- faces drama
+- faces drama x
 - black joker 
 
 Tundra:
-- polar bear
-- snowman 
-- ice demon 
-- icy ghost
+- dragon x
+- ice monster x
+- icy ghost x
 
 necromancer 
 lost sibling to disease, study dark arts to communicate with them
