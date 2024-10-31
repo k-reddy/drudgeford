@@ -53,7 +53,7 @@ class Display:
             for el in row:
                 if isinstance(el, Character):
                     sides += f"|  {el.emoji}  "
-                elif el == "X":
+                elif el == "X" or el=='STONE':
                     sides += "|  🪨   "
                 else:
                     sides += EMPTY_CELL
