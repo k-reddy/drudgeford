@@ -10,6 +10,7 @@ from listwithupdate import ListWithUpdate
 import agent
 import attack_shapes as shapes
 
+MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
 FIRE_DAMAGE = 1
 TRAP_DAMAGE = 3
@@ -40,7 +41,7 @@ class Board:
         self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
         # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1, round_num=100)
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1, round_num=MAX_ROUNDS)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -321,8 +322,11 @@ class Board:
             attacker,
             strength
         )
+        if target.shield[0] > 0:
+            self.log.append(f"Target has shield {target.shield[0]}")
+            modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
-            self.log.append("Darn, attack missed!")
+            self.log.append("Darn, attack does no damage!")
             return
         self.log.append(
             f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
@@ -484,6 +488,12 @@ class Board:
                 # if the terrain item was placed 2 or more rounds ago, clear it
                 if round_num-el[1] >= 2:
                     self.terrain[i][j] = 'X'
+    
+    def update_character_statuses(self, round_num):
+        for character in self.characters:
+            if character.shield[1] <= round_num:
+                # reset to shield 0 indefinitely
+                character.shield = (0, MAX_ROUNDS)
     
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)

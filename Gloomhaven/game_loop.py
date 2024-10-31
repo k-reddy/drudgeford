@@ -50,6 +50,7 @@ Kill it or be killed..."""
     def run_round(self, round_num: int) -> None:
         # clear the elements from the board that have "expired"
         self.board.update_terrain(round_num)
+        self.board.update_character_statuses(round_num)
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
@@ -86,6 +87,8 @@ Kill it or be killed..."""
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
+            if acting_character.shield[0]>0:
+                self.disp.add_to_log((f"{acting_character.name} has shield {acting_character.shield[0]}"))
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
             actions = [
