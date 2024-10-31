@@ -126,23 +126,31 @@ class Pull(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
+        from agent import Human, Ai
+
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.disp.log("No one in range to pull")
+            board.disp.add_to_log("No one in range to pull")
             return
         
-        # give the attacker control of the target for the pull
-        old_agent = target.agent
-        target.agent = attacker.agent
+        # give the attacker control of the target for the pull if attacker is human
+        if isinstance(attacker.agent, Human):
+            attacker.agent.perform_movement(
+                target,
+                self.squares,
+                False,
+                board
+            )
+        
+        else:
+            # otherwise, auto move target:
+            board.move_character_toward_location(
+                target, 
+                board.find_location_of_target(attacker),
+                self.squares,
+                False)
 
-        target.perform_movement(
-            self.squares,
-            False,
-            board
-        )
-        # return control 
-        target.agent=old_agent
 
     def __str__(self):
         return f"Pull {self.squares} any target in range {self.att_range}"
