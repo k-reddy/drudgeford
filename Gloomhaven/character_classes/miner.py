@@ -3,10 +3,7 @@ import attack_shapes as shapes
 
 
 cards = [
-# Desparate Mining - Range 2, examine stone pile. If gems found, gain shield 2, bless, heal 2. If no gems, gain weaken. Move 1 
-# Tax Assessment - Weaken target, pull 2, attack 3
 # Stone Foundation - Create impassable stone barrier length 2, shield all adjacent allies
-# Self Sacrifice - Attack 6, range 1, bless self but -3 health, move 1
     gh_types.ActionCard(
         attack_name="Heavy Hammer",
         actions=[
@@ -54,7 +51,7 @@ cards = [
                 strength=2,
                 duration=1
             ),
-            gh_types.HealSelf(
+            gh_types.ModifySelfHealth(
                 strength=4
             )
         ],
@@ -64,13 +61,49 @@ cards = [
     gh_types.ActionCard(
         attack_name="Crystal Placebo",
         actions=[
-            gh_types.HealSelf(strength=4),
+            gh_types.ModifySelfHealth(strength=4),
             gh_types.SingleTargetAttack(
                 strength=2,
                 att_range=1
             ),
         ],
         movement=0,
+        jump=False
+    ),
+    gh_types.ActionCard(
+        attack_name="Self Sacrifice",
+        actions=[
+            gh_types.SingleTargetAttack(
+                strength=6,
+                att_range=1
+            ),
+            gh_types.BlessSelf(),
+            gh_types.ModifySelfHealth(-4)
+        ],
+        movement=1,
+        jump=False   
+    ),
+    gh_types.ActionCard(
+        attack_name="Desperate Mining",
+        actions=[
+            gh_types.AreaAttack(shape=shapes.circle(2),strength=1),
+            gh_types.BlessSelf(),
+            gh_types.ChargeNextAttack(strength=4),
+            gh_types.ModifySelfHealth(-5),
+        ],
+        movement=0,
+        jump=False
+    ),
+    gh_types.ActionCard(
+        # Tax Assessment - Weaken target, pull 2, attack 3
+        attack_name="Tax Assessment",
+        actions=[
+            gh_types.Pull(
+                squares=2, 
+                att_range=2
+            )
+        ],
+        movement=10,
         jump=False
     )
 ]

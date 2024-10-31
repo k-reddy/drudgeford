@@ -1,7 +1,6 @@
 import abc
 import random
 from gh_types import ActionCard
-from board import Board
 from display import Display
 
 DIRECTION_MAP = {
@@ -34,7 +33,7 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def perform_movement(char, action_card: ActionCard, board):
+    def perform_movement(char, movement: int, is_jump: bool, board):
         pass 
 
 
@@ -55,10 +54,10 @@ class Ai(Agent):
         return random.choice(in_range_opponents)
     
     @staticmethod
-    def perform_movement(char, action_card: ActionCard, board):
+    def perform_movement(char, movement, is_jump, board):
         targets = board.find_opponents(char)
         target_loc = board.find_location_of_target(random.choice(targets))
-        board.move_character_toward_location(char, target_loc, action_card["movement"], action_card["jump"])
+        board.move_character_toward_location(char, target_loc, movement, is_jump)
     
 class Human(Agent):
     @staticmethod
@@ -94,8 +93,8 @@ class Human(Agent):
         return in_range_opponents[int(target_num)]
     
     @staticmethod
-    def perform_movement(char, action_card, board):
-        remaining_movement = action_card["movement"]
+    def perform_movement(char, movement, is_jump, board):
+        remaining_movement = movement
         while remaining_movement > 0:
             char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
             prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
@@ -111,7 +110,7 @@ class Human(Agent):
             ]
             if board.is_legal_move(new_row, new_col):
                 # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(char, (new_row, new_col), 1, action_card["jump"])
+                board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
                 remaining_movement -= 1
                 continue
             else:
@@ -119,6 +118,6 @@ class Human(Agent):
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
-        if action_card["jump"]:
+        if is_jump:
             board.deal_terrain_damage_current_location(char)
         char.disp.add_to_log("Movement done! \n")

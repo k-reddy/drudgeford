@@ -43,14 +43,15 @@ Kill it or be killed..."""
             self.run_round(round_number)
             # print(self.game_state)
             round_number += 1
+            self.board.round_num = round_number
         # once we're no longer playing, end the game
         # print(f"{self.game_state.name=}")
         return self._end_game()
 
     def run_round(self, round_num: int) -> None:
         # clear the elements from the board that have "expired"
-        self.board.update_terrain(round_num)
-        self.board.update_character_statuses(round_num)
+        self.board.update_terrain()
+        self.board.update_character_statuses()
         # randomize who starts the turn
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
@@ -94,7 +95,7 @@ Kill it or be killed..."""
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
-                lambda: acting_character.perform_movement(action_card, self.board),
+                lambda: acting_character.perform_movement(action_card.movement, action_card.jump, self.board),
                 lambda: action_card.perform_attack(acting_character, self.board, round_num),
             ]
             # if not move_first, swap the order of movement and attack

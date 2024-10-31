@@ -44,12 +44,12 @@ class Character(abc.ABC):
         self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
         return self.agent.decide_if_move_first(self.disp)
 
-    def perform_movement(self, action_card, board):
-        if action_card["movement"] == 0:
+    def perform_movement(self, movement, is_jump, board):
+        if movement == 0:
             self.disp.add_to_log("No movement!")
             return
         self.disp.add_to_log(f"{self.name} is moving")
-        self.agent.perform_movement(self, action_card, board)
+        self.agent.perform_movement(self, movement, is_jump, board)
         # add some space between the movement and attack
         self.disp.add_to_log("")
 

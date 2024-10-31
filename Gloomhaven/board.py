@@ -26,6 +26,7 @@ class Board:
     def __init__(
         self, size: int, monsters: list[Character], players: list[Character], disp: Display
     ) -> None:
+        self.round_num = 0
         self.size = size
         self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
@@ -41,7 +42,7 @@ class Board:
         self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
         self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
         # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1, round_num=MAX_ROUNDS)
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
 
     @property
@@ -82,32 +83,32 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int, round_num: int=0) -> None:
+    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int) -> None:
         max_loc = self.size - 1
         counter = 0
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.add_effect_if_valid_square(row, col, effect, round_num):
+            if self.add_effect_if_valid_square(row, col, effect):
                 counter+=1
             if is_contiguous:
                 for i in [-1,0,1]:
-                    if self.add_effect_if_valid_square(row+i, col, effect, round_num):
+                    if self.add_effect_if_valid_square(row+i, col, effect):
                         counter+=1
             if counter >= target_num:
                 return
 
-    def add_effect_if_valid_square(self, row, col, effect, round_num) -> bool:
+    def add_effect_if_valid_square(self, row, col, effect) -> bool:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
-            self.terrain[row][col] = (effect, round_num)
+            self.terrain[row][col] = (effect, self.round_num)
             return True
         return False
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, shape: set, round_num: int
+        self, effect: str, row: int, col: int, shape: set,
     ) -> None:
         for coordinate in shape:
             effect_row = row + coordinate[0]
@@ -116,10 +117,10 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    self.terrain[effect_row][effect_col] = (effect, round_num)
+                    self.terrain[effect_row][effect_col] = (effect, self.round_num)
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, Character):
-                        self.deal_terrain_damage(potential_char, effect_row, effect_col, round_num)
+                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
     def attack_area(
         self, attacker: Character, shape: set, strength: int
@@ -413,9 +414,9 @@ class Board:
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: Character, row: int, col: int, round_num: int | None = None
+        self, acting_character: Character, row: int, col: int,
     ) -> None:
-        damage = self.get_terrain_damage(row, col, round_num)
+        damage = self.get_terrain_damage(row, col)
         if damage:
             self.log.append(
                 f"{acting_character.name} took {damage} damage from terrain"
@@ -441,7 +442,7 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int, round_num: int | None = None) -> int:
+    def get_terrain_damage(self, row: int, col: int) -> int:
         el = self.terrain[row][col][0]
         if el == "FIRE":
             return FIRE_DAMAGE
@@ -456,10 +457,8 @@ class Board:
         elif el == 'TOXIC_MUSHROOM':
             self.terrain[row][col] = 'X'
             self.log.append("The mushroom exploded into spores!")
-            if not round_num:
-                raise ValueError("No round num for spores")
-            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1), round_num)
-            return
+            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1))
+            return 0
         elif el == 'SPORE':
             return SPORE_DAMAGE
         else:
@@ -479,19 +478,19 @@ class Board:
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
     
-    def update_terrain(self, round_num: int):
+    def update_terrain(self):
         for i, _ in enumerate(self.terrain):
             for j, el in enumerate(self.terrain[i]):
                 # x is the default initialization
                 if el == 'X':
                     continue 
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if round_num-el[1] >= 2:
+                if self.round_num-el[1] >= 2:
                     self.terrain[i][j] = 'X'
     
-    def update_character_statuses(self, round_num):
+    def update_character_statuses(self):
         for character in self.characters:
-            if character.shield[1] <= round_num:
+            if character.shield[1] <= self.round_num:
                 # reset to shield 0 indefinitely
                 character.shield = (0, MAX_ROUNDS)
     
