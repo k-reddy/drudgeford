@@ -200,7 +200,8 @@ class Board:
 
     def set_character_starting_locations(self) -> None:
         for x in self.characters:
-            self.pick_unoccupied_location(x)
+            row, col = self.pick_unoccupied_location()
+            self.locations[row][col] = x
 
     def get_shortest_valid_path(
         self, start: tuple[int, int], end: tuple[int, int]
@@ -278,15 +279,14 @@ class Board:
         path = path[1:]  # drop the starting position
         return path
 
-    def pick_unoccupied_location(self, actor: Character) -> None:
+    def pick_unoccupied_location(self) -> tuple[int,int]:
         while True:
-            rand_location = [
+            rand_location = (
                 random.randint(0, self.size - 1),
                 random.randint(0, self.size - 1),
-            ]
+            )
             if not self.locations[rand_location[0]][rand_location[1]]:
-                self.locations[rand_location[0]][rand_location[1]] = actor
-                break
+                return rand_location
 
     # is the attack in range?
     def is_attack_in_range(
@@ -499,6 +499,10 @@ class Board:
         for destination in destinations:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
+
+    def teleport(self, target: Character):
+        new_loc = self.pick_unoccupied_location()
+        self.update_character_location(target,self.find_location_of_target(target),new_loc)
 
 class SlipAndLoseTurn(Exception):
     pass
