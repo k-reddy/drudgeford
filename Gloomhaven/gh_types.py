@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import attack_shapes as shapes
 import abc 
+import utils
 
 
 @dataclass
@@ -79,6 +80,17 @@ class Teleport(ActionStep):
 
     def __str__(self):
         return f"Teleport Another Character in range {self.att_range}"
+
+@dataclass
+class ChargeNextAttack(ActionStep):
+    strength: int
+
+    def perform(self, board, attacker, round_num):
+        modifier = utils.make_additive_modifier(2)
+        attacker.attack_modifier_deck.insert(0,modifier)
+
+    def __str__(self):
+        return f"Charge next attack {self.strength}"
 
 @dataclass
 class ActionCard:

@@ -1,4 +1,4 @@
-from gh_types import ActionCard
+import gh_types
 import attack_shapes as shapes
 
 
@@ -12,6 +12,20 @@ cards = [
 # Crystal Placebo - Attack 2, range 1, heal 4
 # Stone Foundation - Create impassable stone barrier length 2, shield all adjacent allies
 # Self Sacrifice - Attack 6, range 1, bless self but -3 health, move 1
+    gh_types.ActionCard(
+        attack_name="Hevvy Hammer",
+        actions=[
+            gh_types.SingleTargetAttack(
+                strength=4,
+                att_range=1
+            ),
+            gh_types.ChargeNextAttack(
+                strength=2
+            )
+        ],
+        movement=0,
+        jump=False
+    )
 ]
 backstory = ""
 health = 16

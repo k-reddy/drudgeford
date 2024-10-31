@@ -1,6 +1,6 @@
 import random
 from enum import Enum, auto
-from character import Character, Wizard
+import character
 from config import DEBUG
 from display import Display
 import agent
@@ -84,7 +84,7 @@ Kill it or be killed..."""
                 return
         self._end_round()
 
-    def run_turn(self, acting_character: Character, round_num: int) -> None:
+    def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
@@ -152,7 +152,7 @@ Kill it or be killed..."""
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
             self.disp.clear_log()
 
-    def refresh_character_cards(self, char: Character) -> None:
+    def refresh_character_cards(self, char: character.Character) -> None:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
         if len(char.available_action_cards) == 0:
             self.disp.add_to_log("No more action cards left, time to short rest!")
@@ -221,9 +221,9 @@ def set_up_players(disp, num_players, all_ai_mode):
         player_name = player_name if player_name != "" else default_names[i]
         player_agent = agent.Ai() if all_ai_mode else agent.Human()
         if i == num_players - 1:
-            players.append(Wizard(player_name, 8, disp, emoji[i], player_agent, is_monster=False))
+            players.append(character.Miner(player_name, disp, emoji[i], player_agent, is_monster=False))
         else:
-            players.append(Character(player_name, 8, disp, emoji[i], player_agent, is_monster=False))
+            players.append(character.Character(player_name, disp, emoji[i], player_agent, is_monster=False))
     if not all_ai_mode:
         disp.clear_display()
     return players
@@ -235,6 +235,6 @@ def set_up_monsters(disp, num_players):
     emoji = ["🌵", "🪼 ", "💀", "🧿"]
     healths = [3, 3, 7, 8]
     for i in range(num_players + 1):
-        monster = Character(names[i], healths[i], disp, emoji[i], agent.Ai(), is_monster=True)
+        monster = character.Character(names[i], disp, emoji[i], agent.Ai(), is_monster=True)
         monsters.append(monster)
     return monsters

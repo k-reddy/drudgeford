@@ -2,14 +2,14 @@ import random
 import abc
 import character_classes
 import gh_types 
-from functools import partial
+import utils
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, health, disp, emoji, agent, is_monster):
+    def __init__(self, name, disp, emoji, agent, is_monster):
         self.health = self.set_health()
         self.name = name
         self.action_cards = self.create_action_cards()
@@ -22,17 +22,11 @@ class Character(abc.ABC):
         self.attack_modifier_deck = self.make_attack_modifier_deck()
         self.team_monster = is_monster
 
-    @abc.abstractmethod
     def set_health(self):
-        pass
+        return 8
 
-    @abc.abstractmethod
-    def create_action_cards(self):
-        pass
-
-    @abc.abstractmethod
     def set_backstory(self):
-        pass
+        return "I'm a generic character, how boring"
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
@@ -70,11 +64,11 @@ class Character(abc.ABC):
 
     def make_attack_modifier_deck(self) -> list:
         attack_modifier_deck = [
-            make_multiply_modifier(2, "2x"),
-            make_multiply_modifier(0, "Null"),
+            utils.make_multiply_modifier(2, "2x"),
+            utils.make_multiply_modifier(0, "Null"),
         ]
         for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append(make_additive_modifier(modifier))
+            attack_modifier_deck.append(utils.make_additive_modifier(modifier))
 
         attack_modifier_weights = [1, 1, 1, 3, 3, 3, 1]
         for i, weight in enumerate(attack_modifier_weights):
@@ -85,6 +79,7 @@ class Character(abc.ABC):
 
     def set_health(self):
         return 8
+    
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]
         strength_weights = [3, 5, 4, 2, 1]
@@ -143,13 +138,11 @@ class Wizard(Character):
         return character_classes.wizard.cards
     def set_backstory(self):
         return character_classes.wizard.backstory
-
-def make_multiply_modifier(multiplier: int, multiplier_text: str) -> tuple:
-    def multiply(x, y):
-        return x * y
-    return (partial(multiply, multiplier), multiplier_text)
-
-def make_additive_modifier(modifier_num) -> tuple:
-    def add(x, y):
-        return x + y
-    return (partial(add, modifier_num), f"{modifier_num:+d}")
+    
+class Miner(Character):
+    def set_health(self):
+        return character_classes.miner.health
+    def create_action_cards(self):
+        return character_classes.miner.cards
+    def set_backstory(self):
+        return character_classes.miner.backstory
