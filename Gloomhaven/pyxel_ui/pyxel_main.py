@@ -243,9 +243,6 @@ class PyxelView:
         max_priority = max((entity.priority for entity in self.entities.values()), default=0)
         for i in range(0,max_priority+1):
             for _, entity in self.entities.items():
-                print(entity.priority)
-                print(entity.name)
-
                 if entity.priority == i:
                     self.draw_sprite(
                         entity.x,

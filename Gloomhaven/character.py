@@ -11,29 +11,22 @@ MAX_ROUNDS = 1000
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, disp, emoji, agent, id: int, is_monster):
-        self.id = id
-        self.health = self.set_health()
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster):
+        self.id = char_id
+        self.health = 8
         self.name = name
         self.action_cards = self.create_action_cards()
         self.killed_action_cards = []
         self.available_action_cards = self.action_cards.copy()
         self.disp = disp
         self.emoji = emoji
+        # a default sprite 
+        self.pyxel_sprite_name = "skeleton"
         self.agent = agent
-        self.backstory = self.set_backstory()
+        self.backstory = "I'm a generic character, how boring"
         self.attack_modifier_deck = self.make_attack_modifier_deck()
         self.team_monster = is_monster
-        self.shield: tuple[int,int] = self.set_shield()
-
-    def set_health(self):
-        return 8
-    
-    def set_shield(self):
-        return (0, MAX_ROUNDS)
-
-    def set_backstory(self):
-        return "I'm a generic character, how boring"
+        self.shield: tuple[int,int] = (0, MAX_ROUNDS)
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
@@ -83,9 +76,6 @@ class Character(abc.ABC):
                 attack_modifier_deck.append(attack_modifier_deck[i])
         random.shuffle(attack_modifier_deck)
         return attack_modifier_deck
-
-    def set_health(self):
-        return 8
     
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]
@@ -134,22 +124,19 @@ class Character(abc.ABC):
             )
             action_cards.append(action_card)
         return action_cards
-    
-    def set_backstory(self):
-        return ""
 
 class Wizard(Character):
-    def set_health(self):
-        return character_classes.wizard.health
-    def create_action_cards(self):
-        return character_classes.wizard.cards
-    def set_backstory(self):
-        return character_classes.wizard.backstory
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.health = character_classes.wizard.health
+        self.action_cards = character_classes.wizard.cards
+        self.backstory = character_classes.wizard.backstory
+        self.pyxel_sprite_name = "wizard"
     
 class Miner(Character):
-    def set_health(self):
-        return character_classes.miner.health
-    def create_action_cards(self):
-        return character_classes.miner.cards
-    def set_backstory(self):
-        return character_classes.miner.backstory
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.health = character_classes.miner.health
+        self.action_cards = character_classes.miner.cards
+        self.backstory = character_classes.miner.backstory
+        self.pyxel_sprite_name = "miner"

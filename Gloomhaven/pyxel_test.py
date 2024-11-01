@@ -66,7 +66,7 @@ def enqueue_actions():
             {
                 "id": 1,
                 "position": (0, 0),
-                "name": "treeman",
+                "name": "skeleton",
                 "priority": 0
             },
             {
@@ -78,7 +78,7 @@ def enqueue_actions():
             {
                 "id": 2,
                 "position": (3, 2),
-                "name": "poisonshroom",
+                "name": "wizard",
                 "priority": 10
             },
             {
