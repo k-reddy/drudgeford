@@ -10,7 +10,7 @@ class PyxelManager:
         self.move_duration = 700
 
 
-    def load_board(self, locations):
+    def load_board(self, locations, id_generator):
         # get some board metadata that we'll need
         board_width = len(locations)
         board_height = len(locations[0])
@@ -25,9 +25,9 @@ class PyxelManager:
                         "id": el.id,
                         "position": (col_num, row_num),
                         # "name": type(el).__name__
-                        "name": "knight"
+                        "name": el.pyxel_sprite_name,
+                        "priority": 10
                     })
-        
         payload = {
             "map_width": board_width,
             "map_height": board_height,

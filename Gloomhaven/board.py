@@ -4,6 +4,7 @@ from collections import deque
 import copy
 import heapq
 import random
+from itertools import count
 
 import agent
 import attack_shapes as shapes
@@ -33,11 +34,13 @@ class Board:
         monsters: list[character.Character],
         players: list[character.Character],
         disp: Display,
-        pyxel_manager: pyxel_backend.PyxelManager
+        pyxel_manager: pyxel_backend.PyxelManager,
+        id_generator: count
     ) -> None:
         self.round_num = 0
         self.size = size
         self.disp = disp
+        self.id_generator = id_generator
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         self.characters: list[character.Character] = ListWithUpdate(
@@ -55,7 +58,7 @@ class Board:
         self.log = ListWithUpdate([], self.disp.add_to_log)
         self.pyxel_manager = pyxel_manager
 
-        pyxel_manager.load_board(self.locations)
+        pyxel_manager.load_board(self.locations, self.id_generator)
         # signal to pyxel that board has been initialized
 
     @property
