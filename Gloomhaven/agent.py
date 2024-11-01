@@ -93,7 +93,7 @@ class Human(Agent):
         return in_range_opponents[int(target_num)]
     
     @staticmethod
-    def perform_movement(char, movement, is_jump, board):
+    def perform_movement(char, movement, is_jump, board, is_pull=False, puller_location: tuple[int,int] | None=None):
         remaining_movement = movement
         while remaining_movement > 0:
             char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
@@ -108,7 +108,19 @@ class Human(Agent):
             new_row, new_col = [
                 a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
             ]
-            if board.is_legal_move(new_row, new_col):
+            # check if it's a legal pull move 
+            legal_pull_move = False
+            if is_pull:
+                is_pulling_toward_puller = check_if_legal_pull(
+                    pull_target_old_location=current_loc,
+                    puller_location=puller_location,
+                    new_pull_target_location=(new_row, new_col),
+                    board=board
+                )
+                legal_pull_move = is_pull and board.is_legal_move(new_row, new_col) and is_pulling_toward_puller
+            
+            legal_non_pull_move = not is_pull and board.is_legal_move(new_row, new_col)
+            if legal_pull_move or legal_non_pull_move:
                 # do this instead of update location because it deals with terrain
                 board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
                 remaining_movement -= 1
@@ -121,3 +133,12 @@ class Human(Agent):
         if is_jump:
             board.deal_terrain_damage_current_location(char)
         char.disp.add_to_log("Movement done! \n")
+
+def check_if_legal_pull(pull_target_old_location, puller_location, new_pull_target_location, board):
+    orig_dist = len(board.get_shortest_valid_path(pull_target_old_location, puller_location))
+    new_dist = len(board.get_shortest_valid_path(new_pull_target_location, puller_location))
+
+    if orig_dist > new_dist:
+        return True
+    else:
+        return False

@@ -138,6 +138,7 @@ class Miner(Character):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)
         self.health = character_classes.miner.health
         self.action_cards = character_classes.miner.cards
+        self.available_action_cards = self.action_cards.copy()
         self.backstory = character_classes.miner.backstory
         self.pyxel_sprite_name = "miner"
 
