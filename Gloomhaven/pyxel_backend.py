@@ -11,7 +11,7 @@ class PyxelManager:
         self.move_duration = 700
 
 
-    def load_board(self, locations, id_generator):
+    def load_board(self, locations, terrain, id_generator):
         # get some board metadata that we'll need
         board_width = len(locations)
         board_height = len(locations[0])
@@ -36,7 +36,21 @@ class PyxelManager:
                         # "name": type(el).__name__
                         "name": el.pyxel_sprite_name,
                         "priority": 20
-                    })        
+                    })  
+
+        for row_num, row in enumerate(terrain):
+            for col_num, el in enumerate(row):
+                if not el:
+                    continue
+                if isinstance(el, obstacle.TerrainObject):
+                    entities.append({
+                        "id": next(id_generator),
+                        "position": (col_num, row_num),
+                        # "name": type(el).__name__
+                        "name": el.pyxel_sprite_name,
+                        "priority": 5
+                    })  
+                      
         payload = {
             "map_width": board_width,
             "map_height": board_height,

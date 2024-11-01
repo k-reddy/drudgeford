@@ -57,7 +57,7 @@ class Board:
         self.log = ListWithUpdate([], self.disp.add_to_log)
         self.pyxel_manager = pyxel_manager
 
-        pyxel_manager.load_board(self.locations, self.id_generator)
+        pyxel_manager.load_board(self.locations, self.terrain, self.id_generator)
         # signal to pyxel that board has been initialized
 
     @property
