@@ -7,6 +7,9 @@ from display import Display
 import agent
 from board import Board
 from board import SlipAndLoseTurn
+from pyxel_backend import PyxelManager
+from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
+
 
 
 class GameState(Enum):
@@ -18,18 +21,18 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool):
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager):
         self.id_generator = count(start=1)
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
-        self.board = Board(10, monsters, players, disp)
+        self.board = Board(10, monsters, players, disp, pyxel_manager)
         self.game_state = GameState.START
         self.disp = disp
         self.all_ai_mode = all_ai_mode
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-
+        
         message = """Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed..."""
