@@ -2,6 +2,7 @@ import character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
+import obstacle
 
 
 class PyxelManager:
@@ -28,6 +29,14 @@ class PyxelManager:
                         "name": el.pyxel_sprite_name,
                         "priority": 10
                     })
+                elif isinstance(el, obstacle.TerrainObject):
+                    entities.append({
+                        "id": next(id_generator),
+                        "position": (col_num, row_num),
+                        # "name": type(el).__name__
+                        "name": el.pyxel_sprite_name,
+                        "priority": 20
+                    })        
         payload = {
             "map_width": board_width,
             "map_height": board_height,
