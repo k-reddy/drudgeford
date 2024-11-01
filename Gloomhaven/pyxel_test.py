@@ -60,8 +60,8 @@ def enqueue_actions():
     time.sleep(3)
     print("Enqueuing actions...")
     payload = {
-        "map_width": 5,
-        "map_height": 5,
+        "map_width": 4,
+        "map_height": 4,
         "entities": [
             {
                 "id": 1,
@@ -70,7 +70,7 @@ def enqueue_actions():
             },
             {
                 "id": 2,
-                "position": (4, 2),
+                "position": (3, 2),
                 "name": "knight",
             },
         ],
@@ -80,7 +80,7 @@ def enqueue_actions():
     shared_action_queue.enqueue(task)
 
     # Create some test actions
-    time.sleep(3)
+    time.sleep(7)
     print("move 1")
     shared_action_queue.enqueue(
         ActionTask("knight", 1, "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
@@ -97,15 +97,15 @@ def enqueue_actions():
             2,
             "walk",
             Direction.EAST,
-            (4, 2),
             (3, 2),
+            (3, 3),
         )
     )
     shared_action_queue.enqueue(
-        ActionTask("knight", 2, "walk", Direction.EAST, (3, 2), (4, 3), move_duration)
+        ActionTask("knight", 2, "walk", Direction.EAST, (3, 3), (2, 2), move_duration)
     )
     shared_action_queue.enqueue(
-        ActionTask("knight", 2, "walk", Direction.EAST, (4, 3), (4, 2), move_duration)
+        ActionTask("knight", 2, "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
     )
     # time.sleep(3)
     # print("move3")
