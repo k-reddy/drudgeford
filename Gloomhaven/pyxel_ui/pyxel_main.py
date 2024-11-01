@@ -228,13 +228,16 @@ class PyxelView:
                 if (x, y) not in occupied_coordinates:
                     self.draw_background("dungeon_floor", occupied_coordinates)
 
-        # Draw entity sprites
-        for _, entity in self.entities.items():
-            self.draw_sprite(
-                entity.x,
-                entity.y,
-                self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
-            )
+        # draw entity sprites with a notion of priority
+        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
+        for i in range(0,max_priority+1):
+            for _, entity in self.entities.items():
+                if entity.priority == i:
+                    self.draw_sprite(
+                        entity.x,
+                        entity.y,
+                        self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
+                    )
 
         # Draw grids
         for tile_x, tile_y in self.canvas.grid_pixels():
