@@ -33,7 +33,7 @@ class PyxelManager:
             "map_height": board_height,
             "entities": entities
         }
-        print(payload)
+        # print(payload)
         task = SystemTask(type="board_init", payload=payload)
         self.shared_action_queue.enqueue(task)
 
