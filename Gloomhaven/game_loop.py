@@ -1,4 +1,5 @@
 import random
+from itertools import count
 from enum import Enum, auto
 import character
 from config import DEBUG
@@ -6,6 +7,9 @@ from display import Display
 import agent
 from board import Board
 from board import SlipAndLoseTurn
+from pyxel_backend import PyxelManager
+from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
+
 
 
 class GameState(Enum):
@@ -17,17 +21,18 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool):
-        players = set_up_players(disp, num_players, all_ai_mode)
-        monsters = set_up_monsters(disp, len(players))
-        self.board = Board(10, monsters, players, disp)
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager):
+        self.id_generator = count(start=1)
+        players = self.set_up_players(disp, num_players, all_ai_mode)
+        monsters = self.set_up_monsters(disp, len(players))
+        self.board = Board(3, monsters, players, disp, pyxel_manager)
         self.game_state = GameState.START
         self.disp = disp
         self.all_ai_mode = all_ai_mode
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-
+        
         message = """Welcome to your quest.
 As you enter the dungeon, you see a terrifying monster ahead! 
 Kill it or be killed..."""
@@ -200,45 +205,45 @@ Kill it or be killed..."""
         return message
 
 
-def set_up_players(disp, num_players, all_ai_mode):
-    players = []
-    emoji = ["🧙", "🕺", "🐣"]
-    default_names = ["Happy", "Glad", "Jolly"]
+    def set_up_players(self, disp, num_players, all_ai_mode):
+        players = []
+        emoji = ["🧙", "🕺", "🐣"]
+        default_names = ["Happy", "Glad", "Jolly"]
 
-    # get some user input before starting the game
-    num_players = (
-        int(
-            disp.get_user_input(
-                "How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
+        # get some user input before starting the game
+        num_players = (
+            int(
+                disp.get_user_input(
+                    "How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
+                )
             )
-        )
-        if not all_ai_mode
-        else num_players
-    )
-    for i in range(num_players):
-        player_name = (
-            disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
             if not all_ai_mode
-            else ""
+            else num_players
         )
-        # default to happy :D
-        player_name = player_name if player_name != "" else default_names[i]
-        player_agent = agent.Ai() if all_ai_mode else agent.Human()
-        if i == num_players - 1:
-            players.append(character.Miner(player_name, disp, emoji[i], player_agent, is_monster=False))
-        else:
-            players.append(character.Character(player_name, disp, emoji[i], player_agent, is_monster=False))
-    if not all_ai_mode:
-        disp.clear_display()
-    return players
+        for i in range(num_players):
+            player_name = (
+                disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
+                if not all_ai_mode
+                else ""
+            )
+            # default to happy :D
+            player_name = player_name if player_name != "" else default_names[i]
+            player_agent = agent.Ai() if all_ai_mode else agent.Human()
+            if i == num_players - 1:
+                players.append(character.Miner(player_name, disp, emoji[i], player_agent, id = next(self.id_generator), is_monster=False))
+            else:
+                players.append(character.Character(player_name, disp, emoji[i], player_agent, id = next(self.id_generator), is_monster=False))
+        if not all_ai_mode:
+            disp.clear_display()
+        return players
 
 
-def set_up_monsters(disp, num_players):
-    monsters = []
-    names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
-    emoji = ["🌵", "🪼 ", "💀", "🧿"]
-    healths = [3, 3, 7, 8]
-    for i in range(num_players + 1):
-        monster = character.Character(names[i], disp, emoji[i], agent.Ai(), is_monster=True)
-        monsters.append(monster)
-    return monsters
+    def set_up_monsters(self, disp, num_players):
+        monsters = []
+        names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
+        emoji = ["🌵", "🪼 ", "💀", "🧿"]
+        healths = [3, 3, 7, 8]
+        for i in range(num_players + 1):
+            monster = character.Character(names[i], disp, emoji[i], agent.Ai(), id = next(self.id_generator), is_monster=True)
+            monsters.append(monster)
+        return monsters
