@@ -6,7 +6,7 @@ from config import DEBUG
 from display import Display
 import agent
 from board import Board
-from board import SlipAndLoseTurn
+from obstacle import SlipAndLoseTurn
 from pyxel_backend import PyxelManager
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 
@@ -240,7 +240,7 @@ Kill it or be killed..."""
         monsters = []
         names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
         char_classes = [character.Treeman, character.EvilBlob, character.Skeleton, character.Corpse]
-        emoji = ["🌵", "🪼 ", "💀", "🧟‍♀️"]
+        emoji = ["🌵", "🪼 ", "💀", "🧟"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
             monster = char_classes[i](names[i], disp, emoji[i], agent.Ai(), char_id = next(self.id_generator), is_monster=True)
