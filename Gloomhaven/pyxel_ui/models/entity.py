@@ -22,6 +22,9 @@ class Entity:
     z: int
     animation_frame: AnimationFrame
     alive: bool = True
+    # 0 upward, with higher priority number displaying on top
+    priority: int=0
+
 
     def update_position(self, x: int, y: int):
         """
