@@ -129,18 +129,21 @@ class Wizard(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)
         self.health = character_classes.wizard.health
-        self.action_cards = character_classes.wizard.cards
         self.backstory = character_classes.wizard.backstory
         self.pyxel_sprite_name = "wizard"
+    
+    def create_action_cards(self):
+        return character_classes.wizard.cards
     
 class Miner(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)
         self.health = character_classes.miner.health
-        self.action_cards = character_classes.miner.cards
-        self.available_action_cards = self.action_cards.copy()
         self.backstory = character_classes.miner.backstory
         self.pyxel_sprite_name = "miner"
+
+    def create_action_cards(self):
+        return character_classes.miner.cards
 
 class Necromancer(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):

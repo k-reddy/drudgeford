@@ -1,5 +1,6 @@
 import gh_types
 import attack_shapes as shapes
+from obstacle import Rock
 
 
 cards = [
@@ -117,7 +118,7 @@ cards = [
         attack_name="Stone Defense",
         actions=[
             gh_types.MakeObstableArea(
-                obstacle_type='Stone',
+                obstacle_type=Rock,
                 shape=shapes.bar(1,1)
             ),
             gh_types.ShieldAllAllies(
