@@ -474,6 +474,11 @@ class Board:
         # Add action queue logic here.
         self.update_locations(old_location[0], old_location[1], None)
         self.update_locations(new_location[0], new_location[1], actor)
+        self.pyxel_manager.move_character(
+            actor,
+            old_location,
+            new_location
+        )
 
     def is_legal_move(self, row: int, col: int) -> bool:
         is_position_within_board = (
