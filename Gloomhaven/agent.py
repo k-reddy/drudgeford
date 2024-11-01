@@ -37,6 +37,10 @@ class Agent(abc.ABC):
     def perform_movement(char, movement: int, is_jump: bool, board):
         pass 
 
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        pass
+
 
 class Ai(Agent):
     @staticmethod
@@ -59,6 +63,15 @@ class Ai(Agent):
         targets = board.find_opponents(char)
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(char, target_loc, movement, is_jump)
+
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        board.move_character_toward_location(
+            char_to_move, 
+            mover_loc,
+            movement,
+            False
+        )
     
 class Human(Agent):
     @staticmethod
@@ -127,3 +140,13 @@ class Human(Agent):
         if is_jump:
             board.deal_terrain_damage_current_location(char)
         char.disp.add_to_log("Movement done! \n")
+
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        Human.perform_movement(
+            char_to_move,
+            movement,
+            False,
+            board,
+            movement_check
+        )
