@@ -11,6 +11,7 @@ import character
 from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
+import pyxel_backend
 
 
 MAX_ROUNDS = 1000
@@ -32,6 +33,7 @@ class Board:
         monsters: list[character.Character],
         players: list[character.Character],
         disp: Display,
+        pyxel_manager: pyxel_backend.PyxelManager
     ) -> None:
         self.round_num = 0
         self.size = size
@@ -51,6 +53,9 @@ class Board:
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num=1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
+        self.pyxel_manager = pyxel_manager
+
+        pyxel_manager.load_board(self.locations)
         # signal to pyxel that board has been initialized
 
     @property

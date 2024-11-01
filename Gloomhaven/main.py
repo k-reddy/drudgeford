@@ -1,20 +1,32 @@
 import os
+import threading
+from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
+from pyxel_ui.pyxel_main import PyxelView
+
 from game_loop import GameLoop
 import display
+import pyxel_backend
 
 def main(num_players: int = 1, all_ai_mode = False):
+    # pyxel setup
+    shared_action_queue = PyxelTaskQueue()
+    pyxel_view = PyxelView(shared_action_queue)
+
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
 
     disp = display.Display(all_ai_mode)
+    pyxel_manager = pyxel_backend.PyxelManager(shared_action_queue)
     if not all_ai_mode:
         disp.clear_display()
     # if players want game help, display instructions
     provide_help_if_desired(disp, all_ai_mode)
 
-    game = GameLoop(disp, num_players, all_ai_mode)
-    return game.start()
+    game = GameLoop(disp, num_players, all_ai_mode, pyxel_manager)
+    threading.Thread(target=game.start).start()
+    pyxel_view.start()
+
 
 def provide_help_if_desired(disp, all_ai_mode):
     help_message = '''Welcome to the game! Here's how it works:
