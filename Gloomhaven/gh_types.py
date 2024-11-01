@@ -3,6 +3,7 @@ import attack_shapes as shapes
 import abc 
 import utils
 import random
+from functools import partial
 
 
 @dataclass
@@ -94,6 +95,9 @@ class WeakenEnemy(ActionStep):
     def perform(self, board, attacker, round_num):
         modifier = utils.make_additive_modifier(self.strength)
         target = select_in_range_target(board, attacker, self.att_range, opponent=True)
+        # if no one is in range, return
+        if not target:
+            return
         target.attack_modifier_deck.append(modifier)
 
     def __str__(self):
@@ -165,13 +169,14 @@ class Pull(ActionStep):
         
         # give the attacker control of the target for the pull if attacker is human
         if isinstance(attacker.agent, Human):
+            is_legal_pull_check = partial(check_if_legal_pull, board.find_location_of_target(attacker), board)
+            
             attacker.agent.perform_movement(
                 target,
                 self.squares,
                 False,
                 board,
-                is_pull=True,
-                puller_location=board.find_location_of_target(attacker)
+                is_legal_pull_check
             )
         
         else:
@@ -184,6 +189,43 @@ class Pull(ActionStep):
 
     def __str__(self):
         return f"Pull {self.squares} any target in range {self.att_range}"
+
+@dataclass  
+class Push(ActionStep):
+    squares: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        from agent import Human, Ai
+
+        target = select_in_range_target(board, attacker, self.att_range)
+
+        if not target:
+            board.disp.add_to_log("No one in range to pull")
+            return
+        
+        # give the attacker control of the target for the pull if attacker is human
+        if isinstance(attacker.agent, Human):
+            is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
+            
+            attacker.agent.perform_movement(
+                target,
+                self.squares,
+                False,
+                board,
+                is_legal_push_check
+            )
+        
+        else:
+            # otherwise, auto move target:
+            board.move_character_toward_location(
+                target, 
+                board.find_location_of_target(attacker),
+                self.squares,
+                False)
+
+    def __str__(self): 
+        return f"Push {self.squares} any target in range {self.att_range}"
 
 @dataclass
 class MakeObstableArea(ActionStep):
@@ -236,3 +278,21 @@ def select_in_range_target(board, attacker, att_range, opponent=True):
     )
     target = attacker.select_attack_target(in_range_chars)
     return target
+
+def check_if_legal_pull(puller_location, board, pull_target_old_location, new_pull_target_location):
+    orig_dist = len(board.get_shortest_valid_path(pull_target_old_location, puller_location))
+    new_dist = len(board.get_shortest_valid_path(new_pull_target_location, puller_location))
+
+    if orig_dist > new_dist:
+        return True
+    else:
+        return False
+
+def check_if_legal_push(puller_location, board, pull_target_old_location, new_pull_target_location):
+    orig_dist = len(board.get_shortest_valid_path(pull_target_old_location, puller_location))
+    new_dist = len(board.get_shortest_valid_path(new_pull_target_location, puller_location))
+
+    if orig_dist < new_dist:
+        return True
+    else:
+        return False
