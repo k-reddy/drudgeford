@@ -60,18 +60,18 @@ def enqueue_actions():
     time.sleep(3)
     print("Enqueuing actions...")
     payload = {
-        "map_width": 4,
-        "map_height": 4,
+        "map_width": 10,
+        "map_height": 10,
         "entities": [
             {
                 "id": 1,
                 "position": (0, 0),
-                "name": "knight",
+                "name": "treeman",
             },
             {
                 "id": 2,
                 "position": (3, 2),
-                "name": "knight",
+                "name": "poisonshroom",
             },
         ],
     }
