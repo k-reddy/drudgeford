@@ -4,6 +4,8 @@ from collections import deque
 import copy
 import heapq
 import random
+from itertools import count
+from typing import Type
 
 import agent
 import attack_shapes as shapes
@@ -12,13 +14,11 @@ from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
 import pyxel_backend
+import obstacle
 
 
 MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
-FIRE_DAMAGE = 1
-TRAP_DAMAGE = 3
-SPORE_DAMAGE = 1
 
 
 # the board holds all the game metadata including the monster and player who are playing
@@ -33,29 +33,31 @@ class Board:
         monsters: list[character.Character],
         players: list[character.Character],
         disp: Display,
-        pyxel_manager: pyxel_backend.PyxelManager
+        pyxel_manager: pyxel_backend.PyxelManager,
+        id_generator: count
     ) -> None:
         self.round_num = 0
         self.size = size
         self.disp = disp
+        self.id_generator = id_generator
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         self.characters: list[character.Character] = ListWithUpdate(
             players + monsters, self.disp.reload_display
         )
         self.locations = self._initialize_map(self.size, self.size)
-        self.terrain = self._initialize_map(self.size, self.size)
+        self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0, 10))
-        self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0, 5))
-        self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0, 3))
+        self.add_starting_effect_to_terrain(obstacle.Fire, False, 1000, random.randint(0, 10))
+        self.add_starting_effect_to_terrain(obstacle.Ice, True, 1000, random.randint(0, 5))
+        self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
         # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num=1)
+        self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
         self.pyxel_manager = pyxel_manager
 
-        pyxel_manager.load_board(self.locations)
+        pyxel_manager.load_board(self.locations, self.terrain, self.id_generator)
         # signal to pyxel that board has been initialized
 
     @property
@@ -92,12 +94,18 @@ class Board:
     # game maps are used to represent locations and terrain
     def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
         return [
-            ListWithUpdate(["X" for _ in range(width)], self.disp.reload_display)
+            ListWithUpdate([obstacle.Rock(round_num=0) for _ in range(width)], self.disp.reload_display)
+            for _ in range(height)
+        ]
+    
+    def _initialize_terrain(self, width: int = 5, height=5) -> list[ListWithUpdate]:
+        return [
+            ListWithUpdate([None for _ in range(width)], self.disp.reload_display)
             for _ in range(height)
         ]
 
     def add_starting_effect_to_terrain(
-        self, effect: str, is_contiguous: bool, num_tries: int, target_num: int
+        self, effect_type: Type[obstacle.TerrainObject], is_contiguous: bool, num_tries: int, target_num: int
     ) -> None:
         max_loc = self.size - 1
         counter = 0
@@ -105,26 +113,26 @@ class Board:
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.add_effect_if_valid_square(row, col, effect):
+            if self.add_effect_if_valid_square(row, col, effect_type):
                 counter += 1
             if is_contiguous:
                 for i in [-1, 0, 1]:
-                    if self.add_effect_if_valid_square(row + i, col, effect):
+                    if self.add_effect_if_valid_square(row + i, col, effect_type):
                         counter += 1
             if counter >= target_num:
                 return
 
-    def add_effect_if_valid_square(self, row, col, effect) -> bool:
+    def add_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
-            self.terrain[row][col] = (effect, self.round_num)
+            self.terrain[row][col] = effect_type(self.round_num)
             return True
         return False
 
     def add_effect_to_terrain_for_attack(
         self,
-        effect: str,
+        effect_type: Type[obstacle.TerrainObject],
         row: int,
         col: int,
         shape: set,
@@ -136,7 +144,7 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    self.terrain[effect_row][effect_col] = (effect, self.round_num)
+                    self.terrain[effect_row][effect_col] = effect_type(self.round_num)
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
@@ -155,7 +163,7 @@ class Board:
                     if isinstance(potential_char, Character):
                         self.attack_target(attacker, strength, potential_char)
 
-    def set_obstacles_in_area(self, starting_coord, shape: set, obstacle: str):
+    def set_obstacles_in_area(self, starting_coord, shape: set, obstacle_type: Type[obstacle.TerrainObject]):
         for coordinate in shape:
             obstacle_row = starting_coord[0] + coordinate[0]
             obstacle_col = starting_coord[1] + coordinate[1]
@@ -164,7 +172,7 @@ class Board:
                 if 0 <= obstacle_col < len(self.locations[obstacle_row]):
                     # if it's unoccupied, place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
-                        self.locations[obstacle_row][obstacle_col] = obstacle.upper()
+                        self.locations[obstacle_row][obstacle_col] = obstacle_type(self.round_num)
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -217,15 +225,6 @@ class Board:
 
             # Update last_room_center for the next iteration
             last_room_center = current_room_center
-
-        # self.locations[0][0] = "X"
-        # for i in range(3):
-        #     for j in range(3):
-        #         if i + j < 3:
-        #             self.locations[i][j] = "X"
-        #             self.locations[-i - 1][-j - 1] = "X"
-        #             self.locations[i][-j - 1] = "X"
-        #             self.locations[-i - 1][j] = "X"
 
     def set_character_starting_locations(self) -> None:
         for x in self.characters:
@@ -486,27 +485,13 @@ class Board:
         )
         return is_position_within_board and self.locations[row][col] is None
 
-    def get_terrain_damage(self, row: int, col: int) -> int:
-        el = self.terrain[row][col][0]
-        if el == "FIRE":
-            return FIRE_DAMAGE
-        elif el == "ICE":
-            if random.random() < 0.25:
-                raise SlipAndLoseTurn("Slipped!")
-            else:
-                return 0
-        elif el == "TRAP":
-            self.terrain[row][col] = "X"
-            return TRAP_DAMAGE
-        elif el == "TOXIC_MUSHROOM":
-            self.terrain[row][col] = "X"
-            self.log.append("The mushroom exploded into spores!")
-            self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1))
-            return 0
-        elif el == "SPORE":
-            return SPORE_DAMAGE
+    def get_terrain_damage(self, row: int, col: int) -> int | None:
+        el = self.terrain[row][col]
+        if el:
+            el.perform(row, col, self)
+            return el.damage
         else:
-            return 0
+            return None
 
     def modify_target_health(self, target: Character, damage: int) -> None:
         target.health -= damage
@@ -527,12 +512,12 @@ class Board:
     def update_terrain(self):
         for i, _ in enumerate(self.terrain):
             for j, el in enumerate(self.terrain[i]):
-                # x is the default initialization
-                if el == "X":
+                # None is the default initialization
+                if not el:
                     continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if self.round_num - el[1] >= 2:
-                    self.terrain[i][j] = "X"
+                if self.round_num - el.round_placed >= el.duration:
+                    self.terrain[i][j] = None
 
     def update_character_statuses(self):
         for character in self.characters:
@@ -563,6 +548,3 @@ class Board:
             target, self.find_location_of_target(target), new_loc
         )
 
-
-class SlipAndLoseTurn(Exception):
-    pass

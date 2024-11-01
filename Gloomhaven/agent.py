@@ -2,6 +2,7 @@ import abc
 import random
 from gh_types import ActionCard
 from display import Display
+from typing import Callable
 
 DIRECTION_MAP = {
     "w": [-1, 0],
@@ -36,6 +37,10 @@ class Agent(abc.ABC):
     def perform_movement(char, movement: int, is_jump: bool, board):
         pass 
 
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        pass
+
 
 class Ai(Agent):
     @staticmethod
@@ -58,6 +63,15 @@ class Ai(Agent):
         targets = board.find_opponents(char)
         target_loc = board.find_location_of_target(random.choice(targets))
         board.move_character_toward_location(char, target_loc, movement, is_jump)
+
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        board.move_character_toward_location(
+            char_to_move, 
+            mover_loc,
+            movement,
+            False
+        )
     
 class Human(Agent):
     @staticmethod
@@ -93,7 +107,7 @@ class Human(Agent):
         return in_range_opponents[int(target_num)]
     
     @staticmethod
-    def perform_movement(char, movement, is_jump, board):
+    def perform_movement(char, movement, is_jump, board, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
         while remaining_movement > 0:
             char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
@@ -108,7 +122,12 @@ class Human(Agent):
             new_row, new_col = [
                 a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
             ]
-            if board.is_legal_move(new_row, new_col):
+            # perform any additional movement checks
+
+            additional_movement_check_result = additional_movement_check(current_loc, (new_row, new_col)) if additional_movement_check else True
+            
+            legal_move = board.is_legal_move(new_row, new_col)
+            if legal_move and additional_movement_check_result:
                 # do this instead of update location because it deals with terrain
                 board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
                 remaining_movement -= 1
@@ -121,3 +140,13 @@ class Human(Agent):
         if is_jump:
             board.deal_terrain_damage_current_location(char)
         char.disp.add_to_log("Movement done! \n")
+
+    @staticmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+        Human.perform_movement(
+            char_to_move,
+            movement,
+            False,
+            board,
+            movement_check
+        )
