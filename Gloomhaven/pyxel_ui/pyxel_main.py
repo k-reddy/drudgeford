@@ -2,6 +2,8 @@ import pyxel
 
 from collections import defaultdict, deque
 import itertools
+from statistics import mean
+import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
@@ -18,6 +20,8 @@ from .views.sprite import Sprite, SpriteManager
 WALL_THICKNESS = 32
 GRID_COLOR = 11
 FRAME_DURATION_MS = 34
+# approx 2 sec of durations with no movement
+WINDOW_LENGTH = 60
 
 
 # phase 1, generate play space based on 64x64 character. add wall boundaries
@@ -42,9 +46,13 @@ class PyxelView:
         # Init action queue system
         self.task_queue = task_queue
         self.current_task = None
-        self.entities: dict = {}
+        self.entities: dict[int, Entity] = {}
         self.sprite_manager = SpriteManager()
         self.is_board_initialized = False
+
+        # To measure framerate and loop duration
+        self.start_time: float = time.time()
+        self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
     def init_pyxel_map(self, width, height):
         self.board_tile_width = width
@@ -169,19 +177,10 @@ class PyxelView:
                 alive=True,
             )
 
-        self.entities[self.current_task.payload["id"]] = Entity(
-            id=self.current_task.payload["id"],
-            name="knight",
-            x=row_px,
-            y=col_px,
-            z=10,
-            animation_frame=AnimationFrame.SOUTH,
-            alive=True,
-        )
-
         # currently assuming payload is board.locations
 
     def update(self):
+        self.start_time = time.time()
         # make a pyxel board with the right shape
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
@@ -245,3 +244,16 @@ class PyxelView:
                 self.canvas.tile_height_px,
                 GRID_COLOR,
             )
+
+        # Draw framerate and frame duration.
+
+        # Calculate duration and framerate
+        loop_duration = time.time() - self.start_time
+        self.loop_durations.append(loop_duration)
+
+        if len(self.loop_durations) > 0:
+            avg_duration = mean(self.loop_durations)
+            loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
+            avg_duration_ms = avg_duration * 1000
+            rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
+            pyxel.text(10, 20, rate_stats, 7)
