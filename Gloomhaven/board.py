@@ -7,10 +7,11 @@ import random
 
 import agent
 import attack_shapes as shapes
-from character import CharacterType, Monster, Player
+import character
 from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
+import pyxel_backend
 
 
 MAX_ROUNDS = 1000
@@ -29,16 +30,17 @@ class Board:
     def __init__(
         self,
         size: int,
-        monsters: list[Character],
-        players: list[Character],
+        monsters: list[character.Character],
+        players: list[character.Character],
         disp: Display,
+        pyxel_manager: pyxel_backend.PyxelManager
     ) -> None:
         self.round_num = 0
         self.size = size
         self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[Character] = ListWithUpdate(
+        self.characters: list[character.Character] = ListWithUpdate(
             players + monsters, self.disp.reload_display
         )
         self.locations = self._initialize_map(self.size, self.size)
@@ -51,6 +53,9 @@ class Board:
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num=1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
+        self.pyxel_manager = pyxel_manager
+
+        pyxel_manager.load_board(self.locations)
         # signal to pyxel that board has been initialized
 
     @property
@@ -469,6 +474,11 @@ class Board:
         # Add action queue logic here.
         self.update_locations(old_location[0], old_location[1], None)
         self.update_locations(new_location[0], new_location[1], actor)
+        self.pyxel_manager.move_character(
+            actor,
+            old_location,
+            new_location
+        )
 
     def is_legal_move(self, row: int, col: int) -> bool:
         is_position_within_board = (
