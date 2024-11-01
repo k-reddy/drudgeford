@@ -169,15 +169,15 @@ class PyxelView:
                 alive=True,
             )
 
-        self.entities[self.current_task.payload["id"]] = Entity(
-            id=self.current_task.payload["id"],
-            name="knight",
-            x=row_px,
-            y=col_px,
-            z=10,
-            animation_frame=AnimationFrame.SOUTH,
-            alive=True,
-        )
+        # self.entities[self.current_task.payload["id"]] = Entity(
+        #     id=self.current_task.payload["id"],
+        #     name="knight",
+        #     x=row_px,
+        #     y=col_px,
+        #     z=10,
+        #     animation_frame=AnimationFrame.SOUTH,
+        #     alive=True,
+        # )
 
         # currently assuming payload is board.locations
 
