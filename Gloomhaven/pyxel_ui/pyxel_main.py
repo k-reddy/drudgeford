@@ -22,6 +22,7 @@ GRID_COLOR = 11
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
+BITS = 32
 
 
 # phase 1, generate play space based on 64x64 character. add wall boundaries
@@ -59,14 +60,14 @@ class PyxelView:
         self.board_tile_height = height
 
         # TODO(John): replace these hardcoded numbers.
-        pyxel.init(self.board_tile_width * 64 + 32, self.board_tile_height * 64 + 64)
+        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + 64)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
             board_tile_width=self.board_tile_width,
             board_tile_height=self.board_tile_height,
-            tile_width_px=64,
-            tile_height_px=64,
+            tile_width_px=BITS,
+            tile_height_px=BITS,
             wall_sprite_thickness_px=32,
         )
 
