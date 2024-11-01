@@ -1,6 +1,7 @@
 import os
 from gh_types import ActionCard
 from character import Character
+import obstacle
 
 EMPTY_CELL = "|      "
 
@@ -53,8 +54,10 @@ class Display:
             for el in row:
                 if isinstance(el, Character):
                     sides += f"|  {el.emoji}  "
-                elif el == "X" or el=='STONE':
-                    sides += "|  🪨   "
+                elif isinstance(el, obstacle.TerrainObject):
+                    sides += f"|  {el.emoji}   "
+                elif el:
+                    raise TypeError(f"Unknown thing in locations {el}")
                 else:
                     sides += EMPTY_CELL
             sides += EMPTY_CELL
@@ -63,16 +66,10 @@ class Display:
 
             effect_sides = ""
             for el in self.terrain[i]:
-                if el[0] == "FIRE":
-                    effect_sides += "|  🔥  "
-                elif el[0] == "ICE":
-                    effect_sides += "|  🧊  "
-                elif el[0] == "TRAP":
-                    effect_sides+= "|  🗯️   "
-                elif el[0] == "TOXIC_MUSHROOM":
-                    effect_sides+="|  🍄  "
-                elif el[0] == "SPORE":
-                    effect_sides+="|  🦠  "
+                if isinstance(el, obstacle.TerrainObject):
+                    effect_sides += f"|  {el.emoji}  "
+                elif el:
+                    raise TypeError(f"Unknown thing in terrain {el}")
                 else:
                     effect_sides += EMPTY_CELL
             effect_sides += EMPTY_CELL
