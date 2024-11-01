@@ -193,25 +193,16 @@ class Push(ActionStep):
             board.disp.add_to_log("No one in range to pull")
             return
         
-        # give the attacker control of the target for the pull if attacker is human
-        if isinstance(attacker.agent, Human):
-            is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
-            
-            attacker.agent.perform_movement(
-                target,
-                self.squares,
-                False,
-                board,
-                is_legal_push_check
-            )
+        is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
         
-        else:
-            # otherwise, auto move target:
-            board.move_character_toward_location(
-                target, 
-                board.find_location_of_target(attacker),
-                self.squares,
-                False)
+        attacker.agent.move_other_character(
+            target,
+            board.find_location_of_target(attacker),
+            self.squares,
+            False,
+            board,
+            is_legal_push_check
+        )
 
     def __str__(self): 
         return f"Push {self.squares} any enemy in range {self.att_range}"
