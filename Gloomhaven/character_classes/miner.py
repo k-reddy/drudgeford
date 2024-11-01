@@ -125,6 +125,10 @@ cards = [
                 strength=2,
                 duration=1,
                 att_range=2
+            ),
+            gh_types.MoveAlly(
+                squares=3,
+                att_range=4
             )
         ],
         movement=0,

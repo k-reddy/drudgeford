@@ -227,6 +227,29 @@ class MakeObstableArea(ActionStep):
         return f"Set {self.obstacle_type} with shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
+class MoveAlly(ActionStep):
+    '''Unlike elements, obstacles go on the locations board
+    and cannot be moved through and do not expire'''
+    squares: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        target = select_in_range_target(board, attacker, self.att_range, opponent=False)
+        
+        attacker.agent.move_other_character(
+            target,
+            board.find_location_of_target(attacker),
+            self.squares,
+            is_jump=False,
+            board=board,
+            movement_check=None
+        )
+    
+    def __str__(self):
+        return f"Move one ally in range {self.att_range} up to {self.squares} squares"
+
+
+@dataclass
 class ActionCard:
     attack_name: str
     actions: list[ActionStep]
