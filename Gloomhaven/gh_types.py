@@ -159,36 +159,25 @@ class Pull(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from agent import Human, Ai
-
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
             board.disp.add_to_log("No one in range to pull")
             return
         
-        # give the attacker control of the target for the pull if attacker is human
-        if isinstance(attacker.agent, Human):
-            is_legal_pull_check = partial(check_if_legal_pull, board.find_location_of_target(attacker), board)
-            
-            attacker.agent.perform_movement(
-                target,
-                self.squares,
-                False,
-                board,
-                is_legal_pull_check
-            )
-        
-        else:
-            # otherwise, auto move target:
-            board.move_character_toward_location(
-                target, 
-                board.find_location_of_target(attacker),
-                self.squares,
-                False)
+        is_legal_pull_check = partial(check_if_legal_pull, board.find_location_of_target(attacker), board)
+
+        attacker.agent.move_other_character(
+            target,
+            board.find_location_of_target(attacker),
+            self.squares,
+            False,
+            board,
+            is_legal_pull_check
+        )
 
     def __str__(self):
-        return f"Pull {self.squares} any target in range {self.att_range}"
+        return f"Pull {self.squares} any enemy in range {self.att_range}"
 
 @dataclass  
 class Push(ActionStep):
@@ -225,7 +214,7 @@ class Push(ActionStep):
                 False)
 
     def __str__(self): 
-        return f"Push {self.squares} any target in range {self.att_range}"
+        return f"Push {self.squares} any enemy in range {self.att_range}"
 
 @dataclass
 class MakeObstableArea(ActionStep):
