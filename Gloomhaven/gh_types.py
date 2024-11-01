@@ -169,7 +169,9 @@ class Pull(ActionStep):
                 target,
                 self.squares,
                 False,
-                board
+                board,
+                is_pull=True,
+                puller_location=board.find_location_of_target(attacker)
             )
         
         else:
