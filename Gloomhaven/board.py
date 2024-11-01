@@ -4,11 +4,14 @@ from collections import deque
 import copy
 import heapq
 import random
+
+import agent
+import attack_shapes as shapes
+from character import CharacterType, Monster, Player
 from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
-import agent
-import attack_shapes as shapes
+
 
 MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
@@ -24,7 +27,11 @@ class Board:
     # set the game up by getting info from the player, giving instructions if needed, and start the turns
     # continue turns until the game is over!
     def __init__(
-        self, size: int, monsters: list[Character], players: list[Character], disp: Display
+        self,
+        size: int,
+        monsters: list[Character],
+        players: list[Character],
+        disp: Display,
     ) -> None:
         self.round_num = 0
         self.size = size
@@ -38,12 +45,13 @@ class Board:
         self.terrain = self._initialize_map(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0,10))
-        self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0,5))
-        self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0,3))
+        self.add_starting_effect_to_terrain("FIRE", False, 1000, random.randint(0, 10))
+        self.add_starting_effect_to_terrain("ICE", True, 1000, random.randint(0, 5))
+        self.add_starting_effect_to_terrain("TRAP", True, 1000, random.randint(0, 3))
         # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num = 1)
+        self.add_starting_effect_to_terrain("TOXIC_MUSHROOM", False, 1000, target_num=1)
         self.log = ListWithUpdate([], self.disp.add_to_log)
+        # signal to pyxel that board has been initialized
 
     @property
     def locations(self):
@@ -83,7 +91,9 @@ class Board:
             for _ in range(height)
         ]
 
-    def add_starting_effect_to_terrain(self,effect: str, is_contiguous: bool, num_tries: int, target_num: int) -> None:
+    def add_starting_effect_to_terrain(
+        self, effect: str, is_contiguous: bool, num_tries: int, target_num: int
+    ) -> None:
         max_loc = self.size - 1
         counter = 0
         for _ in range(num_tries):
@@ -91,11 +101,11 @@ class Board:
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
             if self.add_effect_if_valid_square(row, col, effect):
-                counter+=1
+                counter += 1
             if is_contiguous:
-                for i in [-1,0,1]:
-                    if self.add_effect_if_valid_square(row+i, col, effect):
-                        counter+=1
+                for i in [-1, 0, 1]:
+                    if self.add_effect_if_valid_square(row + i, col, effect):
+                        counter += 1
             if counter >= target_num:
                 return
 
@@ -108,7 +118,11 @@ class Board:
         return False
 
     def add_effect_to_terrain_for_attack(
-        self, effect: str, row: int, col: int, shape: set,
+        self,
+        effect: str,
+        row: int,
+        col: int,
+        shape: set,
     ) -> None:
         for coordinate in shape:
             effect_row = row + coordinate[0]
@@ -122,9 +136,7 @@ class Board:
                     if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
-    def attack_area(
-        self, attacker: Character, shape: set, strength: int
-    ) -> None:
+    def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
         starting_coord = self.find_location_of_target(attacker)
         for coordinate in shape:
             attack_row = starting_coord[0] + coordinate[0]
@@ -133,7 +145,7 @@ class Board:
             if 0 <= attack_row < len(self.locations):
                 if 0 <= attack_col < len(self.locations[attack_row]):
                     potential_char = self.locations[attack_row][attack_col]
-                    # if there's a character there, deal damage to them 
+                    # if there's a character there, deal damage to them
                     # note: this allows friendly fire, which I think is fun
                     if isinstance(potential_char, Character):
                         self.attack_target(attacker, strength, potential_char)
@@ -148,7 +160,6 @@ class Board:
                     # if it's unoccupied, place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
                         self.locations[obstacle_row][obstacle_col] = obstacle.upper()
-
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -292,7 +303,7 @@ class Board:
         path = path[1:]  # drop the starting position
         return path
 
-    def pick_unoccupied_location(self) -> tuple[int,int]:
+    def pick_unoccupied_location(self) -> tuple[int, int]:
         while True:
             rand_location = (
                 random.randint(0, self.size - 1),
@@ -325,22 +336,19 @@ class Board:
             pot_opponent
             for pot_opponent in self.characters
             if pot_opponent.team_monster != actor.team_monster
-
         ]
-    
+
     def find_allies(self, actor: Character) -> list[Character]:
         return [
             pot_opponent
             for pot_opponent in self.characters
             if pot_opponent.team_monster == actor.team_monster
-
         ]
 
     def attack_target(self, attacker, strength, target):
         self.log.append(f"{attacker.name} is attempting to attack {target.name}")
         modified_attack_strength = self.select_and_apply_attack_modifier(
-            attacker,
-            strength
+            attacker, strength
         )
         if target.shield[0] > 0:
             self.log.append(f"Target has shield {target.shield[0]}")
@@ -384,8 +392,8 @@ class Board:
     ) -> list[Character]:
         if opponents:
             chars = self.find_opponents(actor)
-        else: 
-            chars=self.find_allies(actor)
+        else:
+            chars = self.find_allies(actor)
         in_range_chars = []
         for char in chars:
             if self.is_attack_in_range(distance, actor, char):
@@ -397,7 +405,7 @@ class Board:
         acting_character: Character,
         target_location: tuple[int, int],
         movement: int,
-        is_jump=False
+        is_jump=False,
     ) -> None:
         if movement == 0:
             return
@@ -436,7 +444,10 @@ class Board:
             acting_character_loc = loc
 
     def deal_terrain_damage(
-        self, acting_character: Character, row: int, col: int,
+        self,
+        acting_character: Character,
+        row: int,
+        col: int,
     ) -> None:
         damage = self.get_terrain_damage(row, col)
         if damage:
@@ -455,6 +466,7 @@ class Board:
         old_location: tuple[int, int],
         new_location: tuple[int, int],
     ) -> None:
+        # Add action queue logic here.
         self.update_locations(old_location[0], old_location[1], None)
         self.update_locations(new_location[0], new_location[1], actor)
 
@@ -474,14 +486,14 @@ class Board:
             else:
                 return 0
         elif el == "TRAP":
-            self.terrain[row][col] = 'X'
+            self.terrain[row][col] = "X"
             return TRAP_DAMAGE
-        elif el == 'TOXIC_MUSHROOM':
-            self.terrain[row][col] = 'X'
+        elif el == "TOXIC_MUSHROOM":
+            self.terrain[row][col] = "X"
             self.log.append("The mushroom exploded into spores!")
             self.add_effect_to_terrain_for_attack("SPORE", row, col, shapes.circle(1))
             return 0
-        elif el == 'SPORE':
+        elif el == "SPORE":
             return SPORE_DAMAGE
         else:
             return 0
@@ -493,39 +505,43 @@ class Board:
         else:
             self.log.append(f"{target.name}'s new health: {target.health}")
 
-    def select_and_apply_attack_modifier(self, attacker, initial_attack_strength: int) -> int:
+    def select_and_apply_attack_modifier(
+        self, attacker, initial_attack_strength: int
+    ) -> int:
         attack_modifier_function, modifier_string = attacker.attack_modifier_deck.pop()
         if len(attacker.attack_modifier_deck) == 0:
             attacker.make_attack_modifier_deck()
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
-    
+
     def update_terrain(self):
         for i, _ in enumerate(self.terrain):
             for j, el in enumerate(self.terrain[i]):
                 # x is the default initialization
-                if el == 'X':
-                    continue 
+                if el == "X":
+                    continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if self.round_num-el[1] >= 2:
-                    self.terrain[i][j] = 'X'
-    
+                if self.round_num - el[1] >= 2:
+                    self.terrain[i][j] = "X"
+
     def update_character_statuses(self):
         for character in self.characters:
             if character.shield[1] <= self.round_num:
                 # reset to shield 0 indefinitely
                 character.shield = (0, MAX_ROUNDS)
-    
+
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)
 
     def push(self, target: Character, direction, squares):
-        '''pushes characters in a straight line'''
+        """pushes characters in a straight line"""
         starting_location = self.find_location_of_target(target)
         destinations = []
         for i in range(squares):
             # scale the movement then add it to starting location
-            destination = tuple([a*(i+1)+b for a, b in zip(direction, starting_location)])
+            destination = tuple(
+                [a * (i + 1) + b for a, b in zip(direction, starting_location)]
+            )
             destinations.append(destination)
         for destination in destinations:
             # force the algo to move the way we want, square by square
@@ -533,7 +549,10 @@ class Board:
 
     def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()
-        self.update_character_location(target,self.find_location_of_target(target),new_loc)
+        self.update_character_location(
+            target, self.find_location_of_target(target), new_loc
+        )
+
 
 class SlipAndLoseTurn(Exception):
     pass

@@ -1,7 +1,9 @@
 import threading
 from typing import Optional, List
 from pyxel_ui.pyxel_main import PyxelView
-from pyxel_ui.models.actions import Action, PyxelActionQueue
+from pyxel_ui.models.action_task import ActionTask
+from pyxel_ui.models.system_task import SystemTask
+from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.enums import Direction
 
 """
@@ -30,7 +32,7 @@ colors (for aseprite use)
 
 """
 
-shared_action_queue = PyxelActionQueue()
+shared_action_queue = PyxelTaskQueue()
 board_width_tiles = 6
 board_height_tiles = 5
 move_duration = 700
@@ -39,55 +41,95 @@ move_duration = 700
 def enqueue_actions():
     """Simulate external enqueueing of actions asynchronously."""
     import time
+    # test_map: List[List[Optional[str]]] = [
+    #     [None for _ in range(board_width_tiles)] for _ in range(board_height_tiles)
+    # ]
+    # row_px, col_px = self.convert_grid_to_pixel_pos(
+    #     self.current_task.payload.start_position[0],
+    #     self.current_task.payload.start_position[1],
+    # )
 
-    time.sleep(1)
+    # self.characters[self.current_task.payload.id] = Character(
+    #     name="knight",
+    #     x=row_px,
+    #     y=col_px,
+    #     z=10,
+    #     animation_frame=AnimationFrame.SOUTH,
+    #     alive=True,
+    # )
+    time.sleep(3)
     print("Enqueuing actions...")
+    payload = {
+        "map_width": 5,
+        "map_height": 5,
+        "entities": [
+            {
+                "id": 1,
+                "position": (0, 0),
+                "name": "knight",
+            },
+            {
+                "id": 2,
+                "position": (4, 2),
+                "name": "knight",
+            },
+        ],
+    }
+
+    task = SystemTask(type="board_init", payload=payload)
+    shared_action_queue.enqueue(task)
 
     # Create some test actions
+    time.sleep(3)
     print("move 1")
     shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
+        ActionTask("knight", 1, "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
     )
     shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (1, 0), (1, 1), move_duration)
+        ActionTask("knight", 1, "walk", Direction.EAST, (1, 0), (1, 1), move_duration)
     )
     time.sleep(2)
+
     print("move2")
     shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (1, 1), (1, 2), move_duration)
+        ActionTask(
+            "knight",
+            2,
+            "walk",
+            Direction.EAST,
+            (4, 2),
+            (3, 2),
+        )
     )
     shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (1, 2), (2, 2), move_duration)
+        ActionTask("knight", 2, "walk", Direction.EAST, (3, 2), (4, 3), move_duration)
     )
     shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
+        ActionTask("knight", 2, "walk", Direction.EAST, (4, 3), (4, 2), move_duration)
     )
-    time.sleep(3)
-    print("move3")
-    shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (1, 2), (1, 3), move_duration)
-    )
-    shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (1, 3), (2, 4), move_duration)
-    )
-    shared_action_queue.enqueue(
-        Action("knight", "walk", Direction.EAST, (2, 4), (2, 3), move_duration)
-    )
+    # time.sleep(3)
+    # print("move3")
+    # shared_action_queue.enqueue(
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 2), (1, 3), move_duration)
+    # )
+    # shared_action_queue.enqueue(
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 3), (2, 4), move_duration)
+    # )
+    # shared_action_queue.enqueue(
+    #     ActionTask("knight", 1, "walk", Direction.EAST, (2, 4), (2, 3), move_duration)
+    # )
 
-    print("Actions enqueued successfully.")
+    print("ActionTasks enqueued successfully.")
     print("yaaaay")
 
 
 def main() -> None:
     # Create the PyxelView instance with the shared queue
-    test_map: List[List[Optional[str]]] = [
-        [None for _ in range(board_width_tiles)] for _ in range(board_height_tiles)
-    ]
-    pyxel_view = PyxelView(test_map, shared_action_queue)
+    pyxel_view = PyxelView(shared_action_queue)
 
     # Start the thread that enqueues actions
     threading.Thread(target=enqueue_actions).start()
-
+    # enqueue_actions()
     # Start the Pyxel game loop (on the main thread)
     pyxel_view.start()
 

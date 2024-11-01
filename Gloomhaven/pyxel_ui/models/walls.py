@@ -16,14 +16,16 @@ class Wall:
         v (int): The y-coordinate where the wall starts.
         thickness (int): The width of the wall in pixels.
         direction (Direction): The wall's orientation (North, South, East, or West).
-        canvas (Canvas): The canvas object defining the game board's layout.
+        canvas_width_px (int): canvas width in pixels
+        canvas_height_px (int): canvas height in pixels
     """
 
     u: int  # x coord of where to start this particular wall
     v: int  # y coord of where to start this wall
     thickness: int  # in px, what size chunk to take out of sprite sheet
     direction: Direction  # NWSE
-    canvas: Canvas
+    canvas_width_px: int
+    canvas_height_px: int
 
     def pixels(
         self,
@@ -40,8 +42,8 @@ class Wall:
         Raises:
             ValueError: If the wall's direction is not supported.
         """
-        canvas_width = self.canvas.canvas_width_px
-        canvas_height = self.canvas.canvas_height_px
+        canvas_width = self.canvas_width_px
+        canvas_height = self.canvas_height_px
 
         if self.direction is Direction.NORTH or self.direction is Direction.SOUTH:
             x_values = range(self.u, canvas_width, self.thickness)
