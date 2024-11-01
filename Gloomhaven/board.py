@@ -7,7 +7,7 @@ import random
 
 import agent
 import attack_shapes as shapes
-from character import CharacterType, Monster, Player
+import character
 from display import Display
 from gh_types import ActionCard
 from listwithupdate import ListWithUpdate
@@ -29,8 +29,8 @@ class Board:
     def __init__(
         self,
         size: int,
-        monsters: list[Character],
-        players: list[Character],
+        monsters: list[character.Character],
+        players: list[character.Character],
         disp: Display,
     ) -> None:
         self.round_num = 0
@@ -38,7 +38,7 @@ class Board:
         self.disp = disp
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[Character] = ListWithUpdate(
+        self.characters: list[character.Character] = ListWithUpdate(
             players + monsters, self.disp.reload_display
         )
         self.locations = self._initialize_map(self.size, self.size)

@@ -11,7 +11,8 @@ MAX_ROUNDS = 1000
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, disp, emoji, agent, is_monster):
+    def __init__(self, name, disp, emoji, agent, id: int, is_monster):
+        self.id = id
         self.health = self.set_health()
         self.name = name
         self.action_cards = self.create_action_cards()
