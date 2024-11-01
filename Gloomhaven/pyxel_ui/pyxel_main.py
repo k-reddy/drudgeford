@@ -135,10 +135,10 @@ class PyxelView:
 
     def process_action(self) -> None:
         assert self.current_task, "Attempting to process empty action"
-        print(f"{self.current_task.action_steps=}")
+        # print(f"{self.current_task.action_steps=}")
 
         if not self.current_task.action_steps:
-            print("ActionTask processing complete. Clearing...")
+            # print("ActionTask processing complete. Clearing...")
             self.current_task = None  # better than del; no dangling logic
             return
 
@@ -193,7 +193,7 @@ class PyxelView:
             self.current_task = self.convert_and_append_move_steps_to_action(
                 self.task_queue.dequeue()
             )
-            print(f"Has new action: {self.current_task}")
+            # print(f"Has new action: {self.current_task}")
             return
 
         if self.current_task:
