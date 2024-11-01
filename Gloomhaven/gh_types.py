@@ -4,6 +4,7 @@ import abc
 import utils
 import random
 from functools import partial
+from obstacle import TerrainObject
 
 
 @dataclass
@@ -211,7 +212,7 @@ class Push(ActionStep):
 class MakeObstableArea(ActionStep):
     '''Unlike elements, obstacles go on the locations board
     and cannot be moved through and do not expire'''
-    obstacle_type: str
+    obstacle_type: TerrainObject
     shape: set
 
     def perform(self, board, attacker, round_num):

@@ -230,7 +230,7 @@ Kill it or be killed..."""
             # default to happy :D
             player_name = player_name if player_name != "" else default_names[i]
             player_agent = agent.Ai() if all_ai_mode else agent.Human()
-            players.append(character.Miner(player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
+            players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
         if not all_ai_mode:
             disp.clear_display()
         return players

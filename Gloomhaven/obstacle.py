@@ -17,6 +17,9 @@ class Rock(TerrainObject):
         super().__init__(round_num)
         self.emoji = "🪨"
         self.pyxel_sprite_name = "poisonshroom"
+    
+    def __str__(self):
+        return "rock"
 
 
 class Fire(TerrainObject):
