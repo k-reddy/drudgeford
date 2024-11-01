@@ -21,7 +21,7 @@ class Character(abc.ABC):
         self.disp = disp
         self.emoji = emoji
         # a default sprite 
-        self.pyxel_sprite_name = "skeleton"
+        self.pyxel_sprite_name = "knight"
         self.agent = agent
         self.backstory = "I'm a generic character, how boring"
         self.attack_modifier_deck = self.make_attack_modifier_deck()
@@ -140,3 +140,28 @@ class Miner(Character):
         self.action_cards = character_classes.miner.cards
         self.backstory = character_classes.miner.backstory
         self.pyxel_sprite_name = "miner"
+
+class Necromancer(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "necromancer"
+
+class Treeman(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "treeman"
+
+class EvilBlob(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "evilblob"
+
+class Skeleton(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "skeleton"
+    
+class Corpse(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "corpse"

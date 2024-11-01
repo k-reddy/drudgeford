@@ -25,7 +25,7 @@ class GameLoop:
         self.id_generator = count(start=1)
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
-        self.board = Board(3, monsters, players, disp, pyxel_manager, self.id_generator)
+        self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
         self.disp = disp
         self.all_ai_mode = all_ai_mode
@@ -209,6 +209,7 @@ Kill it or be killed..."""
         players = []
         emoji = ["🧙", "🕺", "🐣"]
         default_names = ["Happy", "Glad", "Jolly"]
+        char_classes = [character.Miner, character.Wizard, character.Necromancer]
 
         # get some user input before starting the game
         num_players = (
@@ -229,10 +230,7 @@ Kill it or be killed..."""
             # default to happy :D
             player_name = player_name if player_name != "" else default_names[i]
             player_agent = agent.Ai() if all_ai_mode else agent.Human()
-            if i == num_players - 1:
-                players.append(character.Miner(player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
-            else:
-                players.append(character.Character(player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
+            players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
         if not all_ai_mode:
             disp.clear_display()
         return players
@@ -240,10 +238,11 @@ Kill it or be killed..."""
 
     def set_up_monsters(self, disp, num_players):
         monsters = []
-        names = ["Tree Man", "Evil Blob", "Living Skeleton", "Evil Eye"]
-        emoji = ["🌵", "🪼 ", "💀", "🧿"]
+        names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
+        char_classes = [character.Treeman, character.EvilBlob, character.Skeleton, character.Corpse]
+        emoji = ["🌵", "🪼 ", "💀", "🧟‍♀️"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
-            monster = character.Character(names[i], disp, emoji[i], agent.Ai(), char_id = next(self.id_generator), is_monster=True)
+            monster = char_classes[i](names[i], disp, emoji[i], agent.Ai(), char_id = next(self.id_generator), is_monster=True)
             monsters.append(monster)
         return monsters
