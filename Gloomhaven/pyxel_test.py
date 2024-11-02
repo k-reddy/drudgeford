@@ -3,7 +3,7 @@ from typing import Optional, List
 from pyxel_ui.pyxel_main import PyxelView
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.system_task import SystemTask
-from pyxel_ui.models.update_tasks import RemoveEntityTask
+from pyxel_ui.models.update_tasks import RemoveEntityTask, AddEntityTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.enums import Direction
 
@@ -58,7 +58,7 @@ def enqueue_actions():
     #     animation_frame=AnimationFrame.SOUTH,
     #     alive=True,
     # )
-    time.sleep(3)
+    # time.sleep(3)
     print("Enqueuing actions...")
     payload = {
         "map_width": 10,
@@ -96,7 +96,7 @@ def enqueue_actions():
     shared_action_queue.enqueue(task)
 
     # Create some test actions
-    time.sleep(7)
+    # time.sleep(7)
     print("move 1")
     shared_action_queue.enqueue(
         ActionTask("knight", 1, "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
@@ -125,6 +125,18 @@ def enqueue_actions():
     )
     shared_action_queue.enqueue(
         RemoveEntityTask(2)
+    )
+    shared_action_queue.enqueue(
+        AddEntityTask({"entities": [
+            {
+                "id": 5,
+                "position": (4, 6),
+                "name": "necromancer",
+                "priority": 1
+            }
+        ]
+
+        })
     )
     # time.sleep(3)
     # print("move3")
