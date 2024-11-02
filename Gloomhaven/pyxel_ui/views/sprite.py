@@ -66,13 +66,19 @@ class SpriteManager:
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=0, w=32, h=32),
             },
             "spores": {
-                AnimationFrame.SOUTH: Sprite(img_bank=2, u=32, v=0, w=32, h=32),
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=32, v=64, w=32, h=32),
             },
             "fire": {
-                AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=32, w=32, h=32),
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=64, w=32, h=32),
             },
             "poisonshroom": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=32, v=32, w=32, h=32),
+            },
+            "boulder": {
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=96, w=32, h=32),
+            },
+            "trap": {
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=32, v=96, w=32, h=32),
             },
             
         }
