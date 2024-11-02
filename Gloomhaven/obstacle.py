@@ -17,7 +17,7 @@ class Rock(TerrainObject):
     def __init__(self, round_num, obj_id):
         super().__init__(round_num, obj_id)
         self.emoji = "🪨"
-        self.pyxel_sprite_name = "poisonshroom"
+        self.pyxel_sprite_name = "boulder"
 
 class Fire(TerrainObject):
     def __init__(self, round_num, obj_id):
@@ -43,6 +43,7 @@ class Trap(TerrainObject):
         super().__init__(round_num, obj_id)
         self.emoji = "🗯️ "
         self.damage = 3
+        self.pyxel_sprite_name="trap"
     
     def perform(self, row, col, board):
         board.clear_terrain_square(row,col)
