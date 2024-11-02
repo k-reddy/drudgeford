@@ -45,7 +45,7 @@ class Trap(TerrainObject):
         self.damage = 3
     
     def perform(self, row, col, board):
-        board.terrain[row][col] = None
+        board.clear_terrain_square(row,col)
 
 class PoisonShroom(TerrainObject):
     def __init__(self, round_num, obj_id):
@@ -54,7 +54,7 @@ class PoisonShroom(TerrainObject):
         self.pyxel_sprite_name = "poisonshroom"
         
     def perform(self, row, col, board):
-        board.terrain[row][col] = None
+        board.clear_terrain_square(row, col)
         board.log.append("The mushroom exploded into spores!")
         board.add_effect_to_terrain_for_attack(Spores, row, col, shapes.circle(1))
 

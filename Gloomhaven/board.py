@@ -56,7 +56,7 @@ class Board:
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
         self.pyxel_manager = pyxel_manager
-        pyxel_manager.load_board(self.locations, self.terrain, self.id_generator)
+        pyxel_manager.load_board(self.locations, self.terrain)
         self.log = ListWithUpdate([], self.disp.add_to_log)
         # signal to pyxel that board has been initialized
 
@@ -177,7 +177,13 @@ class Board:
                 if 0 <= obstacle_col < len(self.locations[obstacle_row]):
                     # if it's unoccupied, place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
-                        self.locations[obstacle_row][obstacle_col] = obstacle_type(self.round_num)
+                        obs = obstacle_type(self.round_num, obj_id=next(self.id_generator))
+                        self.locations[obstacle_row][obstacle_col] = obs
+                        self.pyxel_manager.add_entity(
+                            obs,
+                            obstacle_row,
+                            obstacle_col,
+                        )
 
     def carve_room(self, start_x: int, start_y: int, width: int, height: int) -> None:
         for x in range(start_x, min(start_x + width, self.size)):
@@ -390,6 +396,7 @@ class Board:
         self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
+        self.pyxel_manager.remove_entity(target.id)
         self.log.append(f"{target.name} has been killed.")
         # !!! for pair coding
         # !!! if the target is the player, end game
@@ -514,6 +521,11 @@ class Board:
         self.log.append(f"Attack modifier: {modifier_string}")
         return attack_modifier_function(initial_attack_strength)
 
+    def clear_terrain_square(self, row, col):
+        el = self.terrain[row][col]
+        self.terrain[row][col] = None
+        self.pyxel_manager.remove_entity(el.id)
+
     def update_terrain(self):
         for i, _ in enumerate(self.terrain):
             for j, el in enumerate(self.terrain[i]):
@@ -522,7 +534,7 @@ class Board:
                     continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
                 if self.round_num - el.round_placed >= el.duration:
-                    self.terrain[i][j] = None
+                    self.clear_terrain_square(i,j)
 
     def update_character_statuses(self):
         for character in self.characters:
