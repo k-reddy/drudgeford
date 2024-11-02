@@ -2,7 +2,7 @@ import character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask
 import obstacle
 
 
@@ -12,7 +12,7 @@ class PyxelManager:
         self.move_duration = 700
 
 
-    def load_board(self, locations, terrain, id_generator):
+    def load_board(self, locations, terrain):
         # get some board metadata that we'll need
         board_width = len(locations)
         board_height = len(locations[0])
@@ -22,20 +22,13 @@ class PyxelManager:
             for col_num, el in enumerate(row):
                 if not el:
                     continue
-                if isinstance(el, character.Character):
+                if isinstance(el, character.Character) or isinstance(el, obstacle.TerrainObject):
                     entities.append({
                         "id": el.id,
                         "position": (col_num, row_num),
                         "name": el.pyxel_sprite_name,
                         "priority": 10
                     })
-                elif isinstance(el, obstacle.TerrainObject):
-                    entities.append({
-                        "id": next(id_generator),
-                        "position": (col_num, row_num),
-                        "name": el.pyxel_sprite_name,
-                        "priority": 20
-                    })  
 
         for row_num, row in enumerate(terrain):
             for col_num, el in enumerate(row):
@@ -43,7 +36,7 @@ class PyxelManager:
                     continue
                 if isinstance(el, obstacle.TerrainObject):
                     entities.append({
-                        "id": next(id_generator),
+                        "id": el.id,
                         "position": (col_num, row_num),
                         "name": el.pyxel_sprite_name,
                         "priority": 5
@@ -81,4 +74,8 @@ class PyxelManager:
                 }
             ]
             })
+        self.shared_action_queue.enqueue(task)
+    
+    def remove_entity(self, entity_id):
+        task = RemoveEntityTask(entity_id)
         self.shared_action_queue.enqueue(task)
