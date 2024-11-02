@@ -1,12 +1,13 @@
 import gh_types 
 import attack_shapes as shapes
+import obstacle 
 
 cards = [
     gh_types.ActionCard(
         attack_name="Fireball",
         actions=[gh_types.ElementAreaEffect(
             shape=shapes.circle(1),
-            element="Fire",
+            element_type=obstacle.Fire,
             att_range=4
         )],
         movement=2,
@@ -21,7 +22,7 @@ cards = [
             ),
             gh_types.ElementAreaEffect(
                 shape=shapes.bar(1,2),
-                element="Ice",
+                element_type=obstacle.Ice,
                 att_range=4
             )
         ],
@@ -50,7 +51,7 @@ cards = [
         attack_name="Masochistic Explosion",
         actions=[gh_types.ElementAreaEffect(
             att_range=1,
-            element="Fire",
+            element_type=obstacle.Fire,
             shape=shapes.circle(2)
         )],
         movement=0,

@@ -7,6 +7,7 @@ import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
+from .models.update_tasks import AddEntityTask, RemoveEntityTask
 
 # from .models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
@@ -82,6 +83,7 @@ class PyxelView:
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
                 self.process_entity_loading_task()
+                # self.process_add_entity_task()
                 self.current_task = None  # clear
                 self.is_board_initialized = True
 
@@ -154,6 +156,11 @@ class PyxelView:
         px_pos_x, px_pos_y = self.current_task.action_steps.popleft()
         self.entities[self.current_task.entity_id].update_position(px_pos_x, px_pos_y)
 
+    def process_remove_entity_task(self) -> None:
+        assert self.current_task, "Attempting to process empty system task"
+        del self.entities[self.current_task.entity_id]
+        self.current_task = None 
+
     def process_board_initialization_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
         height = self.current_task.payload["map_height"]
@@ -191,14 +198,26 @@ class PyxelView:
             return
         # Check for new tasks here
         if not self.current_task and not self.task_queue.is_empty():
-            self.current_task = self.convert_and_append_move_steps_to_action(
-                self.task_queue.dequeue()
-            )
-            # print(f"Has new action: {self.current_task}")
-            return
+            temp_task = self.task_queue.dequeue()
+            if isinstance(temp_task, ActionTask):
+                self.current_task = self.convert_and_append_move_steps_to_action(
+                    temp_task
+                )
+                # print(f"Has new action: {self.current_task}")
+                return
+            else:
+                self.current_task = temp_task
+                return
 
         if self.current_task:
-            self.process_action()
+            if isinstance(self.current_task, ActionTask):
+                self.process_action()
+            elif isinstance(self.current_task, RemoveEntityTask):
+                self.process_remove_entity_task()
+            elif isinstance(self.current_task, AddEntityTask):
+                self.process_entity_loading_task()
+                self.current_task=None
+            
 
     def draw(self):
         pyxel.cls(0)
