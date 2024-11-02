@@ -40,6 +40,7 @@ class Board:
         self.size = size
         self.disp = disp
         self.id_generator = id_generator
+        
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         self.characters: list[character.Character] = ListWithUpdate(
@@ -54,10 +55,9 @@ class Board:
         self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
-        self.log = ListWithUpdate([], self.disp.add_to_log)
         self.pyxel_manager = pyxel_manager
-
         pyxel_manager.load_board(self.locations, self.terrain, self.id_generator)
+        self.log = ListWithUpdate([], self.disp.add_to_log)
         # signal to pyxel that board has been initialized
 
     @property
@@ -113,20 +113,21 @@ class Board:
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
             # don't put fire on characters or map edge
-            if self.add_effect_if_valid_square(row, col, effect_type):
+            if self.add_starting_effect_if_valid_square(row, col, effect_type):
                 counter += 1
             if is_contiguous:
                 for i in [-1, 0, 1]:
-                    if self.add_effect_if_valid_square(row + i, col, effect_type):
+                    if self.add_starting_effect_if_valid_square(row + i, col, effect_type):
                         counter += 1
             if counter >= target_num:
                 return
 
-    def add_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
+    def add_starting_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
-            self.terrain[row][col] = effect_type(self.round_num)
+            terrain_obj = effect_type(self.round_num)
+            self.terrain[row][col] = terrain_obj
             return True
         return False
 
@@ -144,7 +145,11 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    self.terrain[effect_row][effect_col] = effect_type(self.round_num)
+                    terrain_obj = effect_type(self.round_num)
+                    self.terrain[effect_row][effect_col] = terrain_obj
+                    self.pyxel_manager.add_terrain_object(
+                        terrain_obj, effect_row, effect_col, self.id_generator
+                    )
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
