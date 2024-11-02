@@ -46,7 +46,7 @@ class SingleTargetAttack(ActionStep):
 @dataclass
 class ElementAreaEffect(ActionStep):
     shape: set
-    element: str
+    element_type: obstacle.TerrainObject
     att_range: int
 
     def perform(self, board, attacker, round_num):
@@ -54,15 +54,15 @@ class ElementAreaEffect(ActionStep):
 
         if target is not None:
             row, col = board.find_location_of_target(target)
-            board.log.append(f"{attacker.name} throws {self.element}")
+            board.log.append(f"{attacker.name} throws {self.element_type.__name__}")
             board.add_effect_to_terrain_for_attack(
-                self.element.upper(), row, col, self.shape, round_num
+                self.element_type, row, col, self.shape
             )
         else:
             board.log.append("No target in range")
 
     def __str__(self):
-        return f"{self.element} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+        return f"{self.element_type.__name__} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class Teleport(ActionStep):
