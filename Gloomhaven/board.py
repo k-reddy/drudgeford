@@ -94,7 +94,7 @@ class Board:
     # game maps are used to represent locations and terrain
     def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
         return [
-            ListWithUpdate([obstacle.Rock(round_num=0) for _ in range(width)], self.disp.reload_display)
+            ListWithUpdate([obstacle.Rock(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)], self.disp.reload_display)
             for _ in range(height)
         ]
     
@@ -126,7 +126,7 @@ class Board:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
-            terrain_obj = effect_type(self.round_num)
+            terrain_obj = effect_type(self.round_num, next(self.id_generator))
             self.terrain[row][col] = terrain_obj
             return True
         return False
@@ -145,7 +145,7 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    terrain_obj = effect_type(self.round_num)
+                    terrain_obj = effect_type(self.round_num, next(self.id_generator))
                     self.terrain[effect_row][effect_col] = terrain_obj
                     self.pyxel_manager.add_terrain_object(
                         terrain_obj, effect_row, effect_col, self.id_generator
