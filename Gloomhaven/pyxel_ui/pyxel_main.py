@@ -42,7 +42,6 @@ BITS = 32
 def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
     pyxel.blt(x, y, img_bank, u, v, w, h, colkey)
 
-
 class PyxelView:
     def __init__(self, task_queue: PyxelTaskQueue):
         # Init action queue system
@@ -243,10 +242,10 @@ class PyxelView:
                     occupied_coordinates[(x, y)] = True
 
         # Draw background
-        for x in range(0, pyxel.width, BACKGROUND_TILES["dungeon_floor"]["w"]):
-            for y in range(0, pyxel.height, BACKGROUND_TILES["dungeon_floor"]["h"]):
-                if (x, y) not in occupied_coordinates:
-                    self.draw_background("dungeon_floor", occupied_coordinates)
+        # for x in range(0, pyxel.width, BACKGROUND_TILES["dungeon_floor_blue"]["w"]):
+        #     for y in range(0, pyxel.height, BACKGROUND_TILES["dungeon_floor_blue"]["h"]):
+        #         if (x, y) not in occupied_coordinates:
+        self.draw_background("dungeon_floor", occupied_coordinates)
 
         # Draw grids
         for tile_x, tile_y in self.canvas.grid_pixels():
