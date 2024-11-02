@@ -3,6 +3,7 @@ from typing import Optional, List
 from pyxel_ui.pyxel_main import PyxelView
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.system_task import SystemTask
+from pyxel_ui.models.update_tasks import RemoveEntityTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.enums import Direction
 
@@ -121,6 +122,9 @@ def enqueue_actions():
     )
     shared_action_queue.enqueue(
         ActionTask("knight", 2, "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
+    )
+    shared_action_queue.enqueue(
+        RemoveEntityTask(2)
     )
     # time.sleep(3)
     # print("move3")
