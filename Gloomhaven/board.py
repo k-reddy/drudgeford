@@ -147,8 +147,8 @@ class Board:
                     potential_char = self.locations[effect_row][effect_col]
                     terrain_obj = effect_type(self.round_num, next(self.id_generator))
                     self.terrain[effect_row][effect_col] = terrain_obj
-                    self.pyxel_manager.add_terrain_object(
-                        terrain_obj, effect_row, effect_col, self.id_generator
+                    self.pyxel_manager.add_entity(
+                        terrain_obj, effect_row, effect_col
                     )
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, Character):
