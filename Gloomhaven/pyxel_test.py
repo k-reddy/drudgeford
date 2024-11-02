@@ -138,6 +138,9 @@ def enqueue_actions():
 
         })
     )
+    shared_action_queue.enqueue(
+        ActionTask("necromancer", 5, "walk", Direction.EAST, (4, 6), (0, 0), move_duration)
+    )
     # time.sleep(3)
     # print("move3")
     # shared_action_queue.enqueue(

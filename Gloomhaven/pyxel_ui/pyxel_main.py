@@ -216,6 +216,7 @@ class PyxelView:
                 self.process_remove_entity_task()
             elif isinstance(self.current_task, AddEntityTask):
                 self.process_entity_loading_task()
+                self.current_task=None
             
 
     def draw(self):
