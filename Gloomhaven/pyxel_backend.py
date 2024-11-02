@@ -71,12 +71,12 @@ class PyxelManager:
         )
         self.shared_action_queue.enqueue(task)
 
-    def add_terrain_object(self, terrain_object, row, col, id_generator):
+    def add_entity(self, entity, row, col):
         task = AddEntityTask({"entities": [
                 {
-                    "id": next(id_generator),
+                    "id": entity.id,
                     "position": (col, row),
-                    "name": terrain_object.pyxel_sprite_name,
+                    "name": entity.pyxel_sprite_name,
                     "priority": 20
                 }
             ]
