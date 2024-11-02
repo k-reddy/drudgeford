@@ -158,10 +158,8 @@ class PyxelView:
 
     def process_remove_entity_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
-        print(self.entities)
         del self.entities[self.current_task.entity_id]
         self.current_task = None 
-
 
     def process_board_initialization_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
@@ -216,6 +214,8 @@ class PyxelView:
                 self.process_action()
             elif isinstance(self.current_task, RemoveEntityTask):
                 self.process_remove_entity_task()
+            elif isinstance(self.current_task, AddEntityTask):
+                self.process_entity_loading_task()
             
 
     def draw(self):
