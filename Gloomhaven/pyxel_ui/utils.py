@@ -38,6 +38,27 @@ BACKGROUND_TILES = {
         "w": 32,
         "h": 32,
     },
+    "dungeon_floor_blue": {
+        "img_bank": 1,
+        "u": 0,
+        "v": 128,
+        "w": 32,
+        "h": 32,
+    },
+    "dungeon_floor_gray": {
+        "img_bank": 1,
+        "u": 32,
+        "v": 128,
+        "w": 32,
+        "h": 32,
+    },
+    "dungeon_floor_tan": {
+        "img_bank": 1,
+        "u":0,
+        "v": 160,
+        "w": 32,
+        "h": 32,
+    },
 }
 
 
