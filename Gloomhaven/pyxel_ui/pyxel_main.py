@@ -92,14 +92,7 @@ class PyxelView:
     def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
         pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
 
-    def draw_background(self, tile_key: str, occupied_coordinates: dict):
-        tile = BACKGROUND_TILES[tile_key]
-        for x in range(0, pyxel.width, tile["w"]):
-            for y in range(0, pyxel.height, tile["h"]):
-                if (x, y) not in occupied_coordinates:
-                    draw_tile(x, y, **tile)
-
-    def draw_background_new(self, floor_tile_key, valid_map_coordinates):
+    def draw_background(self, floor_tile_key, valid_map_coordinates):
         floor_tile = BACKGROUND_TILES[floor_tile_key]
         occupied_coordinates = []
         directions = [
@@ -286,39 +279,8 @@ class PyxelView:
 
     def draw(self):
         pyxel.cls(0)
-        occupied_coordinates = []
 
-        # Draw walls
-        # for cardinal_direction, wall in self.dungeon_walls.items():
-        #     if wall is not None:
-        #         assert isinstance(wall, Wall)
-        #         if cardinal_direction not in self.dungeon_walls.keys():
-        #             raise ValueError("invalid cardinal_directiona")
-
-        #         pixels = itertools.product(*wall.pixels())
-        #         for x, y in pixels:
-        #             if (x, y) in occupied_coordinates:
-        #                 continue
-        #             draw_tile(
-        #                 x,
-        #                 y,
-        #                 **BACKGROUND_TILES[f"dungeon_wall_{cardinal_direction}"],
-        #             )
-        #             ## !!! ideally we should change this to include all the occupied 
-        #             # coords because right now it just tracks the start, but we 
-        #             # are later naive to how big the wall is
-        #             # and then later we should find the start pos, then for loop through
-        #             # until we're done
-        #             # this doesn't ensure we don't cover the end walls, but I think that's ok for now
-        #             occupied_coordinates.append((x, y))
-
-        # # Draw background
-        # # for x in range(0, pyxel.width, BACKGROUND_TILES["dungeon_floor_blue"]["w"]):
-        # #     for y in range(0, pyxel.height, BACKGROUND_TILES["dungeon_floor_blue"]["h"]):
-        # #         if (x, y) not in occupied_coordinates:
-        # self.draw_background("dungeon_floor", occupied_coordinates)
-
-        self.draw_background_new("dungeon_floor", self.valid_floor_coordinates)
+        self.draw_background("dungeon_floor", self.valid_floor_coordinates)
 
         # draw grid only on valid floor coordinates
         for x, y in self.valid_floor_coordinates:
