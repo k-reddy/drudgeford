@@ -18,10 +18,14 @@ class PyxelManager:
         board_height = len(locations[0])
 
         entities = []
+        valid_floor_coordinates = []
         for row_num, row in enumerate(locations):
             for col_num, el in enumerate(row):
                 if not el:
+                    valid_floor_coordinates.append((col_num, row_num))
                     continue
+                if isinstance(el, obstacle.Wall):
+                    continue         
                 if isinstance(el, character.Character) or isinstance(el, obstacle.TerrainObject):
                     entities.append({
                         "id": el.id,
@@ -29,6 +33,8 @@ class PyxelManager:
                         "name": el.pyxel_sprite_name,
                         "priority": 10
                     })
+                valid_floor_coordinates.append((col_num, row_num))
+
 
         for row_num, row in enumerate(terrain):
             for col_num, el in enumerate(row):
@@ -45,7 +51,8 @@ class PyxelManager:
         payload = {
             "map_width": board_width,
             "map_height": board_height,
-            "entities": entities
+            "entities": entities,
+            "valid_floor_coordinates": valid_floor_coordinates
         }
         # print(payload)
         task = SystemTask(type="board_init", payload=payload)

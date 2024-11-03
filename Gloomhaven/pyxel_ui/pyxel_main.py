@@ -19,7 +19,7 @@ from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
-GRID_COLOR = 11
+GRID_COLOR =11
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
@@ -42,7 +42,6 @@ BITS = 32
 def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
     pyxel.blt(x, y, img_bank, u, v, w, h, colkey)
 
-
 class PyxelView:
     def __init__(self, task_queue: PyxelTaskQueue):
         # Init action queue system
@@ -56,9 +55,10 @@ class PyxelView:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
-    def init_pyxel_map(self, width, height):
+    def init_pyxel_map(self, width, height, valid_floor_coordinates):
         self.board_tile_width = width
         self.board_tile_height = height
+        self.valid_floor_coordinates=valid_floor_coordinates
 
         # TODO(John): replace these hardcoded numbers.
         pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + 64)
@@ -69,7 +69,7 @@ class PyxelView:
             board_tile_height=self.board_tile_height,
             tile_width_px=BITS,
             tile_height_px=BITS,
-            wall_sprite_thickness_px=32,
+            wall_sprite_thickness_px=WALL_THICKNESS,
         )
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
@@ -92,12 +92,69 @@ class PyxelView:
     def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
         pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
 
-    def draw_background(self, tile_key: str, occupied_coordinates: dict):
-        tile = BACKGROUND_TILES[tile_key]
-        for x in range(0, pyxel.width, tile["w"]):
-            for y in range(0, pyxel.height, tile["h"]):
-                if (x, y) not in occupied_coordinates:
-                    draw_tile(x, y, **tile)
+    def draw_background(self, floor_tile_key, valid_map_coordinates):
+        floor_tile = BACKGROUND_TILES[floor_tile_key]
+        occupied_coordinates = []
+        directions = [
+            {
+                "coord": (1,-1),
+                "wall_tile_name": "dungeon_wall_south"
+            },
+            {
+                "coord": (-1,-1),
+                "wall_tile_name": "dungeon_wall_south"
+            },
+            {
+                "coord": (-1,1),
+                "wall_tile_name": "dungeon_wall_south"
+            },
+            {
+                "coord": (1,1),
+                "wall_tile_name": "dungeon_wall_south"
+            },
+            {
+                "coord": (1,0),
+                "wall_tile_name": "dungeon_wall_south"
+             },
+            {
+                "coord": (-1,0),
+                "wall_tile_name": "dungeon_wall_south"
+             },
+             {
+                "coord": (0,1),
+                "wall_tile_name": "dungeon_wall_south"
+             },
+             {
+                "coord": (0,-1),
+                "wall_tile_name": "dungeon_wall_south"
+             },
+        ]
+
+        # offset the map by wall thickness in x and y directions
+        # draw the floor tiles where they belong
+        # leave space for the walls and draw the floor
+        floor_start_x = self.canvas.board_start_pos[0]
+        floor_start_y = self.canvas.board_start_pos[1]
+        for (x,y) in valid_map_coordinates:
+            x_px = x*self.canvas.tile_width_px+ floor_start_x 
+            y_px = y*self.canvas.tile_height_px + floor_start_y
+            draw_tile(x_px,y_px,**floor_tile)
+        # come back through and draw the walls
+        for (x,y) in valid_map_coordinates:
+            x_px = x*self.canvas.tile_width_px+ floor_start_x 
+            y_px = y*self.canvas.tile_height_px + floor_start_y
+            for direction in directions:
+                new_coord = tuple(a+b for a,b in zip((x,y), direction["coord"]))
+                if new_coord in valid_map_coordinates+occupied_coordinates:
+                    continue
+                x_px_new = x_px + self.canvas.wall_sprite_thickness_px*direction["coord"][0]
+                y_px_new = y_px + self.canvas.wall_sprite_thickness_px*direction["coord"][1]
+                draw_tile(
+                    x_px_new,
+                    y_px_new,
+                    **BACKGROUND_TILES[direction["wall_tile_name"]],
+                )
+                occupied_coordinates.append(new_coord)
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
@@ -165,7 +222,8 @@ class PyxelView:
         assert self.current_task, "Attempting to process empty system task"
         height = self.current_task.payload["map_height"]
         width = self.current_task.payload["map_width"]
-        self.init_pyxel_map(width, height)
+        valid_floor_coordinates = self.current_task.payload["valid_floor_coordinates"]
+        self.init_pyxel_map(width, height, valid_floor_coordinates)
 
     def process_entity_loading_task(self) -> None:
         assert self.current_task, "Attempting to process empty system task"
@@ -222,40 +280,16 @@ class PyxelView:
     def draw(self):
         pyxel.cls(0)
 
-        occupied_coordinates = defaultdict(lambda: False)
+        self.draw_background("dungeon_floor", self.valid_floor_coordinates)
 
-        # Draw walls
-        for cardinal_direction, wall in self.dungeon_walls.items():
-            if wall is not None:
-                assert isinstance(wall, Wall)
-                if cardinal_direction not in self.dungeon_walls.keys():
-                    raise ValueError("invalid cardinal_directiona")
-
-                pixels = itertools.product(*wall.pixels())
-                for x, y in pixels:
-                    if (x, y) in occupied_coordinates:
-                        continue
-                    draw_tile(
-                        x,
-                        y,
-                        **BACKGROUND_TILES[f"dungeon_wall_{cardinal_direction}"],
-                    )
-                    occupied_coordinates[(x, y)] = True
-
-        # Draw background
-        for x in range(0, pyxel.width, BACKGROUND_TILES["dungeon_floor"]["w"]):
-            for y in range(0, pyxel.height, BACKGROUND_TILES["dungeon_floor"]["h"]):
-                if (x, y) not in occupied_coordinates:
-                    self.draw_background("dungeon_floor", occupied_coordinates)
-
-        # Draw grids
-        for tile_x, tile_y in self.canvas.grid_pixels():
+        # draw grid only on valid floor coordinates
+        for x, y in self.valid_floor_coordinates:
             pyxel.rectb(
-                tile_x,
-                tile_y,
+                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
+                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
                 self.canvas.tile_width_px,
                 self.canvas.tile_height_px,
-                GRID_COLOR,
+                GRID_COLOR
             )
 
         # draw entity sprites with a notion of priority
