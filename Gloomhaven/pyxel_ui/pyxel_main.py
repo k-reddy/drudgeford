@@ -121,11 +121,11 @@ class PyxelView:
             },
             {
                 "coord": (1,0),
-                "wall_tile_name": "dungeon_wall_east"
+                "wall_tile_name": "dungeon_wall_south"
              },
             {
                 "coord": (-1,0),
-                "wall_tile_name": "dungeon_wall_west"
+                "wall_tile_name": "dungeon_wall_south"
              },
              {
                 "coord": (0,1),
