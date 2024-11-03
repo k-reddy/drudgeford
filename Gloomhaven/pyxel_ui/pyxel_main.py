@@ -19,7 +19,7 @@ from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
-GRID_COLOR =0
+GRID_COLOR =11
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
