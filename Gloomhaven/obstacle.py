@@ -66,6 +66,12 @@ class Spores(TerrainObject):
         self.pyxel_sprite_name = "spores"
         self.damage = 1
 
+class Wall(TerrainObject):
+    def __init__(self, round_num, obj_id):
+        super().__init__(round_num, obj_id)
+        self.emoji = "🪨"
+        self.pyxel_sprite_name = "boulder"
+        self.duration = 1000
 
 class SlipAndLoseTurn(Exception):
     pass

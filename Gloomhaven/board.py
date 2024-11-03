@@ -94,7 +94,7 @@ class Board:
     # game maps are used to represent locations and terrain
     def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
         return [
-            ListWithUpdate([obstacle.Rock(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)], self.disp.reload_display)
+            ListWithUpdate([obstacle.Wall(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)], self.disp.reload_display)
             for _ in range(height)
         ]
     
