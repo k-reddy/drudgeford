@@ -60,9 +60,16 @@ def enqueue_actions():
     # )
     # time.sleep(3)
     print("Enqueuing actions...")
+    width = 10
+    height = 10
+    valid_floor_coordinates = []
+    for x in range (0,width):
+        for y in range(0,height):
+            valid_floor_coordinates.append((x, y))
     payload = {
         "map_width": 10,
         "map_height": 10,
+        "valid_floor_coordinates": valid_floor_coordinates,
         "entities": [
             {
                 "id": 1,

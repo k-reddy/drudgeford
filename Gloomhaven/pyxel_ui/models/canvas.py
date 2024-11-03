@@ -43,13 +43,3 @@ class Canvas:
             self.canvas_width_px - wall_sprite_thickness_px // 2,
             self.canvas_height_px - wall_sprite_thickness_px,
         )
-
-    def grid_pixels(self):
-        x_values = range(
-            self.board_start_pos[0], self.board_end_pos[0], self.tile_width_px
-        )
-        y_values = range(
-            self.board_start_pos[1], self.board_end_pos[1], self.tile_height_px
-        )
-
-        return itertools.product(x_values, y_values)
