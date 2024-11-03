@@ -69,7 +69,7 @@ class PyxelView:
             board_tile_height=self.board_tile_height,
             tile_width_px=BITS,
             tile_height_px=BITS,
-            wall_sprite_thickness_px=32,
+            wall_sprite_thickness_px=WALL_THICKNESS,
         )
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
@@ -140,8 +140,8 @@ class PyxelView:
         # offset the map by wall thickness in x and y directions
         # draw the floor tiles where they belong
         # leave space for the walls and draw the floor
-        floor_start_x = self.canvas.wall_sprite_thickness_px//2
-        floor_start_y = self.canvas.wall_sprite_thickness_px
+        floor_start_x = self.canvas.board_start_pos[0]
+        floor_start_y = self.canvas.board_start_pos[1]
         for (x,y) in valid_map_coordinates:
             x_px = x*self.canvas.tile_width_px+ floor_start_x 
             y_px = y*self.canvas.tile_height_px + floor_start_y
@@ -320,15 +320,19 @@ class PyxelView:
 
         self.draw_background_new("dungeon_floor", self.valid_floor_coordinates)
 
-        # Draw grids
-        for tile_x, tile_y in self.canvas.grid_pixels():
-            pyxel.rectb(
-                tile_x,
-                tile_y,
-                self.canvas.tile_width_px,
-                self.canvas.tile_height_px,
-                GRID_COLOR,
-            )
+        # for x, y in self.valid_floor_coordinates:
+        #     pyxel.rectb(
+                
+        #     )
+        # # Draw grids
+        # for tile_x, tile_y in self.canvas.grid_pixels():
+        #     pyxel.rectb(
+        #         tile_x,
+        #         tile_y,
+        #         self.canvas.tile_width_px,
+        #         self.canvas.tile_height_px,
+        #         GRID_COLOR,
+        #     )
 
         # draw entity sprites with a notion of priority
         max_priority = max((entity.priority for entity in self.entities.values()), default=0)
