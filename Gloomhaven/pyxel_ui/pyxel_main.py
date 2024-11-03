@@ -19,7 +19,7 @@ from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
-GRID_COLOR = 11
+GRID_COLOR =0
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
@@ -320,19 +320,15 @@ class PyxelView:
 
         self.draw_background_new("dungeon_floor", self.valid_floor_coordinates)
 
-        # for x, y in self.valid_floor_coordinates:
-        #     pyxel.rectb(
-                
-        #     )
-        # # Draw grids
-        # for tile_x, tile_y in self.canvas.grid_pixels():
-        #     pyxel.rectb(
-        #         tile_x,
-        #         tile_y,
-        #         self.canvas.tile_width_px,
-        #         self.canvas.tile_height_px,
-        #         GRID_COLOR,
-        #     )
+        # draw grid only on valid floor coordinates
+        for x, y in self.valid_floor_coordinates:
+            pyxel.rectb(
+                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
+                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
+                self.canvas.tile_width_px,
+                self.canvas.tile_height_px,
+                GRID_COLOR
+            )
 
         # draw entity sprites with a notion of priority
         max_priority = max((entity.priority for entity in self.entities.values()), default=0)
