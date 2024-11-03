@@ -1,4 +1,5 @@
 import pyxel
+import random
 
 from collections import defaultdict, deque
 import itertools
@@ -19,7 +20,7 @@ from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
-GRID_COLOR =11
+GRID_COLOR =0
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
@@ -92,41 +93,31 @@ class PyxelView:
     def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
         pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
 
-    def draw_background(self, floor_tile_key, valid_map_coordinates):
-        floor_tile = BACKGROUND_TILES[floor_tile_key]
-        occupied_coordinates = []
+    def draw_background(self, floor_tile_keys, valid_map_coordinates):
         directions = [
             {
-                "coord": (1,-1),
-                "wall_tile_name": "dungeon_wall_south"
-            },
-            {
-                "coord": (-1,-1),
-                "wall_tile_name": "dungeon_wall_south"
-            },
-            {
-                "coord": (-1,1),
-                "wall_tile_name": "dungeon_wall_south"
-            },
-            {
-                "coord": (1,1),
-                "wall_tile_name": "dungeon_wall_south"
-            },
-            {
                 "coord": (1,0),
-                "wall_tile_name": "dungeon_wall_south"
+                "wall_tile_name": "new_wall_ns",
+                "height": 32,
+                "width": 4
              },
             {
                 "coord": (-1,0),
-                "wall_tile_name": "dungeon_wall_south"
+                "wall_tile_name": "new_wall_ns",
+                "height": 32,
+                "width": 4
              },
              {
                 "coord": (0,1),
-                "wall_tile_name": "dungeon_wall_south"
+                "wall_tile_name": "new_wall_ew",
+                "height": 4,
+                "width": 32
              },
              {
                 "coord": (0,-1),
-                "wall_tile_name": "dungeon_wall_south"
+                "wall_tile_name": "new_wall_ew",
+                "height": 4,
+                "width": 32
              },
         ]
 
@@ -135,9 +126,15 @@ class PyxelView:
         # leave space for the walls and draw the floor
         floor_start_x = self.canvas.board_start_pos[0]
         floor_start_y = self.canvas.board_start_pos[1]
+
+        # ensure we get the same floor tiles each time we draw the floor
+        random.seed(100)
+
         for (x,y) in valid_map_coordinates:
             x_px = x*self.canvas.tile_width_px+ floor_start_x 
             y_px = y*self.canvas.tile_height_px + floor_start_y
+            floor_tile = BACKGROUND_TILES[random.choice(floor_tile_keys)]
+
             draw_tile(x_px,y_px,**floor_tile)
         # come back through and draw the walls
         for (x,y) in valid_map_coordinates:
@@ -145,16 +142,15 @@ class PyxelView:
             y_px = y*self.canvas.tile_height_px + floor_start_y
             for direction in directions:
                 new_coord = tuple(a+b for a,b in zip((x,y), direction["coord"]))
-                if new_coord in valid_map_coordinates+occupied_coordinates:
+                if new_coord in valid_map_coordinates:
                     continue
-                x_px_new = x_px + self.canvas.wall_sprite_thickness_px*direction["coord"][0]
-                y_px_new = y_px + self.canvas.wall_sprite_thickness_px*direction["coord"][1]
+                x_px_new = x_px + self.canvas.tile_width_px*direction["coord"][0] if direction["coord"][0] > 0 else x_px + direction["width"]*direction["coord"][0]
+                y_px_new = y_px + self.canvas.tile_height_px*direction["coord"][1] if direction["coord"][1] > 0 else y_px + direction["height"]*direction["coord"][1]
                 draw_tile(
                     x_px_new,
                     y_px_new,
                     **BACKGROUND_TILES[direction["wall_tile_name"]],
                 )
-                occupied_coordinates.append(new_coord)
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
@@ -279,8 +275,9 @@ class PyxelView:
 
     def draw(self):
         pyxel.cls(0)
+        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
 
-        self.draw_background("dungeon_floor", self.valid_floor_coordinates)
+        self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
 
         # draw grid only on valid floor coordinates
         for x, y in self.valid_floor_coordinates:

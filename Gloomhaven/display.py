@@ -23,7 +23,7 @@ class Display:
         if self.round_number == 0:
             return
         self.clear_display()
-        self._draw_board()
+        # self._draw_board()
         self._print_round_and_turn_info()
         self._print_healths()
         print("\n")
