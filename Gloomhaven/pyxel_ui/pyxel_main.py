@@ -19,7 +19,7 @@ from .views.sprite import Sprite, SpriteManager
 
 
 WALL_THICKNESS = 32
-GRID_COLOR =11
+GRID_COLOR =0
 FRAME_DURATION_MS = 34
 # approx 2 sec of durations with no movement
 WINDOW_LENGTH = 60
@@ -280,7 +280,7 @@ class PyxelView:
     def draw(self):
         pyxel.cls(0)
 
-        self.draw_background("dungeon_floor", self.valid_floor_coordinates)
+        self.draw_background("dungeon_floor_blue", self.valid_floor_coordinates)
 
         # draw grid only on valid floor coordinates
         for x, y in self.valid_floor_coordinates:
