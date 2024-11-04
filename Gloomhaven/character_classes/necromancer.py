@@ -1,6 +1,6 @@
 import gh_types as actions
 import attack_shapes as shapes
-from obstacle import Fire
+from obstacle import Shadow
 # from character import Skeleton
 
 
@@ -67,7 +67,7 @@ cards = [
         # switch this to shadow that shows up around you
         attack_name="Night Owl",
         actions=[
-            actions.ElementAreaEffect(shapes.circle(2,),Fire,2)
+            actions.ElementAreaEffect(shapes.circle(2,),Shadow,2)
         ],
         movement=2,
         jump=False

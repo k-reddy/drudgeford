@@ -80,6 +80,9 @@ class SpriteManager:
             "trap": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=32, v=96, w=32, h=32),
             },
+            "shadow": {
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=64, v=0, w=32, h=32),
+            },
             
         }
 
