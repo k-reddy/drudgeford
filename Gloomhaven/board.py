@@ -376,12 +376,30 @@ class Board:
         if modified_attack_strength <= 0:
             self.log.append("Darn, attack does no damage!")
             return
+        if self.is_shadow_interference(attacker, target):
+            self.log.append("Attack missed due to shadow")
+            return
         self.log.append(
             f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
         )
 
         self.modify_target_health(target, modified_attack_strength)
 
+    def is_shadow_interference(self, attacker, target):
+        '''returns true if the attack misses due to shadow'''
+        attacker_loc = self.find_location_of_target(attacker)
+        target_path = self.get_shortest_valid_path(
+            attacker_loc,
+            self.find_location_of_target(target)
+        )
+        chance_of_miss = 0
+        target_path += [attacker_loc]
+        for coord in target_path:
+            if isinstance(self.terrain[coord[0]][coord[1]], obstacle.Shadow):
+                chance_of_miss += .1
+        return random.random() < chance_of_miss
+
+    
     def update_locations(self, row, col, new_item):
         self.locations[row][col] = new_item
 
@@ -538,7 +556,7 @@ class Board:
                 if not el:
                     continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if self.round_num - el.round_placed >= el.duration:
+                if self.round_num - el.round_placed > el.duration:
                     self.clear_terrain_square(i,j)
 
     def update_character_statuses(self):
