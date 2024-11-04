@@ -43,9 +43,11 @@ class Board:
         
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[character.Character] = ListWithUpdate(
-            players + monsters, self.disp.reload_display
-        )
+        # self.characters: list[character.Character] = ListWithUpdate(
+        #     players + monsters, self.disp.reload_display
+        # )
+        self.characters: list[character.Character] = players + monsters
+
         self.locations = self._initialize_map(self.size, self.size)
         self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
@@ -561,6 +563,21 @@ class Board:
         for destination in destinations:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
+
+    def add_new_skeleton(self, is_monster):
+        from agent import Ai
+        new_char = character.Skeleton(
+            "Spooky Skeleton", 
+            self.disp, 
+            "💀",
+            Ai(), 
+            next(self.id_generator), 
+            is_monster=is_monster
+        )
+        self.characters.append(new_char)
+        row, col = self.pick_unoccupied_location()
+        self.locations[row][col] = new_char
+        self.pyxel_manager.add_entity(new_char,row, col)
 
     def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()
