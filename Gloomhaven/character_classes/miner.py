@@ -41,7 +41,7 @@ cards = [
                 att_range=1
             )
         ],
-        movement=0,
+        movement=2,
         jump=False
     ),
     gh_types.ActionCard(
@@ -55,7 +55,7 @@ cards = [
                 strength=4
             )
         ],
-        movement=0,
+        movement=1,
         jump=False
     ),
     gh_types.ActionCard(
@@ -111,7 +111,7 @@ cards = [
                 att_range=1
             )
         ],
-        movement=10,
+        movement=3,
         jump=False
     ),
     gh_types.ActionCard(
