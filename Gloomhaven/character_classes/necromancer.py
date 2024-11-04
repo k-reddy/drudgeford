@@ -10,6 +10,22 @@ cards = [
         ],
         movement=0,
         jump=False
+    ),
+        actions.ActionCard(
+        attack_name="Fear Mongerer",
+        actions=[
+            actions.PushAllEnemies(3,2)
+        ],
+        movement=0,
+        jump=False
+    ),
+        actions.ActionCard(
+        attack_name="Fear Mongerer",
+        actions=[
+            actions.PushAllEnemies(3,2)
+        ],
+        movement=0,
+        jump=False
     )
 
 # the theme is a character that doesn't have much health

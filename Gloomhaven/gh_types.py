@@ -214,7 +214,7 @@ class PushAllEnemies(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from agent import Ai
+        from agent import Human
         enemies = board.find_in_range_opponents_or_allies(
             attacker, self.att_range, opponents=True
         )
@@ -225,14 +225,16 @@ class PushAllEnemies(ActionStep):
         is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
         
         for enemy in enemies:
-            Ai.move_other_character(
+            board.disp.add_to_log(f"Pushing {enemy.name}")
+
+            Human.move_other_character(
                 enemy,
                 board.find_location_of_target(attacker),
                 self.squares,
                 False,
                 board,
                 is_legal_push_check
-        )
+            )
 
     def __str__(self): 
         return f"Push all enemies in range {self.att_range} away {self.squares} squares"
