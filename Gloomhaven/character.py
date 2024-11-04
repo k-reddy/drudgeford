@@ -1,7 +1,7 @@
 import random
 import abc
 import character_classes
-import gh_types 
+import actions 
 import utils
 
 MAX_ROUNDS = 1000
@@ -113,9 +113,9 @@ class Character(abc.ABC):
             strength = random.choices(strengths, strength_weights)[0]
             movement = random.choices(movements, movement_weights)[0]
             distance = random.randint(1, max_distance)
-            action_card = gh_types.ActionCard(
+            action_card = actions.ActionCard(
                 attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
-                actions=[gh_types.SingleTargetAttack(
+                actions=[actions.SingleTargetAttack(
                     strength=strength,
                     att_range=distance
                 )],
