@@ -100,7 +100,7 @@ cards = [
         actions=[
             gh_types.Pull(
                 squares=2, 
-                att_range=2
+                att_range=3
             ),
             gh_types.SingleTargetAttack(
                 strength=3,
