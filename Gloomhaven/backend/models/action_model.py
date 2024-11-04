@@ -1,11 +1,13 @@
-import typing
 from dataclasses import dataclass
-import attack_shapes as shapes
 import abc 
-import utils
 import random
 from functools import partial
-import obstacle
+from typing import Type
+
+from . import obstacle
+from ..utils import utilities as utils
+from ..utils import attack_shapes as shapes
+
 
 
 @dataclass
@@ -47,7 +49,7 @@ class SingleTargetAttack(ActionStep):
 @dataclass
 class ElementAreaEffectWithTarget(ActionStep):
     shape: set
-    element_type: obstacle.TerrainObject
+    element_type: Type[obstacle.TerrainObject]
     att_range: int
 
     def perform(self, board, attacker, round_num):
@@ -68,7 +70,7 @@ class ElementAreaEffectWithTarget(ActionStep):
 @dataclass
 class ElementAreaEffectFromSelf(ActionStep):
     shape: set
-    element_type: obstacle.TerrainObject
+    element_type: Type[obstacle.TerrainObject]
 
     def perform(self, board, attacker, round_num):
         target = attacker
@@ -272,8 +274,6 @@ class Push(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from agent import Human, Ai
-
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
@@ -300,7 +300,7 @@ class PushAllEnemies(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from agent import Human
+        from .agent import Human
         enemies = board.find_in_range_opponents_or_allies(
             attacker, self.att_range, opponents=True
         )
@@ -332,14 +332,14 @@ class SummonSkeleton(ActionStep):
         board.add_new_skeleton(attacker.team_monster)
 
     def __str__(self):
-        return f"Summon a skeleton to fight alongside you."
+        return "Summon a skeleton to fight alongside you."
 
 
 @dataclass
 class MakeObstableArea(ActionStep):
     '''Unlike elements, obstacles go on the locations board
     and cannot be moved through and do not expire'''
-    obstacle_type: obstacle.TerrainObject
+    obstacle_type: Type[obstacle.TerrainObject]
     shape: set
 
     def perform(self, board, attacker, round_num):

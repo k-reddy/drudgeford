@@ -32,3 +32,10 @@ class LoadCharactersTask:
     sprite_names: list[str]
     teams: list[bool]
 
+@dataclass
+class LoadLogTask:
+    '''
+    task that updates the pyxel log
+    '''
+    log: list[str]
+

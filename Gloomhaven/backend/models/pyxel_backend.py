@@ -1,12 +1,14 @@
-import character
+import backend.models.character as character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask
-import obstacle
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
+import backend.models.obstacle as obstacle
+from ..utils.listwithupdate import ListWithUpdate
 
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
+MAX_LOG_LINES = 10
 
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
@@ -124,5 +126,9 @@ class PyxelManager:
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
         task = LoadCharactersTask(healths, sprite_names, teams)
+        self.shared_action_queue.enqueue(task)
+
+    def load_log(self, log: ListWithUpdate):
+        task = LoadLogTask(log[-MAX_LOG_LINES:])
         self.shared_action_queue.enqueue(task)
 
