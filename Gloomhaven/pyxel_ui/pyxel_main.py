@@ -8,7 +8,7 @@ import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
-from .models.update_tasks import AddEntityTask, RemoveEntityTask
+from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
 
 # from .models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
@@ -51,6 +51,10 @@ class PyxelView:
         self.entities: dict[int, Entity] = {}
         self.sprite_manager = SpriteManager()
         self.is_board_initialized = False
+        self.initiative_bar_sprite_names = []
+        self.initiative_bar_healths = []
+        self.initiative_bar_teams = []
+        self.log = []
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -62,7 +66,7 @@ class PyxelView:
         self.valid_floor_coordinates=valid_floor_coordinates
 
         # TODO(John): replace these hardcoded numbers.
-        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + 64)
+        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + BITS*4)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
@@ -79,19 +83,21 @@ class PyxelView:
         print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
         # canvas + map = board
+        # we always do these first 3 tasks in the same order
         while not self.is_board_initialized:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
                 self.process_entity_loading_task()
-                # self.process_add_entity_task()
+                self.current_task = self.task_queue.dequeue()
+                self.process_load_characters_task()                
                 self.current_task = None  # clear
                 self.is_board_initialized = True
 
         pyxel.run(self.update, self.draw)
 
-    def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
-        pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
+    def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0, scale=1) -> None:
+        pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey, scale=scale)
 
     def draw_background(self, floor_tile_keys, valid_map_coordinates):
         directions = [
@@ -239,8 +245,15 @@ class PyxelView:
                 animation_frame=AnimationFrame.SOUTH,
                 alive=True,
             )
+
+    def process_load_log_task(self):
+        self.log = self.current_task.log
             
         # currently assuming payload is board.locations
+    def process_load_characters_task(self):
+        self.initiative_bar_sprite_names = self.current_task.sprite_names
+        self.initiative_bar_healths = self.current_task.healths
+        self.initiative_bar_teams = self.current_task.teams
 
     def update(self):
         self.start_time = time.time()
@@ -270,13 +283,85 @@ class PyxelView:
                 self.process_remove_entity_task()
             elif isinstance(self.current_task, AddEntityTask):
                 self.process_entity_loading_task()
-                self.current_task=None
+            elif isinstance(self.current_task, LoadCharactersTask):
+                self.process_load_characters_task()
+            elif isinstance(self.current_task, LoadLogTask):
+                self.process_load_log_task()
+            self.current_task=None
             
+    def draw_health_and_iniative_bar(self, sprite_names, healths, teams) -> None:
+        '''
+        Draw a bar showing health and initiative for sprites, with team indicators.
+        
+        Args:
+            sprite_names: List of sprite names to display
+            healths: List of health values corresponding to sprites
+            teams: List of boolean values (True for monster team, False for player team)
+        '''
+        horiz_gap = 12
+        sprite_width = BITS  # BITS is the sprite width constant
+        font_offset = BITS//4
+        vertical_gap = BITS  # Gap between rows
+
+        # Calculate maximum items per row based on screen width
+        item_width = sprite_width + horiz_gap
+        # Leave some margin on both sides
+        usable_width = pyxel.width - (sprite_width//2)
+        items_per_row = max(1, usable_width // item_width)
+        
+        # Calculate items for each row
+        first_row = sprite_names[:items_per_row]
+        second_row = sprite_names[items_per_row:]
+        
+        for row_num, row_items in enumerate([first_row, second_row]):
+            if not row_items:
+                continue
+                
+            # Calculate total width needed for this row
+            item_width = sprite_width + horiz_gap
+            row_width = item_width * len(row_items)
+            
+            # Center alignment calculation for this row
+            screen_center_x = pyxel.width // 2
+            start_x = screen_center_x - (row_width // 2)
+            
+            for i, sprite_name in enumerate(row_items):
+                actual_index = i if row_num == 0 else i + items_per_row
+                
+                # Calculate x and y positions
+                x_pos = start_x + (i * (sprite_width + horiz_gap))
+                y_pos = row_num * vertical_gap
+                
+                # Draw sprite
+                self.draw_sprite(
+                    x_pos,
+                    y_pos,
+                    self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
+                    colkey=0,
+                    scale=.5
+                )
+                
+                # Draw health text
+                pyxel.text(x_pos + font_offset, y_pos, f"H:{healths[actual_index]}", 7)
+                
+                # Draw team indicator line
+                line_y = y_pos + BITS - sprite_width//4  # Position line below sprite
+                line_color = 8 if teams[actual_index] else 11  # Red (8) for monsters, Green (11) for players
+                pyxel.line(x_pos + sprite_width//4, line_y, x_pos + sprite_width - sprite_width//4, line_y, line_color)
+        # self.canvas.board_start_pos[1] = BITS*2 if second_row else BITS
 
     def draw(self):
         pyxel.cls(0)
-        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
 
+        # draw iniative bar
+        self.draw_health_and_iniative_bar(
+            self.initiative_bar_sprite_names,
+            self.initiative_bar_healths,
+            self.initiative_bar_teams
+        )
+
+        # draw floor and walls
+        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
         self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
 
         # draw grid only on valid floor coordinates
@@ -300,6 +385,12 @@ class PyxelView:
                         self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
                     )
 
+        # draw log
+        x = 0
+        y = self.canvas.board_end_pos[1] + BITS//2
+        for line in self.log:
+            pyxel.text(x,y,line,col=7)
+            y+=8
         # Draw framerate and frame duration.
 
         # Calculate duration and framerate
@@ -311,4 +402,4 @@ class PyxelView:
             loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
             avg_duration_ms = avg_duration * 1000
             rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
-            pyxel.text(10, 20, rate_stats, 7)
+            # pyxel.text(10, 20, rate_stats, 7)

@@ -1,20 +1,15 @@
-from functools import partial
-from character import Character
-from collections import deque
-import copy
+from backend.models.character import Character
 import heapq
 import random
 from itertools import count
 from typing import Type
 
-import agent
-import attack_shapes as shapes
-import character
-from display import Display
-from action_model import ActionCard
-from listwithupdate import ListWithUpdate
-import pyxel_backend
-import obstacle
+import backend.models.agent as agent
+import backend.models.character as character
+from backend.models.display import Display
+from ..utils.listwithupdate import ListWithUpdate
+import backend.models.pyxel_backend as pyxel_backend
+import backend.models.obstacle as obstacle
 
 
 MAX_ROUNDS = 1000
@@ -40,13 +35,15 @@ class Board:
         self.size = size
         self.disp = disp
         self.id_generator = id_generator
-        
+        self.pyxel_manager = pyxel_manager
+
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         # self.characters: list[character.Character] = ListWithUpdate(
-        #     players + monsters, self.disp.reload_display
+        #     players + monsters, self.pyxel_manager.load_characters
         # )
-        self.characters: list[character.Character] = players + monsters
+        # self.characters: list[character.Character] = players + monsters
+        self.characters=players+monsters
 
         self.locations = self._initialize_map(self.size, self.size)
         self.terrain = self._initialize_terrain(self.size, self.size)
@@ -57,8 +54,9 @@ class Board:
         self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
-        self.pyxel_manager = pyxel_manager
         pyxel_manager.load_board(self.locations, self.terrain)
+        pyxel_manager.load_characters(self.characters)
+
         self.log = ListWithUpdate([], self.disp.add_to_log)
         # signal to pyxel that board has been initialized
 
@@ -90,6 +88,7 @@ class Board:
     def characters(self, characters):
         self.__characters = characters
         self.disp.characters = characters
+        # self.pyxel_manager.load_characters(characters)
         self.disp.reload_display()
 
     # initializes a game map which is a list of ListWithUpdate
@@ -213,7 +212,7 @@ class Board:
             y += 1 if end_y > y else -1
 
     def reshape_board(self, num_rooms: int = 4) -> None:
-        last_room_center = None
+        last_room_center: tuple = ()
 
         for _ in range(num_rooms):
             # Random room size and position, ensuring it doesn't exceed map bounds
@@ -382,7 +381,7 @@ class Board:
         self.log.append(
             f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
         )
-
+        self.pyxel_manager.load_log(self.log)
         self.modify_target_health(target, modified_attack_strength)
 
     def is_shadow_interference(self, attacker, target):
@@ -405,6 +404,7 @@ class Board:
 
     def remove_character(self, target):
         self.characters.remove(target)
+        self.pyxel_manager.load_characters(self.characters)
         # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: Character) -> None:
@@ -421,6 +421,7 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
         self.log.append(f"{target.name} has been killed.")
+        self.pyxel_manager.load_log(self.log)
         # !!! for pair coding
         # !!! if the target is the player, end game
         # !!! if the target is the acting_character, end turn
@@ -534,6 +535,7 @@ class Board:
             self.kill_target(target)
         else:
             self.log.append(f"{target.name}'s new health: {target.health}")
+        self.pyxel_manager.load_log(self.log)
 
     def select_and_apply_attack_modifier(
         self, attacker, initial_attack_strength: int
@@ -560,10 +562,10 @@ class Board:
                     self.clear_terrain_square(i,j)
 
     def update_character_statuses(self):
-        for character in self.characters:
-            if character.shield[1] <= self.round_num:
+        for char in self.characters:
+            if char.shield[1] <= self.round_num:
                 # reset to shield 0 indefinitely
-                character.shield = (0, MAX_ROUNDS)
+                char.shield = (0, MAX_ROUNDS)
 
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)
@@ -583,7 +585,7 @@ class Board:
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
     def add_new_skeleton(self, is_monster):
-        from agent import Ai
+        from backend.models.agent import Ai
         new_char = character.Skeleton(
             "Spooky Skeleton", 
             self.disp, 
@@ -596,6 +598,7 @@ class Board:
         row, col = self.pick_unoccupied_location()
         self.locations[row][col] = new_char
         self.pyxel_manager.add_entity(new_char,row, col)
+        self.pyxel_manager.load_characters(self.characters)
 
     def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()

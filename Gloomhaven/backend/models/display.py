@@ -1,7 +1,7 @@
 import os
-from action_model import ActionCard
-from character import Character
-import obstacle
+from backend.models.action_model import ActionCard
+from backend.models.character import Character
+import backend.models.obstacle as obstacle
 
 EMPTY_CELL = "|      "
 
@@ -98,6 +98,7 @@ class Display:
     def _print_log(self, num_lines=10) -> None:
         for line in self.log[-num_lines:]:
             print(line)
+
 
     def log_action_cards(self, action_cards: list[ActionCard]) -> None:
         self.add_to_log("Your action cards are: ")

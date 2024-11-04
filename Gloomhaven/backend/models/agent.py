@@ -1,7 +1,7 @@
 import abc
 import random
-from action_model import ActionCard
-from display import Display
+from backend.models.action_model import ActionCard
+from backend.models.display import Display
 from typing import Callable
 
 DIRECTION_MAP = {

@@ -3,9 +3,10 @@ from typing import Optional
 
 from .action_task import ActionTask
 from .system_task import SystemTask
+from .update_tasks import LoadCharactersTask, RemoveEntityTask, LoadLogTask, AddEntityTask
 
 
-task_type = ActionTask | SystemTask
+task_type = ActionTask | SystemTask | LoadCharactersTask | RemoveEntityTask | LoadLogTask | AddEntityTask
 
 
 class PyxelTaskQueue:
