@@ -3,9 +3,9 @@ import threading
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.pyxel_main import PyxelView
 
-from game_loop import GameLoop
-import display
-import pyxel_backend
+from backend.models.game_loop import GameLoop
+import backend.models.display as display
+import backend.models.pyxel_backend as pyxel_backend
 
 def main(num_players: int = 1, all_ai_mode = False):
     # pyxel setup

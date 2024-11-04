@@ -34,12 +34,12 @@ class Canvas:
         self.wall_sprite_thickness_px = wall_sprite_thickness_px
 
         # Calculate the board start position and sizes
-        self.board_start_pos = (wall_sprite_thickness_px // 2, wall_sprite_thickness_px)
+        self.board_start_pos = [wall_sprite_thickness_px // 2, wall_sprite_thickness_px]
         self.board_width_px = board_tile_width * tile_width_px
         self.board_height_px = board_tile_height * tile_height_px
         self.canvas_width_px = self.board_width_px + wall_sprite_thickness_px
         self.canvas_height_px = self.board_height_px + (2 * wall_sprite_thickness_px)
-        self.board_end_pos = (
+        self.board_end_pos = [
             self.canvas_width_px - wall_sprite_thickness_px // 2,
             self.canvas_height_px - wall_sprite_thickness_px,
-        )
+        ]

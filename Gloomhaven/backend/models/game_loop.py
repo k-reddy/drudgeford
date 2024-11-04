@@ -1,13 +1,13 @@
 import random
 from itertools import count
 from enum import Enum, auto
-import character
-from config import DEBUG
-from display import Display
-import agent
-from board import Board
-from obstacle import SlipAndLoseTurn
-from pyxel_backend import PyxelManager
+import backend.models.character as character
+from backend.utils.config import DEBUG
+from backend.models.display import Display
+import backend.models.agent
+from backend.models.board import Board
+from backend.models.obstacle import SlipAndLoseTurn
+from backend.models.pyxel_backend import PyxelManager
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 
 
@@ -25,6 +25,7 @@ class GameLoop:
         self.id_generator = count(start=1)
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
+        self.pyxel_manager = pyxel_manager
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
         self.disp = disp
@@ -61,6 +62,7 @@ Kill it or be killed..."""
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
         round_character_list = self.board.characters
+        self.pyxel_manager.load_characters(self.board.characters)
         for acting_character in round_character_list:
             # since we use a copy, we need to make sure the character is still alive
             if acting_character not in self.board.characters:
@@ -211,6 +213,8 @@ Kill it or be killed..."""
         default_names = ["Happy", "Glad", "Jolly"]
         char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard, ]
         random.shuffle(char_classes)
+        char_classes = [character.Necromancer, character.Miner, character.Wizard, ]
+
         # get some user input before starting the game
         num_players = (
             int(
@@ -229,7 +233,7 @@ Kill it or be killed..."""
             )
             # default to happy :D
             player_name = player_name if player_name != "" else default_names[i]
-            player_agent = agent.Ai() if all_ai_mode else agent.Human()
+            player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
             players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
         if not all_ai_mode:
             disp.clear_display()
@@ -243,6 +247,6 @@ Kill it or be killed..."""
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
-            monster = char_classes[i](names[i], disp, emoji[i], agent.Ai(), char_id = next(self.id_generator), is_monster=True)
+            monster = char_classes[i](names[i], disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True)
             monsters.append(monster)
         return monsters

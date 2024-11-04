@@ -1,6 +1,6 @@
 import pandas as pd
 import random
-import main
+from .. import main
 
 # setup variables
 LOG_PATH = "ai_mode_condensed_log.txt"
