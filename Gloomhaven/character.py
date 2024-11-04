@@ -113,9 +113,9 @@ class Character(abc.ABC):
             strength = random.choices(strengths, strength_weights)[0]
             movement = random.choices(movements, movement_weights)[0]
             distance = random.randint(1, max_distance)
-            action_card = actions.ActionCard(
+            action_card = action_model.ActionCard(
                 attack_name=f"{adjectives[i]} {elements[i]} {actions[i]}",
-                actions=[actions.SingleTargetAttack(
+                actions=[action_model.SingleTargetAttack(
                     strength=strength,
                     att_range=distance
                 )],
@@ -152,6 +152,14 @@ class Necromancer(Character):
     
     def create_action_cards(self):
         return character_classes.necromancer.cards
+    
+class Monk(Character):
+    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+        self.pyxel_sprite_name = "monk"
+    
+    def create_action_cards(self):
+        return character_classes.monk.cards
 
 class Treeman(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
