@@ -153,6 +153,19 @@ class BlessSelf(ActionStep):
     
     def __str__(self):
         return "Bless self with one 2x modifier card"
+    
+@dataclass
+class Curse(ActionStep):
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        target = select_in_range_target(board, attacker, self.att_range, opponent=True)
+        rand_index = random.randint(0, len(attacker.attack_modifier_deck))
+        modifier = utils.make_multiply_modifier(2, "2x Bless")
+        target.attack_modifier_deck.insert(rand_index, modifier)
+    
+    def __str__(self):
+        return "Curse an enemy with one null modifier card"
 
 @dataclass  
 class Pull(ActionStep):
