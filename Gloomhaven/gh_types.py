@@ -280,7 +280,7 @@ def select_in_range_target(board, attacker, att_range, opponent=True):
     in_range_chars = board.find_in_range_opponents_or_allies(
         attacker, att_range, opponents=opponent
     )
-    target = attacker.select_attack_target(in_range_chars)
+    target = attacker.select_attack_target(in_range_chars, board)
     return target
 
 def check_if_legal_pull(puller_location, board, pull_target_old_location, new_pull_target_location):

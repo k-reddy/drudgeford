@@ -23,7 +23,7 @@ cards = [
             gh_types.ElementAreaEffect(
                 shape=shapes.bar(1,2),
                 element_type=obstacle.Ice,
-                att_range=4
+                att_range=1
             )
         ],
         movement=2,
