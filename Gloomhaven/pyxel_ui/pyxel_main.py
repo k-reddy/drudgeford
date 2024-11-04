@@ -90,8 +90,8 @@ class PyxelView:
 
         pyxel.run(self.update, self.draw)
 
-    def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0) -> None:
-        pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey)
+    def draw_sprite(self, x: int, y: int, sprite: Sprite, colkey=0, scale=1) -> None:
+        pyxel.blt(x, y, sprite.img_bank, sprite.u, sprite.v, sprite.w, sprite.h, colkey, scale=scale)
 
     def draw_background(self, floor_tile_keys, valid_map_coordinates):
         directions = [
@@ -272,11 +272,35 @@ class PyxelView:
                 self.process_entity_loading_task()
                 self.current_task=None
             
+    def draw_health_and_iniative_bar(self, sprite_names, healths):
+        # add something to check for overflow and start a new line
+        # add something to center the resulting bar
+        # send character info from pyxel_backend
+        # put a red line under team monster and green line under team player
+        gap_px = 15
+        y_start = 0
+        font_offset = 8
+        for i, sprite_name in enumerate(sprite_names):
+            x_start = (BITS+gap_px)*i
+            self.draw_sprite(
+                x_start,
+                y_start,
+                self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
+                colkey=0,
+                scale=.5
+            )
+            pyxel.text(x_start+font_offset, 0, f"H:{healths[i]}", 7)
 
     def draw(self):
         pyxel.cls(0)
-        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
 
+        # draw text 
+        sprite_names = ["skeleton","treeman","evilblob","necromancer"]
+        healths = [4,4,5,6]
+        self.draw_health_and_iniative_bar(sprite_names, healths)
+
+        # draw floor and walls
+        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
         self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
 
         # draw grid only on valid floor coordinates
@@ -311,4 +335,4 @@ class PyxelView:
             loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
             avg_duration_ms = avg_duration * 1000
             rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
-            pyxel.text(10, 20, rate_stats, 7)
+            # pyxel.text(10, 20, rate_stats, 7)
