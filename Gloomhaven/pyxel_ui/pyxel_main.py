@@ -272,24 +272,82 @@ class PyxelView:
                 self.process_entity_loading_task()
                 self.current_task=None
             
-    def draw_health_and_iniative_bar(self, sprite_names, healths):
-        # add something to check for overflow and start a new line
-        # add something to center the resulting bar
-        # send character info from pyxel_backend
-        # put a red line under team monster and green line under team player
-        gap_px = 15
-        y_start = 0
-        font_offset = 8
-        for i, sprite_name in enumerate(sprite_names):
-            x_start = (BITS+gap_px)*i
-            self.draw_sprite(
-                x_start,
-                y_start,
-                self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
-                colkey=0,
-                scale=.5
-            )
-            pyxel.text(x_start+font_offset, 0, f"H:{healths[i]}", 7)
+    # def draw_health_and_iniative_bar(self, sprite_names, healths, teams):
+    #     ''' teams is an ordered list that's True if team monster, 
+    #         false if team player
+    #     '''
+    #     # add something to check for overflow and start a new line
+    #     # add something to center the resulting bar
+    #     # put a red line under team monster and green line under team player
+    #     gap_px = 15
+    #     y_start = 0
+    #     font_offset = 8
+    #     for i, sprite_name in enumerate(sprite_names):
+    #         x_start = (BITS+gap_px)*i
+    #         self.draw_sprite(
+    #             x_start,
+    #             y_start,
+    #             self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
+    #             colkey=0,
+    #             scale=.5
+    #         )
+    #         pyxel.text(x_start+font_offset, 0, f"H:{healths[i]}", 7)
+
+    def draw_health_and_iniative_bar(self, sprite_names, healths, teams) -> None:
+        '''
+        Draw a bar showing health and initiative for sprites, with team indicators.
+        
+        Args:
+            sprite_names: List of sprite names to display
+            healths: List of health values corresponding to sprites
+            teams: List of boolean values (True for monster team, False for player team)
+        '''
+        horiz_gap = 12
+        sprite_width = BITS  # BITS is the sprite width constant
+        font_offset = BITS//4
+        items_per_row = 8  # Maximum items before starting new row
+        vertical_gap = BITS  # Gap between rows
+        
+        # Calculate items for each row
+        first_row = sprite_names[:items_per_row]
+        second_row = sprite_names[items_per_row:]
+        
+        for row_num, row_items in enumerate([first_row, second_row]):
+            if not row_items:
+                continue
+                
+            # Calculate total width needed for this row
+            item_width = sprite_width + horiz_gap
+            row_width = item_width * len(row_items)
+            
+            # Center alignment calculation for this row
+            screen_center_x = pyxel.width // 2
+            start_x = screen_center_x - (row_width // 2)
+            
+            for i, sprite_name in enumerate(row_items):
+                actual_index = i if row_num == 0 else i + items_per_row
+                
+                # Calculate x and y positions
+                x_pos = start_x + (i * (sprite_width + horiz_gap))
+                y_pos = row_num * vertical_gap
+                
+                # Draw sprite
+                self.draw_sprite(
+                    x_pos,
+                    y_pos,
+                    self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
+                    colkey=0,
+                    scale=.5
+                )
+                
+                # Draw health text
+                pyxel.text(x_pos + font_offset, y_pos, f"H:{healths[actual_index]}", 7)
+                
+                # Draw team indicator line
+                line_y = y_pos + BITS - sprite_width//4  # Position line below sprite
+                line_color = 8 if teams[actual_index] else 11  # Red (8) for monsters, Green (11) for players
+                pyxel.line(x_pos + sprite_width//4, line_y, x_pos + sprite_width - sprite_width//4, line_y, line_color)
+        self.canvas.board_start_pos[1] = BITS*2 if second_row else BITS
 
     def draw(self):
         pyxel.cls(0)
@@ -297,7 +355,8 @@ class PyxelView:
         # draw text 
         sprite_names = ["skeleton","treeman","evilblob","necromancer"]
         healths = [4,4,5,6]
-        self.draw_health_and_iniative_bar(sprite_names, healths)
+        teams = [True, True, True, False]
+        map_start = self.draw_health_and_iniative_bar(sprite_names, healths, teams)
 
         # draw floor and walls
         dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
