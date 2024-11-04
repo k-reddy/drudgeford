@@ -209,7 +209,7 @@ Kill it or be killed..."""
         players = []
         emoji = ["🧙", "🕺", "🐣"]
         default_names = ["Happy", "Glad", "Jolly"]
-        char_classes = [character.Necromancer, character.Miner, character.Wizard, ]
+        char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard, ]
 
         # get some user input before starting the game
         num_players = (
