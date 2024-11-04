@@ -67,7 +67,7 @@ cards = [
         # switch this to shadow that shows up around you
         attack_name="Night Owl",
         actions=[
-            actions.ElementAreaEffect(shapes.circle(2,),Shadow,2)
+            actions.ElementAreaEffectFromSelf(shape=shapes.circle(2,),element_type=Shadow)
         ],
         movement=2,
         jump=False
