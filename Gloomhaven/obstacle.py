@@ -73,5 +73,7 @@ class Wall(TerrainObject):
         self.pyxel_sprite_name = "boulder"
         self.duration = 1000
 
+class Ice
+
 class SlipAndLoseTurn(Exception):
     pass
