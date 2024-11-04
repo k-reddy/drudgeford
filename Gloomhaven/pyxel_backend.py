@@ -15,27 +15,27 @@ class PyxelManager:
 
 
     def load_board(self, locations, terrain):
-        # get some board metadata that we'll need
-        board_width = len(locations)
-        board_height = len(locations[0])
-
         entities = []
-        valid_floor_coordinates = []
+        # get all the coordinates on the map
+        valid_floor_coordinates = self.generate_valid_floor_coordinates(locations)
+        # there are sometimes full rows and columns of nothing - set offsets and remove those rows/cols
+        self.set_x_y_offset(valid_floor_coordinates)
+        valid_floor_coordinates = [self.normalize_coordinate(coordinate) for coordinate in valid_floor_coordinates]
+        # get some board metadata that we'll need
+
         for row_num, row in enumerate(locations):
             for col_num, el in enumerate(row):
                 if not el:
-                    valid_floor_coordinates.append((col_num, row_num))
-                    continue
+                    continue   
                 if isinstance(el, obstacle.Wall):
-                    continue         
+                    continue     
                 if isinstance(el, character.Character) or isinstance(el, obstacle.TerrainObject):
                     entities.append({
                         "id": el.id,
-                        "position": (col_num, row_num),
+                        "position": self.normalize_coordinate((col_num, row_num)),
                         "name": el.pyxel_sprite_name,
                         "priority": CHAR_PRIORITY
                     })
-                valid_floor_coordinates.append((col_num, row_num))
 
 
         for row_num, row in enumerate(terrain):
@@ -45,14 +45,14 @@ class PyxelManager:
                 if isinstance(el, obstacle.TerrainObject):
                     entities.append({
                         "id": el.id,
-                        "position": (col_num, row_num),
+                        "position": self.normalize_coordinate((col_num, row_num)),
                         "name": el.pyxel_sprite_name,
                         "priority": OTHER_PRIORITY
                     })  
-                      
+
         payload = {
-            "map_width": board_width,
-            "map_height": board_height,
+            "map_width": self.board_width,
+            "map_height": self.board_height,
             "entities": entities,
             "valid_floor_coordinates": valid_floor_coordinates
         }
@@ -67,8 +67,8 @@ class PyxelManager:
             char.id,
             "walk",
             direction,
-            (old_location[1], old_location[0]),
-            (new_location[1], new_location[0]),
+            self.normalize_coordinate((old_location[1], old_location[0])),
+            self.normalize_coordinate((new_location[1], new_location[0])),
             self.move_duration,            
         )
         self.shared_action_queue.enqueue(task)
@@ -82,7 +82,7 @@ class PyxelManager:
         task = AddEntityTask({"entities": [
                 {
                     "id": entity.id,
-                    "position": (col, row),
+                    "position": self.normalize_coordinate((col, row)),
                     "name": entity.pyxel_sprite_name,
                     "priority": priority
                 }
@@ -93,3 +93,28 @@ class PyxelManager:
     def remove_entity(self, entity_id):
         task = RemoveEntityTask(entity_id)
         self.shared_action_queue.enqueue(task)
+
+    def set_x_y_offset(self, coordinates: list[tuple[int, int]]):
+        min_x = min(x for x, y in coordinates)
+        min_y = min(y for x, y in coordinates)
+        max_y = max(y for x, y in coordinates)
+        max_x = max(x for x, y in coordinates)
+        self.x_offset = min_x
+        self.y_offset = min_y
+        self.board_height = max_y-min_y+1
+        self.board_width = max_x-min_x+1
+
+    def normalize_coordinate(self, coordinate: tuple[int, int]):
+        return (coordinate[0] - self.x_offset, coordinate[1] - self.y_offset)
+    
+    def generate_valid_floor_coordinates(self, locations):
+        valid_floor_coordinates = []
+        for row_num, row in enumerate(locations):
+            for col_num, el in enumerate(row):
+                if not el:
+                    valid_floor_coordinates.append((col_num, row_num))
+                    continue
+                if isinstance(el, obstacle.Wall):
+                    continue         
+                valid_floor_coordinates.append((col_num, row_num))
+        return valid_floor_coordinates
