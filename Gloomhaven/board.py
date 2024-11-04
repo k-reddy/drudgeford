@@ -40,13 +40,15 @@ class Board:
         self.size = size
         self.disp = disp
         self.id_generator = id_generator
-        
+        self.pyxel_manager = pyxel_manager
+
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
         # self.characters: list[character.Character] = ListWithUpdate(
-        #     players + monsters, self.disp.reload_display
+        #     players + monsters, self.pyxel_manager.load_characters
         # )
-        self.characters: list[character.Character] = players + monsters
+        # self.characters: list[character.Character] = players + monsters
+        self.characters=players+monsters
 
         self.locations = self._initialize_map(self.size, self.size)
         self.terrain = self._initialize_terrain(self.size, self.size)
@@ -57,8 +59,9 @@ class Board:
         self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
         # set round_num to 100 so mushroom doesn't auto-expire
         self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
-        self.pyxel_manager = pyxel_manager
         pyxel_manager.load_board(self.locations, self.terrain)
+        pyxel_manager.load_characters(self.characters)
+
         self.log = ListWithUpdate([], self.disp.add_to_log)
         # signal to pyxel that board has been initialized
 
@@ -90,6 +93,7 @@ class Board:
     def characters(self, characters):
         self.__characters = characters
         self.disp.characters = characters
+        # self.pyxel_manager.load_characters(characters)
         self.disp.reload_display()
 
     # initializes a game map which is a list of ListWithUpdate
@@ -405,6 +409,7 @@ class Board:
 
     def remove_character(self, target):
         self.characters.remove(target)
+        self.pyxel_manager.load_characters(self.characters)
         # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: Character) -> None:
@@ -596,6 +601,7 @@ class Board:
         row, col = self.pick_unoccupied_location()
         self.locations[row][col] = new_char
         self.pyxel_manager.add_entity(new_char,row, col)
+        self.pyxel_manager.load_characters(self.characters)
 
     def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()
