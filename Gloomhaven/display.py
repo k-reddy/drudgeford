@@ -1,5 +1,5 @@
 import os
-from gh_types import ActionCard
+from action_model import ActionCard
 from character import Character
 import obstacle
 

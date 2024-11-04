@@ -163,6 +163,18 @@ class ModifySelfHealth(ActionStep):
             return f"Take {self.strength} damage"
 
 @dataclass
+class HealAlly(ActionStep):
+    strength: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        target=select_in_range_target(board, attacker, self.att_range, False)
+        board.modify_target_health(target, -self.strength)
+    
+    def __str__(self):
+        return f"Heal ally in range {self.att_range} for {self.strength}"
+
+@dataclass
 class BlessSelf(ActionStep):
     def perform(self, board, attacker, round_num):
         rand_index = random.randint(0, len(attacker.attack_modifier_deck))
@@ -171,7 +183,24 @@ class BlessSelf(ActionStep):
     
     def __str__(self):
         return "Bless self with one 2x modifier card"
+
+
+@dataclass
+class BlessAndChargeAlly(ActionStep):
+    att_range: int
+    strength: int
+
+    def perform(self, board, attacker, round_num):
+        target = select_in_range_target(board, attacker, self.att_range, opponent=False)
+        rand_index = random.randint(0, len(target.attack_modifier_deck))
+        bless = utils.make_multiply_modifier(2, "2x Bless")
+        charge = utils.make_additive_modifier(self.strength)
+        target.attack_modifier_deck.insert(rand_index, bless)
+        target.attack_modifier_deck.append(charge)  
     
+    def __str__(self):
+        return f"Bless one ally in range {self.att_range} and charge their next attack +{self.strength}"
+     
 @dataclass
 class Curse(ActionStep):
     att_range: int
@@ -184,6 +213,16 @@ class Curse(ActionStep):
     
     def __str__(self):
         return "Curse an enemy with one null modifier card"
+
+@dataclass
+class CurseSelf(ActionStep):
+    def perform(self, board, attacker, round_num):
+        rand_index = random.randint(0, len(attacker.attack_modifier_deck))
+        modifier = utils.make_multiply_modifier(0, "Null Curse")
+        attacker.attack_modifier_deck.insert(rand_index, modifier)
+    
+    def __str__(self):
+        return "Curse self with one null modifier card"
 
 @dataclass
 class CurseAllEnemies(ActionStep):
