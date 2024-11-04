@@ -3,7 +3,7 @@ from board import Board
 from character import Monster, Player
 from agent import Ai, Human
 from display import Display
-from gh_types import ActionCard
+from actions import ActionCard
 
 # !!! implement pytest fixtures 
 # !!! try parameterizing tests 

@@ -1,11 +1,11 @@
-import gh_types 
+import actions 
 import attack_shapes as shapes
 import obstacle 
 
 cards = [
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Fireball",
-        actions=[gh_types.ElementAreaEffectWithTarget(
+        actions=[actions.ElementAreaEffectWithTarget(
             shape=shapes.circle(1),
             element_type=obstacle.Fire,
             att_range=4
@@ -13,14 +13,14 @@ cards = [
         movement=2,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Cursed Frost Surge",
         actions=[
-            gh_types.AreaAttack(
+            actions.AreaAttack(
                 shape=shapes.bar(1,2),
                 strength=1
             ),
-            gh_types.ElementAreaEffectFromSelf(
+            actions.ElementAreaEffectFromSelf(
                 shape=shapes.bar(1,2),
                 element_type=obstacle.Ice,
             )
@@ -28,49 +28,49 @@ cards = [
         movement=2,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Elementary Missile",
-        actions=[gh_types.SingleTargetAttack(
+        actions=[actions.SingleTargetAttack(
             strength=5,
             att_range=4
         )],
         movement=0,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Scholar's Escape",
-        actions=[gh_types.SingleTargetAttack(
+        actions=[actions.SingleTargetAttack(
             strength=1,
             att_range=1
         )],
         movement=5,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Masochistic Explosion",
-        actions=[gh_types.ElementAreaEffectFromSelf(
+        actions=[actions.ElementAreaEffectFromSelf(
             element_type=obstacle.Fire,
             shape=shapes.circle(2)
         )],
         movement=0,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Lightning Bolt",
-        actions=[gh_types.AreaAttack(
+        actions=[actions.AreaAttack(
             shape=shapes.line((1,0), 3),
             strength=4
         )],
         movement=1,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="Random Teleport",
         actions=[
-            gh_types.Teleport(
+            actions.Teleport(
                 att_range=1
             ),
-            gh_types.SingleTargetAttack(
+            actions.SingleTargetAttack(
                 strength=2,
                 att_range=1
             )
@@ -78,9 +78,9 @@ cards = [
         movement=1,
         jump=False
     ),
-    gh_types.ActionCard(
+    actions.ActionCard(
         attack_name="B-Line",
-        actions=[gh_types.AreaAttack(
+        actions=[actions.AreaAttack(
             shape=shapes.line((0,1), 2),
             strength=2
         )],

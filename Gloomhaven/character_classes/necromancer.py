@@ -1,4 +1,4 @@
-import gh_types as actions
+import actions as actions
 import attack_shapes as shapes
 from obstacle import Shadow
 # from character import Skeleton
