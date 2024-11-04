@@ -1,21 +1,21 @@
-import actions as actions
+import action_model as action_model
 import attack_shapes as shapes
 
 cards = [
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Bitter Harvest",
         actions=[
-            actions.SingleTargetAttack(3,1),
-            actions.ChargeNextAttack(2),
+            action_model.SingleTargetAttack(3,1),
+            action_model.ChargeNextAttack(2),
         ],
         movement=2,
         jump=True
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Sacred Cultivation",
         actions=[
-            actions.ModifySelfHealth(3),
-            actions.BlessSelf(),
+            action_model.ModifySelfHealth(3),
+            action_model.BlessSelf(),
         ],
         movement=3,
         jump=False

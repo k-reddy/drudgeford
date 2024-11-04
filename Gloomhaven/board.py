@@ -11,7 +11,7 @@ import agent
 import attack_shapes as shapes
 import character
 from display import Display
-from actions import ActionCard
+from action_model import ActionCard
 from listwithupdate import ListWithUpdate
 import pyxel_backend
 import obstacle

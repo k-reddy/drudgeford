@@ -1,11 +1,11 @@
-import actions 
+import action_model 
 import attack_shapes as shapes
 import obstacle 
 
 cards = [
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Fireball",
-        actions=[actions.ElementAreaEffectWithTarget(
+        actions=[action_model.ElementAreaEffectWithTarget(
             shape=shapes.circle(1),
             element_type=obstacle.Fire,
             att_range=4
@@ -13,14 +13,14 @@ cards = [
         movement=2,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Cursed Frost Surge",
         actions=[
-            actions.AreaAttack(
+            action_model.AreaAttack(
                 shape=shapes.bar(1,2),
                 strength=1
             ),
-            actions.ElementAreaEffectFromSelf(
+            action_model.ElementAreaEffectFromSelf(
                 shape=shapes.bar(1,2),
                 element_type=obstacle.Ice,
             )
@@ -28,49 +28,49 @@ cards = [
         movement=2,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Elementary Missile",
-        actions=[actions.SingleTargetAttack(
+        actions=[action_model.SingleTargetAttack(
             strength=5,
             att_range=4
         )],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Scholar's Escape",
-        actions=[actions.SingleTargetAttack(
+        actions=[action_model.SingleTargetAttack(
             strength=1,
             att_range=1
         )],
         movement=5,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Masochistic Explosion",
-        actions=[actions.ElementAreaEffectFromSelf(
+        actions=[action_model.ElementAreaEffectFromSelf(
             element_type=obstacle.Fire,
             shape=shapes.circle(2)
         )],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Lightning Bolt",
-        actions=[actions.AreaAttack(
+        actions=[action_model.AreaAttack(
             shape=shapes.line((1,0), 3),
             strength=4
         )],
         movement=1,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Random Teleport",
         actions=[
-            actions.Teleport(
+            action_model.Teleport(
                 att_range=1
             ),
-            actions.SingleTargetAttack(
+            action_model.SingleTargetAttack(
                 strength=2,
                 att_range=1
             )
@@ -78,9 +78,9 @@ cards = [
         movement=1,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="B-Line",
-        actions=[actions.AreaAttack(
+        actions=[action_model.AreaAttack(
             shape=shapes.line((0,1), 2),
             strength=2
         )],
