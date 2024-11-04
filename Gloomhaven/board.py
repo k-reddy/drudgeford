@@ -457,12 +457,12 @@ class Board:
         if is_jump and isinstance(acting_character.agent, agent.Ai):
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
-            # humans move step by step, so they should not take damage on a jump
-            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
-                self.deal_terrain_damage(acting_character, loc[0], loc[1])
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc
+            # humans move step by step, so they should not take damage on a jump
+            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
+                self.deal_terrain_damage(acting_character, loc[0], loc[1])
 
     def deal_terrain_damage(
         self,
