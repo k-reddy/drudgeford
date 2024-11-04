@@ -1,8 +1,8 @@
 import random
 import abc
-import character_classes
-import action_model 
-import utils
+import backend.models.character_classes as character_classes
+import backend.models.action_model as action_model 
+from ..utils import utilities
 
 MAX_ROUNDS = 1000
 
@@ -16,7 +16,7 @@ class Character(abc.ABC):
         self.health = 8
         self.name = name
         self.action_cards = self.create_action_cards()
-        self.killed_action_cards = []
+        self.killed_action_cards: list = []
         self.available_action_cards = self.action_cards.copy()
         self.disp = disp
         self.emoji = emoji
@@ -64,11 +64,11 @@ class Character(abc.ABC):
 
     def make_attack_modifier_deck(self) -> list:
         attack_modifier_deck = [
-            utils.make_multiply_modifier(2, "2x"),
-            utils.make_multiply_modifier(0, "Null"),
+            utilities.make_multiply_modifier(2, "2x"),
+            utilities.make_multiply_modifier(0, "Null"),
         ]
         for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append(utils.make_additive_modifier(modifier))
+            attack_modifier_deck.append(utilities.make_additive_modifier(modifier))
 
         attack_modifier_weights = [1, 1, 1, 3, 3, 3, 1]
         for i, weight in enumerate(attack_modifier_weights):
@@ -175,7 +175,7 @@ class Skeleton(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)
         self.pyxel_sprite_name = "skeleton"
-    
+
 class Corpse(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)

@@ -1,9 +1,9 @@
 from unittest.mock import patch
-from board import Board
-from character import Monster, Player
+from backend.models.board import Board
+from backend.models.character import Monster, Player
 from agent import Ai, Human
-from display import Display
-from action_model import ActionCard
+from backend.models.display import Display
+from backend.models.action_model import ActionCard
 
 # !!! implement pytest fixtures 
 # !!! try parameterizing tests 

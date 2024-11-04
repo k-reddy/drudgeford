@@ -1,5 +1,5 @@
 import random
-import attack_shapes as shapes
+from ..utils import attack_shapes as shapes
 
 class TerrainObject:
     def __init__(self, round_num: int, obj_id: int):
@@ -9,7 +9,7 @@ class TerrainObject:
         self.duration = 2
         self.damage = 0
         self.id = obj_id
-    
+        
     def perform(self, row, col, board):
         return
 

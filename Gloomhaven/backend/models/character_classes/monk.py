@@ -1,5 +1,4 @@
-import action_model as action_model
-import attack_shapes as shapes
+import backend.models.action_model as action_model
 
 cards = [
     action_model.ActionCard(

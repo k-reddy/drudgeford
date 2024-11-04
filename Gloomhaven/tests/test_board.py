@@ -1,5 +1,5 @@
-import board
-import display
+import backend.models.board as board
+import backend.models.display as display
 
 def test_update_terrain():
     disp = display.Display(False)

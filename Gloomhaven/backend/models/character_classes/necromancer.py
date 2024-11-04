@@ -1,6 +1,6 @@
-import action_model as action_model
-import attack_shapes as shapes
-from obstacle import Shadow
+import backend.models.action_model as action_model
+from ...utils import attack_shapes as shapes
+from backend.models.obstacle import Shadow
 # from character import Skeleton
 
 

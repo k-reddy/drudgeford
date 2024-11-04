@@ -8,7 +8,7 @@ import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
-from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask
+from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
 
 # from .models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
@@ -54,6 +54,7 @@ class PyxelView:
         self.initiative_bar_sprite_names = []
         self.initiative_bar_healths = []
         self.initiative_bar_teams = []
+        self.log = []
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -65,7 +66,7 @@ class PyxelView:
         self.valid_floor_coordinates=valid_floor_coordinates
 
         # TODO(John): replace these hardcoded numbers.
-        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + 64)
+        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + BITS*4)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
@@ -244,6 +245,9 @@ class PyxelView:
                 animation_frame=AnimationFrame.SOUTH,
                 alive=True,
             )
+
+    def process_load_log_task(self):
+        self.log = self.current_task.log
             
         # currently assuming payload is board.locations
     def process_load_characters_task(self):
@@ -281,6 +285,8 @@ class PyxelView:
                 self.process_entity_loading_task()
             elif isinstance(self.current_task, LoadCharactersTask):
                 self.process_load_characters_task()
+            elif isinstance(self.current_task, LoadLogTask):
+                self.process_load_log_task()
             self.current_task=None
             
     def draw_health_and_iniative_bar(self, sprite_names, healths, teams) -> None:
@@ -379,6 +385,12 @@ class PyxelView:
                         self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
                     )
 
+        # draw log
+        x = 0
+        y = self.canvas.board_end_pos[1] + BITS//2
+        for line in self.log:
+            pyxel.text(x,y,line,col=7)
+            y+=8
         # Draw framerate and frame duration.
 
         # Calculate duration and framerate

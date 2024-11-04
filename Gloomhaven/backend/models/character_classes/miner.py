@@ -1,6 +1,6 @@
-import action_model
-import attack_shapes as shapes
-from obstacle import Rock
+import backend.models.action_model as action_model
+from ...utils import attack_shapes as shapes
+from backend.models.obstacle import Rock
 
 
 cards = [
