@@ -25,6 +25,7 @@ class GameLoop:
         self.id_generator = count(start=1)
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
+        self.pyxel_manager = pyxel_manager
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
         self.disp = disp
@@ -61,6 +62,7 @@ Kill it or be killed..."""
         random.shuffle(self.board.characters)
         # using this copy, since we can edit this list during a round, messing up indexing
         round_character_list = self.board.characters
+        self.pyxel_manager.load_characters(self.board.characters)
         for acting_character in round_character_list:
             # since we use a copy, we need to make sure the character is still alive
             if acting_character not in self.board.characters:

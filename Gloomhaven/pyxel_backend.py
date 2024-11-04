@@ -2,7 +2,7 @@ import character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask
 import obstacle
 
 CHAR_PRIORITY = 20
@@ -118,3 +118,11 @@ class PyxelManager:
                     continue         
                 valid_floor_coordinates.append((col_num, row_num))
         return valid_floor_coordinates
+    
+    def load_characters(self, characters: list[character.Character]):
+        healths = [character.health for character in characters]
+        sprite_names = [character.pyxel_sprite_name for character in characters]
+        teams = [character.team_monster for character in characters]
+        task = LoadCharactersTask(healths, sprite_names, teams)
+        self.shared_action_queue.enqueue(task)
+
