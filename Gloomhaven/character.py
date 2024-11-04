@@ -1,7 +1,7 @@
 import random
 import abc
 import character_classes
-import actions 
+import action_model 
 import utils
 
 MAX_ROUNDS = 1000

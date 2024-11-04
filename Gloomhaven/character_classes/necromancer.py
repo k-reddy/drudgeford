@@ -1,73 +1,73 @@
-import actions as actions
+import action_model as action_model
 import attack_shapes as shapes
 from obstacle import Shadow
 # from character import Skeleton
 
 
 cards = [
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Fear Mongerer",
         actions=[
-            actions.PushAllEnemies(3,2)
+            action_model.PushAllEnemies(3,2)
         ],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Curse of Futility",
         actions=[
-            actions.SingleTargetAttack(3,1),
-            actions.Curse(1),
+            action_model.SingleTargetAttack(3,1),
+            action_model.Curse(1),
         ],
         movement=1,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Death's embrace",
         actions=[
-            actions.AreaAttack(shapes.circle(radius=2), 1)
+            action_model.AreaAttack(shapes.circle(radius=2), 1)
         ],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Shadow Step",
         actions=[
-            actions.SingleTargetAttack(1, 4)
+            action_model.SingleTargetAttack(1, 4)
         ],
         movement=4,
         jump=True
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Soul Strike",
         actions=[
-            actions.SingleTargetAttack(4, 1),
+            action_model.SingleTargetAttack(4, 1),
         ],
         movement=1,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Death's Gambit",
         actions=[
-            actions.CurseAllEnemies(3),
-            actions.PushAllEnemies(1,3),
+            action_model.CurseAllEnemies(3),
+            action_model.PushAllEnemies(1,3),
         ],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         attack_name="Reviving Glare",
         actions=[
-            actions.SummonSkeleton()
+            action_model.SummonSkeleton()
         ],
         movement=0,
         jump=False
     ),
-    actions.ActionCard(
+    action_model.ActionCard(
         # switch this to shadow that shows up around you
         attack_name="Night Owl",
         actions=[
-            actions.ElementAreaEffectFromSelf(shape=shapes.circle(2,),element_type=Shadow)
+            action_model.ElementAreaEffectFromSelf(shape=shapes.circle(2,),element_type=Shadow)
         ],
         movement=2,
         jump=False
