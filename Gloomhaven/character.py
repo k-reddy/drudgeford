@@ -47,11 +47,11 @@ class Character(abc.ABC):
         # add some space between the movement and attack
         self.disp.add_to_log("")
 
-    def select_attack_target(self, in_range_opponents):
+    def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
             self.disp.add_to_log("No opponents in range\n")
             return None
-        return self.agent.select_attack_target(self.disp, in_range_opponents)
+        return self.agent.select_attack_target(self.disp, in_range_opponents, board, self)
 
     def short_rest(self) -> None:
         # reset our available cards
@@ -120,7 +120,7 @@ class Character(abc.ABC):
                     att_range=distance
                 )],
                 movement=movement,
-                jump=True
+                jump=random.choice([False, False, False, False, True])
             )
             action_cards.append(action_card)
         return action_cards

@@ -29,7 +29,7 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def select_attack_target(disp, in_range_opponents: list):
+    def select_attack_target(disp, in_range_opponents: list, board, char):
         pass
 
     @staticmethod
@@ -54,14 +54,24 @@ class Ai(Agent):
         return True
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents: list):
+    def select_attack_target(disp, in_range_opponents: list, board, char):
         # monster picks a random opponent
-        return random.choice(in_range_opponents)
+        shortest_dist = 1000
+        nearest_opponent = None
+        attacker_location = board.find_location_of_target(char)
+        for opponent in in_range_opponents:
+            opponent_location = board.find_location_of_target(opponent)
+            opponent_dist = len(board.get_shortest_valid_path(attacker_location, opponent_location))
+            if opponent_dist < shortest_dist:
+                nearest_opponent = opponent
+                shortest_dist = opponent_dist
+        return nearest_opponent
     
     @staticmethod
     def perform_movement(char, movement, is_jump, board):
         targets = board.find_opponents(char)
-        target_loc = board.find_location_of_target(random.choice(targets))
+        target = Ai.select_attack_target(None, targets, board, char)
+        target_loc = board.find_location_of_target(target)
         board.move_character_toward_location(char, target_loc, movement, is_jump)
 
     @staticmethod
@@ -93,7 +103,7 @@ class Human(Agent):
         return key_press == "1"
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents):
+    def select_attack_target(disp, in_range_opponents: list, board, char):
         # show in range opponents
         disp.add_to_log("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
