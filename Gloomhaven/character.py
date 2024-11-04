@@ -149,6 +149,9 @@ class Necromancer(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):
         super().__init__(name, disp, emoji, agent, char_id, is_monster)
         self.pyxel_sprite_name = "necromancer"
+    
+    def create_action_cards(self):
+        return character_classes.necromancer.cards
 
 class Treeman(Character):
     def __init__(self, name, disp, emoji, agent, char_id, is_monster):

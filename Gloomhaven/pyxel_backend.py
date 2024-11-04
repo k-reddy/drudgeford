@@ -5,6 +5,8 @@ from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask
 import obstacle
 
+CHAR_PRIORITY = 20
+OTHER_PRIORITY = 10
 
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
@@ -31,7 +33,7 @@ class PyxelManager:
                         "id": el.id,
                         "position": (col_num, row_num),
                         "name": el.pyxel_sprite_name,
-                        "priority": 10
+                        "priority": CHAR_PRIORITY
                     })
                 valid_floor_coordinates.append((col_num, row_num))
 
@@ -45,7 +47,7 @@ class PyxelManager:
                         "id": el.id,
                         "position": (col_num, row_num),
                         "name": el.pyxel_sprite_name,
-                        "priority": 5
+                        "priority": OTHER_PRIORITY
                     })  
                       
         payload = {
@@ -72,12 +74,17 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
 
     def add_entity(self, entity, row, col):
+        if isinstance(entity, character.Character):
+            priority = CHAR_PRIORITY
+        else:
+            priority = OTHER_PRIORITY
+
         task = AddEntityTask({"entities": [
                 {
                     "id": entity.id,
                     "position": (col, row),
                     "name": entity.pyxel_sprite_name,
-                    "priority": 20
+                    "priority": priority
                 }
             ]
             })

@@ -75,12 +75,13 @@ class Ai(Agent):
         board.move_character_toward_location(char, target_loc, movement, is_jump)
 
     @staticmethod
+    # !!! found bug: this is a pull, not a push/movement
     def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
         board.move_character_toward_location(
             char_to_move, 
             mover_loc,
             movement,
-            False
+            is_jump
         )
     
 class Human(Agent):

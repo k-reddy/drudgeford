@@ -43,9 +43,11 @@ class Board:
         
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        self.characters: list[character.Character] = ListWithUpdate(
-            players + monsters, self.disp.reload_display
-        )
+        # self.characters: list[character.Character] = ListWithUpdate(
+        #     players + monsters, self.disp.reload_display
+        # )
+        self.characters: list[character.Character] = players + monsters
+
         self.locations = self._initialize_map(self.size, self.size)
         self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
@@ -374,12 +376,30 @@ class Board:
         if modified_attack_strength <= 0:
             self.log.append("Darn, attack does no damage!")
             return
+        if self.is_shadow_interference(attacker, target):
+            self.log.append("Attack missed due to shadow")
+            return
         self.log.append(
             f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
         )
 
         self.modify_target_health(target, modified_attack_strength)
 
+    def is_shadow_interference(self, attacker, target):
+        '''returns true if the attack misses due to shadow'''
+        attacker_loc = self.find_location_of_target(attacker)
+        target_path = self.get_shortest_valid_path(
+            attacker_loc,
+            self.find_location_of_target(target)
+        )
+        chance_of_miss = 0
+        target_path += [attacker_loc]
+        for coord in target_path:
+            if isinstance(self.terrain[coord[0]][coord[1]], obstacle.Shadow):
+                chance_of_miss += .1
+        return random.random() < chance_of_miss
+
+    
     def update_locations(self, row, col, new_item):
         self.locations[row][col] = new_item
 
@@ -455,12 +475,12 @@ class Board:
         if is_jump and isinstance(acting_character.agent, agent.Ai):
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
-            # humans move step by step, so they should not take damage on a jump
-            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
-                self.deal_terrain_damage(acting_character, loc[0], loc[1])
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc
+            # humans move step by step, so they should not take damage on a jump
+            if not (is_jump and isinstance(acting_character.agent, agent.Human)):
+                self.deal_terrain_damage(acting_character, loc[0], loc[1])
 
     def deal_terrain_damage(
         self,
@@ -536,7 +556,7 @@ class Board:
                 if not el:
                     continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
-                if self.round_num - el.round_placed >= el.duration:
+                if self.round_num - el.round_placed > el.duration:
                     self.clear_terrain_square(i,j)
 
     def update_character_statuses(self):
@@ -561,6 +581,21 @@ class Board:
         for destination in destinations:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
+
+    def add_new_skeleton(self, is_monster):
+        from agent import Ai
+        new_char = character.Skeleton(
+            "Spooky Skeleton", 
+            self.disp, 
+            "💀",
+            Ai(), 
+            next(self.id_generator), 
+            is_monster=is_monster
+        )
+        self.characters.append(new_char)
+        row, col = self.pick_unoccupied_location()
+        self.locations[row][col] = new_char
+        self.pyxel_manager.add_entity(new_char,row, col)
 
     def teleport_character(self, target: Character):
         new_loc = self.pick_unoccupied_location()
