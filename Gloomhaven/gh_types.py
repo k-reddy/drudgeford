@@ -209,6 +209,35 @@ class Push(ActionStep):
         return f"Push {self.squares} any enemy in range {self.att_range}"
 
 @dataclass
+class PushAllEnemies(ActionStep):
+    squares: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        from agent import Ai
+        enemies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=True
+        )
+        if not enemies:
+            board.disp.add_to_log("No one in range to push")
+            return
+        
+        is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
+        
+        for enemy in enemies:
+            Ai.move_other_character(
+                enemy,
+                board.find_location_of_target(attacker),
+                self.squares,
+                False,
+                board,
+                is_legal_push_check
+        )
+
+    def __str__(self): 
+        return f"Push all enemies in range {self.att_range} away {self.squares} squares"
+
+@dataclass
 class MakeObstableArea(ActionStep):
     '''Unlike elements, obstacles go on the locations board
     and cannot be moved through and do not expire'''

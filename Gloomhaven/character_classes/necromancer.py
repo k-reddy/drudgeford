@@ -1,8 +1,17 @@
-from gh_types import ActionCard
+import gh_types as actions
 import attack_shapes as shapes
 
 
 cards = [
+    actions.ActionCard(
+        attack_name="Fear Mongerer",
+        actions=[
+            actions.PushAllEnemies(3,2)
+        ],
+        movement=0,
+        jump=False
+    )
+
 # the theme is a character that doesn't have much health
 # so has crowd control, but is rewarded for staying close to enemies
 # reviving glare - bring a corpse to life as a skeleton that's AI team hero - range 10, move 0
@@ -14,5 +23,5 @@ cards = [
 # death's gambit - pull all enemies in range 3, curse and weaken all adjacent enemies, no movement
 # soul strike - attack 4, range 1, move 1
 ]
-backstory = ""
-health = 8
+backstory = "I'm a necromancer. Grr."
+health = 9
