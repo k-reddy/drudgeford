@@ -1,6 +1,6 @@
 import abc
 import random
-from gh_types import ActionCard
+from action_model import ActionCard
 from display import Display
 from typing import Callable
 
