@@ -5,7 +5,7 @@ import obstacle
 cards = [
     gh_types.ActionCard(
         attack_name="Fireball",
-        actions=[gh_types.ElementAreaEffect(
+        actions=[gh_types.ElementAreaEffectWithTarget(
             shape=shapes.circle(1),
             element_type=obstacle.Fire,
             att_range=4
@@ -20,10 +20,9 @@ cards = [
                 shape=shapes.bar(1,2),
                 strength=1
             ),
-            gh_types.ElementAreaEffect(
+            gh_types.ElementAreaEffectFromSelf(
                 shape=shapes.bar(1,2),
                 element_type=obstacle.Ice,
-                att_range=1
             )
         ],
         movement=2,
@@ -49,8 +48,7 @@ cards = [
     ),
     gh_types.ActionCard(
         attack_name="Masochistic Explosion",
-        actions=[gh_types.ElementAreaEffect(
-            att_range=1,
+        actions=[gh_types.ElementAreaEffectFromSelf(
             element_type=obstacle.Fire,
             shape=shapes.circle(2)
         )],

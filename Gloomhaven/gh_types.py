@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass
 import attack_shapes as shapes
 import abc 
@@ -44,7 +45,7 @@ class SingleTargetAttack(ActionStep):
         return f"Single Target Attack with Strength {self.strength}, Range {self.att_range}"
 
 @dataclass
-class ElementAreaEffect(ActionStep):
+class ElementAreaEffectWithTarget(ActionStep):
     shape: set
     element_type: obstacle.TerrainObject
     att_range: int
@@ -63,6 +64,23 @@ class ElementAreaEffect(ActionStep):
 
     def __str__(self):
         return f"{self.element_type.__name__} Attack with Range {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+
+@dataclass
+class ElementAreaEffectFromSelf(ActionStep):
+    shape: set
+    element_type: obstacle.TerrainObject
+
+    def perform(self, board, attacker, round_num):
+        target = attacker
+
+        row, col = board.find_location_of_target(target)
+        board.log.append(f"{attacker.name} throws {self.element_type.__name__}")
+        board.add_effect_to_terrain_for_attack(
+            self.element_type, row, col, self.shape
+        )
+
+    def __str__(self):
+        return f"{self.element_type.__name__} Attack with Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class Teleport(ActionStep):
@@ -153,6 +171,35 @@ class BlessSelf(ActionStep):
     
     def __str__(self):
         return "Bless self with one 2x modifier card"
+    
+@dataclass
+class Curse(ActionStep):
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        target = select_in_range_target(board, attacker, self.att_range, opponent=True)
+        rand_index = random.randint(0, len(target.attack_modifier_deck))
+        modifier = utils.make_multiply_modifier(0, "Null Curse")
+        target.attack_modifier_deck.insert(rand_index, modifier)
+    
+    def __str__(self):
+        return "Curse an enemy with one null modifier card"
+
+@dataclass
+class CurseAllEnemies(ActionStep):
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        enemies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=True
+        )
+        for enemy in enemies:
+            rand_index = random.randint(0, len(enemy.attack_modifier_deck))
+            modifier = utils.make_multiply_modifier(0, "Null Curse")
+            enemy.attack_modifier_deck.insert(rand_index, modifier)
+    
+    def __str__(self):
+        return f"Curse all enemies within range {self.att_range}"
 
 @dataclass  
 class Pull(ActionStep):
@@ -207,6 +254,47 @@ class Push(ActionStep):
 
     def __str__(self): 
         return f"Push {self.squares} any enemy in range {self.att_range}"
+
+@dataclass
+class PushAllEnemies(ActionStep):
+    squares: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        from agent import Human
+        enemies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=True
+        )
+        if not enemies:
+            board.disp.add_to_log("No one in range to push")
+            return
+        
+        is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
+        
+        for enemy in enemies:
+            board.disp.add_to_log(f"Pushing {enemy.name}")
+
+            Human.move_other_character(
+                enemy,
+                board.find_location_of_target(attacker),
+                self.squares,
+                False,
+                board,
+                is_legal_push_check
+            )
+
+    def __str__(self): 
+        return f"Push all enemies in range {self.att_range} away {self.squares} squares"
+
+@dataclass
+class SummonSkeleton(ActionStep):
+
+    def perform(self, board, attacker, round_num):
+        board.add_new_skeleton(attacker.team_monster)
+
+    def __str__(self):
+        return f"Summon a skeleton to fight alongside you."
+
 
 @dataclass
 class MakeObstableArea(ActionStep):
