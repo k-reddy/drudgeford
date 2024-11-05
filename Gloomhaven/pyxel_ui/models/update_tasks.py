@@ -39,3 +39,10 @@ class LoadLogTask:
     '''
     log: list[str]
 
+@dataclass
+class LoadActionCardsTask:
+    '''
+    task that updates the action cards area
+    '''
+    action_card_log: list[str]
+

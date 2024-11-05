@@ -97,6 +97,8 @@ Kill it or be killed..."""
         try:
             if acting_character.shield[0]>0:
                 self.disp.add_to_log((f"{acting_character.name} has shield {acting_character.shield[0]}"))
+            if not acting_character.team_monster:
+                self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
             move_first = acting_character.decide_if_move_first(action_card)
             actions = [
