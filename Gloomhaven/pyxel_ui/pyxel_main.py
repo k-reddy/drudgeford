@@ -8,7 +8,7 @@ import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
-from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask
+from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask
 
 # from .models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
@@ -60,6 +60,8 @@ class PyxelView:
         self.action_card_log = []
         self.current_card_page = 0  # Track which page of cards we're viewing
         self.cards_per_page = 4     # Number of cards to show at once
+        self.round_number = 0
+        self.acting_character_name = ""
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -302,6 +304,10 @@ class PyxelView:
             elif isinstance(self.current_task, LoadActionCardsTask):
                 self.process_load_action_card_task()
                 self.current_task=None
+            elif isinstance(self.current_task, LoadRoundTurnInfoTask):
+                self.round_number=self.current_task.round_number
+                self.acting_character_name=self.current_task.acting_character_name
+                self.current_task=None
         
         # Add controls for scrolling
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
@@ -413,12 +419,12 @@ class PyxelView:
         # draw log
         x = BITS*11
         y=BITS
-        # y = self.canvas.board_end_pos[1] + BITS//2
-        for line in self.log[-MAX_LOG_LINES:]:
-            pyxel.text(x,y,line,col=7)
-            y_lines = line.count('\n') + 1
-            y+=8*y_lines
-        
+        if self.log or self.round_number > 0:
+            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
+                pyxel.text(x,y,line,col=7)
+                y_lines = line.count('\n') + 1
+                y+=8*y_lines
+            
         # draw action_cards
         # x = 0
         # y=self.canvas.board_end_pos[1] + BITS//2

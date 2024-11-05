@@ -2,7 +2,7 @@ import backend.models.character as character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 from .action_model import ActionCard
@@ -142,4 +142,11 @@ class PyxelManager:
         for i,action_card in enumerate(action_cards):
             action_card_log.append(f"{i}: {action_card}")
         task = LoadActionCardsTask(action_card_log=action_card_log)
+        self.shared_action_queue.enqueue(task)
+
+    def load_round_turn_info(self, round_num, acting_character_name):
+        task = LoadRoundTurnInfoTask(
+            round_number=round_num,
+            acting_character_name=acting_character_name
+            )
         self.shared_action_queue.enqueue(task)

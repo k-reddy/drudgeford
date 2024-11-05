@@ -46,3 +46,10 @@ class LoadActionCardsTask:
     '''
     action_card_log: list[str]
 
+@dataclass
+class LoadRoundTurnInfoTask:
+    '''
+    task that updates the round number and who's turn it is
+    '''
+    round_number: int
+    acting_character_name: str

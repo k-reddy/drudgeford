@@ -45,7 +45,6 @@ Kill it or be killed..."""
 
         round_number = 1
         while self.game_state == GameState.RUNNING:
-            self.disp.update_round_number(round_number)
             self.run_round(round_number)
             # print(self.game_state)
             round_number += 1
@@ -83,7 +82,7 @@ Kill it or be killed..."""
                 print(f"{optimal_path=}")
                 # end pathfinding test
 
-            self.disp.update_acting_character_name(acting_character.name)
+            self.pyxel_manager.load_round_turn_info(round_num, acting_character.name)
             self.run_turn(acting_character, round_num)
             # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
             # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
@@ -156,7 +155,6 @@ Kill it or be killed..."""
     def _end_turn(self) -> None:
         if not self.all_ai_mode:
             self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
-            self.disp.clear_log()
             self.pyxel_manager.load_action_cards([])
             self.pyxel_manager.log.clear() 
 
@@ -165,7 +163,7 @@ Kill it or be killed..."""
             self.refresh_character_cards(char)
         if not self.all_ai_mode:
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
-            self.disp.clear_log()
+            self.pyxel_manager.log.clear() 
 
     def refresh_character_cards(self, char: character.Character) -> None:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
@@ -217,7 +215,6 @@ Kill it or be killed..."""
         default_names = ["Happy", "Glad", "Jolly"]
         char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard, ]
         random.shuffle(char_classes)
-        char_classes = [character.Necromancer, character.Miner, character.Wizard, ]
 
         # get some user input before starting the game
         num_players = (
