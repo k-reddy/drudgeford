@@ -121,7 +121,7 @@ class Human(Agent):
     def perform_movement(char, movement, is_jump, board, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
         while remaining_movement > 0:
-            char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
+            board.log.append(f"\nMovement remaining: {remaining_movement}")    
             prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
             direction = char.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
             
@@ -144,13 +144,13 @@ class Human(Agent):
                 remaining_movement -= 1
                 continue
             else:
-                char.disp.add_to_log(
+                board.log.append(
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
-        char.disp.add_to_log("Movement done! \n")
+        board.log.append("Movement done! \n")
 
     @staticmethod
     def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
