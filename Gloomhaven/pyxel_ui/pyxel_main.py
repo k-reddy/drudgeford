@@ -18,6 +18,8 @@ from .models.walls import Wall
 from .utils import BACKGROUND_TILES, generate_wall_bank
 from .views.sprite import Sprite, SpriteManager
 
+MAX_LOG_LINES = 10
+
 
 WALL_THICKNESS = 32
 GRID_COLOR =0
@@ -248,6 +250,7 @@ class PyxelView:
 
     def process_load_log_task(self):
         self.log = self.current_task.log
+        return
             
         # currently assuming payload is board.locations
     def process_load_characters_task(self):
@@ -275,7 +278,6 @@ class PyxelView:
             else:
                 self.current_task = temp_task
                 return
-
         if self.current_task:
             if isinstance(self.current_task, ActionTask):
                 self.process_action()
@@ -388,9 +390,10 @@ class PyxelView:
         # draw log
         x = 0
         y = self.canvas.board_end_pos[1] + BITS//2
-        for line in self.log:
+        for line in self.log[-MAX_LOG_LINES:]:
             pyxel.text(x,y,line,col=7)
-            y+=8
+            y_lines = line.count('\n') + 1
+            y+=8*y_lines
         # Draw framerate and frame duration.
 
         # Calculate duration and framerate

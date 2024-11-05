@@ -8,8 +8,7 @@ class ListWithUpdate:
 
     def __setitem__(self, index, value):
         self.data[index] = value
-        for callable in self.to_call:
-            callable()
+        callable(self.data)
 
     def __len__(self):
         return len(self.data)
@@ -22,14 +21,11 @@ class ListWithUpdate:
 
     def append(self, item):
         self.data.append(item)
-        for callable in self.to_call:
-            callable(item)
+        callable(item)
 
     def remove(self, item):
         self.data.remove(item)
-        for callable in self.to_call:
-            # what to pass in here?
-            callable()
+        callable(item)
 
 
 # use lambdas to encode arguments or functools.partial

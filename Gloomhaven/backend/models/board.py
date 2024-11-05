@@ -39,11 +39,11 @@ class Board:
 
         # TODO(john) - discuss with group whether to turn this into tuple
         # Possibly do not remove characters from tuple, just update statuses
-        # self.characters: list[character.Character] = ListWithUpdate(
-        #     players + monsters, self.pyxel_manager.load_characters
-        # )
+        self.characters: list[character.Character] = ListWithUpdate(
+            players + monsters, self.pyxel_manager.load_characters
+        )
         # self.characters: list[character.Character] = players + monsters
-        self.characters=players+monsters
+        # self.characters=players+monsters
 
         self.locations = self._initialize_map(self.size, self.size)
         self.terrain = self._initialize_terrain(self.size, self.size)
@@ -56,52 +56,50 @@ class Board:
         self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
+        self.log = ListWithUpdate([], self.pyxel_manager.load_log)
 
-        self.log = ListWithUpdate([], self.disp.add_to_log)
-        # signal to pyxel that board has been initialized
+    # @property
+    # def locations(self):
+    #     return self.__locations
 
-    @property
-    def locations(self):
-        return self.__locations
+    # @locations.setter
+    # def locations(self, locations):
+    #     self.__locations = locations
+    #     self.disp.locations = locations
+    #     self.disp.reload_display()
 
-    @locations.setter
-    def locations(self, locations):
-        self.__locations = locations
-        self.disp.locations = locations
-        self.disp.reload_display()
+    # @property
+    # def terrain(self):
+    #     return self.__terrain
 
-    @property
-    def terrain(self):
-        return self.__terrain
+    # @terrain.setter
+    # def terrain(self, terrain):
+    #     self.__terrain = terrain
+    #     self.disp.terrain = terrain
+    #     self.disp.reload_display()
 
-    @terrain.setter
-    def terrain(self, terrain):
-        self.__terrain = terrain
-        self.disp.terrain = terrain
-        self.disp.reload_display()
+    # @property
+    # def characters(self):
+    #     return self.__characters
 
-    @property
-    def characters(self):
-        return self.__characters
-
-    @characters.setter
-    def characters(self, characters):
-        self.__characters = characters
-        self.disp.characters = characters
-        # self.pyxel_manager.load_characters(characters)
-        self.disp.reload_display()
+    # @characters.setter
+    # def characters(self, characters):
+    #     self.__characters = characters
+    #     self.disp.characters = characters
+    #     # self.pyxel_manager.load_characters(characters)
+    #     self.disp.reload_display()
 
     # initializes a game map which is a list of ListWithUpdate
     # game maps are used to represent locations and terrain
-    def _initialize_map(self, width: int = 5, height=5) -> list[ListWithUpdate]:
+    def _initialize_map(self, width: int = 5, height=5) -> list:
         return [
-            ListWithUpdate([obstacle.Wall(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)], self.disp.reload_display)
+            [obstacle.Wall(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)]
             for _ in range(height)
         ]
     
-    def _initialize_terrain(self, width: int = 5, height=5) -> list[ListWithUpdate]:
+    def _initialize_terrain(self, width: int = 5, height=5) -> list:
         return [
-            ListWithUpdate([None for _ in range(width)], self.disp.reload_display)
+            [None for _ in range(width)]
             for _ in range(height)
         ]
 
@@ -365,23 +363,21 @@ class Board:
         ]
 
     def attack_target(self, attacker, strength, target):
-        self.log.append(f"{attacker.name} is attempting to attack {target.name}")
+        to_log = f"{attacker.name} is attempting to attack {target.name}\n"
         modified_attack_strength = self.select_and_apply_attack_modifier(
             attacker, strength
         )
         if target.shield[0] > 0:
-            self.log.append(f"Target has shield {target.shield[0]}")
+            to_log+= f"Target has shield {target.shield[0]}\n"
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
-            self.log.append("Darn, attack does no damage!")
+            to_log+= "Darn, attack does no damage!\n"
             return
         if self.is_shadow_interference(attacker, target):
-            self.log.append("Attack missed due to shadow")
+            to_log+= "Attack missed due to shadow\n"
             return
-        self.log.append(
-            f"Attack hits {target.name} with a modified strength of {modified_attack_strength}"
-        )
-        self.pyxel_manager.load_log(self.log)
+        to_log+= f"Attack hits {target.name} with a modified strength of {modified_attack_strength}\n"
+        self.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
     def is_shadow_interference(self, attacker, target):
@@ -565,7 +561,7 @@ class Board:
         for char in self.characters:
             if char.shield[1] <= self.round_num:
                 # reset to shield 0 indefinitely
-                char.shield = (0, MAX_ROUNDS)
+                character.shield = (0, MAX_ROUNDS)
 
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)
@@ -606,3 +602,8 @@ class Board:
             target, self.find_location_of_target(target), new_loc
         )
 
+    def log_action_cards(self, action_cards: list) -> None:
+        to_log = "Your action cards are:\n"
+        for i, action_card in enumerate(action_cards):
+            to_log += f"{i}: {action_card}\n"
+        self.log.append(to_log)
