@@ -23,9 +23,9 @@ class GameState(Enum):
 class GameLoop:
     def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager):
         self.id_generator = count(start=1)
+        self.pyxel_manager = pyxel_manager
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
-        self.pyxel_manager = pyxel_manager
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
         self.disp = disp
@@ -96,7 +96,7 @@ Kill it or be killed..."""
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
             if acting_character.shield[0]>0:
-                self.board.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}"))
+                self.pyxel_manager.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}"))
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
@@ -158,7 +158,7 @@ Kill it or be killed..."""
             self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
             self.disp.clear_log()
             self.pyxel_manager.load_action_cards([])
-            self.board.log.clear() 
+            self.pyxel_manager.log.clear() 
 
     def _end_round(self) -> None:
         for char in self.board.characters:
@@ -170,13 +170,13 @@ Kill it or be killed..."""
     def refresh_character_cards(self, char: character.Character) -> None:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
         if len(char.available_action_cards) == 0:
-            self.board.log.append("No more action cards left, time to short rest!")
+            self.pyxel_manager.log.append("No more action cards left, time to short rest!")
             char.short_rest()
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
             if not char.team_monster:
-                self.board.log.append("Drat, you ran out of cards and got exhausted")
+                self.pyxel_manager.log.append("Drat, you ran out of cards and got exhausted")
                 self.game_state = GameState.EXHAUSTED
             else:
                 raise ValueError("Monsters getting exhausted...")
@@ -238,7 +238,7 @@ Kill it or be killed..."""
             # default to happy :D
             player_name = player_name if player_name != "" else default_names[i]
             player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
-            players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False))
+            players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         if not all_ai_mode:
             disp.clear_display()
         return players
@@ -251,6 +251,6 @@ Kill it or be killed..."""
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
-            monster = char_classes[i](names[i], disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True)
+            monster = char_classes[i](names[i], disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
             monsters.append(monster)
         return monsters

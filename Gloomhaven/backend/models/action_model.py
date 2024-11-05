@@ -41,7 +41,7 @@ class SingleTargetAttack(ActionStep):
         if target is not None:
             board.attack_target(attacker, self.strength, target)
         else:
-            board.log.append("No targets in range")
+            board.pyxel_manager.log.append("No targets in range")
 
     def __str__(self):
         return f"Single Target Attack\nStrength {self.strength}\nRange {self.att_range}"
@@ -57,12 +57,12 @@ class ElementAreaEffectWithTarget(ActionStep):
 
         if target is not None:
             row, col = board.find_location_of_target(target)
-            board.log.append(f"{attacker.name} throws {self.element_type.__name__}")
+            board.pyxel_manager.log.append(f"{attacker.name} throws {self.element_type.__name__}")
             board.add_effect_to_terrain_for_attack(
                 self.element_type, row, col, self.shape
             )
         else:
-            board.log.append("No target in range")
+            board.pyxel_manager.log.append("No target in range")
 
     def __str__(self):
         return f"{self.element_type.__name__} Attack\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
@@ -76,7 +76,7 @@ class ElementAreaEffectFromSelf(ActionStep):
         target = attacker
 
         row, col = board.find_location_of_target(target)
-        board.log.append(f"{attacker.name} throws {self.element_type.__name__}")
+        board.pyxel_manager.log.append(f"{attacker.name} throws {self.element_type.__name__}")
         board.add_effect_to_terrain_for_attack(
             self.element_type, row, col, self.shape
         )
@@ -251,7 +251,7 @@ class Pull(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.log.append("No one in range to pull")
+            board.pyxel_manager.log.append("No one in range to pull")
             return
         
         is_legal_pull_check = partial(check_if_legal_pull, board.find_location_of_target(attacker), board)
@@ -277,7 +277,7 @@ class Push(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.log.append("No one in range to pull")
+            board.pyxel_manager.log.append("No one in range to pull")
             return
         
         is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
@@ -305,13 +305,13 @@ class PushAllEnemies(ActionStep):
             attacker, self.att_range, opponents=True
         )
         if not enemies:
-            board.log.append("No one in range to push")
+            board.pyxel_manager.log.append("No one in range to push")
             return
         
         is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
         
         for enemy in enemies:
-            board.log.append(f"Pushing {enemy.name}")
+            board.pyxel_manager.log.append(f"Pushing {enemy.name}")
 
             Human.move_other_character(
                 enemy,
@@ -386,7 +386,7 @@ class ActionCard:
     # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
         for action in self.actions:
-            board.log.append(f"{attacker.name} is performing {action}!")
+            board.pyxel_manager.log.append(f"{attacker.name} is performing {action}!")
             action.perform(board, attacker, round_num)
 
     def __getitem__(self, key):
