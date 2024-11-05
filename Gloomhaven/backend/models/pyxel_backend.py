@@ -64,7 +64,6 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
 
     def move_character(self, char, old_location, new_location):
-        print("moving char")
         direction = "DIR HOLDER"
         task = ActionTask(
             char.pyxel_sprite_name,
@@ -124,7 +123,6 @@ class PyxelManager:
         return valid_floor_coordinates
     
     def load_characters(self, characters: list[character.Character]):
-        print("updating characters")
         healths = [character.health for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
@@ -132,12 +130,10 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
 
     def load_log(self, log):
-        print("updating log")
         task = LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
 
     def load_action_cards(self, action_cards):
-        print("updating action cards")
         action_card_log= []
         for i,action_card in enumerate(action_cards):
             action_card_log.append(f"{i}: {action_card}")
