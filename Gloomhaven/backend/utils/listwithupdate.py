@@ -21,11 +21,15 @@ class ListWithUpdate:
 
     def append(self, item):
         self.data.append(item)
-        callable(item)
+        callable(self.data)
 
     def remove(self, item):
         self.data.remove(item)
-        callable(item)
+        callable(self.data)
+    
+    def clear(self):
+        self.data.clear()
+        callable(self.data)
 
 
 # use lambdas to encode arguments or functools.partial
