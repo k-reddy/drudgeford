@@ -2,18 +2,19 @@ import backend.models.character as character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
+from .action_model import ActionCard
 
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
-MAX_LOG_LINES = 10
 
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
         self.shared_action_queue = shared_action_queue
         self.move_duration = 700
+        self.log = ListWithUpdate([], self.load_log)
 
 
     def load_board(self, locations, terrain):
@@ -63,9 +64,10 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
 
     def move_character(self, char, old_location, new_location):
+        print("moving char")
         direction = "DIR HOLDER"
         task = ActionTask(
-            "knight",
+            char.pyxel_sprite_name,
             char.id,
             "walk",
             direction,
@@ -122,13 +124,29 @@ class PyxelManager:
         return valid_floor_coordinates
     
     def load_characters(self, characters: list[character.Character]):
+        print("updating characters")
         healths = [character.health for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
         task = LoadCharactersTask(healths, sprite_names, teams)
         self.shared_action_queue.enqueue(task)
 
-    def load_log(self, log: ListWithUpdate):
-        task = LoadLogTask(log[-MAX_LOG_LINES:])
+    def load_log(self, log):
+        print("updating log")
+        task = LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
 
+    def load_action_cards(self, action_cards):
+        print("updating action cards")
+        action_card_log= []
+        for i,action_card in enumerate(action_cards):
+            action_card_log.append(f"{i}: {action_card}")
+        task = LoadActionCardsTask(action_card_log=action_card_log)
+        self.shared_action_queue.enqueue(task)
+
+    def load_round_turn_info(self, round_num, acting_character_name):
+        task = LoadRoundTurnInfoTask(
+            round_number=round_num,
+            acting_character_name=acting_character_name
+            )
+        self.shared_action_queue.enqueue(task)

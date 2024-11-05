@@ -8,7 +8,7 @@ import time
 
 from .enums import AnimationFrame
 from .models.action_task import ActionTask
-from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
+from .models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask
 
 # from .models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
@@ -17,6 +17,8 @@ from .models.entity import Entity
 from .models.walls import Wall
 from .utils import BACKGROUND_TILES, generate_wall_bank
 from .views.sprite import Sprite, SpriteManager
+
+MAX_LOG_LINES = 10
 
 
 WALL_THICKNESS = 32
@@ -55,6 +57,11 @@ class PyxelView:
         self.initiative_bar_healths = []
         self.initiative_bar_teams = []
         self.log = []
+        self.action_card_log = []
+        self.current_card_page = 0  # Track which page of cards we're viewing
+        self.cards_per_page = 4     # Number of cards to show at once
+        self.round_number = 0
+        self.acting_character_name = ""
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -66,7 +73,7 @@ class PyxelView:
         self.valid_floor_coordinates=valid_floor_coordinates
 
         # TODO(John): replace these hardcoded numbers.
-        pyxel.init(self.board_tile_width * BITS + 32, self.board_tile_height * BITS + BITS*4)
+        pyxel.init(self.board_tile_width * BITS + 32+BITS*12, self.board_tile_height * BITS + BITS*8)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
@@ -248,12 +255,16 @@ class PyxelView:
 
     def process_load_log_task(self):
         self.log = self.current_task.log
+        return
             
         # currently assuming payload is board.locations
     def process_load_characters_task(self):
         self.initiative_bar_sprite_names = self.current_task.sprite_names
         self.initiative_bar_healths = self.current_task.healths
         self.initiative_bar_teams = self.current_task.teams
+
+    def process_load_action_card_task(self):
+        self.action_card_log = self.current_task.action_card_log
 
     def update(self):
         self.start_time = time.time()
@@ -275,19 +286,39 @@ class PyxelView:
             else:
                 self.current_task = temp_task
                 return
-
         if self.current_task:
             if isinstance(self.current_task, ActionTask):
                 self.process_action()
             elif isinstance(self.current_task, RemoveEntityTask):
                 self.process_remove_entity_task()
+                self.current_task=None
             elif isinstance(self.current_task, AddEntityTask):
                 self.process_entity_loading_task()
+                self.current_task=None
             elif isinstance(self.current_task, LoadCharactersTask):
                 self.process_load_characters_task()
+                self.current_task=None
             elif isinstance(self.current_task, LoadLogTask):
                 self.process_load_log_task()
-            self.current_task=None
+                self.current_task=None
+            elif isinstance(self.current_task, LoadActionCardsTask):
+                self.process_load_action_card_task()
+                self.current_task=None
+            elif isinstance(self.current_task, LoadRoundTurnInfoTask):
+                self.round_number=self.current_task.round_number
+                self.acting_character_name=self.current_task.acting_character_name
+                self.current_task=None
+        
+        # Add controls for scrolling
+        if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
+            # Go to next page if there are more cards to show
+            if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
+                self.current_card_page += 1
+        
+        if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
+            # Go to previous page if we're not at the start
+            if self.current_card_page > 0:
+                self.current_card_page -= 1
             
     def draw_health_and_iniative_bar(self, sprite_names, healths, teams) -> None:
         '''
@@ -386,11 +417,46 @@ class PyxelView:
                     )
 
         # draw log
+        x = BITS*11
+        y=BITS
+        if self.log or self.round_number > 0:
+            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
+                pyxel.text(x,y,line,col=7)
+                y_lines = line.count('\n') + 1
+                y+=8*y_lines
+            
+        # draw action_cards
+        # x = 0
+        # y=self.canvas.board_end_pos[1] + BITS//2
+        # for line in self.action_card_log:
+        #     pyxel.text(x,y,line,col=7)
+        #     y_lines = line.count('\n') + 1
+        #     x+=BITS*3
+
+        # Draw action cards
+        start_idx = self.current_card_page * self.cards_per_page
+        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
+        
         x = 0
         y = self.canvas.board_end_pos[1] + BITS//2
-        for line in self.log:
-            pyxel.text(x,y,line,col=7)
-            y+=8
+        
+        # Draw only the current page of cards
+        for line in self.action_card_log[start_idx:end_idx]:
+            pyxel.text(x, y, line, col=7)
+            x += BITS*4
+
+        # Optional: Draw page indicator
+        if self.action_card_log:
+            indicator_y = y + BITS*4
+            total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
+            page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+            pyxel.text(0, indicator_y, page_text, col=7)
+
+        # Optional: Draw navigation hints
+        if self.current_card_page > 0:
+            pyxel.text(BITS*3, indicator_y, "<- Previous", col=7)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
+            pyxel.text(BITS*(end_idx-1)*4, indicator_y, "-> Next", col=7)
         # Draw framerate and frame duration.
 
         # Calculate duration and framerate

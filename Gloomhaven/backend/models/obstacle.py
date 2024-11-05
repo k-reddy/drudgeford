@@ -56,7 +56,7 @@ class PoisonShroom(TerrainObject):
         
     def perform(self, row, col, board):
         board.clear_terrain_square(row, col)
-        board.log.append("The mushroom exploded into spores!")
+        board.pyxel_manager.log.append("The mushroom exploded into spores!")
         board.add_effect_to_terrain_for_attack(Spores, row, col, shapes.circle(1))
 
 class Spores(TerrainObject):
