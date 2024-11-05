@@ -22,12 +22,12 @@ class Display:
             return
         if self.round_number == 0:
             return
-        self.clear_display()
-        # self._draw_board()
-        self._print_round_and_turn_info()
-        self._print_healths()
-        print("\n")
-        self._print_log()
+        # self.clear_display()
+        # # self._draw_board()
+        # self._print_round_and_turn_info()
+        # self._print_healths()
+        # print("\n")
+        # self._print_log()
 
     def update_locations(self, locations) -> None:
         self.locations = locations

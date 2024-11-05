@@ -2,7 +2,7 @@ import backend.models.character as character
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
+from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask, LoadActionCardsTask
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 from .action_model import ActionCard
@@ -130,4 +130,11 @@ class PyxelManager:
 
     def load_log(self, log: ListWithUpdate):
         task = LoadLogTask(log)
+        self.shared_action_queue.enqueue(task)
+
+    def load_action_cards(self, action_cards):
+        action_card_log= []
+        for i,action_card in enumerate(action_cards):
+            action_card_log.append(f"{i}: {action_card}")
+        task = LoadActionCardsTask(action_card_log=action_card_log)
         self.shared_action_queue.enqueue(task)
