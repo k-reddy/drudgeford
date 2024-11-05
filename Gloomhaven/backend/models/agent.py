@@ -112,7 +112,6 @@ class Human(Agent):
         prompt = "Please type the number of the opponent you want to attack"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        disp.add_to_log("")
         return in_range_opponents[int(target_num)]
     
     @staticmethod
