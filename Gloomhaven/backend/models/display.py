@@ -106,7 +106,8 @@ class Display:
             self.add_to_log(f"{i}: {action_card}")
 
     def clear_log(self) -> None:
-        self.log = []
+        # self.log = []
+        pass
 
     def get_user_input(self, prompt: str, valid_inputs=None):
         user_input = input(prompt)

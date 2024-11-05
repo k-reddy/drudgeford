@@ -289,15 +289,19 @@ class PyxelView:
                 self.process_action()
             elif isinstance(self.current_task, RemoveEntityTask):
                 self.process_remove_entity_task()
+                self.current_task=None
             elif isinstance(self.current_task, AddEntityTask):
                 self.process_entity_loading_task()
+                self.current_task=None
             elif isinstance(self.current_task, LoadCharactersTask):
                 self.process_load_characters_task()
+                self.current_task=None
             elif isinstance(self.current_task, LoadLogTask):
                 self.process_load_log_task()
+                self.current_task=None
             elif isinstance(self.current_task, LoadActionCardsTask):
                 self.process_load_action_card_task()
-            self.current_task=None
+                self.current_task=None
         
         # Add controls for scrolling
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
@@ -407,7 +411,7 @@ class PyxelView:
                     )
 
         # draw log
-        x = BITS*10
+        x = BITS*11
         y=BITS
         # y = self.canvas.board_end_pos[1] + BITS//2
         for line in self.log[-MAX_LOG_LINES:]:
@@ -446,7 +450,7 @@ class PyxelView:
         if self.current_card_page > 0:
             pyxel.text(BITS*3, indicator_y, "<- Previous", col=7)
         if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
-            pyxel.text(BITS*end_idx*4, indicator_y, "-> Next", col=7)
+            pyxel.text(BITS*(end_idx-1)*4, indicator_y, "-> Next", col=7)
         # Draw framerate and frame duration.
 
         # Calculate duration and framerate

@@ -157,6 +157,8 @@ Kill it or be killed..."""
         if not self.all_ai_mode:
             self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
             self.disp.clear_log()
+            self.pyxel_manager.load_action_cards([])
+            self.board.log.clear() 
 
     def _end_round(self) -> None:
         for char in self.board.characters:
