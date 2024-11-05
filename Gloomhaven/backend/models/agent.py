@@ -88,14 +88,12 @@ class Human(Agent):
     @staticmethod
     def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
         # let them pick a valid action_card
-        disp.log_action_cards(available_action_cards)
         prompt = "Which action card would you like to pick? Type the number exactly."
         valid_inputs = [str(i) for i, _ in enumerate(available_action_cards)]
 
         action_card_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
 
-        disp.clear_log()
         return action_card_to_perform
     
     @staticmethod
@@ -106,22 +104,21 @@ class Human(Agent):
     @staticmethod
     def select_attack_target(disp, in_range_opponents: list, board, char):
         # show in range opponents
-        disp.add_to_log("Opponents in range: ")
+        board.pyxel_manager.log.append("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            disp.add_to_log(f"{i}: {opponent.emoji} {opponent.name}")
+            board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
 
         # get user input on which to attack
         prompt = "Please type the number of the opponent you want to attack"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
-        disp.add_to_log("")
         return in_range_opponents[int(target_num)]
     
     @staticmethod
     def perform_movement(char, movement, is_jump, board, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
         while remaining_movement > 0:
-            char.disp.add_to_log(f"\nMovement remaining: {remaining_movement}")    
+            board.pyxel_manager.log.append(f"\nMovement remaining: {remaining_movement}")    
             prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
             direction = char.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
             
@@ -144,13 +141,13 @@ class Human(Agent):
                 remaining_movement -= 1
                 continue
             else:
-                char.disp.add_to_log(
+                board.pyxel_manager.log.append(
                     "Invalid movement direction (obstacle, character, or board edge) - try again"
                 )
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
-        char.disp.add_to_log("Movement done! \n")
+        board.pyxel_manager.log.append("Movement done! \n")
 
     @staticmethod
     def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
