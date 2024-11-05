@@ -5,10 +5,10 @@ from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.update_tasks import AddEntityTask, RemoveEntityTask, LoadCharactersTask, LoadLogTask
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
+from .action_model import ActionCard
 
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
-MAX_LOG_LINES = 10
 
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
@@ -65,7 +65,7 @@ class PyxelManager:
     def move_character(self, char, old_location, new_location):
         direction = "DIR HOLDER"
         task = ActionTask(
-            "knight",
+            char.pyxel_sprite_name,
             char.id,
             "walk",
             direction,
@@ -129,6 +129,5 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
 
     def load_log(self, log: ListWithUpdate):
-        task = LoadLogTask(log[-MAX_LOG_LINES:])
+        task = LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
-
