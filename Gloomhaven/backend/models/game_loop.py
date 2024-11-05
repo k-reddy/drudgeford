@@ -96,7 +96,7 @@ Kill it or be killed..."""
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
             if acting_character.shield[0]>0:
-                self.disp.add_to_log((f"{acting_character.name} has shield {acting_character.shield[0]}"))
+                self.board.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}"))
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
@@ -170,13 +170,13 @@ Kill it or be killed..."""
     def refresh_character_cards(self, char: character.Character) -> None:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
         if len(char.available_action_cards) == 0:
-            self.disp.add_to_log("No more action cards left, time to short rest!")
+            self.board.log.append("No more action cards left, time to short rest!")
             char.short_rest()
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
             if not char.team_monster:
-                self.disp.add_to_log("Drat, you ran out of cards and got exhausted")
+                self.board.log.append("Drat, you ran out of cards and got exhausted")
                 self.game_state = GameState.EXHAUSTED
             else:
                 raise ValueError("Monsters getting exhausted...")

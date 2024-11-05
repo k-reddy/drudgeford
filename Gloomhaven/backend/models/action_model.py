@@ -251,7 +251,7 @@ class Pull(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.disp.add_to_log("No one in range to pull")
+            board.log.append("No one in range to pull")
             return
         
         is_legal_pull_check = partial(check_if_legal_pull, board.find_location_of_target(attacker), board)
@@ -277,7 +277,7 @@ class Push(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.disp.add_to_log("No one in range to pull")
+            board.log.append("No one in range to pull")
             return
         
         is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
@@ -305,13 +305,13 @@ class PushAllEnemies(ActionStep):
             attacker, self.att_range, opponents=True
         )
         if not enemies:
-            board.disp.add_to_log("No one in range to push")
+            board.log.append("No one in range to push")
             return
         
         is_legal_push_check = partial(check_if_legal_push, board.find_location_of_target(attacker), board)
         
         for enemy in enemies:
-            board.disp.add_to_log(f"Pushing {enemy.name}")
+            board.log.append(f"Pushing {enemy.name}")
 
             Human.move_other_character(
                 enemy,
