@@ -14,6 +14,7 @@ class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
         self.shared_action_queue = shared_action_queue
         self.move_duration = 700
+        self.log = ListWithUpdate([], self.load_log)
 
 
     def load_board(self, locations, terrain):
@@ -132,7 +133,6 @@ class PyxelManager:
 
     def load_log(self, log):
         print("updating log")
-        print(log)
         task = LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
 

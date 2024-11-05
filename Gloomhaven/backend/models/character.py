@@ -11,7 +11,7 @@ MAX_ROUNDS = 1000
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         self.id = char_id
         self.health = 8
         self.name = name
@@ -27,6 +27,7 @@ class Character(abc.ABC):
         self.attack_modifier_deck = self.make_attack_modifier_deck()
         self.team_monster = is_monster
         self.shield: tuple[int,int] = (0, MAX_ROUNDS)
+        self.log = log
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
@@ -35,21 +36,21 @@ class Character(abc.ABC):
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        self.disp.add_to_log(f"{self.name} is performing {action_card}\n")
+        self.log.append(f"{self.name} is performing {action_card}\n")
         return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, movement, is_jump, board):
         if movement == 0:
-            self.disp.add_to_log("No movement!")
+            self.log.append("No movement!")
             return
-        self.disp.add_to_log(f"{self.name} is moving")
+        self.log.append(f"{self.name} is moving")
         self.agent.perform_movement(self, movement, is_jump, board)
         # add some space between the movement and attack
-        self.disp.add_to_log("")
+        self.log.append("")
 
     def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
-            self.disp.add_to_log("No opponents in range\n")
+            self.log.append("No opponents in range\n")
             return None
         return self.agent.select_attack_target(self.disp, in_range_opponents, board, self)
 
@@ -58,7 +59,7 @@ class Character(abc.ABC):
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
         # kill a random card, update the user, remove it from play, and keep track for next round
         killed_card = random.choice(self.available_action_cards)
-        self.disp.add_to_log(f"You lost {killed_card}")
+        self.log.append(f"You lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
 
@@ -126,8 +127,8 @@ class Character(abc.ABC):
         return action_cards
 
 class Wizard(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.health = character_classes.wizard.health
         self.backstory = character_classes.wizard.backstory
         self.pyxel_sprite_name = "wizard"
@@ -136,8 +137,8 @@ class Wizard(Character):
         return character_classes.wizard.cards
     
 class Miner(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.health = character_classes.miner.health
         self.backstory = character_classes.miner.backstory
         self.pyxel_sprite_name = "miner"
@@ -146,37 +147,37 @@ class Miner(Character):
         return character_classes.miner.cards
 
 class Necromancer(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "necromancer"
     
     def create_action_cards(self):
         return character_classes.necromancer.cards
     
 class Monk(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "monk"
     
     def create_action_cards(self):
         return character_classes.monk.cards
 
 class Treeman(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "treeman"
 
 class EvilBlob(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "evilblob"
 
 class Skeleton(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "skeleton"
 
 class Corpse(Character):
-    def __init__(self, name, disp, emoji, agent, char_id, is_monster):
-        super().__init__(name, disp, emoji, agent, char_id, is_monster)
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "corpse"
