@@ -11,7 +11,6 @@ from pyxel_ui.constants import (
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.models.font import PixelFont
-from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
 from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.models import view_section as view
 
