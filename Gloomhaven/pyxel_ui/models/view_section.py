@@ -3,6 +3,7 @@ import random
 import pyxel
 from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
 from pyxel_ui.views.sprite import Sprite, SpriteManager
+from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import (
     GRID_COLOR,
     MAX_LOG_LINES,
@@ -140,26 +141,13 @@ class MapView(ViewSection):
                 GRID_COLOR,
             )
 
-    def draw_sprite(self, x, y, sprite: Sprite, colkey=0, scale=1) -> None:
-        pyxel.blt(
-            x,
-            y,
-            sprite.img_bank,
-            sprite.u,
-            sprite.v,
-            sprite.w,
-            sprite.h,
-            colkey,
-            scale=scale,
-        )
-
     def draw_sprites(self) -> None:
         """draws entity sprites with a notion of priority"""
         max_priority = max((entity.priority for entity in self.entities.values()), default=0)
         for i in range(0, max_priority + 1):
             for _, entity in self.entities.items():
                 if entity.priority == i:
-                    self.draw_sprite(
+                    draw_sprite(
                         entity.x,
                         entity.y,
                         self.sprite_manager.get_sprite(
@@ -200,3 +188,94 @@ class ActionCardView(ViewSection):
             pyxel.text(BITS * 3, y_start, "<- Previous", col=7)
         if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
             pyxel.text(x_start, y_start, "-> Next", col=7)
+
+class InitiativeBarView(ViewSection):
+    sprite_names: list[str] = []
+    healths: list[int] = []
+    teams: list[bool] = []
+    horiz_gap = 12
+    sprite_width = BITS  # BITS is the sprite width constant
+    font_offset = BITS // 4
+    vertical_gap = BITS  # Gap between rows
+    sprite_manager = SpriteManager()
+
+    def draw(self) -> None:
+        """
+        Draw a bar showing health and initiative for sprites, with team indicators.
+
+        Args:
+            sprite_names: List of sprite names to display
+            healths: List of health values corresponding to sprites
+            teams: List of boolean values (True for monster team, False for player team)
+        """
+
+
+        # Calculate maximum items per row based on screen width
+        item_width = self.sprite_width + self.horiz_gap
+        # Leave some margin on both sides
+        usable_width = self.bounding_coordinate[0] - self.start_pos[0] - (self.sprite_width // 2)
+        items_per_row = max(1, usable_width // item_width)
+        print(usable_width)
+        print(item_width)
+        print(items_per_row)
+
+        # Calculate items for each row
+        first_row = self.sprite_names[:items_per_row]
+        second_row = self.sprite_names[items_per_row:]
+
+        for row_num, row_items in enumerate([first_row, second_row]):
+            if not row_items:
+                continue
+
+            # Calculate total width needed for this row
+            item_width = self.sprite_width + self.horiz_gap
+            row_width = item_width * len(row_items)
+
+            # Center alignment calculation for this row
+            screen_center_x = (self.bounding_coordinate[0]-self.start_pos[0])//2
+            start_x = screen_center_x - (row_width // 2)
+
+            for i, sprite_name in enumerate(row_items):
+                actual_index = i if row_num == 0 else i + items_per_row
+
+                # Calculate x and y positions
+                x_pos = start_x + (i * (self.sprite_width + self.horiz_gap))
+                y_pos = row_num * self.vertical_gap
+
+                # Draw sprite
+                draw_sprite(
+                    x_pos,
+                    y_pos,
+                    self.sprite_manager.get_sprite(sprite_name, AnimationFrame.SOUTH),
+                    colkey=0,
+                    scale=0.5,
+                )
+
+                # Draw health text
+                pyxel.text(x_pos + self.font_offset, y_pos, f"H:{self.healths[actual_index]}", 7)
+
+                # Draw team indicator line
+                line_y = y_pos + BITS - self.sprite_width // 4  # Position line below sprite
+                line_color = (
+                    8 if self.teams[actual_index] else 11
+                )  # Red (8) for monsters, Green (11) for players
+                pyxel.line(
+                    x_pos + self.sprite_width // 4,
+                    line_y,
+                    x_pos + self.sprite_width - self.sprite_width // 4,
+                    line_y,
+                    line_color,
+                )
+
+def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
+    pyxel.blt(
+        x,
+        y,
+        sprite.img_bank,
+        sprite.u,
+        sprite.v,
+        sprite.w,
+        sprite.h,
+        colkey,
+        scale=scale,
+    )
