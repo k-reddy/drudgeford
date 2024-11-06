@@ -7,16 +7,6 @@ from pyxel_ui.constants import (
     MAX_LOG_LINES,
 )
 
-class ViewSection(abc.ABC):
-    def __init__(self, font, start_pos, bounding_coordinate):
-        self.font = font
-        self.start_pos = start_pos
-        self.end_pos = start_pos
-        self.bounding_coordinate = bounding_coordinate
-
-    @abc.abstractmethod
-    def draw(self):
-        pass
 
 WALL_DIRECTIONS = [
     {
@@ -45,6 +35,17 @@ WALL_DIRECTIONS = [
     },
 ]
 
+class ViewSection(abc.ABC):
+    def __init__(self, font, start_pos, bounding_coordinate):
+        self.font = font
+        self.start_pos = start_pos
+        self.end_pos = start_pos
+        self.bounding_coordinate = bounding_coordinate
+
+    @abc.abstractmethod
+    def draw(self):
+        pass
+    
 class LogView(ViewSection):
     log: list[str] = []
     round_number: int = 0
