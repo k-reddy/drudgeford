@@ -13,6 +13,7 @@ from pyxel_ui.models.entity import Entity
 from pyxel_ui.models.font import PixelFont
 from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
 from pyxel_ui.views.sprite import Sprite, SpriteManager
+from pyxel_ui.models.view_section import LogView
 
 
 class Renderer:
@@ -240,19 +241,24 @@ class Renderer:
     def draw_log(
         self, log: list[str], round_number: int, acting_character_name: str
     ) -> None:
-        x = BITS * 11
-        y = BITS
-        if log or round_number > 0:
-            for line in [f"Round {round_number}, {acting_character_name}'s turn"] + log[
-                -MAX_LOG_LINES:
-            ]:
-                self.font.draw_text(
-                    x, y, line, col=7, size="medium", max_width=BITS * 8
-                )
-                y += (
-                    self.font.get_text_height(line, size="medium", max_width=BITS * 8)
-                    + 4
-                )
+        logview = LogView(self.font,[BITS*11, BITS],[BITS*19, BITS*9])
+        logview.log = log
+        logview.round_number=round_number
+        logview.acting_character_name=acting_character_name
+        logview.draw()
+        # x = BITS * 11
+        # y = BITS
+        # if log or round_number > 0:
+        #     for line in [f"Round {round_number}, {acting_character_name}'s turn"] + log[
+        #         -MAX_LOG_LINES:
+        #     ]:
+        #         self.font.draw_text(
+        #             x, y, line, col=7, size="medium", max_width=BITS * 8
+        #         )
+        #         y += (
+        #             self.font.get_text_height(line, size="medium", max_width=BITS * 8)
+        #             + 4
+        #         )
 
     def draw_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
         dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1, 13)]
