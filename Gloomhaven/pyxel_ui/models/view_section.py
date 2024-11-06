@@ -1,9 +1,8 @@
 import abc
 
 class ViewSection(abc.ABC):
-    @abc.abstractmethod
-    def __init__(self, pyxel, start_pos, bounding_coordinate):
-        self.pyxel = pyxel
+    def __init__(self, font, start_pos, bounding_coordinate):
+        self.font = font
         self.start_pos = start_pos
         self.end_pos = start_pos
         self.bounding_coordinate = bounding_coordinate
@@ -28,7 +27,7 @@ class LogView(ViewSection):
         for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[
             -self.max_log_lines:
         ]:
-            self.pyxel.font.draw_text(
+            self.font.draw_text(
                 self.start_pos[0],
                 log_line_y,
                 line,
@@ -36,6 +35,6 @@ class LogView(ViewSection):
                 size="medium",
                 max_width=self.bounding_coordinate[0]-self.start_pos[0]
             )
-            line_height = self.pyxel.font.get_text_height(line, size="medium", max_width=self.bounding_coordinate[0]-self.start_pos[0]) + 4
+            line_height = self.font.get_text_height(line, size="medium", max_width=self.bounding_coordinate[0]-self.start_pos[0]) + 4
             log_line_y += line_height
 
