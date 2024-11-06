@@ -1,48 +1,26 @@
 import abc
 import random
 import pyxel
-from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
+from pyxel_ui.utils import draw_tile
 from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import (
     GRID_COLOR,
     MAX_LOG_LINES,
-    BITS
+    BITS,
+    BACKGROUND_TILES,
+    WALL_DIRECTIONS
 )
 from pyxel_ui.models.entity import Entity
 
-
 # !!! somehow enforce the end bounds throughout
 # !!! have tasks update the view data directly
-
-WALL_DIRECTIONS = [
-    {
-        "coord": (1, 0),
-        "wall_tile_name": "new_wall_ns",
-        "height": 32,
-        "width": 4,
-    },
-    {
-        "coord": (-1, 0),
-        "wall_tile_name": "new_wall_ns",
-        "height": 32,
-        "width": 4,
-    },
-    {
-        "coord": (0, 1),
-        "wall_tile_name": "new_wall_ew",
-        "height": 4,
-        "width": 32,
-    },
-    {
-        "coord": (0, -1),
-        "wall_tile_name": "new_wall_ew",
-        "height": 4,
-        "width": 32,
-    },
-]
+# !!! figure out who should be initializing the views and managing them
 
 class ViewSection(abc.ABC):
+    '''view sections are pieces of the pyxel display that 
+    know their own data and draw themselves within the bounds they
+    are given by the controller'''
     def __init__(self, font, start_pos, bounding_coordinate):
         self.font = font
         self.start_pos = start_pos
@@ -57,6 +35,7 @@ class LogView(ViewSection):
     log: list[str] = []
     round_number: int = 0
     acting_character_name: str = ""
+    # !!! I want to set this dynamically based on the amount of space we have
     max_log_lines: int = MAX_LOG_LINES
 
     def draw(self) -> None:
@@ -83,6 +62,7 @@ class LogView(ViewSection):
 class MapView(ViewSection):
     dungeon_floor_tile_names: list[str] = [f"dungeon_floor_cracked_{i}" for i in range(1, 13)]
     valid_map_coordinates = [[]]
+    # !!! these 2 should probably be set in the init
     tile_width_px = 0
     tile_height_px = 0
     sprite_manager = SpriteManager()
@@ -158,43 +138,52 @@ class MapView(ViewSection):
                     )
 
 class ActionCardView(ViewSection):
+    # !!! we should probably set a card width and then 
+    # set cards per page dynamically rather than the other 
+    # way around
     action_card_log: list[str] = []
     current_card_page = 0
     cards_per_page = 3
     def draw(self) -> None:
+        if not self.action_card_log:
+            return 
+        
+        self.draw_page_indicator(self.start_pos[1])
+
         # Draw action cards
         start_idx = self.current_card_page * self.cards_per_page
         end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
 
         x = self.start_pos[0]
+        # !!! ideally put something here that measures the height of the page indicator
+        y = self.start_pos[1] + 10
         card_border = 4
         card_width = (self.bounding_coordinate[0]-self.start_pos[0]-self.cards_per_page*card_border)//self.cards_per_page
         # Draw only the current page of cards
         for card in self.action_card_log[start_idx:end_idx]:
-            self.font.draw_text(x, self.start_pos[1], card, col=7, size="medium", max_width=card_width)
+            self.font.draw_text(x, y, card, col=7, size="medium", max_width=card_width)
             x += card_width + card_border
 
-        if self.action_card_log:
-            # !!! should change this to measure the height of the cards
-            indicator_navig_start_y = self.start_pos[1] + BITS * 4 + card_border
-            self.draw_page_indicator(indicator_navig_start_y)
-            self.draw_navigation_hints(x, indicator_navig_start_y)
+        # !!! should change this to measure the height of the cards and page indicator
+        navigation_start_y = self.start_pos[1] + BITS * 4 + card_border + 10
+        self.draw_navigation_hints(x-card_width//2, navigation_start_y)
 
-    def draw_page_indicator(self, y_start) -> None:
+    def draw_page_indicator(self,y_start) -> None:
         total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
         page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-        pyxel.text(0, y_start, page_text, col=7)
+        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
 
-    def draw_navigation_hints(self, x_start, y_start) -> None:
+    def draw_navigation_hints(self, x_start_next, y_start) -> None:
         if self.current_card_page > 0:
-            pyxel.text(BITS * 3, y_start, "<- Previous", col=7)
+            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
         if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
-            pyxel.text(x_start, y_start, "-> Next", col=7)
+            pyxel.text(x_start_next, y_start, "-> Next", col=7)
 
 class InitiativeBarView(ViewSection):
     sprite_names: list[str] = []
     healths: list[int] = []
     teams: list[bool] = []
+    # !!! we should rename bits or something b/c this feels sort of arbitrary
     horiz_gap = 12
     sprite_width = BITS  # BITS is the sprite width constant
     font_offset = BITS // 4
