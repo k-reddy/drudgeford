@@ -1,5 +1,6 @@
 import pyxel
 import random
+import os
 
 from collections import defaultdict, deque
 import itertools
@@ -17,6 +18,7 @@ from .models.entity import Entity
 from .models.walls import Wall
 from .utils import BACKGROUND_TILES, generate_wall_bank
 from .views.sprite import Sprite, SpriteManager
+from .models.font import PixelFont
 
 MAX_LOG_LINES = 10
 
@@ -59,9 +61,13 @@ class PyxelView:
         self.log = []
         self.action_card_log = []
         self.current_card_page = 0  # Track which page of cards we're viewing
-        self.cards_per_page = 4     # Number of cards to show at once
+        self.cards_per_page = 3     # Number of cards to show at once
         self.round_number = 0
         self.acting_character_name = ""
+        font_path = os.path.join("pyxel_ui","assets", "Press_Start_2P", "PressStart2P-Regular.ttf")     
+        print(font_path)
+
+        self.font = PixelFont(pyxel, font_path)
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -391,74 +397,13 @@ class PyxelView:
             self.initiative_bar_teams
         )
 
-        # draw floor and walls
-        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
-        self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
+        # draw map background and grid
+        self.draw_map()
 
-        # draw grid only on valid floor coordinates
-        for x, y in self.valid_floor_coordinates:
-            pyxel.rectb(
-                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
-                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
-                self.canvas.tile_width_px,
-                self.canvas.tile_height_px,
-                GRID_COLOR
-            )
+        self.draw_sprites()
 
-        # draw entity sprites with a notion of priority
-        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
-        for i in range(0,max_priority+1):
-            for _, entity in self.entities.items():
-                if entity.priority == i:
-                    self.draw_sprite(
-                        entity.x,
-                        entity.y,
-                        self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
-                    )
-
-        # draw log
-        x = BITS*11
-        y=BITS
-        if self.log or self.round_number > 0:
-            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
-                pyxel.text(x,y,line,col=7)
-                y_lines = line.count('\n') + 1
-                y+=8*y_lines
-            
-        # draw action_cards
-        # x = 0
-        # y=self.canvas.board_end_pos[1] + BITS//2
-        # for line in self.action_card_log:
-        #     pyxel.text(x,y,line,col=7)
-        #     y_lines = line.count('\n') + 1
-        #     x+=BITS*3
-
-        # Draw action cards
-        start_idx = self.current_card_page * self.cards_per_page
-        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
-        
-        x = 0
-        y = self.canvas.board_end_pos[1] + BITS//2
-        
-        # Draw only the current page of cards
-        for line in self.action_card_log[start_idx:end_idx]:
-            pyxel.text(x, y, line, col=7)
-            x += BITS*4
-
-        # Optional: Draw page indicator
-        if self.action_card_log:
-            indicator_y = y + BITS*4
-            total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
-            page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-            pyxel.text(0, indicator_y, page_text, col=7)
-
-        # Optional: Draw navigation hints
-        if self.current_card_page > 0:
-            pyxel.text(BITS*3, indicator_y, "<- Previous", col=7)
-        if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
-            pyxel.text(BITS*(end_idx-1)*4, indicator_y, "-> Next", col=7)
-        # Draw framerate and frame duration.
-
+        self.draw_log()
+        self.draw_action_cards()
         # Calculate duration and framerate
         loop_duration = time.time() - self.start_time
         self.loop_durations.append(loop_duration)
@@ -469,3 +414,70 @@ class PyxelView:
             avg_duration_ms = avg_duration * 1000
             rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
             # pyxel.text(10, 20, rate_stats, 7)
+
+    def draw_grid(self):
+        # draw grid only on valid floor coordinates
+        for x, y in self.valid_floor_coordinates:
+            pyxel.rectb(
+                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
+                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
+                self.canvas.tile_width_px,
+                self.canvas.tile_height_px,
+                GRID_COLOR
+            )
+        
+    def draw_map(self):
+        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
+        self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
+        self.draw_grid()
+
+    def draw_sprites(self):
+        ''' draws entity sprites with a notion of priority'''
+        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
+        for i in range(0,max_priority+1):
+            for _, entity in self.entities.items():
+                if entity.priority == i:
+                    self.draw_sprite(
+                        entity.x,
+                        entity.y,
+                        self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
+                    )
+        
+    def draw_log(self):
+        x = BITS*11
+        y=BITS
+        if self.log or self.round_number > 0:
+            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
+                self.font.draw_text(x,y,line, col=7, size="medium", max_width=BITS*8)
+                y+=self.font.get_text_height(line, size="medium", max_width=BITS*8) + 4
+          
+
+    def draw_action_cards(self):
+        # Draw action cards
+        start_idx = self.current_card_page * self.cards_per_page
+        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
+        
+        x = 0
+        y = self.canvas.board_end_pos[1] + BITS//2
+        
+        # Draw only the current page of cards
+        for line in self.action_card_log[start_idx:end_idx]:
+            self.font.draw_text(x, y, line, col=7, size="medium", max_width= BITS*6)
+            x += BITS*6 + 4
+
+        if self.action_card_log:
+            self.draw_page_indicator(y)
+            self.draw_navigation_hints(y, end_idx)
+
+    def draw_page_indicator(self, y):
+        indicator_y = y + BITS*4
+        total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(0, indicator_y, page_text, col=7)
+
+    def draw_navigation_hints(self, y, end_idx):
+        indicator_y = y + BITS*4
+        if self.current_card_page > 0:
+            pyxel.text(BITS*3, indicator_y, "<- Previous", col=7)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
+            pyxel.text(BITS*(end_idx-1)*4, indicator_y, "-> Next", col=7)
