@@ -12,6 +12,8 @@ from pyxel_ui.constants import (
 from pyxel_ui.models.entity import Entity
 
 
+# !!! somehow enforce the end bounds throughout
+# !!! have tasks update the view data directly
 
 WALL_DIRECTIONS = [
     {
@@ -208,16 +210,11 @@ class InitiativeBarView(ViewSection):
             healths: List of health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
-
-
         # Calculate maximum items per row based on screen width
         item_width = self.sprite_width + self.horiz_gap
         # Leave some margin on both sides
         usable_width = self.bounding_coordinate[0] - self.start_pos[0] - (self.sprite_width // 2)
         items_per_row = max(1, usable_width // item_width)
-        print(usable_width)
-        print(item_width)
-        print(items_per_row)
 
         # Calculate items for each row
         first_row = self.sprite_names[:items_per_row]
