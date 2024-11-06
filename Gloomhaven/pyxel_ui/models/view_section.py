@@ -9,5 +9,6 @@ class ViewSection(abc.ABC):
     def draw(self):
         pass
 
+    @abc.abstractmethod
     def update(self):
         pass
