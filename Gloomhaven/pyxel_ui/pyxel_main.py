@@ -397,11 +397,8 @@ class PyxelView:
             self.initiative_bar_teams
         )
 
-        # draw floor and walls
-        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
-        self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
-
-        self.draw_grid()
+        # draw map background and grid
+        self.draw_map()
 
         self.draw_sprites()
 
@@ -429,6 +426,11 @@ class PyxelView:
                 GRID_COLOR
             )
         
+    def draw_map(self):
+        dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
+        self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
+        self.draw_grid()
+
     def draw_sprites(self):
         ''' draws entity sprites with a notion of priority'''
         max_priority = max((entity.priority for entity in self.entities.values()), default=0)
