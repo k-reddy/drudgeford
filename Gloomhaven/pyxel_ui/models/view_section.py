@@ -2,10 +2,13 @@ import abc
 import random
 import pyxel
 from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
+from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.constants import (
     GRID_COLOR,
     MAX_LOG_LINES,
 )
+from pyxel_ui.models.entity import Entity
+
 
 
 WALL_DIRECTIONS = [
@@ -45,7 +48,7 @@ class ViewSection(abc.ABC):
     @abc.abstractmethod
     def draw(self):
         pass
-    
+
 class LogView(ViewSection):
     log: list[str] = []
     round_number: int = 0
@@ -78,6 +81,8 @@ class MapView(ViewSection):
     valid_map_coordinates = [[]]
     tile_width_px = 0
     tile_height_px = 0
+    sprite_manager = SpriteManager()
+    entities = {}
 
     def draw(self):
         self.draw_map_background()
@@ -133,3 +138,30 @@ class MapView(ViewSection):
                 self.tile_height_px,
                 GRID_COLOR,
             )
+
+    def draw_sprite(self, x, y, sprite: Sprite, colkey=0, scale=1) -> None:
+        pyxel.blt(
+            x,
+            y,
+            sprite.img_bank,
+            sprite.u,
+            sprite.v,
+            sprite.w,
+            sprite.h,
+            colkey,
+            scale=scale,
+        )
+
+    def draw_sprites(self) -> None:
+        """draws entity sprites with a notion of priority"""
+        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
+        for i in range(0, max_priority + 1):
+            for _, entity in self.entities.items():
+                if entity.priority == i:
+                    self.draw_sprite(
+                        entity.x,
+                        entity.y,
+                        self.sprite_manager.get_sprite(
+                            entity.name, entity.animation_frame
+                        ),
+                    )

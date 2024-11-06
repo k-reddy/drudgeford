@@ -22,6 +22,11 @@ class Renderer:
         self.canvas = canvas
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
+        self.mapview = MapView(
+            self.font, 
+            self.canvas.board_start_pos,
+            [BITS*10, BITS*10]
+            )
 
     # Card related methods grouped together
     def draw_action_cards(
@@ -167,40 +172,16 @@ class Renderer:
 
 
     def draw_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
-        mapview = MapView(
-            self.font, 
-            self.canvas.board_start_pos,
-            [BITS*10, BITS*10]
-            )
-        mapview.tile_width_px = self.canvas.tile_width_px
-        mapview.tile_height_px = self.canvas.tile_height_px
-        mapview.valid_map_coordinates = valid_floor_coordinates
-        mapview.draw()
+        self.mapview.tile_width_px = self.canvas.tile_width_px
+        self.mapview.tile_height_px = self.canvas.tile_height_px
+        self.mapview.valid_map_coordinates = valid_floor_coordinates
+        self.mapview.draw()
 
     def draw_sprite(self, x, y, sprite: Sprite, colkey=0, scale=1) -> None:
-        # sprite = self.sprite_manager.get_sprite(sprite_name, animation_frame)
-        pyxel.blt(
-            x,
-            y,
-            sprite.img_bank,
-            sprite.u,
-            sprite.v,
-            sprite.w,
-            sprite.h,
-            colkey,
-            scale=scale,
-        )
+        self.mapview.draw_sprite(x,y,sprite, colkey, scale)
 
     def draw_sprites(self, entities: list[Entity]) -> None:
         """draws entity sprites with a notion of priority"""
-        max_priority = max((entity.priority for entity in entities.values()), default=0)
-        for i in range(0, max_priority + 1):
-            for _, entity in entities.items():
-                if entity.priority == i:
-                    self.draw_sprite(
-                        entity.x,
-                        entity.y,
-                        self.sprite_manager.get_sprite(
-                            entity.name, entity.animation_frame
-                        ),
-                    )
+        self.mapview.entities = entities
+        self.mapview.draw_sprites()
+        
