@@ -401,35 +401,11 @@ class PyxelView:
         dungeon_floor_tiles = [f"dungeon_floor_cracked_{i}" for i in range(1,13)]
         self.draw_background(dungeon_floor_tiles, self.valid_floor_coordinates)
 
-        # draw grid only on valid floor coordinates
-        for x, y in self.valid_floor_coordinates:
-            pyxel.rectb(
-                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
-                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
-                self.canvas.tile_width_px,
-                self.canvas.tile_height_px,
-                GRID_COLOR
-            )
+        self.draw_grid()
 
-        # draw entity sprites with a notion of priority
-        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
-        for i in range(0,max_priority+1):
-            for _, entity in self.entities.items():
-                if entity.priority == i:
-                    self.draw_sprite(
-                        entity.x,
-                        entity.y,
-                        self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
-                    )
+        self.draw_sprites()
 
-        # draw log
-        x = BITS*11
-        y=BITS
-        if self.log or self.round_number > 0:
-            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
-                self.font.draw_text(x,y,line, col=7, size="medium", max_width=BITS*8)
-                y+=self.font.get_text_height(line, size="medium", max_width=BITS*8) + 4
-            
+        self.draw_log()
         self.draw_action_cards()
         # Calculate duration and framerate
         loop_duration = time.time() - self.start_time
@@ -441,6 +417,38 @@ class PyxelView:
             avg_duration_ms = avg_duration * 1000
             rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
             # pyxel.text(10, 20, rate_stats, 7)
+
+    def draw_grid(self):
+        # draw grid only on valid floor coordinates
+        for x, y in self.valid_floor_coordinates:
+            pyxel.rectb(
+                x*self.canvas.tile_width_px+self.canvas.board_start_pos[0],
+                y*self.canvas.tile_height_px+self.canvas.board_start_pos[1],
+                self.canvas.tile_width_px,
+                self.canvas.tile_height_px,
+                GRID_COLOR
+            )
+        
+    def draw_sprites(self):
+        ''' draws entity sprites with a notion of priority'''
+        max_priority = max((entity.priority for entity in self.entities.values()), default=0)
+        for i in range(0,max_priority+1):
+            for _, entity in self.entities.items():
+                if entity.priority == i:
+                    self.draw_sprite(
+                        entity.x,
+                        entity.y,
+                        self.sprite_manager.get_sprite(entity.name, entity.animation_frame),
+                    )
+        
+    def draw_log(self):
+        x = BITS*11
+        y=BITS
+        if self.log or self.round_number > 0:
+            for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
+                self.font.draw_text(x,y,line, col=7, size="medium", max_width=BITS*8)
+                y+=self.font.get_text_height(line, size="medium", max_width=BITS*8) + 4
+          
 
     def draw_action_cards(self):
         # Draw action cards
