@@ -13,7 +13,7 @@ from pyxel_ui.models.entity import Entity
 from pyxel_ui.models.font import PixelFont
 from pyxel_ui.utils import BACKGROUND_TILES, draw_tile
 from pyxel_ui.views.sprite import Sprite, SpriteManager
-from pyxel_ui.models.view_section import LogView, MapView
+from pyxel_ui.models.view_section import LogView, MapView, ActionCardView
 
 
 class Renderer:
@@ -32,58 +32,15 @@ class Renderer:
     def draw_action_cards(
         self, action_card_log, current_card_page, cards_per_page
     ) -> None:
-        # Draw action cards
-        start_idx = current_card_page * cards_per_page
-        end_idx = min(start_idx + cards_per_page, len(action_card_log))
-
-        x = 0
-        y = self.canvas.board_end_pos[1] + BITS // 2
-
-        # Draw only the current page of cards
-        for line in action_card_log[start_idx:end_idx]:
-            self.font.draw_text(x, y, line, col=7, size="medium", max_width=BITS * 6)
-            x += BITS * 6 + 4
-
-        if action_card_log:
-            self.draw_page_indicator(
-                y,
-                action_card_log,
-                cards_per_page,
-                current_card_page,
-            )
-            self.draw_navigation_hints(
-                y,
-                end_idx,
-                action_card_log,
-                cards_per_page,
-                current_card_page,
-            )
-
-    def draw_page_indicator(
-        self,
-        y,
-        action_card_log,
-        cards_per_page,
-        current_card_page,
-    ) -> None:
-        indicator_y = y + BITS * 4
-        total_pages = (len(action_card_log) + cards_per_page - 1) // cards_per_page
-        page_text = f"Page {current_card_page + 1}/{total_pages}"
-        pyxel.text(0, indicator_y, page_text, col=7)
-
-    def draw_navigation_hints(
-        self,
-        y,
-        end_idx,
-        action_card_log,
-        cards_per_page,
-        current_card_page,
-    ) -> None:
-        indicator_y = y + BITS * 4
-        if current_card_page > 0:
-            pyxel.text(BITS * 3, indicator_y, "<- Previous", col=7)
-        if (current_card_page + 1) * cards_per_page < len(action_card_log):
-            pyxel.text(BITS * (end_idx - 1) * 4, indicator_y, "-> Next", col=7)
+        actioncardview = ActionCardView(
+            self.font,
+            [0, BITS*10],
+            [BITS*20, BITS*20]
+        )
+        actioncardview.action_card_log = action_card_log
+        actioncardview.current_card_page=current_card_page
+        actioncardview.cards_per_page=cards_per_page
+        actioncardview.draw()
 
     # End card methods
     
@@ -169,7 +126,6 @@ class Renderer:
         logview.round_number=round_number
         logview.acting_character_name=acting_character_name
         logview.draw()
-
 
     def draw_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
         self.mapview.tile_width_px = self.canvas.tile_width_px

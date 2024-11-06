@@ -6,6 +6,7 @@ from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.constants import (
     GRID_COLOR,
     MAX_LOG_LINES,
+    BITS
 )
 from pyxel_ui.models.entity import Entity
 
@@ -165,3 +166,37 @@ class MapView(ViewSection):
                             entity.name, entity.animation_frame
                         ),
                     )
+
+class ActionCardView(ViewSection):
+    action_card_log: list[str] = []
+    current_card_page = 0
+    cards_per_page = 3
+    def draw(self) -> None:
+        # Draw action cards
+        start_idx = self.current_card_page * self.cards_per_page
+        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
+
+        x = self.start_pos[0]
+        card_border = 4
+        card_width = (self.bounding_coordinate[0]-self.start_pos[0]-self.cards_per_page*card_border)//self.cards_per_page
+        # Draw only the current page of cards
+        for card in self.action_card_log[start_idx:end_idx]:
+            self.font.draw_text(x, self.start_pos[1], card, col=7, size="medium", max_width=card_width)
+            x += card_width + card_border
+
+        if self.action_card_log:
+            # !!! should change this to measure the height of the cards
+            indicator_navig_start_y = self.start_pos[1] + BITS * 4 + card_border
+            self.draw_page_indicator(indicator_navig_start_y)
+            self.draw_navigation_hints(x, indicator_navig_start_y)
+
+    def draw_page_indicator(self, y_start) -> None:
+        total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(0, y_start, page_text, col=7)
+
+    def draw_navigation_hints(self, x_start, y_start) -> None:
+        if self.current_card_page > 0:
+            pyxel.text(BITS * 3, y_start, "<- Previous", col=7)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
+            pyxel.text(x_start, y_start, "-> Next", col=7)
