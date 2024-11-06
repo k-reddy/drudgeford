@@ -2,13 +2,14 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 
 class PixelFont:
-    def __init__(self):
+    def __init__(self, pyxel):
         """Initialize Press Start 2P font"""
         font_path = os.path.join("..", "assets", "Press_Start_2P", "PressStart2P-Regular.ttf")
         self.medium_font = ImageFont.truetype(font_path, 8)
         self.large_font = ImageFont.truetype(font_path, 12)
+        self.pyxel = pyxel
             
-    def draw_text(self, pyxel, text, x, y, col, size="medium"):
+    def draw_text(self, x, y, text, col, size="medium"):
         """
         Draw text at the specified position with given size
         
@@ -20,6 +21,7 @@ class PixelFont:
             col: Color
             size: "small", "medium", or "large"
         """
+        pyxel = self.pyxel
         if size == "small":
             pyxel.text(x, y, text, col)
             return
@@ -59,7 +61,7 @@ class PixelFont:
 #         pyxel.init(320, 320)
         
 #         # Create single font instance
-#         self.font = PixelFont()
+#         self.font = PixelFont(pyxel)
         
 #         pyxel.run(self.update, self.draw)
     
@@ -72,20 +74,20 @@ class PixelFont:
         
 #         # Show different sizes
 #         y = 5
-#         self.font.draw_text(pyxel, "SMALL", 5, y, 8, "small")
+#         self.font.draw_text(5, y, "SMALL", 8, "small")
         
 #         y += 16
-#         self.font.draw_text(pyxel, "Medium 8px", 5, y, 9, "medium")
+#         self.font.draw_text(5, y, "Medium 8px", 9, "medium")
         
 #         y += 20
-#         self.font.draw_text(pyxel, "LARGE 12", 5, y, 10, "large")
+#         self.font.draw_text(5, y, "LARGE 12", 10, "large")
         
 #         # Show some game-style text with the medium font
 #         y += 25
-#         self.font.draw_text(pyxel, "SCORE:1000", 5, y, 11, "medium")
+#         self.font.draw_text( 5, y, "SCORE:1000",11, "medium")
         
 #         # Show that it handles lowercase too
 #         y += 15
-#         self.font.draw_text(pyxel, "Hello World!", 5, y, 12, "medium")
+#         self.font.draw_text(5, y,  "Hello World!", 12, "medium")
 
 # App()
