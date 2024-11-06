@@ -1,5 +1,6 @@
 import pyxel
 import random
+import os
 
 from collections import defaultdict, deque
 import itertools
@@ -17,6 +18,7 @@ from .models.entity import Entity
 from .models.walls import Wall
 from .utils import BACKGROUND_TILES, generate_wall_bank
 from .views.sprite import Sprite, SpriteManager
+from .models.font import PixelFont
 
 MAX_LOG_LINES = 10
 
@@ -59,9 +61,13 @@ class PyxelView:
         self.log = []
         self.action_card_log = []
         self.current_card_page = 0  # Track which page of cards we're viewing
-        self.cards_per_page = 4     # Number of cards to show at once
+        self.cards_per_page = 3     # Number of cards to show at once
         self.round_number = 0
         self.acting_character_name = ""
+        font_path = os.path.join("pyxel_ui","assets", "Press_Start_2P", "PressStart2P-Regular.ttf")     
+        print(font_path)
+
+        self.font = PixelFont(pyxel, font_path)
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
@@ -421,9 +427,8 @@ class PyxelView:
         y=BITS
         if self.log or self.round_number > 0:
             for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[-MAX_LOG_LINES:]:
-                pyxel.text(x,y,line,col=7)
-                y_lines = line.count('\n') + 1
-                y+=8*y_lines
+                self.font.draw_text(x,y,line, col=7, size="medium", max_width=BITS*8)
+                y+=self.font.get_text_height(line, size="medium", max_width=BITS*8) + 4
             
         # draw action_cards
         # x = 0
@@ -442,8 +447,8 @@ class PyxelView:
         
         # Draw only the current page of cards
         for line in self.action_card_log[start_idx:end_idx]:
-            pyxel.text(x, y, line, col=7)
-            x += BITS*4
+            self.font.draw_text(x, y, line, col=7, size="medium", max_width= BITS*6)
+            x += BITS*6 + 4
 
         # Optional: Draw page indicator
         if self.action_card_log:
