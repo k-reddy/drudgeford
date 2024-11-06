@@ -1,6 +1,6 @@
 import threading
 from typing import Optional, List
-from pyxel_ui.pyxel_main import PyxelView
+from pyxel_ui.engine import PyxelEngine
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.update_tasks import RemoveEntityTask, AddEntityTask
@@ -42,6 +42,7 @@ move_duration = 700
 def enqueue_actions():
     """Simulate external enqueueing of actions asynchronously."""
     import time
+
     # test_map: List[List[Optional[str]]] = [
     #     [None for _ in range(board_width_tiles)] for _ in range(board_height_tiles)
     # ]
@@ -63,39 +64,18 @@ def enqueue_actions():
     width = 10
     height = 10
     valid_floor_coordinates = []
-    for x in range (0,width):
-        for y in range(0,height):
+    for x in range(0, width):
+        for y in range(0, height):
             valid_floor_coordinates.append((x, y))
     payload = {
         "map_width": 10,
         "map_height": 10,
         "valid_floor_coordinates": valid_floor_coordinates,
         "entities": [
-            {
-                "id": 1,
-                "position": (0, 0),
-                "name": "skeleton",
-                "priority": 0
-            },
-            {
-                "id": 3,
-                "position": (3, 2),
-                "name": "spores",
-                "priority": 1
-            },
-            {
-                "id": 2,
-                "position": (3, 2),
-                "name": "wizard",
-                "priority": 10
-            },
-            {
-                "id": 4,
-                "position": (3, 2),
-                "name": "fire",
-                "priority": 0
-            },
-
+            {"id": 1, "position": (0, 0), "name": "skeleton", "priority": 0},
+            {"id": 3, "position": (3, 2), "name": "spores", "priority": 1},
+            {"id": 2, "position": (3, 2), "name": "wizard", "priority": 10},
+            {"id": 4, "position": (3, 2), "name": "fire", "priority": 0},
         ],
     }
 
@@ -130,23 +110,20 @@ def enqueue_actions():
     shared_action_queue.enqueue(
         ActionTask("knight", 2, "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
     )
+    shared_action_queue.enqueue(RemoveEntityTask(2))
     shared_action_queue.enqueue(
-        RemoveEntityTask(2)
-    )
-    shared_action_queue.enqueue(
-        AddEntityTask({"entities": [
+        AddEntityTask(
             {
-                "id": 5,
-                "position": (4, 6),
-                "name": "necromancer",
-                "priority": 1
+                "entities": [
+                    {"id": 5, "position": (4, 6), "name": "necromancer", "priority": 1}
+                ]
             }
-        ]
-
-        })
+        )
     )
     shared_action_queue.enqueue(
-        ActionTask("necromancer", 5, "walk", Direction.EAST, (4, 6), (0, 0), move_duration)
+        ActionTask(
+            "necromancer", 5, "walk", Direction.EAST, (4, 6), (0, 0), move_duration
+        )
     )
     # time.sleep(3)
     # print("move3")
@@ -165,8 +142,8 @@ def enqueue_actions():
 
 
 def main() -> None:
-    # Create the PyxelView instance with the shared queue
-    pyxel_view = PyxelView(shared_action_queue)
+    # Create the PyxelEngine instance with the shared queue
+    pyxel_view = PyxelEngine(shared_action_queue)
 
     # Start the thread that enqueues actions
     threading.Thread(target=enqueue_actions).start()
