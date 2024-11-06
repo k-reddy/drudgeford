@@ -430,14 +430,19 @@ class PyxelView:
                 self.font.draw_text(x,y,line, col=7, size="medium", max_width=BITS*8)
                 y+=self.font.get_text_height(line, size="medium", max_width=BITS*8) + 4
             
-        # draw action_cards
-        # x = 0
-        # y=self.canvas.board_end_pos[1] + BITS//2
-        # for line in self.action_card_log:
-        #     pyxel.text(x,y,line,col=7)
-        #     y_lines = line.count('\n') + 1
-        #     x+=BITS*3
+        self.draw_action_cards()
+        # Calculate duration and framerate
+        loop_duration = time.time() - self.start_time
+        self.loop_durations.append(loop_duration)
 
+        if len(self.loop_durations) > 0:
+            avg_duration = mean(self.loop_durations)
+            loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
+            avg_duration_ms = avg_duration * 1000
+            rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
+            # pyxel.text(10, 20, rate_stats, 7)
+
+    def draw_action_cards(self):
         # Draw action cards
         start_idx = self.current_card_page * self.cards_per_page
         end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
@@ -450,27 +455,19 @@ class PyxelView:
             self.font.draw_text(x, y, line, col=7, size="medium", max_width= BITS*6)
             x += BITS*6 + 4
 
-        # Optional: Draw page indicator
         if self.action_card_log:
-            indicator_y = y + BITS*4
-            total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
-            page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-            pyxel.text(0, indicator_y, page_text, col=7)
+            self.draw_page_indicator(y)
+            self.draw_navigation_hints(y, end_idx)
 
-        # Optional: Draw navigation hints
+    def draw_page_indicator(self, y):
+        indicator_y = y + BITS*4
+        total_pages = (len(self.action_card_log) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(0, indicator_y, page_text, col=7)
+
+    def draw_navigation_hints(self, y, end_idx):
+        indicator_y = y + BITS*4
         if self.current_card_page > 0:
             pyxel.text(BITS*3, indicator_y, "<- Previous", col=7)
         if (self.current_card_page + 1) * self.cards_per_page < len(self.action_card_log):
             pyxel.text(BITS*(end_idx-1)*4, indicator_y, "-> Next", col=7)
-        # Draw framerate and frame duration.
-
-        # Calculate duration and framerate
-        loop_duration = time.time() - self.start_time
-        self.loop_durations.append(loop_duration)
-
-        if len(self.loop_durations) > 0:
-            avg_duration = mean(self.loop_durations)
-            loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
-            avg_duration_ms = avg_duration * 1000
-            rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
-            # pyxel.text(10, 20, rate_stats, 7)
