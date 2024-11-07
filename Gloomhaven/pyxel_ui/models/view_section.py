@@ -82,6 +82,7 @@ class MapView(ViewSection):
         self.clear_bounds()
         self.draw_map_background()
         self.draw_map_grid()
+        self.draw_sprites()
 
     def draw_map_background(self):
         # ensure we get the same floor tiles each time we draw the floor

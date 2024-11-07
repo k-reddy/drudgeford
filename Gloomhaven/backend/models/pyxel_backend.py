@@ -7,6 +7,7 @@ from ..utils.listwithupdate import ListWithUpdate
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
 
+
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
         self.shared_action_queue = shared_action_queue

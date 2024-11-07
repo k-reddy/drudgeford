@@ -35,14 +35,14 @@ class PyxelEngine:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
-    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_floor_coordinates):
-        self.valid_floor_coordinates = valid_floor_coordinates
+    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_map_coordinates):
         pyxel_width = max(DEFAULT_PYXEL_WIDTH, map_width_tiles*MAP_TILE_WIDTH_PX)
         pyxel_height = max(DEFAULT_PYXEL_HEIGHT, map_height_tiles*MAP_TILE_HEIGHT_PX*1.5)
         pyxel.init(pyxel_width, pyxel_height)
         pyxel.load("../my_resource.pyxres")
 
         self.view_manager = ViewManager(pyxel_width, pyxel_height)
+        self.view_manager.update_map(valid_floor_coordinates=valid_map_coordinates)
 
     def start(self):
         print("Starting Pyxel game loop...")
@@ -55,8 +55,8 @@ class PyxelEngine:
                 if isinstance(self.current_task, BoardInitTask):
                     self.init_pyxel_map(
                         self.current_task.map_width, 
-                        self.current_task.map_height, 
-                        self.current_task.valid_map_coordinates
+                        self.current_task.map_height,
+                        self.current_task.valid_map_coordinates 
                     )
                     self.current_task = None  # clear
                     self.is_board_initialized = True
@@ -96,7 +96,7 @@ class PyxelEngine:
 
     def draw(self):
         # # draw map background and grid
-        self.view_manager.update_map(self.valid_floor_coordinates)
+        # self.view_manager.map_view.draw()
 
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time
@@ -108,3 +108,4 @@ class PyxelEngine:
         #     avg_duration_ms = avg_duration * 1000
         #     rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
         #     # pyxel.text(10, 20, rate_stats, 7)
+        return
