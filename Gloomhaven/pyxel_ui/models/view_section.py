@@ -59,13 +59,13 @@ class LogView(ViewSection):
                 max_width=self.bounding_coordinate[0] - self.start_pos[0]
             ) + 4
         
-        def draw_line(text: str, y_pos: int) -> int:
+        def draw_line(text: str, y_pos: int, size: str="medium") -> int:
             self.font.draw_text(
                 self.start_pos[0],
                 y_pos,
                 text,
                 col=7,
-                size="medium",
+                size=size,
                 max_width=self.bounding_coordinate[0] - self.start_pos[0]
             )
             return y_pos + get_line_height(text)
@@ -78,7 +78,7 @@ class LogView(ViewSection):
         header_height = get_line_height(header)
         
         if header_height <= available_height:
-            current_y = draw_line(header, current_y)
+            current_y = draw_line(header, current_y, "large")
             available_height -= header_height
         
         # Get displayable log lines
