@@ -78,3 +78,9 @@ class ViewManager:
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the map."""
         return self.map_view.convert_grid_to_pixel_pos(tile_x, tile_y)
+    
+    def draw_whole_game(self):
+        self.initiative_bar_view.draw()
+        self.map_view.draw()
+        self.log_view.draw()
+        self.action_card_view.draw()
