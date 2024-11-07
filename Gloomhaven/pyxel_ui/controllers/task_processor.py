@@ -11,6 +11,7 @@ from pyxel_ui.constants import FRAME_DURATION_MS
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.utils import generate_wall_bank
 from pyxel_ui.controllers.view_manager import ViewManager
+import time
 
 
 
@@ -22,13 +23,11 @@ class TaskProcessor:
     # Task processors
     def process_action(self, action_task: ActionTask) -> None:
         assert action_task, "Attempting to process empty action"
- 
- 
-        action_task = self.convert_and_append_move_steps_to_action(action_task)
-        while(action_task.action_steps):
-            px_pos_x, px_pos_y = action_task.action_steps.popleft()
-            # !!! yuck! fix this later 
-            self.view_manager.map_view.entities[action_task.entity_id].update_position(px_pos_x, px_pos_y)
+        px_pos_x, px_pos_y = action_task.action_steps.popleft()
+        # !!! yuck! fix this later 
+        self.view_manager.map_view.entities[action_task.entity_id].update_position(px_pos_x, px_pos_y)
+        self.view_manager.map_view.draw_sprites()
+
 
     def process_entity_loading_task(self, entity_loading_task: AddEntityTask) -> None:
         assert entity_loading_task, "Attempting to process empty system task"

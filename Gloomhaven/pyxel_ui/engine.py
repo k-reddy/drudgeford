@@ -114,10 +114,13 @@ class PyxelEngine:
 
         if not self.current_task and not self.task_queue.is_empty():
             self.current_task = self.task_queue.dequeue()
+            if isinstance(self.current_task, ActionTask) and not self.current_task.action_steps:
+                self.current_task = self.task_processor.convert_and_append_move_steps_to_action(self.current_task)
 
         if self.current_task:
-            if isinstance(self.current_task, ActionTask):
+            if isinstance(self.current_task, ActionTask) and self.current_task.action_steps:
                 self.task_processor.process_action(self.current_task)
+                return
             elif isinstance(self.current_task, AddEntityTask):
                 self.task_processor.process_entity_loading_task(self.current_task)
             elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask)):
