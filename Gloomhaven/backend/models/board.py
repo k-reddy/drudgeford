@@ -416,7 +416,6 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
         self.pyxel_manager.log.append(f"{target.name} has been killed.")
-        self.pyxel_manager.load_log(self.pyxel_manager.log)
         # !!! for pair coding
         # !!! if the target is the player, end game
         # !!! if the target is the acting_character, end turn
@@ -530,7 +529,6 @@ class Board:
             self.kill_target(target)
         else:
             self.pyxel_manager.log.append(f"{target.name}'s new health: {target.health}")
-        self.pyxel_manager.load_log(self.pyxel_manager.log)
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 
