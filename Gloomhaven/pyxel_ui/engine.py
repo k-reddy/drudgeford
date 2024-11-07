@@ -23,6 +23,7 @@ from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from .models.canvas import Canvas
 from .models.entity import Entity
 from pyxel_ui.controllers.renderer import Renderer
+from pyxel_ui.controllers.view_manager import ViewManager
 from pyxel_ui.controllers.task_processor import TaskProcessor
 from .utils import generate_wall_bank
 
@@ -48,6 +49,7 @@ class PyxelEngine:
 
         # Controllers and queues
         self.task_queue = task_queue
+        self.view_manager = None
         self.task_processor = None
         self.renderer = None
 
@@ -85,8 +87,9 @@ class PyxelEngine:
             tile_height_px=BITS,
             wall_sprite_thickness_px=WALL_THICKNESS,
         )
+        self.view_manager = ViewManager(self.canvas)
         self.task_processor = TaskProcessor(self.entities, self.canvas)
-        self.renderer = Renderer(self.canvas)
+        self.renderer = Renderer(self.view_manager)
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
 
