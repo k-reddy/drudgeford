@@ -24,9 +24,18 @@ class ViewSection(abc.ABC):
     def __init__(self, font, start_pos, bounding_coordinate):
         self.font = font
         self.start_pos = start_pos
-        self.end_pos = start_pos
         self.bounding_coordinate = bounding_coordinate
+        self.end_pos = self.bounding_coordinate
 
+    def clear_bounds(self):
+        '''a function to clear the view's area before redrawing itself'''
+        pyxel.rect(
+            self.start_pos[0], 
+            self.start_pos[1], 
+            self.end_pos[0], 
+            self.end_pos[1], 
+            0
+        )
     @abc.abstractmethod
     def draw(self):
         pass
@@ -39,6 +48,7 @@ class LogView(ViewSection):
     max_log_lines: int = MAX_LOG_LINES
 
     def draw(self) -> None:
+        self.clear_bounds()
         # only draw if you have something loaded
         if not self.log and self.round_number <= 0:
             return 
@@ -69,6 +79,7 @@ class MapView(ViewSection):
     entities = {}
 
     def draw(self):
+        self.clear_bounds()
         self.draw_map_background()
         self.draw_map_grid()
 
@@ -151,6 +162,7 @@ class ActionCardView(ViewSection):
     current_card_page = 0
     cards_per_page = 3
     def draw(self) -> None:
+        self.clear_bounds()
         if not self.action_card_log:
             return 
         
@@ -205,6 +217,8 @@ class InitiativeBarView(ViewSection):
             healths: List of health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
+        self.clear_bounds()
+
         # Calculate maximum items per row based on screen width
         item_width = self.sprite_width + self.horiz_gap
         # Leave some margin on both sides
