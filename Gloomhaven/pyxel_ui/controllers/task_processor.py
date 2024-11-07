@@ -22,7 +22,8 @@ class TaskProcessor:
     # Task processors
     def process_action(self, action_task: ActionTask) -> None:
         assert action_task, "Attempting to process empty action"
-
+ 
+ 
         action_task = self.convert_and_append_move_steps_to_action(action_task)
         while(action_task.action_steps):
             px_pos_x, px_pos_y = action_task.action_steps.popleft()
