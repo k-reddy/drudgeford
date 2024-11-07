@@ -9,15 +9,7 @@ from .constants import (
     WALL_THICKNESS,
     WINDOW_LENGTH,
 )
-from .models.action_task import ActionTask
-from .models.update_tasks import (
-    AddEntitiesTask,
-    RemoveEntityTask,
-    LoadCharactersTask,
-    LoadLogTask,
-    LoadActionCardsTask,
-    LoadRoundTurnInfoTask,
-)
+from .models.tasks import BoardInitTask, ActionTask
 
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from .models.canvas import Canvas
@@ -90,18 +82,17 @@ class PyxelEngine:
         while not self.is_board_initialized:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
-                self.process_board_initialization_task()
-                self.current_task = None  # clear
-                self.is_board_initialized = True
+                # ensure our first task is board initialization
+                if isinstance(self.current_task, BoardInitTask):
+                    self.init_pyxel_map(
+                        self.current_task.map_width, 
+                        self.current_task.map_height, 
+                        self.current_task.valid_map_coordinates
+                    )
+                    self.current_task = None  # clear
+                    self.is_board_initialized = True
 
         pyxel.run(self.update, self.draw)
-
-    def process_board_initialization_task(self) -> None:
-        assert self.current_task, "Attempting to process empty system task"
-        height = self.current_task.payload["map_height"]
-        width = self.current_task.payload["map_width"]
-        valid_floor_coordinates = self.current_task.payload["valid_floor_coordinates"]
-        self.init_pyxel_map(width, height, valid_floor_coordinates)
 
     def update(self):
         self.start_time = time.time()
@@ -117,11 +108,10 @@ class PyxelEngine:
                 self.current_task = self.task_processor.convert_and_append_move_steps_to_action(self.current_task)
 
         if self.current_task:
+            self.current_task.perform(self.view_manager)
+            # don't clear the task if it's an action task and has steps to do
             if isinstance(self.current_task, ActionTask) and self.current_task.action_steps:
-                self.task_processor.process_action(self.current_task)
                 return
-            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask, AddEntitiesTask)):
-                self.current_task.perform(self.view_manager)
             self.current_task = None
 
         # Add controls for scrolling

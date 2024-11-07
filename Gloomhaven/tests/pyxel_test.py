@@ -3,7 +3,7 @@ from typing import Optional, List
 from pyxel_ui.engine import PyxelEngine
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.system_task import SystemTask
-from pyxel_ui.models.update_tasks import RemoveEntityTask, AddEntitiesTask
+from pyxel_ui.models.tasks import RemoveEntityTask, AddEntitiesTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.enums import Direction
 
