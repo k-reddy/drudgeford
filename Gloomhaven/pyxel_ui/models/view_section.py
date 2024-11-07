@@ -49,25 +49,54 @@ class LogView(ViewSection):
 
     def draw(self) -> None:
         self.clear_bounds()
-        # only draw if you have something loaded
         if not self.log and self.round_number <= 0:
             return 
         
-        log_line_y = self.start_pos[1]
+        def get_line_height(text: str) -> int:
+            return self.font.get_text_height(
+                text, 
+                size="medium", 
+                max_width=self.bounding_coordinate[0] - self.start_pos[0]
+            ) + 4
         
-        for line in [f"Round {self.round_number}, {self.acting_character_name}'s turn"] + self.log[
-            -self.max_log_lines:
-        ]:
+        def draw_line(text: str, y_pos: int) -> int:
             self.font.draw_text(
                 self.start_pos[0],
-                log_line_y,
-                line,
+                y_pos,
+                text,
                 col=7,
                 size="medium",
-                max_width=self.bounding_coordinate[0]-self.start_pos[0]
+                max_width=self.bounding_coordinate[0] - self.start_pos[0]
             )
-            line_height = self.font.get_text_height(line, size="medium", max_width=self.bounding_coordinate[0]-self.start_pos[0]) + 4
-            log_line_y += line_height
+            return y_pos + get_line_height(text)
+        
+        current_y = self.start_pos[1]
+        available_height = self.bounding_coordinate[1] - self.start_pos[1]
+        
+        # Try to draw header
+        header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
+        header_height = get_line_height(header)
+        
+        if header_height <= available_height:
+            current_y = draw_line(header, current_y)
+            available_height -= header_height
+        
+        # Get displayable log lines
+        lines = []
+        for line in reversed(self.log[-self.max_log_lines:]):
+            line_height = get_line_height(line)
+            if line_height <= available_height:
+                lines.insert(0, line)
+                available_height -= line_height
+            else:
+                break
+        
+        # Draw log lines
+        for line in lines:
+            current_y = draw_line(line, current_y)
+
+        self.end_pos = (self.bounding_coordinate[0], current_y)
+
 
 class MapView(ViewSection):
     dungeon_floor_tile_names: list[str] = [f"dungeon_floor_cracked_{i}" for i in range(1, 13)]
@@ -184,7 +213,7 @@ class ActionCardView(ViewSection):
             x += card_width + card_border
 
         # !!! should change this to measure the height of the cards and page indicator
-        navigation_start_y = self.start_pos[1] + BITS * 4 + card_border + 10
+        navigation_start_y = self.start_pos[1] + BITS * 6 + card_border + 10
         self.draw_navigation_hints(x-card_width//2, navigation_start_y)
 
     def draw_page_indicator(self,y_start) -> None:

@@ -15,28 +15,27 @@ class ViewManager:
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.canvas_width = pyxel_width
         self.canvas_height = pyxel_height
-        self.map_view = view.MapView(
-            self.font, 
-            [self.view_border, BITS+self.view_border*2],
-            [BITS*11, BITS*11+self.view_border*4]
-            )
-        # !!! eventually, we should reset these to get the end pos of the
-        # other view and add the border, but we don't set end positions right now
-        self.action_card_view = view.ActionCardView(
-            self.font,
-            [self.view_border, BITS*11+self.view_border*4],
-            [self.canvas_width, self.canvas_height]
-            )
         self.initiative_bar_view = view.InitiativeBarView(
             self.font, 
-            start_pos=[0,self.view_border//2], 
+            start_pos=[self.view_border,self.view_border//4], 
             bounding_coordinate=[BITS*11, BITS]
         )
+        self.map_view = view.MapView(
+            self.font, 
+            [self.initiative_bar_view.start_pos[0], self.initiative_bar_view.bounding_coordinate[1]+self.view_border],
+            [self.initiative_bar_view.bounding_coordinate[0], BITS*11+self.view_border*2]
+            )
         self.log_view = view.LogView(
             self.font,
-            [BITS*11, self.view_border],
-            [self.canvas_width, BITS*11+self.view_border*4]
-        )        
+            [self.initiative_bar_view.bounding_coordinate[0], self.initiative_bar_view.start_pos[1]],
+            [self.canvas_width, self.map_view.bounding_coordinate[1]+self.view_border]
+        )  
+        self.action_card_view = view.ActionCardView(
+            self.font,
+            [self.map_view.start_pos[0], self.map_view.bounding_coordinate[1]+self.view_border],
+            [self.canvas_width, self.canvas_height]
+            )
+      
     def update_log(
             self, 
             log: list[str]):
