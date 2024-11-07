@@ -82,17 +82,22 @@ class PyxelEngine:
             self.current_task = None
 
         # Add controls for scrolling
+        # !!! this is a yucky fix
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
             # Go to next page if there are more cards to show
-            if (self.current_card_page + 1) * self.cards_per_page < len(
-                self.action_card_log
+            if (self.view_manager.action_card_view.current_card_page + 1) * self.view_manager.action_card_view.cards_per_page < len(
+                self.view_manager.action_card_view.action_card_log
             ):
-                self.current_card_page += 1
+                self.view_manager.action_card_view.current_card_page += 1
+                self.view_manager.action_card_view.draw()
 
+        # !!! another yucky fix
         if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
             # Go to previous page if we're not at the start
-            if self.current_card_page > 0:
-                self.current_card_page -= 1
+            if self.view_manager.action_card_view.current_card_page > 0:
+                self.view_manager.action_card_view.current_card_page -= 1
+                self.view_manager.action_card_view.draw()
+
 
     def draw(self):
         '''everything in the task queue draws itself, 
