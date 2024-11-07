@@ -61,8 +61,18 @@ class ViewManager:
     def update_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
         self.map_view.valid_map_coordinates = valid_floor_coordinates
         self.map_view.draw()
+        self.map_view.draw_sprites()
 
-    def update_sprites(self, entities: list[Entity]) -> None:
+    def update_sprites(self, entities: dict) -> None:
         """draws entity sprites with a notion of priority"""
         self.map_view.entities = entities
+        self.map_view.draw_sprites()
+
+    def remove_entity(self, entity_id: int) -> None:
+        try:
+            del self.map_view.entities[entity_id]
+        except Exception as e:
+            print(f"attempting to delete non-existent entity: {str(e)}")
+            raise
+        self.map_view.draw()
         self.map_view.draw_sprites()

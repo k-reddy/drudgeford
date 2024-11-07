@@ -88,7 +88,7 @@ class PyxelEngine:
             wall_sprite_thickness_px=WALL_THICKNESS,
         )
         self.view_manager = ViewManager(self.canvas)
-        self.task_processor = TaskProcessor(self.entities, self.canvas)
+        self.task_processor = TaskProcessor(self.canvas, self.view_manager)
         self.renderer = Renderer(self.view_manager)
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
@@ -139,13 +139,10 @@ class PyxelEngine:
         if self.current_task:
             if isinstance(self.current_task, ActionTask):
                 self.task_processor.process_action(self.current_task)
-            elif isinstance(self.current_task, RemoveEntityTask):
-                self.task_processor.process_remove_entity_task(self.current_task)
-                self.current_task = None
             elif isinstance(self.current_task, AddEntityTask):
                 self.task_processor.process_entity_loading_task(self.current_task)
                 self.current_task = None
-            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask)):
+            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask)):
                 self.current_task.perform(self.view_manager)
                 self.current_task = None
 
@@ -164,11 +161,11 @@ class PyxelEngine:
 
     def draw(self):
         # pyxel.cls(0)
-        
+
         # # draw map background and grid
         self.view_manager.update_map(self.valid_floor_coordinates)
 
-        self.view_manager.update_sprites(self.entities)
+        # self.view_manager.update_sprites(self.entities)
 
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time

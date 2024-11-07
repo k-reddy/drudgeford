@@ -23,6 +23,9 @@ class RemoveEntityTask:
     """
     entity_id: int
 
+    def perform(self, view_manager: ViewManager):
+        view_manager.remove_entity(self.entity_id)
+
 @dataclass
 class LoadCharactersTask:
     '''
