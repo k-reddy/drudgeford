@@ -51,18 +51,7 @@ class PyxelEngine:
         self.task_queue = task_queue
         self.view_manager = None
         self.task_processor = None
-        self.renderer = None
-
-        # Init game state attributes
-        self.initiative_bar_sprite_names = []
-        self.initiative_bar_healths = []
-        self.initiative_bar_teams = []
-        self.log = []
-        self.action_card_log = []
-        self.current_card_page = 0  # Track which page of cards we're viewing
-        self.cards_per_page = 3  # Number of cards to show at once
-        self.round_number = 0
-        self.acting_character_name = ""
+        self.renderer = None    
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
