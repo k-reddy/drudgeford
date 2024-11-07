@@ -36,8 +36,8 @@ shared_action_queue = PyxelTaskQueue()
 move_duration = 700
 test_map=False
 test_other_areas = True
-width = 6
-height = 8
+width = 10
+height = 10
 
 def enqueue_actions():
     """Simulate external enqueueing of actions asynchronously."""
