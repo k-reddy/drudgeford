@@ -30,7 +30,7 @@ class AddEntitiesTask(Task):
     entities: list
 
     def perform(self, view_manager: ViewManager):
-        entities = {}
+        entities = view_manager.map_view.entities
         for entity in self.entities:
             row_px, col_px = view_manager.convert_grid_to_pixel_pos(
                 entity["position"][0],
