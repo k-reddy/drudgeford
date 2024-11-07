@@ -41,15 +41,28 @@ class ViewManager:
             self, 
             log: list[str]):
         self.log_view.log = log
+        self.log_view.draw()
 
     def update_round_turn(self, round_number: int, acting_character_name: str):
         self.log_view.round_number = round_number
         self.log_view.acting_character_name = acting_character_name
+        self.log_view.draw()
 
     def update_initiative_bar(self, sprite_names: list[str], healths: list[int], teams: list[bool]):
         self.initiative_bar_view.sprite_names = sprite_names
         self.initiative_bar_view.healths = healths
         self.initiative_bar_view.teams = teams
+        self.initiative_bar_view.draw()
 
     def update_action_card_log(self, action_card_log: list[str]):
         self.action_card_view.action_card_log = action_card_log
+        self.action_card_view.draw()
+
+    def update_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
+        self.map_view.valid_map_coordinates = valid_floor_coordinates
+        self.map_view.draw()
+
+    def update_sprites(self, entities: list[Entity]) -> None:
+        """draws entity sprites with a notion of priority"""
+        self.map_view.entities = entities
+        self.map_view.draw_sprites()

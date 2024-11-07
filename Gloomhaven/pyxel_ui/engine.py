@@ -102,13 +102,7 @@ class PyxelEngine:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
-                self.task_processor.process_entity_loading_task(self.current_task)
-                # self.current_task = self.task_queue.dequeue()
-                # self.view_manager.update_initiative_bar(
-                #     self.current_task.sprite_names,
-                #     self.current_task.healths,
-                #     self.current_task.teams
-                # )    
+                self.task_processor.process_entity_loading_task(self.current_task)  
                 self.current_task = None  # clear
                 self.is_board_initialized = True
 
@@ -151,24 +145,8 @@ class PyxelEngine:
             elif isinstance(self.current_task, AddEntityTask):
                 self.task_processor.process_entity_loading_task(self.current_task)
                 self.current_task = None
-            elif isinstance(self.current_task, LoadCharactersTask):
-                self.view_manager.update_initiative_bar(
-                    self.current_task.sprite_names,
-                    self.current_task.healths,
-                    self.current_task.teams
-                )                
-                self.current_task = None
-            elif isinstance(self.current_task, LoadLogTask):
-                self.view_manager.update_log(self.current_task.log)
-                self.current_task = None
-            elif isinstance(self.current_task, LoadActionCardsTask):
-                self.view_manager.update_action_card_log(self.current_task.action_card_log)
-                self.current_task = None
-            elif isinstance(self.current_task, LoadRoundTurnInfoTask):
-                self.view_manager.update_round_turn(
-                    self.current_task.round_number, 
-                    self.current_task.acting_character_name
-                )
+            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask)):
+                self.current_task.perform(self.view_manager)
                 self.current_task = None
 
         # Add controls for scrolling
@@ -185,30 +163,30 @@ class PyxelEngine:
                 self.current_card_page -= 1
 
     def draw(self):
-        pyxel.cls(0)
+        # pyxel.cls(0)
 
-        # draw iniative bar
-        self.renderer.draw_health_and_iniative_bar(
-            self.initiative_bar_sprite_names,
-            self.initiative_bar_healths,
-            self.initiative_bar_teams,
-        )
+        # # draw iniative bar
+        # self.renderer.draw_health_and_iniative_bar(
+        #     self.initiative_bar_sprite_names,
+        #     self.initiative_bar_healths,
+        #     self.initiative_bar_teams,
+        # )
 
-        # draw map background and grid
-        self.renderer.draw_map(self.valid_floor_coordinates)
+        # # draw map background and grid
+        self.view_manager.update_map(self.valid_floor_coordinates)
 
-        self.renderer.draw_sprites(self.entities)
+        self.view_manager.update_sprites(self.entities)
 
-        self.renderer.draw_log(
-            self.log,
-            self.round_number,
-            self.acting_character_name,
-        )
-        self.renderer.draw_action_cards(
-            self.action_card_log,
-            self.current_card_page,
-            self.cards_per_page,
-        )
+        # self.renderer.draw_log(
+        #     self.log,
+        #     self.round_number,
+        #     self.acting_character_name,
+        # )
+        # self.renderer.draw_action_cards(
+        #     self.action_card_log,
+        #     self.current_card_page,
+        #     self.cards_per_page,
+        # )
         # Calculate duration and framerate
         loop_duration = time.time() - self.start_time
         self.loop_durations.append(loop_duration)
