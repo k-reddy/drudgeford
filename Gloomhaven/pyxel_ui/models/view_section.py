@@ -136,6 +136,12 @@ class MapView(ViewSection):
                             entity.name, entity.animation_frame
                         ),
                     )
+        
+    def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
+        """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
+        pixel_x = self.start_pos[0] + (tile_x * self.tile_width_px)
+        pixel_y = self.start_pos[1] + (tile_y * self.tile_height_px)
+        return (pixel_x, pixel_y)
 
 class ActionCardView(ViewSection):
     # !!! we should probably set a card width and then 

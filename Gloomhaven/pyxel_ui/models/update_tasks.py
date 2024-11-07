@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from pyxel_ui.controllers.view_manager import ViewManager
+from pyxel_ui.models.entity import Entity
+from pyxel_ui.enums import AnimationFrame
+
 
 @dataclass
 class AddEntityTask:
@@ -14,6 +17,26 @@ class AddEntityTask:
             when the map draws
     """
     payload: dict
+
+    def perform(self, view_manager: ViewManager):
+        entities = {}
+        for entity in self.payload["entities"]:
+            row_px, col_px = view_manager.convert_grid_to_pixel_pos(
+                entity["position"][0],
+                entity["position"][1],
+            )
+
+            entities[entity["id"]] = Entity(
+                id=entity["id"],
+                name=entity["name"],
+                x=row_px,
+                y=col_px,
+                z=10,
+                priority=entity["priority"],
+                animation_frame=AnimationFrame.SOUTH,
+                alive=True,
+            )
+        view_manager.update_sprites(entities)
 
 @dataclass
 class RemoveEntityTask:
