@@ -10,12 +10,14 @@ from pyxel_ui.models.update_tasks import (
 from pyxel_ui.constants import FRAME_DURATION_MS
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.utils import generate_wall_bank
+from pyxel_ui.controllers.view_manager import ViewManager
+
 
 
 class TaskProcessor:
-    def __init__(self, entities, canvas: Canvas):
-        self.entities = entities
+    def __init__(self, canvas: Canvas, view_manager):
         self.canvas = canvas
+        self.view_manager = view_manager
 
     # Task processors
     def process_action(self, action_task: ActionTask) -> None:
@@ -24,17 +26,19 @@ class TaskProcessor:
             return
 
         px_pos_x, px_pos_y = action_task.action_steps.popleft()
-        self.entities[action_task.entity_id].update_position(px_pos_x, px_pos_y)
+        # !!! yuck! fix this later 
+        self.view_manager.map_view.entities[action_task.entity_id].update_position(px_pos_x, px_pos_y)
 
     def process_entity_loading_task(self, entity_loading_task: AddEntityTask) -> None:
         assert entity_loading_task, "Attempting to process empty system task"
+        entities = {}
         for entity in entity_loading_task.payload["entities"]:
             row_px, col_px = self.convert_grid_to_pixel_pos(
                 entity["position"][0],
                 entity["position"][1],
             )
 
-            self.entities[entity["id"]] = Entity(
+            entities[entity["id"]] = Entity(
                 id=entity["id"],
                 name=entity["name"],
                 x=row_px,
@@ -44,15 +48,7 @@ class TaskProcessor:
                 animation_frame=AnimationFrame.SOUTH,
                 alive=True,
             )
-
-    def process_remove_entity_task(self, remove_entity_task: RemoveEntityTask) -> None:
-        assert remove_entity_task, "Attempting to process empty system task"
-        try:
-            del self.entities[remove_entity_task.entity_id]
-        except Exception as e:
-            print(f"attempting to delete non-existent entity: {str(e)}")
-            raise
-        self.current_task = None
+        self.view_manager.update_sprites(entities)
 
     # End task processors
 
