@@ -144,7 +144,7 @@ class ActionTask(Task):
         px_pos_x, px_pos_y = self.action_steps.popleft()
         # !!! yuck! fix this later 
         view_manager.map_view.entities[self.entity_id].update_position(px_pos_x, px_pos_y)
-        view_manager.map_view.draw_sprites()
+        view_manager.map_view.draw()
 
     def get_px_move_steps_between_tiles(
         self, view_manager: ViewManager

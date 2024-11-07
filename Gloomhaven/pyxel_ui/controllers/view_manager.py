@@ -18,7 +18,7 @@ class ViewManager:
         self.canvas_height = pyxel_height
         self.map_view = view.MapView(
             self.font, 
-            [self.view_border, BITS+self.view_border],
+            [self.view_border, BITS+self.view_border*2],
             [self.canvas_width, self.canvas_height]
             )
         # !!! eventually, we should reset these to get the end pos of the
@@ -67,7 +67,7 @@ class ViewManager:
     def update_sprites(self, entities: dict) -> None:
         """draws entity sprites with a notion of priority"""
         self.map_view.entities = entities
-        self.map_view.draw_sprites()
+        self.map_view.draw()
 
     def remove_entity(self, entity_id: int) -> None:
         try:
@@ -76,7 +76,6 @@ class ViewManager:
             print(f"attempting to delete non-existent entity: {str(e)}")
             raise
         self.map_view.draw()
-        self.map_view.draw_sprites()
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the map."""
