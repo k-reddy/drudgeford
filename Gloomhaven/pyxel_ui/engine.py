@@ -164,36 +164,19 @@ class PyxelEngine:
 
     def draw(self):
         # pyxel.cls(0)
-
-        # # draw iniative bar
-        # self.renderer.draw_health_and_iniative_bar(
-        #     self.initiative_bar_sprite_names,
-        #     self.initiative_bar_healths,
-        #     self.initiative_bar_teams,
-        # )
-
+        
         # # draw map background and grid
         self.view_manager.update_map(self.valid_floor_coordinates)
 
         self.view_manager.update_sprites(self.entities)
 
-        # self.renderer.draw_log(
-        #     self.log,
-        #     self.round_number,
-        #     self.acting_character_name,
-        # )
-        # self.renderer.draw_action_cards(
-        #     self.action_card_log,
-        #     self.current_card_page,
-        #     self.cards_per_page,
-        # )
         # Calculate duration and framerate
-        loop_duration = time.time() - self.start_time
-        self.loop_durations.append(loop_duration)
+        # loop_duration = time.time() - self.start_time
+        # self.loop_durations.append(loop_duration)
 
-        if len(self.loop_durations) > 0:
-            avg_duration = mean(self.loop_durations)
-            loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
-            avg_duration_ms = avg_duration * 1000
-            rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
-            # pyxel.text(10, 20, rate_stats, 7)
+        # if len(self.loop_durations) > 0:
+        #     avg_duration = mean(self.loop_durations)
+        #     loops_per_second = 1 / avg_duration if avg_duration > 0 else 0
+        #     avg_duration_ms = avg_duration * 1000
+        #     rate_stats = f"LPS: {loops_per_second:.2f} - DUR: {avg_duration_ms:.2f} ms"
+        #     # pyxel.text(10, 20, rate_stats, 7)
