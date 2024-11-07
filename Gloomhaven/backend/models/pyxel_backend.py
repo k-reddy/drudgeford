@@ -10,6 +10,7 @@ from pyxel_ui.models.update_tasks import (
     LoadActionCardsTask,
     LoadRoundTurnInfoTask,
 )
+from pyxel_ui.controllers.view_manager import ViewManager
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 

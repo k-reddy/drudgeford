@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pyxel_ui.controllers.view_manager import ViewManager
 
 @dataclass
 class AddEntityTask:
@@ -32,12 +33,18 @@ class LoadCharactersTask:
     sprite_names: list[str]
     teams: list[bool]
 
+    def perform(self, view_manager: ViewManager):
+        view_manager.update_initiative_bar(self.sprite_names, self.healths, self.teams)
+
 @dataclass
 class LoadLogTask:
     '''
     task that updates the pyxel log
     '''
     log: list[str]
+
+    def perform(self, view_manager: ViewManager):
+        view_manager.update_log(self.log)
 
 @dataclass
 class LoadActionCardsTask:
@@ -46,6 +53,9 @@ class LoadActionCardsTask:
     '''
     action_card_log: list[str]
 
+    def perform(self, view_manager: ViewManager):
+        view_manager.update_action_card_log(self.action_card_log)
+
 @dataclass
 class LoadRoundTurnInfoTask:
     '''
@@ -53,3 +63,6 @@ class LoadRoundTurnInfoTask:
     '''
     round_number: int
     acting_character_name: str
+    
+    def perform(self, view_manager: ViewManager):
+        view_manager.update_round_turn(self.round_number, self.acting_character_name)

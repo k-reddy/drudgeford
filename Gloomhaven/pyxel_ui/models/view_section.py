@@ -40,7 +40,7 @@ class LogView(ViewSection):
 
     def draw(self) -> None:
         # only draw if you have something loaded
-        if not (self.log or self.round_number > 0):
+        if not self.log and self.round_number <= 0:
             return 
         
         log_line_y = self.start_pos[1]
@@ -63,8 +63,8 @@ class MapView(ViewSection):
     dungeon_floor_tile_names: list[str] = [f"dungeon_floor_cracked_{i}" for i in range(1, 13)]
     valid_map_coordinates = [[]]
     # !!! these 2 should probably be set in the init
-    tile_width_px = 0
-    tile_height_px = 0
+    tile_width_px = BITS
+    tile_height_px = BITS
     sprite_manager = SpriteManager()
     entities = {}
 
