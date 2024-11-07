@@ -1,11 +1,10 @@
 import threading
-from typing import Optional, List
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))  # Add parent directory to path
 from pyxel_ui.engine import PyxelEngine
-from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.system_task import SystemTask
-from pyxel_ui.models.tasks import RemoveEntityTask, AddEntitiesTask
+from pyxel_ui.models import tasks
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-from pyxel_ui.enums import Direction
 
 """
 average frame time = 0.0343 sec
@@ -38,7 +37,6 @@ board_width_tiles = 6
 board_height_tiles = 5
 move_duration = 700
 
-
 def enqueue_actions():
     """Simulate external enqueueing of actions asynchronously."""
     import time
@@ -67,75 +65,39 @@ def enqueue_actions():
     for x in range(0, width):
         for y in range(0, height):
             valid_floor_coordinates.append((x, y))
-    payload = {
-        "map_width": 10,
-        "map_height": 10,
-        "valid_floor_coordinates": valid_floor_coordinates,
-        "entities": [
-            {"id": 1, "position": (0, 0), "name": "skeleton", "priority": 0},
-            {"id": 3, "position": (3, 2), "name": "spores", "priority": 1},
+    board_load_task = tasks.BoardInitTask(map_height=10, map_width=10,
+                                          valid_map_coordinates=valid_floor_coordinates)
+    shared_action_queue.enqueue(board_load_task)
+    entities = [
+            {"id": 1, "position": (0, 0), "name": "skeleton", "priority": 10},
+            {"id": 3, "position": (4, 2), "name": "necromancer", "priority": 10},
             {"id": 2, "position": (3, 2), "name": "wizard", "priority": 10},
-            {"id": 4, "position": (3, 2), "name": "fire", "priority": 0},
-        ],
-    }
-
-    task = SystemTask(type="board_init", payload=payload)
-    shared_action_queue.enqueue(task)
+            {"id": 4, "position": (4, 4), "name": "fire", "priority": 0},
+        ]
+    shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
 
     # Create some test actions
-    # time.sleep(7)
-    print("move 1")
+    print("move 1: skele 0,0 to 1,0 to 1,1")
     shared_action_queue.enqueue(
-        ActionTask("knight", 1, "walk", Direction.EAST, (0, 0), (1, 0), move_duration)
+        tasks.ActionTask(1, (0, 0), (1, 0), move_duration)
     )
     shared_action_queue.enqueue(
-        ActionTask("knight", 1, "walk", Direction.EAST, (1, 0), (1, 1), move_duration)
+        tasks.ActionTask(1, (1, 0), (1, 1), move_duration)
     )
-    time.sleep(2)
+    time.sleep(4)
 
-    print("move2")
+    print("move2 wizard 3,2 to 3,3")
     shared_action_queue.enqueue(
-        ActionTask(
-            "knight",
-            2,
-            "walk",
-            Direction.EAST,
-            (3, 2),
-            (3, 3),
-        )
+        tasks.ActionTask(2, (3, 2), (3, 3), move_duration)
     )
-    shared_action_queue.enqueue(
-        ActionTask("knight", 2, "walk", Direction.EAST, (3, 3), (2, 2), move_duration)
-    )
-    shared_action_queue.enqueue(
-        ActionTask("knight", 2, "walk", Direction.EAST, (2, 2), (1, 2), move_duration)
-    )
-    shared_action_queue.enqueue(RemoveEntityTask(2))
-    shared_action_queue.enqueue(
-        AddEntitiesTask(
-            {
-                "entities": [
-                    {"id": 5, "position": (4, 6), "name": "necromancer", "priority": 1}
-                ]
-            }
-        )
-    )
-    shared_action_queue.enqueue(
-        ActionTask(
-            "necromancer", 5, "walk", Direction.EAST, (4, 6), (0, 0), move_duration
-        )
-    )
-    # time.sleep(3)
-    # print("move3")
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 2), (1, 3), move_duration)
-    # )
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", 1, "walk", Direction.EAST, (1, 3), (2, 4), move_duration)
-    # )
-    # shared_action_queue.enqueue(
-    #     ActionTask("knight", 1, "walk", Direction.EAST, (2, 4), (2, 3), move_duration)
-    # )
+    
+    time.sleep(4)
+    print("remove wizard")
+    shared_action_queue.enqueue(tasks.RemoveEntityTask(2))
+    print("add miner")
+    shared_action_queue.enqueue(tasks.AddEntitiesTask([
+                    {"id": 5, "position": (4, 6), "name": "miner", "priority": 10}
+                ]))
 
     print("ActionTasks enqueued successfully.")
     print("yaaaay")
