@@ -1,5 +1,7 @@
 import pyxel
 
+from typing import Optional
+
 from pyxel_ui.constants import (
     BITS,
     FONT_PATH,
@@ -8,39 +10,61 @@ from pyxel_ui.models.font import PixelFont
 from pyxel_ui.views.sprite import SpriteManager
 from pyxel_ui.models import view_section as view
 
+
 class ViewManager:
-    def __init__(self, pyxel_width, pyxel_height, floor_color_map=[], wall_color_map=[]):
+    def __init__(
+        self, pyxel_width, pyxel_height, floor_color_map=[], wall_color_map=[]
+    ):
         self.view_border = 10
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.canvas_width = pyxel_width
         self.canvas_height = pyxel_height
         self.initiative_bar_view = view.InitiativeBarView(
-            self.font, 
-            start_pos=[self.view_border,self.view_border//4], 
-            bounding_coordinate=[BITS*11, BITS]
+            self.font,
+            start_pos=[self.view_border, self.view_border // 4],
+            bounding_coordinate=[BITS * 11, BITS],
         )
         self.map_view = view.MapView(
-            self.font, 
-            [self.initiative_bar_view.start_pos[0], self.initiative_bar_view.bounding_coordinate[1]+self.view_border],
-            [self.initiative_bar_view.bounding_coordinate[0], BITS*11+self.view_border*2],
+            self.font,
+            [
+                self.initiative_bar_view.start_pos[0],
+                self.initiative_bar_view.bounding_coordinate[1] + self.view_border,
+            ],
+            [
+                self.initiative_bar_view.bounding_coordinate[0],
+                BITS * 11 + self.view_border * 2,
+            ],
             floor_color_map=floor_color_map,
-            wall_color_map=wall_color_map
-            )
+            wall_color_map=wall_color_map,
+        )
         self.log_view = view.LogView(
             self.font,
-            [self.initiative_bar_view.bounding_coordinate[0], self.initiative_bar_view.start_pos[1]],
-            [self.canvas_width, self.map_view.bounding_coordinate[1]+self.view_border]
-        )  
+            [
+                self.initiative_bar_view.bounding_coordinate[0],
+                self.initiative_bar_view.start_pos[1],
+            ],
+            [
+                self.canvas_width,
+                self.map_view.bounding_coordinate[1] + self.view_border,
+            ],
+        )
         self.action_card_view = view.ActionCardView(
             self.font,
-            [self.map_view.start_pos[0], self.map_view.bounding_coordinate[1]+self.view_border],
-            [self.canvas_width, self.canvas_height]
-            )
-      
-    def update_log(
-            self, 
-            log: list[str]):
+            [
+                self.map_view.start_pos[0],
+                self.map_view.bounding_coordinate[1] + self.view_border,
+            ],
+            [self.canvas_width, self.canvas_height],
+        )
+        self.views = [
+            self.initiative_bar_view,
+            self.map_view,
+            self.log_view,
+            self.action_card_view,
+        ]
+
+    def update_log(self, log: list[str]):
         self.log_view.log = log
         self.log_view.draw()
 
@@ -49,7 +73,9 @@ class ViewManager:
         self.log_view.acting_character_name = acting_character_name
         self.log_view.draw()
 
-    def update_initiative_bar(self, sprite_names: list[str], healths: list[int], teams: list[bool]):
+    def update_initiative_bar(
+        self, sprite_names: list[str], healths: list[int], teams: list[bool]
+    ):
         self.initiative_bar_view.sprite_names = sprite_names
         self.initiative_bar_view.healths = healths
         self.initiative_bar_view.teams = teams
@@ -91,7 +117,25 @@ class ViewManager:
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the map."""
         return self.map_view.convert_grid_to_pixel_pos(tile_x, tile_y)
-    
+
+    def get_view_for_coordinate_px(
+        self,
+        px_x: int,
+        px_y: int,
+    ) -> Optional[view.ViewSection]:
+        return next(
+            (
+                curr_view
+                for curr_view in self.views
+                if curr_view.start_pos[0] <= px_x < curr_view.end_pos[0]
+                and curr_view.start_pos[1] <= px_y < curr_view.end_pos[1]
+            ),
+            None,
+        )
+
+    def draw_grid(self, px_x: int, px_y: int, px_width: int, px_height: int) -> None:
+        view.draw_grid(px_x, px_y, px_width, px_height)
+
     def draw_whole_game(self):
         self.initiative_bar_view.draw()
         self.map_view.draw()

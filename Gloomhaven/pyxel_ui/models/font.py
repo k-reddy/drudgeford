@@ -1,12 +1,15 @@
+from types import ModuleType
+
 from PIL import Image, ImageDraw, ImageFont  # type: ignore
 
 
 class PixelFont:
-    def __init__(self, pyxel, font_path):
+    def __init__(self, pyxel: ModuleType, font_path: str):
         """Initialize Press Start 2P font"""
         self.medium_font = ImageFont.truetype(font_path, 8)
         self.large_font = ImageFont.truetype(font_path, 12)
         self.pyxel = pyxel
+        self.text_pixels: dict[tuple[int, int], tuple[int, int, int]] = {}
 
     def get_line_height(self, size="medium"):
         """Get the line height for a given font size"""
@@ -127,6 +130,7 @@ class PixelFont:
 
             # Convert to pixels in Pyxel
             pixels = img.load()
+            # print(f"{pixels=}")
             for py in range(h):
                 for px in range(w):
                     if pixels[px, py]:
