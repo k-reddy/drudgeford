@@ -1,13 +1,10 @@
 from collections import deque
 from typing import Optional
 
-from .action_task import ActionTask
-from .system_task import SystemTask
-from .tasks import LoadCharactersTask, RemoveEntityTask, LoadLogTask, AddEntitiesTask
+from .tasks import Task, BoardInitTask
 
-
-task_type = ActionTask | SystemTask | LoadCharactersTask | RemoveEntityTask | LoadLogTask | AddEntitiesTask
-
+# all tasks are children of Task except BoardInitTask
+task_type = Task | BoardInitTask
 
 class PyxelTaskQueue:
     """
