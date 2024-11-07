@@ -103,7 +103,8 @@ class PyxelEngine:
         we're not redrawing the canvas unless there's something 
         new to draw!
         '''
-
+        # this is also very slow with the new font implementation
+        # self.view_manager.draw_whole_game()
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time
         # self.loop_durations.append(loop_duration)
