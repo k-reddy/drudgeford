@@ -113,27 +113,16 @@ class PyxelEngine:
             return
 
         if not self.current_task and not self.task_queue.is_empty():
-            temp_task = self.task_queue.dequeue()
-            if isinstance(temp_task, ActionTask):
-                self.current_task = (
-                    self.task_processor.convert_and_append_move_steps_to_action(
-                        temp_task
-                    )
-                )
-                return
-            else:
-                self.current_task = temp_task
-                return
+            self.current_task = self.task_queue.dequeue()
 
         if self.current_task:
             if isinstance(self.current_task, ActionTask):
                 self.task_processor.process_action(self.current_task)
             elif isinstance(self.current_task, AddEntityTask):
                 self.task_processor.process_entity_loading_task(self.current_task)
-                self.current_task = None
             elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask)):
                 self.current_task.perform(self.view_manager)
-                self.current_task = None
+            self.current_task = None
 
         # Add controls for scrolling
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
