@@ -15,6 +15,7 @@ class Task(abc.ABC):
     def perform(self, view_manager: ViewManager):
         pass
 
+
 @dataclass
 class AddEntitiesTask(Task):
     """
@@ -27,6 +28,7 @@ class AddEntitiesTask(Task):
         - priority - kind of a "z" index, with higher numbers showing up on top
             when the map draws
     """
+
     entities: list
 
     def perform(self, view_manager: ViewManager):
@@ -49,23 +51,27 @@ class AddEntitiesTask(Task):
             )
         view_manager.update_sprites(entities)
 
+
 @dataclass
 class RemoveEntityTask(Task):
     """
     A task that tells pyxel to remove an entity from the game map.
     Pyxel will have no record of that entity going forward
     """
+
     entity_id: int
 
     def perform(self, view_manager: ViewManager):
         view_manager.remove_entity(self.entity_id)
 
+
 @dataclass
 class LoadCharactersTask(Task):
-    '''
+    """
     A task that tells pyxel to update the characters/healths/ordering in the
     initiative bar
-    '''
+    """
+
     healths: list[int]
     sprite_names: list[str]
     teams: list[bool]
@@ -73,49 +79,58 @@ class LoadCharactersTask(Task):
     def perform(self, view_manager: ViewManager):
         view_manager.update_initiative_bar(self.sprite_names, self.healths, self.teams)
 
+
 @dataclass
 class LoadLogTask(Task):
-    '''
+    """
     task that updates the pyxel log
-    '''
+    """
+
     log: list[str]
 
     def perform(self, view_manager: ViewManager):
         view_manager.update_log(self.log)
 
+
 @dataclass
 class LoadActionCardsTask(Task):
-    '''
+    """
     task that updates the action cards area
-    '''
+    """
+
     action_card_log: list[str]
 
     def perform(self, view_manager: ViewManager):
         view_manager.update_action_card_log(self.action_card_log)
 
+
 @dataclass
 class LoadRoundTurnInfoTask(Task):
-    '''
+    """
     task that updates the round number and who's turn it is
-    '''
+    """
+
     round_number: int
     acting_character_name: str
-    
+
     def perform(self, view_manager: ViewManager):
         view_manager.update_round_turn(self.round_number, self.acting_character_name)
+
 
 # board init tasks are the only task that shouldn't be performed
 # because they're only used to set up the board once
 @dataclass
-class BoardInitTask():
+class BoardInitTask:
     """
     Initializes the board
     """
+
     map_height: int
     map_width: int
-    valid_map_coordinates: list[tuple[int,int]]
-    floor_color_map: Optional[list[tuple[int,int]]] = None
-    wall_color_map: Optional[list[tuple[int,int]]] = None
+    valid_map_coordinates: list[tuple[int, int]]
+    floor_color_map: Optional[list[tuple[int, int]]] = None
+    wall_color_map: Optional[list[tuple[int, int]]] = None
+
 
     def perform(self, view_manager):
         view_manager.update_map(
@@ -137,6 +152,7 @@ class ActionTask(Task):
         action_steps (Optional[deque[tuple[int, int]]]): A sequence of pixel positions
             representing the path of the action (optional).
     """
+
     entity_id: int
     from_grid_pos: tuple
     to_grid_pos: tuple
@@ -149,8 +165,10 @@ class ActionTask(Task):
             self.action_steps = self.get_px_move_steps_between_tiles(view_manager)
 
         px_pos_x, px_pos_y = self.action_steps.popleft()
-        # !!! yuck! fix this later 
-        view_manager.map_view.entities[self.entity_id].update_position(px_pos_x, px_pos_y)
+        # !!! yuck! fix this later
+        view_manager.map_view.entities[self.entity_id].update_position(
+            px_pos_x, px_pos_y
+        )
         view_manager.map_view.draw()
 
     def get_px_move_steps_between_tiles(
@@ -162,9 +180,13 @@ class ActionTask(Task):
         Movement is broken into discrete steps, where the number of steps determines
         the speed of the animation. The steps are stored as tuples of (x, y) pixel coordinates.
         """
-        assert self.duration_ms > FRAME_DURATION_MS, "ActionTask smaller than frame rate"
+        assert (
+            self.duration_ms > FRAME_DURATION_MS
+        ), "ActionTask smaller than frame rate"
 
-        start_px_x, start_px_y = view_manager.convert_grid_to_pixel_pos(*self.from_grid_pos)
+        start_px_x, start_px_y = view_manager.convert_grid_to_pixel_pos(
+            *self.from_grid_pos
+        )
         end_px_x, end_px_y = view_manager.convert_grid_to_pixel_pos(*self.to_grid_pos)
 
         step_count = self.duration_ms // FRAME_DURATION_MS
