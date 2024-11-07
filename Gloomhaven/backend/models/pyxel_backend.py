@@ -1,15 +1,6 @@
 import backend.models.character as character
-from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-from pyxel_ui.models.action_task import ActionTask
-from pyxel_ui.models.update_tasks import (
-    AddEntityTask,
-    RemoveEntityTask,
-    LoadCharactersTask,
-    LoadLogTask,
-    LoadActionCardsTask,
-    LoadRoundTurnInfoTask,
-)
+from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 
@@ -26,12 +17,12 @@ class PyxelManager:
     def load_board(self, locations, terrain):
         entities = []
         # get all the coordinates on the map
-        valid_floor_coordinates = self.generate_valid_floor_coordinates(locations)
+        valid_map_coordinates = self.generate_valid_map_coordinates(locations)
         # there are sometimes full rows and columns of nothing - set offsets and remove those rows/cols
-        self.set_x_y_offset(valid_floor_coordinates)
-        valid_floor_coordinates = [
+        self.set_x_y_offset(valid_map_coordinates)
+        valid_map_coordinates = [
             self.normalize_coordinate(coordinate)
-            for coordinate in valid_floor_coordinates
+            for coordinate in valid_map_coordinates
         ]
         # get some board metadata that we'll need
 
@@ -67,23 +58,17 @@ class PyxelManager:
                         }
                     )
 
-        payload = {
-            "map_width": self.board_width,
-            "map_height": self.board_height,
-            "entities": entities,
-            "valid_floor_coordinates": valid_floor_coordinates,
-        }
-        # print(payload)
-        task = SystemTask(type="board_init", payload=payload)
+        task = tasks.BoardInitTask(
+            map_height=self.board_height,
+            map_width=self.board_width,
+            valid_map_coordinates=valid_map_coordinates
+        )
         self.shared_action_queue.enqueue(task)
+        self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
 
     def move_character(self, char, old_location, new_location):
-        direction = "DIR HOLDER"
-        task = ActionTask(
-            char.pyxel_sprite_name,
+        task = tasks.ActionTask(
             char.id,
-            "walk",
-            direction,
             self.normalize_coordinate((old_location[1], old_location[0])),
             self.normalize_coordinate((new_location[1], new_location[0])),
             self.move_duration,
@@ -96,22 +81,20 @@ class PyxelManager:
         else:
             priority = OTHER_PRIORITY
 
-        task = AddEntityTask(
-            {
-                "entities": [
-                    {
-                        "id": entity.id,
-                        "position": self.normalize_coordinate((col, row)),
-                        "name": entity.pyxel_sprite_name,
-                        "priority": priority,
-                    }
-                ]
-            }
+        task = tasks.AddEntitiesTask(
+            entities=[
+                {
+                    "id": entity.id,
+                    "position": self.normalize_coordinate((col, row)),
+                    "name": entity.pyxel_sprite_name,
+                    "priority": priority,
+                }
+            ]
         )
         self.shared_action_queue.enqueue(task)
 
     def remove_entity(self, entity_id):
-        task = RemoveEntityTask(entity_id)
+        task = tasks.RemoveEntityTask(entity_id)
         self.shared_action_queue.enqueue(task)
 
     def set_x_y_offset(self, coordinates: list[tuple[int, int]]):
@@ -127,38 +110,38 @@ class PyxelManager:
     def normalize_coordinate(self, coordinate: tuple[int, int]):
         return (coordinate[0] - self.x_offset, coordinate[1] - self.y_offset)
 
-    def generate_valid_floor_coordinates(self, locations):
-        valid_floor_coordinates = []
+    def generate_valid_map_coordinates(self, locations):
+        valid_map_coordinates = []
         for row_num, row in enumerate(locations):
             for col_num, el in enumerate(row):
                 if not el:
-                    valid_floor_coordinates.append((col_num, row_num))
+                    valid_map_coordinates.append((col_num, row_num))
                     continue
                 if isinstance(el, obstacle.Wall):
                     continue
-                valid_floor_coordinates.append((col_num, row_num))
-        return valid_floor_coordinates
+                valid_map_coordinates.append((col_num, row_num))
+        return valid_map_coordinates
 
     def load_characters(self, characters: list[character.Character]):
         healths = [character.health for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
-        task = LoadCharactersTask(healths, sprite_names, teams)
+        task = tasks.LoadCharactersTask(healths, sprite_names, teams)
         self.shared_action_queue.enqueue(task)
 
     def load_log(self, log):
-        task = LoadLogTask(log)
+        task = tasks.LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
 
     def load_action_cards(self, action_cards):
         action_card_log = []
         for i, action_card in enumerate(action_cards):
             action_card_log.append(f"{i}: {action_card}")
-        task = LoadActionCardsTask(action_card_log=action_card_log)
+        task = tasks.LoadActionCardsTask(action_card_log=action_card_log)
         self.shared_action_queue.enqueue(task)
 
     def load_round_turn_info(self, round_num, acting_character_name):
-        task = LoadRoundTurnInfoTask(
+        task = tasks.LoadRoundTurnInfoTask(
             round_number=round_num, acting_character_name=acting_character_name
         )
         self.shared_action_queue.enqueue(task)
