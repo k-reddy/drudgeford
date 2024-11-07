@@ -18,7 +18,7 @@ class ViewManager:
         self.map_view = view.MapView(
             self.font, 
             [self.view_border, BITS+self.view_border*2],
-            [self.canvas_width, self.canvas_height]
+            [BITS*11, BITS*11+self.view_border*4]
             )
         # !!! eventually, we should reset these to get the end pos of the
         # other view and add the border, but we don't set end positions right now
@@ -29,13 +29,13 @@ class ViewManager:
             )
         self.initiative_bar_view = view.InitiativeBarView(
             self.font, 
-            start_pos=[0,self.view_border], 
+            start_pos=[0,self.view_border//2], 
             bounding_coordinate=[BITS*11, BITS]
         )
         self.log_view = view.LogView(
             self.font,
             [BITS*11, self.view_border],
-            [self.canvas_width, self.canvas_height]
+            [self.canvas_width, BITS*11+self.view_border*4]
         )        
     def update_log(
             self, 
