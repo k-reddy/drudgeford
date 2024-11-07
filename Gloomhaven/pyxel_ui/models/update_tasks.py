@@ -5,22 +5,22 @@ from pyxel_ui.enums import AnimationFrame
 
 
 @dataclass
-class AddEntityTask:
+class AddEntitiesTask:
     """
     A task that tells pyxel to load an entity onto the game map.
 
-    Payload Dict has one entry, "entities", which is a list of dicts with:
+    entities is a list of dicts with:
         - entity_id - unique id for the entity
         - position - where on the map to put the entity
         - sprite_name - name of the sprite to display for the entity
         - priority - kind of a "z" index, with higher numbers showing up on top
             when the map draws
     """
-    payload: dict
+    entities: dict
 
     def perform(self, view_manager: ViewManager):
         entities = {}
-        for entity in self.payload["entities"]:
+        for entity in self.entities:
             row_px, col_px = view_manager.convert_grid_to_pixel_pos(
                 entity["position"][0],
                 entity["position"][1],

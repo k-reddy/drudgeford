@@ -11,7 +11,7 @@ from .constants import (
 )
 from .models.action_task import ActionTask
 from .models.update_tasks import (
-    AddEntityTask,
+    AddEntitiesTask,
     RemoveEntityTask,
     LoadCharactersTask,
     LoadLogTask,
@@ -120,7 +120,7 @@ class PyxelEngine:
             if isinstance(self.current_task, ActionTask) and self.current_task.action_steps:
                 self.task_processor.process_action(self.current_task)
                 return
-            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask, AddEntityTask)):
+            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask, AddEntitiesTask)):
                 self.current_task.perform(self.view_manager)
             self.current_task = None
 

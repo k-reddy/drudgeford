@@ -3,7 +3,7 @@ from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.update_tasks import (
-    AddEntityTask,
+    AddEntitiesTask,
     RemoveEntityTask,
     LoadCharactersTask,
     LoadLogTask,
@@ -77,7 +77,7 @@ class PyxelManager:
         # print(payload)
         task = SystemTask(type="board_init", payload=payload)
         self.shared_action_queue.enqueue(task)
-        task = AddEntityTask(payload=payload)
+        task = AddEntitiesTask(entities=payload["entities"])
         self.shared_action_queue.enqueue(task)
 
     def move_character(self, char, old_location, new_location):
@@ -99,17 +99,15 @@ class PyxelManager:
         else:
             priority = OTHER_PRIORITY
 
-        task = AddEntityTask(
-            {
-                "entities": [
-                    {
-                        "id": entity.id,
-                        "position": self.normalize_coordinate((col, row)),
-                        "name": entity.pyxel_sprite_name,
-                        "priority": priority,
-                    }
-                ]
-            }
+        task = AddEntitiesTask(
+            entities=[
+                {
+                    "id": entity.id,
+                    "position": self.normalize_coordinate((col, row)),
+                    "name": entity.pyxel_sprite_name,
+                    "priority": priority,
+                }
+            ]
         )
         self.shared_action_queue.enqueue(task)
 
