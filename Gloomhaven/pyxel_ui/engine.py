@@ -95,8 +95,11 @@ class PyxelEngine:
                 self.current_card_page -= 1
 
     def draw(self):
-        # # draw map background and grid
-        # self.view_manager.map_view.draw()
+        '''everything in the task queue draws itself, 
+        so there's nothing to draw here - this ensures 
+        we're not redrawing the canvas unless there's something 
+        new to draw!
+        '''
 
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time
