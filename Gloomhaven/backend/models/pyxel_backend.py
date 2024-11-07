@@ -1,8 +1,6 @@
 import backend.models.character as character
-from pyxel_ui.models.system_task import SystemTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models import tasks
-from pyxel_ui.controllers.view_manager import ViewManager
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 

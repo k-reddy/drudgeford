@@ -14,10 +14,8 @@ from .constants import (
 from .models.tasks import BoardInitTask, ActionTask
 
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-from .models.canvas import Canvas
 from .models.entity import Entity
 from pyxel_ui.controllers.view_manager import ViewManager
-from .utils import generate_wall_bank
 
 
 # phase 1, generate play space based on 64x64 character. add wall boundaries
@@ -53,9 +51,6 @@ class PyxelEngine:
         pyxel.load("../my_resource.pyxres")
 
         self.view_manager = ViewManager()
-
-        self.dungeon_walls = generate_wall_bank(self.canvas)
-
     def start(self):
         print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
