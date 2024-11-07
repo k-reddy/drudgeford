@@ -4,7 +4,7 @@ from pyxel_ui.models.entity import Entity
 from pyxel_ui.models.canvas import Canvas
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.update_tasks import (
-    AddEntityTask,
+    AddEntitiesTask,
     RemoveEntityTask,
 )
 from pyxel_ui.constants import FRAME_DURATION_MS

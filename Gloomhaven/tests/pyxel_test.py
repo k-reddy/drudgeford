@@ -3,7 +3,7 @@ from typing import Optional, List
 from pyxel_ui.engine import PyxelEngine
 from pyxel_ui.models.action_task import ActionTask
 from pyxel_ui.models.system_task import SystemTask
-from pyxel_ui.models.update_tasks import RemoveEntityTask, AddEntityTask
+from pyxel_ui.models.update_tasks import RemoveEntityTask, AddEntitiesTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.enums import Direction
 
@@ -112,7 +112,7 @@ def enqueue_actions():
     )
     shared_action_queue.enqueue(RemoveEntityTask(2))
     shared_action_queue.enqueue(
-        AddEntityTask(
+        AddEntitiesTask(
             {
                 "entities": [
                     {"id": 5, "position": (4, 6), "name": "necromancer", "priority": 1}
