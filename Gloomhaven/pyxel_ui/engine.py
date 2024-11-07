@@ -5,11 +5,11 @@ from statistics import mean
 import time
 
 from .constants import (
-    BITS,
-    WALL_THICKNESS,
     WINDOW_LENGTH,
-    PYXEL_WIDTH,
-    PYXEL_HEIGHT
+    DEFAULT_PYXEL_WIDTH,
+    DEFAULT_PYXEL_HEIGHT,
+    MAP_TILE_HEIGHT_PX,
+    MAP_TILE_WIDTH_PX
 )
 from .models.tasks import BoardInitTask, ActionTask
 
@@ -17,24 +17,14 @@ from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from .models.entity import Entity
 from pyxel_ui.controllers.view_manager import ViewManager
 
-
-# phase 1, generate play space based on 64x64 character. add wall boundaries
-# phase 2, create move queue and read from them to move character around on grid
-# phase 3, integrate with GH backend - set up new task types for use with message queue
-# phase 4, start UI, allow for mouse hover to highlight grid boxes
-# phase 5, add log and be able to write to it.
-# phase 6, add way to dynamically shape walls as obstacles.
-
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
 # TODO(john): allow mouse to highlight grid sections
 # TODO: limit re-draw to areas that will change.
 
-
 class PyxelEngine:
     def __init__(self, task_queue: PyxelTaskQueue):
         self.current_task = None
-        self.entities: dict[int, Entity] = {}
         self.is_board_initialized = False
 
         # Controllers and queues
@@ -45,12 +35,15 @@ class PyxelEngine:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
-    def init_pyxel_map(self, board_width_tiles, board_height_tiles, valid_floor_coordinates):
+    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_floor_coordinates):
         self.valid_floor_coordinates = valid_floor_coordinates
-        pyxel.init(PYXEL_WIDTH, PYXEL_HEIGHT)
+        pyxel_width = max(DEFAULT_PYXEL_WIDTH, map_width_tiles*MAP_TILE_WIDTH_PX)
+        pyxel_height = max(DEFAULT_PYXEL_HEIGHT, map_height_tiles*MAP_TILE_HEIGHT_PX*1.5)
+        pyxel.init(pyxel_width, pyxel_height)
         pyxel.load("../my_resource.pyxres")
 
-        self.view_manager = ViewManager()
+        self.view_manager = ViewManager(pyxel_width, pyxel_height)
+
     def start(self):
         print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
@@ -102,12 +95,8 @@ class PyxelEngine:
                 self.current_card_page -= 1
 
     def draw(self):
-        # pyxel.cls(0)
-
         # # draw map background and grid
         self.view_manager.update_map(self.valid_floor_coordinates)
-
-        # self.view_manager.update_sprites(self.entities)
 
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time
