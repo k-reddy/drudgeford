@@ -24,7 +24,7 @@ class ViewManager:
         # other view and add the border, but we don't set end positions right now
         self.action_card_view = view.ActionCardView(
             self.font,
-            [self.view_border, BITS*11+self.view_border],
+            [self.view_border, BITS*11+self.view_border*4],
             [self.canvas_width, self.canvas_height]
             )
         self.initiative_bar_view = view.InitiativeBarView(
