@@ -6,7 +6,6 @@ import abc
 from pyxel_ui.controllers.view_manager import ViewManager
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
-from ..enums import Direction
 from pyxel_ui.constants import FRAME_DURATION_MS
 
 
