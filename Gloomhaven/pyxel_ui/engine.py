@@ -63,7 +63,7 @@ class PyxelEngine:
             tile_height_px=BITS,
             wall_sprite_thickness_px=WALL_THICKNESS,
         )
-        self.view_manager = ViewManager(self.canvas)
+        self.view_manager = ViewManager()
         self.task_processor = TaskProcessor(self.canvas, self.view_manager)
         self.renderer = Renderer(self.view_manager)
 
@@ -98,7 +98,7 @@ class PyxelEngine:
 
         if not self.current_task and not self.task_queue.is_empty():
             self.current_task = self.task_queue.dequeue()
-            
+
         if self.current_task:
             self.current_task.perform(self.view_manager)
             # don't clear the task if it's an action task and has steps to do
