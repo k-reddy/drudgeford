@@ -103,8 +103,12 @@ class PyxelEngine:
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
                 self.task_processor.process_entity_loading_task(self.current_task)
-                self.current_task = self.task_queue.dequeue()
-                self.process_load_characters_task()
+                # self.current_task = self.task_queue.dequeue()
+                # self.view_manager.update_initiative_bar(
+                #     self.current_task.sprite_names,
+                #     self.current_task.healths,
+                #     self.current_task.teams
+                # )    
                 self.current_task = None  # clear
                 self.is_board_initialized = True
 
@@ -116,18 +120,6 @@ class PyxelEngine:
         width = self.current_task.payload["map_width"]
         valid_floor_coordinates = self.current_task.payload["valid_floor_coordinates"]
         self.init_pyxel_map(width, height, valid_floor_coordinates)
-
-    def process_load_log_task(self):
-        self.log = self.current_task.log
-        return
-
-    def process_load_characters_task(self):
-        self.initiative_bar_sprite_names = self.current_task.sprite_names
-        self.initiative_bar_healths = self.current_task.healths
-        self.initiative_bar_teams = self.current_task.teams
-
-    def process_load_action_card_task(self):
-        self.action_card_log = self.current_task.action_card_log
 
     def update(self):
         self.start_time = time.time()
@@ -160,17 +152,23 @@ class PyxelEngine:
                 self.task_processor.process_entity_loading_task(self.current_task)
                 self.current_task = None
             elif isinstance(self.current_task, LoadCharactersTask):
-                self.process_load_characters_task()
+                self.view_manager.update_initiative_bar(
+                    self.current_task.sprite_names,
+                    self.current_task.healths,
+                    self.current_task.teams
+                )                
                 self.current_task = None
             elif isinstance(self.current_task, LoadLogTask):
-                self.process_load_log_task()
+                self.view_manager.update_log(self.current_task.log)
                 self.current_task = None
             elif isinstance(self.current_task, LoadActionCardsTask):
-                self.process_load_action_card_task()
+                self.view_manager.update_action_card_log(self.current_task.action_card_log)
                 self.current_task = None
             elif isinstance(self.current_task, LoadRoundTurnInfoTask):
-                self.round_number = self.current_task.round_number
-                self.acting_character_name = self.current_task.acting_character_name
+                self.view_manager.update_round_turn(
+                    self.current_task.round_number, 
+                    self.current_task.acting_character_name
+                )
                 self.current_task = None
 
         # Add controls for scrolling
