@@ -32,8 +32,8 @@ class ViewSection(abc.ABC):
         pyxel.rect(
             self.start_pos[0], 
             self.start_pos[1], 
-            self.end_pos[0], 
-            self.end_pos[1], 
+            self.end_pos[0]-self.start_pos[0], 
+            self.end_pos[1]-self.start_pos[1], 
             0
         )
     @abc.abstractmethod
