@@ -54,6 +54,8 @@ class ViewManager:
         self.initiative_bar_view.draw()
 
     def update_action_card_log(self, action_card_log: list[str]):
+        # reset the card page to 0 every time we load new action cards
+        self.action_card_view.current_card_page = 0
         self.action_card_view.action_card_log = action_card_log
         self.action_card_view.draw()
 
