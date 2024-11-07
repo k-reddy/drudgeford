@@ -1,6 +1,7 @@
 import os
 
-
+PYXEL_WIDTH = 720
+PYXEL_HEIGHT= 600
 BITS = 32
 FRAME_DURATION_MS = 34
 FONT_PATH = os.path.join(

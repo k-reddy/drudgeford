@@ -69,12 +69,8 @@ class PyxelManager:
         self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
 
     def move_character(self, char, old_location, new_location):
-        direction = "DIR HOLDER"
         task = tasks.ActionTask(
-            char.pyxel_sprite_name,
             char.id,
-            "walk",
-            direction,
             self.normalize_coordinate((old_location[1], old_location[0])),
             self.normalize_coordinate((new_location[1], new_location[0])),
             self.move_duration,
