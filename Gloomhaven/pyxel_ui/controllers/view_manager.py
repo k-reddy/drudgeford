@@ -10,14 +10,13 @@ from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.models import view_section as view
 
 class ViewManager:
-    def __init__(self, canvas):
+    def __init__(self):
         self.view_border = 10
-        self.canvas = canvas
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.map_view = view.MapView(
             self.font, 
-            self.canvas.board_start_pos,
+            [self.view_border, BITS+self.view_border],
             [BITS*10, BITS*11]
             )
         # !!! eventually, we should reset these to get the end pos of the
@@ -78,5 +77,5 @@ class ViewManager:
         self.map_view.draw_sprites()
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
-        """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
+        """Converts grid-based tile coordinates to pixel coordinates on the map."""
         return self.map_view.convert_grid_to_pixel_pos(tile_x, tile_y)
