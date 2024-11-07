@@ -531,6 +531,8 @@ class Board:
         else:
             self.pyxel_manager.log.append(f"{target.name}'s new health: {target.health}")
         self.pyxel_manager.load_log(self.pyxel_manager.log)
+        # updating healths also affects the initiative bar
+        self.pyxel_manager.load_characters(self.characters)
 
     def select_and_apply_attack_modifier(
         self, attacker, initial_attack_strength: int
