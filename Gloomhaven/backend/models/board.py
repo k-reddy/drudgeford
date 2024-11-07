@@ -600,9 +600,3 @@ class Board:
         self.update_character_location(
             target, self.find_location_of_target(target), new_loc
         )
-
-    def log_action_cards(self, action_cards: list) -> None:
-        to_log = "Your action cards are:\n"
-        for i, action_card in enumerate(action_cards):
-            to_log += f"{i}: {action_card}\n"
-        self.pyxel_manager.log.append(to_log)
