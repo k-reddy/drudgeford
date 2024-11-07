@@ -52,13 +52,6 @@ class PyxelEngine:
         pyxel.init(PYXEL_WIDTH, PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
 
-        self.canvas = Canvas(
-            board_tile_width=board_width_tiles,
-            board_tile_height=board_height_tiles,
-            tile_width_px=BITS,
-            tile_height_px=BITS,
-            wall_sprite_thickness_px=WALL_THICKNESS,
-        )
         self.view_manager = ViewManager()
 
         self.dungeon_walls = generate_wall_bank(self.canvas)
