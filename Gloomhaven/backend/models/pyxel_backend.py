@@ -77,6 +77,8 @@ class PyxelManager:
         # print(payload)
         task = SystemTask(type="board_init", payload=payload)
         self.shared_action_queue.enqueue(task)
+        task = AddEntityTask(payload=payload)
+        self.shared_action_queue.enqueue(task)
 
     def move_character(self, char, old_location, new_location):
         direction = "DIR HOLDER"

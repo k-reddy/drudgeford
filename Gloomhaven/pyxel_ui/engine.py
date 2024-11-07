@@ -91,7 +91,6 @@ class PyxelEngine:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
                 self.process_board_initialization_task()
-                self.task_processor.process_entity_loading_task(self.current_task)  
                 self.current_task = None  # clear
                 self.is_board_initialized = True
 
@@ -121,9 +120,7 @@ class PyxelEngine:
             if isinstance(self.current_task, ActionTask) and self.current_task.action_steps:
                 self.task_processor.process_action(self.current_task)
                 return
-            elif isinstance(self.current_task, AddEntityTask):
-                self.task_processor.process_entity_loading_task(self.current_task)
-            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask)):
+            elif isinstance(self.current_task, (LoadCharactersTask, LoadLogTask, LoadActionCardsTask, LoadRoundTurnInfoTask, RemoveEntityTask, AddEntityTask)):
                 self.current_task.perform(self.view_manager)
             self.current_task = None
 

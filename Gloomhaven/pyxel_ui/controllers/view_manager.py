@@ -76,3 +76,7 @@ class ViewManager:
             raise
         self.map_view.draw()
         self.map_view.draw_sprites()
+
+    def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
+        """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
+        return self.map_view.convert_grid_to_pixel_pos(tile_x, tile_y)

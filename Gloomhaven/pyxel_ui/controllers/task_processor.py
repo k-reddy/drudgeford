@@ -29,27 +29,6 @@ class TaskProcessor:
         self.view_manager.map_view.draw_sprites()
 
 
-    def process_entity_loading_task(self, entity_loading_task: AddEntityTask) -> None:
-        assert entity_loading_task, "Attempting to process empty system task"
-        entities = {}
-        for entity in entity_loading_task.payload["entities"]:
-            row_px, col_px = self.convert_grid_to_pixel_pos(
-                entity["position"][0],
-                entity["position"][1],
-            )
-
-            entities[entity["id"]] = Entity(
-                id=entity["id"],
-                name=entity["name"],
-                x=row_px,
-                y=col_px,
-                z=10,
-                priority=entity["priority"],
-                animation_frame=AnimationFrame.SOUTH,
-                alive=True,
-            )
-        self.view_manager.update_sprites(entities)
-
     # End task processors
 
     def get_px_move_steps_between_tiles(
