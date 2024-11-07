@@ -1,7 +1,6 @@
 import pyxel
 
 from collections import deque
-from statistics import mean
 import time
 
 from .constants import (
@@ -14,7 +13,6 @@ from .constants import (
 from .models.tasks import BoardInitTask, ActionTask
 
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-from .models.entity import Entity
 from pyxel_ui.controllers.view_manager import ViewManager
 
 # TODO(john): enable mouse control

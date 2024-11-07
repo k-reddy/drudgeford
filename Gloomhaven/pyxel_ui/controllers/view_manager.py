@@ -4,9 +4,8 @@ from pyxel_ui.constants import (
     BITS,
     FONT_PATH,
 )
-from pyxel_ui.models.entity import Entity
 from pyxel_ui.models.font import PixelFont
-from pyxel_ui.views.sprite import Sprite, SpriteManager
+from pyxel_ui.views.sprite import SpriteManager
 from pyxel_ui.models import view_section as view
 
 class ViewManager:
