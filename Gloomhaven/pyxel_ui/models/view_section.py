@@ -226,7 +226,7 @@ class InitiativeBarView(ViewSection):
 
                 # Calculate x and y positions
                 x_pos = start_x + (i * (self.sprite_width + self.horiz_gap))
-                y_pos = row_num * self.vertical_gap
+                y_pos = row_num * self.vertical_gap + self.start_pos[1]
 
                 # Draw sprite
                 draw_sprite(
