@@ -10,32 +10,34 @@ from pyxel_ui.views.sprite import Sprite, SpriteManager
 from pyxel_ui.models import view_section as view
 
 class ViewManager:
-    def __init__(self):
+    def __init__(self, pyxel_width, pyxel_height):
         self.view_border = 10
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
+        self.canvas_width = pyxel_width
+        self.canvas_height = pyxel_height
         self.map_view = view.MapView(
             self.font, 
             [self.view_border, BITS+self.view_border],
-            [BITS*10, BITS*11]
+            [self.canvas_width, self.canvas_height]
             )
         # !!! eventually, we should reset these to get the end pos of the
         # other view and add the border, but we don't set end positions right now
         self.action_card_view = view.ActionCardView(
             self.font,
             [self.view_border, BITS*11+self.view_border],
-            [pyxel.width, pyxel.height]
+            [self.canvas_width, self.canvas_height]
             )
         self.initiative_bar_view = view.InitiativeBarView(
             self.font, 
             start_pos=[0,self.view_border], 
-            bounding_coordinate=[BITS*10, BITS]
+            bounding_coordinate=[BITS*11, BITS]
         )
         self.log_view = view.LogView(
             self.font,
             [BITS*11, self.view_border],
-            [pyxel.width, BITS*11])
-        
+            [self.canvas_width, self.canvas_height]
+        )        
     def update_log(
             self, 
             log: list[str]):
