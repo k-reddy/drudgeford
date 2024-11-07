@@ -7,6 +7,8 @@ from pyxel_ui.controllers.view_manager import ViewManager
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from ..enums import Direction
+from pyxel_ui.constants import FRAME_DURATION_MS
+
 
 @dataclass
 class Task(abc.ABC):
@@ -103,17 +105,16 @@ class LoadRoundTurnInfoTask(Task):
     def perform(self, view_manager: ViewManager):
         view_manager.update_round_turn(self.round_number, self.acting_character_name)
 
+# board init tasks are the only task that shouldn't be performed
+# because they're only used to set up the board once
 @dataclass
-class BoardInitTask(Task):
+class BoardInitTask():
     """
     Initializes the board
     """
     map_height: int
     map_width: int
     valid_map_coordinates: list[tuple[int,int]]
-
-    def perform(self):
-        pass
 
 @dataclass
 class ActionTask(Task):
@@ -122,26 +123,51 @@ class ActionTask(Task):
     and animation details.
 
     Attributes:
-        entity (str): The name of the entity performing the action.
-        animation_type (str): The type of animation for the action (e.g., 'walk', 'attack').
-        direction (Direction): The direction of movement.
+        entity id (int)): The id of the entity performing the action.
         from_grid_pos (tuple): The starting position on the grid (x, y).
         to_grid_pos (tuple): The target position on the grid (x, y).
         duration_ms (int): The duration of the action in milliseconds (default is 1000 ms).
         action_steps (Optional[deque[tuple[int, int]]]): A sequence of pixel positions
             representing the path of the action (optional).
     """
-    entity: str
     entity_id: int
-    animation_type: str
-    direction: Direction
     from_grid_pos: tuple
     to_grid_pos: tuple
     duration_ms: int = 1000
     action_steps: Optional[deque[tuple[int, int]]] = None
 
     def perform(self, view_manager):
+        # if you don't have action steps, create them
+        if not self.action_steps:
+            self.action_steps = self.get_px_move_steps_between_tiles(view_manager)
+
         px_pos_x, px_pos_y = self.action_steps.popleft()
         # !!! yuck! fix this later 
         view_manager.map_view.entities[self.entity_id].update_position(px_pos_x, px_pos_y)
         view_manager.map_view.draw_sprites()
+
+    def get_px_move_steps_between_tiles(
+        self, view_manager: ViewManager
+    ) -> deque[tuple[int, int]]:
+        """
+        Calculates the pixel-based steps for movement between two tiles.
+
+        Movement is broken into discrete steps, where the number of steps determines
+        the speed of the animation. The steps are stored as tuples of (x, y) pixel coordinates.
+        """
+        assert self.duration_ms > FRAME_DURATION_MS, "ActionTask smaller than frame rate"
+
+        start_px_x, start_px_y = view_manager.convert_grid_to_pixel_pos(*self.from_grid_pos)
+        end_px_x, end_px_y = view_manager.convert_grid_to_pixel_pos(*self.to_grid_pos)
+
+        step_count = self.duration_ms // FRAME_DURATION_MS
+        diff_px_x = end_px_x - start_px_x
+        diff_px_y = end_px_y - start_px_y
+
+        return deque(
+            (
+                int(start_px_x + i / step_count * (diff_px_x)),
+                int(start_px_y + i / step_count * (diff_px_y)),
+            )
+            for i in range(step_count + 1)
+        )

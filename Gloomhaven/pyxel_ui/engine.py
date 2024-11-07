@@ -8,6 +8,8 @@ from .constants import (
     BITS,
     WALL_THICKNESS,
     WINDOW_LENGTH,
+    PYXEL_WIDTH,
+    PYXEL_HEIGHT
 )
 from .models.tasks import BoardInitTask, ActionTask
 
@@ -49,21 +51,14 @@ class PyxelEngine:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
-    def init_pyxel_map(self, width, height, valid_floor_coordinates):
-        self.board_tile_width = width
-        self.board_tile_height = height
+    def init_pyxel_map(self, board_width_tiles, board_height_tiles, valid_floor_coordinates):
         self.valid_floor_coordinates = valid_floor_coordinates
-
-        # TODO(John): replace these hardcoded numbers.
-        pyxel.init(
-            self.board_tile_width * BITS + 32 + BITS * 12,
-            self.board_tile_height * BITS + BITS * 8,
-        )
+        pyxel.init(PYXEL_WIDTH, PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
 
         self.canvas = Canvas(
-            board_tile_width=self.board_tile_width,
-            board_tile_height=self.board_tile_height,
+            board_tile_width=board_width_tiles,
+            board_tile_height=board_height_tiles,
             tile_width_px=BITS,
             tile_height_px=BITS,
             wall_sprite_thickness_px=WALL_THICKNESS,
@@ -78,7 +73,6 @@ class PyxelEngine:
         print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
         # canvas + map = board
-        # we always do these first 3 tasks in the same order
         while not self.is_board_initialized:
             if not self.current_task and not self.task_queue.is_empty():
                 self.current_task = self.task_queue.dequeue()
@@ -104,9 +98,7 @@ class PyxelEngine:
 
         if not self.current_task and not self.task_queue.is_empty():
             self.current_task = self.task_queue.dequeue()
-            if isinstance(self.current_task, ActionTask) and not self.current_task.action_steps:
-                self.current_task = self.task_processor.convert_and_append_move_steps_to_action(self.current_task)
-
+            
         if self.current_task:
             self.current_task.perform(self.view_manager)
             # don't clear the task if it's an action task and has steps to do
