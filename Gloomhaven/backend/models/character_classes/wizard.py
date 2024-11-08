@@ -11,27 +11,27 @@ cards = [
             att_range=4
         )],
         movement=2,
-        jump=False
+        jump=True
     ),
     action_model.ActionCard(
-        attack_name="Cursed Frost Surge",
+        attack_name="Fire and Ice",
         actions=[
             action_model.AreaAttack(
-                shape=shapes.bar(1,2),
-                strength=1
+                shape=shapes.cone(3),
+                strength=2
             ),
             action_model.ElementAreaEffectFromSelf(
-                shape=shapes.bar(1,2),
+                shape=shapes.circle(3),
                 element_type=obstacle.Ice,
             )
         ],
-        movement=2,
+        movement=0,
         jump=False
     ),
     action_model.ActionCard(
         attack_name="Elementary Missile",
         actions=[action_model.SingleTargetAttack(
-            strength=5,
+            strength=6,
             att_range=4
         )],
         movement=0,
@@ -40,7 +40,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Scholar's Escape",
         actions=[action_model.SingleTargetAttack(
-            strength=1,
+            strength=3,
             att_range=1
         )],
         movement=5,
@@ -50,39 +50,41 @@ cards = [
         attack_name="Masochistic Explosion",
         actions=[action_model.ElementAreaEffectFromSelf(
             element_type=obstacle.Fire,
-            shape=shapes.circle(2)
-        )],
-        movement=0,
-        jump=False
+            shape=shapes.circle(2)),
+            action_model.AreaAttack(shape=shapes.circle(2),strength=3)
+        ],
+        movement=3,
+        jump=True
     ),
     action_model.ActionCard(
-        attack_name="Lightning Bolt",
+        attack_name="Lightning Charge",
         actions=[action_model.AreaAttack(
             shape=shapes.line((1,0), 3),
-            strength=4
-        )],
+            strength=4),
+            action_model.ModifySelfHealth(3)
+            ],
         movement=1,
         jump=False
     ),
     action_model.ActionCard(
         attack_name="Random Teleport",
         actions=[
+            action_model.SingleTargetAttack(
+                strength=3,
+                att_range=1
+            ),
             action_model.Teleport(
                 att_range=1
             ),
-            action_model.SingleTargetAttack(
-                strength=2,
-                att_range=1
-            )
         ],
-        movement=1,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
         attack_name="B-Line",
         actions=[action_model.AreaAttack(
-            shape=shapes.line((0,1), 2),
-            strength=2
+            shape=shapes.line((0,1), 3),
+            strength=4
         )],
         movement=2,
         jump=True
