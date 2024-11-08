@@ -1,4 +1,5 @@
 import backend.models.action_model as action_model
+from backend.utils import attack_shapes as shapes
 
 cards = [
     action_model.ActionCard(
@@ -15,13 +16,15 @@ cards = [
         actions=[
             action_model.HealAlly(strength=4, att_range=2),
             action_model.BlessAndChargeAlly(att_range=2, strength=2),
+            action_model.SingleTargetAttack(3,1)
         ],
         movement=3,
-        jump=False
+        jump=True
     ),
     action_model.ActionCard(
         attack_name="Estrangement",
         actions=[
+            action_model.SingleTargetAttack(2,1),
             action_model.Push(3,2),
             action_model.BlessSelf(),
         ],
@@ -42,6 +45,8 @@ cards = [
         attack_name="Seeds of Wrath",
         actions=[
             action_model.BlessAndChargeAlly(2,3),
+            action_model.CurseSelf(),
+            action_model.AreaAttack(shapes.line((0,1), 5),4)
         ],
         movement=2,
         jump=False
@@ -49,16 +54,15 @@ cards = [
     action_model.ActionCard(
         attack_name="Scythe Swipe",
         actions=[
-            action_model.SingleTargetAttack(4,1)
+            action_model.SingleTargetAttack(5,1)
         ],
-        movement=2,
-        jump=False
+        movement=3,
+        jump=True
     ),
     action_model.ActionCard(
         attack_name="Field Runner",
         actions=[
-            action_model.ModifySelfHealth(2),
-            action_model.SingleTargetAttack(2,1)
+            action_model.ModifySelfHealth(4),
         ],
         movement=4,
         jump=False
@@ -69,7 +73,7 @@ cards = [
             action_model.SingleTargetAttack(6,2),
             action_model.CurseSelf()
         ],
-        movement=0,
+        movement=1,
         jump=False
     )
 ]

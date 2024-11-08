@@ -33,6 +33,15 @@ def arc(length: int):
             x -= 1
     return directions
 
+def cone(length: int):
+    directions = set()
+    for y in range(length+1):
+        for x in range(y):
+            directions.add((x,y))
+            directions.add((-x,y))
+            directions.add((0,y))
+    return directions
+    
 def print_shape(shape):
     print_str = ''
     ymin = min([y for y, _ in shape])
