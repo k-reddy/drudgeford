@@ -8,6 +8,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Fear Mongerer",
         actions=[
+            action_model.AreaAttack(shapes.circle(2),2),
             action_model.PushAllEnemies(3,2)
         ],
         movement=0,
@@ -19,21 +20,22 @@ cards = [
             action_model.SingleTargetAttack(3,1),
             action_model.Curse(1),
         ],
-        movement=1,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
-        attack_name="Death's embrace",
+        attack_name="Life Drain",
         actions=[
-            action_model.AreaAttack(shapes.circle(radius=2), 1)
+            action_model.AreaAttack(shapes.circle(radius=3), 2),
+            action_model.ModifySelfHealth(4)
         ],
-        movement=0,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
         attack_name="Shadow Step",
         actions=[
-            action_model.SingleTargetAttack(1, 4)
+            action_model.SingleTargetAttack(2,4)
         ],
         movement=4,
         jump=True
@@ -42,14 +44,16 @@ cards = [
         attack_name="Soul Strike",
         actions=[
             action_model.SingleTargetAttack(4, 1),
+            action_model.Curse(1)
         ],
         movement=1,
         jump=False
     ),
     action_model.ActionCard(
-        attack_name="Death's Gambit",
+        attack_name="Death's Embrace",
         actions=[
             action_model.CurseAllEnemies(3),
+            action_model.AreaAttack(shapes.circle(3), 2),
             action_model.PushAllEnemies(1,3),
         ],
         movement=0,
@@ -67,9 +71,10 @@ cards = [
         # switch this to shadow that shows up around you
         attack_name="Night Owl",
         actions=[
-            action_model.ElementAreaEffectFromSelf(shape=shapes.circle(2,),element_type=Shadow)
+            action_model.ElementAreaEffectFromSelf(shape=shapes.circle(2,),element_type=Shadow),
+            action_model.AreaAttack(shapes.cone(2), 2)
         ],
-        movement=2,
+        movement=3,
         jump=False
     ),
 
