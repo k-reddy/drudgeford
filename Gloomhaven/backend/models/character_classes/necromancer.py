@@ -35,7 +35,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Shadow Step",
         actions=[
-            action_model.SingleTargetAttack(2,4)
+            action_model.SingleTargetAttack(2,4),
+            action_model.ModifySelfHealth(3)
         ],
         movement=4,
         jump=True

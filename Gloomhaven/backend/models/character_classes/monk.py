@@ -24,9 +24,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Estrangement",
         actions=[
+            action_model.SingleTargetAttack(2,1),
             action_model.Push(3,2),
             action_model.BlessSelf(),
-            action_model.SingleTargetAttack(2,1)
         ],
         movement=2,
         jump=False
@@ -46,7 +46,7 @@ cards = [
         actions=[
             action_model.BlessAndChargeAlly(2,3),
             action_model.CurseSelf(),
-            action_model.AreaAttack(shapes.line((1,0), 5),4)
+            action_model.AreaAttack(shapes.line((0,1), 5),4)
         ],
         movement=2,
         jump=False
@@ -56,14 +56,13 @@ cards = [
         actions=[
             action_model.SingleTargetAttack(5,1)
         ],
-        movement=4,
+        movement=3,
         jump=True
     ),
     action_model.ActionCard(
         attack_name="Field Runner",
         actions=[
             action_model.ModifySelfHealth(4),
-            action_model.SingleTargetAttack(3,1)
         ],
         movement=4,
         jump=False
