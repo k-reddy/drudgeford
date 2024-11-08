@@ -587,7 +587,8 @@ class Board:
             "💀",
             Ai(), 
             next(self.id_generator), 
-            is_monster=is_monster
+            is_monster=is_monster,
+            log=self.pyxel_manager.log
         )
         self.characters.append(new_char)
         row, col = self.pick_unoccupied_location()
