@@ -209,12 +209,14 @@ class Curse(ActionStep):
 
     def perform(self, board, attacker, round_num):
         target = select_in_range_target(board, attacker, self.att_range, opponent=True)
+        if not target:
+            return
         rand_index = random.randint(0, len(target.attack_modifier_deck))
         modifier = utils.make_multiply_modifier(0, "Null Curse")
         target.attack_modifier_deck.insert(rand_index, modifier)
     
     def __str__(self):
-        return "Curse an enemy\nOne null modifier card"
+        return f"Curse an enemy\nRange {self.att_range}\nOne null modifier card"
 
 @dataclass
 class CurseSelf(ActionStep):
