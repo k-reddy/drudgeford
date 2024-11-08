@@ -23,10 +23,10 @@ cards = [
         actions=[
             action_model.AreaAttack(
                 shape=shapes.arc(4),
-                strength=2
+                strength=3
             )
         ],
-        movement=2,
+        movement=3,
         jump=False
     ),
     action_model.ActionCard(
@@ -55,7 +55,7 @@ cards = [
                 strength=4
             )
         ],
-        movement=1,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
@@ -63,11 +63,11 @@ cards = [
         actions=[
             action_model.ModifySelfHealth(strength=4),
             action_model.SingleTargetAttack(
-                strength=2,
+                strength=3,
                 att_range=1
             ),
         ],
-        movement=0,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
@@ -80,16 +80,16 @@ cards = [
             action_model.BlessSelf(),
             action_model.ModifySelfHealth(-4)
         ],
-        movement=1,
+        movement=2,
         jump=False   
     ),
     action_model.ActionCard(
         attack_name="Desperate Mining",
         actions=[
-            action_model.AreaAttack(shape=shapes.circle(2),strength=1),
+            action_model.AreaAttack(shape=shapes.circle(2),strength=3),
             action_model.BlessSelf(),
             action_model.ChargeNextAttack(strength=4),
-            action_model.ModifySelfHealth(-5),
+            action_model.ModifySelfHealth(-3),
         ],
         movement=0,
         jump=False
@@ -111,23 +111,23 @@ cards = [
                 att_range=1
             )
         ],
-        movement=3,
+        movement=2,
         jump=False
     ),
     action_model.ActionCard(
-        attack_name="Stone Defense",
+        attack_name="Stone Defense Rescue",
         actions=[
             action_model.MakeObstableArea(
                 obstacle_type=Rock,
-                shape=shapes.bar(1,1)
+                shape=shapes.bar(1,2)
             ),
             action_model.ShieldAllAllies(
                 strength=2,
                 duration=1,
                 att_range=2
-            )
+            ),
         ],
-        movement=0,
+        movement=3,
         jump=False
     )
 ]
