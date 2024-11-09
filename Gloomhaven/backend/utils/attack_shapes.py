@@ -58,5 +58,3 @@ def print_shape(shape):
                 print_str += "  "
         print_str+="\n"
     return print_str
-
-print(print_shape(cone(2)))
