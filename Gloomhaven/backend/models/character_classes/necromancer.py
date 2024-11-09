@@ -17,8 +17,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Curse of Futility",
         actions=[
-            action_model.SingleTargetAttack(3,1),
-            action_model.Curse(1),
+            action_model.SingleTargetAttack(2,3),
+            action_model.Curse(3),
         ],
         movement=2,
         jump=False
@@ -35,7 +35,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Shadow Step",
         actions=[
-            action_model.SingleTargetAttack(2,4),
+            action_model.SingleTargetAttack(2,2),
             action_model.ModifySelfHealth(3)
         ],
         movement=4,

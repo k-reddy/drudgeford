@@ -119,7 +119,7 @@ cards = [
         actions=[
             action_model.MakeObstableArea(
                 obstacle_type=Rock,
-                shape=shapes.bar(1,2)
+                shape=shapes.bar(1,1)
             ),
             action_model.ShieldAllAllies(
                 strength=2,
