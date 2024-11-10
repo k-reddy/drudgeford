@@ -19,6 +19,10 @@ def main(num_players: int = 1, all_ai_mode=False):
 
     disp = display.Display(all_ai_mode)
     pyxel_manager = pyxel_backend.PyxelManager(shared_action_queue)
+    pyxel_manager.set_level_map_colors(
+        floor_color_map = [(1,3), (5,11)],
+        wall_color_map = [(1,4), (13,15)]
+    )
     if not all_ai_mode:
         disp.clear_display()
     # if players want game help, display instructions
