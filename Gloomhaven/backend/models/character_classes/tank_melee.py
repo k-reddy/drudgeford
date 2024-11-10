@@ -19,7 +19,7 @@ cards = [
     actions.ActionCard(
         attack_name="Sweeping Blow",
         actions=[
-            actions.AreaAttack(shape=shapes.arc(3),strength=2)
+            actions.AreaAttack(shape=shapes.cone(2),strength=2)
         ],
         movement=3,
         jump=False

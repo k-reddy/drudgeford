@@ -17,7 +17,7 @@ def main(num_players: int = 1, all_ai_mode=False):
     level = Level(
         floor_color_map=[(1,3), (5,11)],
         wall_color_map=[(1,4), (13,15)],
-        monster_classes=[character.Treeman, character.Skeleton, character.EvilBlob]
+        monster_classes=[character.Treeman, character.MushroomMan, character.Fairy]
     )
 
     # set up terminal

@@ -52,7 +52,7 @@ magic_user_cards = [
         attack_name="Chain Lightning",
         actions=[
             actions.SingleTargetAttack(3, 4),
-            actions.AreaAttack(shape=shapes.line((0,1),3), strength=2)
+            actions.AreaAttack(shape=shapes.line((0,1),5), strength=2)
         ],
         movement=1,
         jump=False
