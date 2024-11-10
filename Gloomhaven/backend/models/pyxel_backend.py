@@ -13,6 +13,8 @@ class PyxelManager:
         self.shared_action_queue = shared_action_queue
         self.move_duration = 700
         self.log = ListWithUpdate([], self.load_log)
+        self.floor_color_map=[]
+        self.wall_color_map=[]
 
     def load_board(self, locations, terrain):
         entities = []
@@ -62,6 +64,8 @@ class PyxelManager:
             map_height=self.board_height,
             map_width=self.board_width,
             valid_map_coordinates=valid_map_coordinates,
+            floor_color_map=self.floor_color_map,
+            wall_color_map=self.wall_color_map
         )
         self.shared_action_queue.enqueue(task)
         self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
@@ -145,3 +149,7 @@ class PyxelManager:
             round_number=round_num, acting_character_name=acting_character_name
         )
         self.shared_action_queue.enqueue(task)
+
+    def set_level_map_colors(self, floor_color_map: list[tuple[int,int]], wall_color_map: list[tuple[int,int]]):
+        self.floor_color_map=floor_color_map
+        self.wall_color_map=wall_color_map
