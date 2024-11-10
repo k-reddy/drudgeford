@@ -62,6 +62,12 @@ class SpriteManager:
             "treeman": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=96, w=32, h=32),
             },
+            "fairy": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=64, v=0, w=32, h=32),
+            },
+            "mushroomman": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=64, v=32, w=32, h=32),
+            },
             "ice": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=0, w=32, h=32),
             },

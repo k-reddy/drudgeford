@@ -244,9 +244,9 @@ Kill it or be killed..."""
     def set_up_monsters(self, disp, num_players):
         monsters = []
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        for i in range(num_players + 1):
+        for i in range(num_players + 2):
             class_num = i%len(self.level.monster_classes)
             monster_name = self.level.monster_classes[class_num].__name__
-            monster = self.level.monster_classes[class_num](monster_name, disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
+            monster = self.level.monster_classes[class_num](monster_name, disp, emoji[class_num], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
             monsters.append(monster)
         return monsters

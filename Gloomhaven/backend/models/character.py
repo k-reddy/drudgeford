@@ -149,6 +149,8 @@ class Miner(Character):
 class Necromancer(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.health = character_classes.necromancer.health
+        self.backstory = character_classes.necromancer.backstory
         self.pyxel_sprite_name = "necromancer"
     
     def create_action_cards(self):
@@ -157,6 +159,8 @@ class Necromancer(Character):
 class Monk(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.health = character_classes.monk.health
+        self.backstory = character_classes.monk.backstory
         self.pyxel_sprite_name = "monk"
     
     def create_action_cards(self):
@@ -165,7 +169,30 @@ class Monk(Character):
 class Treeman(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.health = character_classes.tank_melee.health
         self.pyxel_sprite_name = "treeman"
+    
+    def create_action_cards(self):
+        return character_classes.tank_melee.cards
+    
+class Fairy(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.health = character_classes.fairy.health
+        self.pyxel_sprite_name = "fairy"
+    
+    def create_action_cards(self):
+        return character_classes.fairy.cards
+    
+class MushroomMan(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.health = character_classes.support_fungal.health
+        self.pyxel_sprite_name = "mushroomman"
+    
+    def create_action_cards(self):
+        return character_classes.support_fungal.cards
+    
 
 class EvilBlob(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):

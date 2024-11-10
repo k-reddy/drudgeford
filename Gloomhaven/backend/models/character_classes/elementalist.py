@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Shockwave",
         actions=[
-            actions.AreaAttack(shape=shapes.line((1,0),4), strength=3),
+            actions.AreaAttack(shape=shapes.circle(1), strength=3),
             actions.PushAllEnemies(1, 3)
         ],
         movement=1,
@@ -50,10 +50,10 @@ cards = [
     actions.ActionCard(
         attack_name="Earthquake",
         actions=[
-            actions.AreaAttack(shape=shapes.line((0,-1),3), strength=4),
+            actions.AreaAttack(shape=shapes.circle(2), strength=4),
             actions.MakeObstableArea(
                 obstacle_type=obstacle.Wall,
-                shape=shapes.bar(1,1)
+                shape=shapes.arc(3)
             )
         ],
         movement=1,
@@ -62,9 +62,9 @@ cards = [
     actions.ActionCard(
         attack_name="Flame Wall",
         actions=[
-            actions.AreaAttack(shape=shapes.line((1,0),2), strength=3),
+            actions.AreaAttack(shape=shapes.line((1,0),3), strength=3),
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.line((1,0), 2),
+                shape=shapes.line((1,0), 3),
                 element_type=obstacle.Fire
             )
         ],
