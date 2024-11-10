@@ -123,7 +123,23 @@ class WeakenEnemy(ActionStep):
 
     def __str__(self):
         return f"Cause one enemy to\ndraw {self.strength} as next attack modifier\nRange {self.att_range}"
+
+@dataclass
+class WeakenAllEnemies(ActionStep):
+    strength: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        enemies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=True
+        )
+        for enemy in enemies:
+            modifier = utils.make_additive_modifier(-self.strength)
+            enemy.attack_modifier_deck.append(modifier)
     
+    def __str__(self):
+        return f"Weaken all enemies by {self.strength}\nRange {self.att_range}"
+
 @dataclass
 class ShieldSelf(ActionStep):
     strength: int
@@ -177,6 +193,20 @@ class HealAlly(ActionStep):
         return f"Heal ally {self.strength}\nRange {self.att_range}"
 
 @dataclass
+class HealAllAllies(ActionStep):
+    strength: int
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        in_range_allies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=False
+        )
+        for ally in in_range_allies:
+            board.modify_target_health(ally, -self.strength)
+    
+    def __str__(self):
+        return f"Heal all allies for {self.strength}\nRange {self.att_range}"
+@dataclass
 class BlessSelf(ActionStep):
     def perform(self, board, attacker, round_num):
         rand_index = random.randint(0, len(attacker.attack_modifier_deck))
@@ -203,6 +233,22 @@ class BlessAndChargeAlly(ActionStep):
     def __str__(self):
         return f"Bless one ally\nRange {self.att_range}\nCharge their next attack +{self.strength}"
      
+@dataclass
+class BlessAllAllies(ActionStep):
+    att_range: int
+
+    def perform(self, board, attacker, round_num):
+        in_range_allies = board.find_in_range_opponents_or_allies(
+            attacker, self.att_range, opponents=False
+        )
+        for ally in in_range_allies:
+            rand_index = random.randint(0, len(ally.attack_modifier_deck))
+            modifier = utils.make_multiply_modifier(2, "2x Bless")
+            ally.attack_modifier_deck.insert(rand_index, modifier)
+    
+    def __str__(self):
+        return f"Bless all allies\nRange {self.att_range}\nOne 2x modifier card each"
+
 @dataclass
 class Curse(ActionStep):
     att_range: int

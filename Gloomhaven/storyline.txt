@@ -16,9 +16,9 @@ Graveyard:
 - troll
 
 Forest:
-- tree warrior x
-- mushroom man x
-- fairy x
+- tree warrior x -> tank_melee
+- mushroom man x -> support_mage
+- fairy x -> mobile_striker
 
 - spore traps
 
