@@ -6,12 +6,19 @@ from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
 import backend.models.display as display
 import backend.models.pyxel_backend as pyxel_backend
+from backend.models.level import Level
+import backend.models.character as character
 
 
 def main(num_players: int = 1, all_ai_mode=False):
     # pyxel setup
     shared_action_queue = PyxelTaskQueue()
     pyxel_view = PyxelEngine(shared_action_queue)
+    level = Level(
+        floor_color_map=[(1,3), (5,11)],
+        wall_color_map=[(1,4), (13,15)],
+        monster_classes=[character.Treeman, character.Skeleton, character.EvilBlob]
+    )
 
     # set up terminal
     if os.getenv("TERM") is None:
@@ -20,15 +27,15 @@ def main(num_players: int = 1, all_ai_mode=False):
     disp = display.Display(all_ai_mode)
     pyxel_manager = pyxel_backend.PyxelManager(shared_action_queue)
     pyxel_manager.set_level_map_colors(
-        floor_color_map = [(1,3), (5,11)],
-        wall_color_map = [(1,4), (13,15)]
+        level.floor_color_map,
+        level.wall_color_map
     )
     if not all_ai_mode:
         disp.clear_display()
     # if players want game help, display instructions
     provide_help_if_desired(disp, all_ai_mode)
 
-    game = GameLoop(disp, num_players, all_ai_mode, pyxel_manager)
+    game = GameLoop(disp, num_players, all_ai_mode, pyxel_manager, level)
     threading.Thread(target=game.start).start()
     pyxel_view.start()
 
