@@ -107,6 +107,11 @@ class MapView(ViewSection):
     sprite_manager = SpriteManager()
     entities = {}
 
+    def __init__(self, font, start_pos, bounding_coordinate, floor_color_map=[], wall_color_map=[]):
+        super().__init__(font, start_pos, bounding_coordinate)
+        self.floor_color_map = floor_color_map
+        self.wall_color_map = wall_color_map
+
     def draw(self):
         self.clear_bounds()
         self.draw_map_background()
@@ -124,10 +129,13 @@ class MapView(ViewSection):
 
             # draw floor tile
             floor_tile = BACKGROUND_TILES[random.choice(self.dungeon_floor_tile_names)]
+            self.set_colors(self.floor_color_map)
             draw_tile(x_px, y_px, **floor_tile)
-
+            pyxel.pal()
+            self.set_colors(self.wall_color_map)
             # draw walls where there's blank space
             self.draw_necessary_walls(x, y, x_px, y_px)
+            pyxel.pal()
 
     def draw_necessary_walls(self, x, y, x_px, y_px):
         for direction in WALL_DIRECTIONS:
@@ -163,6 +171,17 @@ class MapView(ViewSection):
                 self.tile_height_px,
                 GRID_COLOR,
             )
+    
+    def set_colors(self, mapping: list[tuple[int,int]]) -> None:
+    # 11 light green
+    # 3 dark green
+    # 5 blue
+    # 1 dark blue
+        '''maps colors in the pyxel palette'''
+        pyxel.pal()
+        if mapping:
+            for orig_col, new_col in mapping:
+                pyxel.pal(orig_col, new_col)
 
     def draw_sprites(self) -> None:
         """draws entity sprites with a notion of priority"""
