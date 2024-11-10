@@ -8,8 +8,7 @@ import backend.models.agent
 from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-
+from backend.models.level import Level
 
 
 class GameState(Enum):
@@ -21,9 +20,10 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager):
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager, level: Level):
         self.id_generator = count(start=1)
         self.pyxel_manager = pyxel_manager
+        self.level=level
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
@@ -243,11 +243,12 @@ Kill it or be killed..."""
 
     def set_up_monsters(self, disp, num_players):
         monsters = []
-        names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
-        char_classes = [character.Treeman, character.EvilBlob, character.Skeleton, character.Corpse]
+        # names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
-            monster = char_classes[i](names[i], disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
+            class_num = i%len(self.level.monster_classes)
+            monster_name = self.level.monster_classes[class_num].__name__
+            monster = self.level.monster_classes[class_num](monster_name, disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
             monsters.append(monster)
         return monsters
