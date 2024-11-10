@@ -61,7 +61,9 @@ class PyxelManager:
         task = tasks.BoardInitTask(
             map_height=self.board_height,
             map_width=self.board_width,
-            valid_map_coordinates=valid_map_coordinates
+            valid_map_coordinates=valid_map_coordinates,
+            floor_color_map = [(1,3), (5,11)],
+            wall_color_map = [(1,4), (13,15)]
         )
         self.shared_action_queue.enqueue(task)
         self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
