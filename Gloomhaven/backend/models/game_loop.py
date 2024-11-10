@@ -243,7 +243,6 @@ Kill it or be killed..."""
 
     def set_up_monsters(self, disp, num_players):
         monsters = []
-        # names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
         healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
