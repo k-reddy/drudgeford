@@ -244,7 +244,6 @@ Kill it or be killed..."""
     def set_up_monsters(self, disp, num_players):
         monsters = []
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        healths = [3, 3, 7, 8]
         for i in range(num_players + 1):
             class_num = i%len(self.level.monster_classes)
             monster_name = self.level.monster_classes[class_num].__name__
