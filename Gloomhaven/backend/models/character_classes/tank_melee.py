@@ -40,7 +40,7 @@ cards = [
             actions.Pull(2,3),
             actions.SingleTargetAttack(3,1),
         ],
-        movement=0,
+        movement=1,
         jump=False
     ),
         actions.ActionCard(
@@ -50,16 +50,16 @@ cards = [
             actions.SingleTargetAttack(3,1),
             actions.Push(2,1)
         ],
-        movement=1,
+        movement=2,
         jump=False
     ),
     actions.ActionCard(
-        attack_name="Life Drain",
+        attack_name="Recuperating Blow",
         actions=[
             actions.SingleTargetAttack(4, 1),
             actions.ModifySelfHealth(2)
         ],
-        movement=1,
+        movement=2,
         jump=False
     ),
 ]

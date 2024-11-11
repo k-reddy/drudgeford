@@ -18,20 +18,17 @@ cards = [
     actions.ActionCard(
         attack_name="Nature's Blessing",
         actions=[
-            actions.BlessAllAllies(2),
-            actions.HealAllAllies(2, 2)
+            actions.ChargeNextAttack(2),
+            actions.SingleTargetAttack(2, 3)
         ],
         movement=3,
         jump=True
     ),
     actions.ActionCard(
-        attack_name="Poisonous Touch",
+        attack_name="Fae Strike",
         actions=[
             actions.SingleTargetAttack(3, 2),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1),
-                element_type=obstacle.PoisonShroom
-            )
+            actions.WeakenEnemy(2, 2)
         ],
         movement=4,
         jump=True
@@ -40,8 +37,8 @@ cards = [
         attack_name="Fairy Ring",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
-                element_type=obstacle.Shadow
+                shape=shapes.ring(2),
+                element_type=obstacle.Spores
             ),
             actions.ShieldAllAllies(2, 2, 2)
         ],
@@ -64,10 +61,7 @@ cards = [
         attack_name="Mystic Circle",
         actions=[
             actions.BlessAndChargeAlly(2, 2),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(3),
-                element_type=obstacle.PoisonShroom
-            )
+            actions.HealAlly(3, 2)
         ],
         movement=3,
         jump=True

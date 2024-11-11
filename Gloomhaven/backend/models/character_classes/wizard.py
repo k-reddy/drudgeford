@@ -21,7 +21,7 @@ cards = [
                 strength=2
             ),
             action_model.ElementAreaEffectFromSelf(
-                shape=shapes.circle(3),
+                shape=shapes.circle(2),
                 element_type=obstacle.Ice,
             )
         ],
