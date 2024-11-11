@@ -16,13 +16,10 @@ cards = [
         jump=False
     ),
     actions.ActionCard(
-        attack_name="Mushroom Ring",
+        attack_name="Mycological Defense",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(2),
-                element_type=obstacle.PoisonShroom
-            ),
-            actions.ShieldAllAllies(2, 2, 2)
+            actions.SingleTargetAttack(3,2),
+            actions.ShieldAllAllies(2, 2, 2),
         ],
         movement=1,
         jump=False
@@ -40,7 +37,7 @@ cards = [
         attack_name="Spore Cloud",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
+                shape=shapes.circle(1),
                 element_type=obstacle.Spores
             ),
             actions.WeakenAllEnemies(2, 2)
@@ -62,7 +59,7 @@ cards = [
         actions=[
             actions.ShieldAllAllies(2, 2, 2),
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(3),
+                shape=shapes.ring(2),
                 element_type=obstacle.PoisonShroom
             )
         ],

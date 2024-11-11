@@ -53,7 +53,7 @@ striker_cards = [
             actions.CurseSelf() 
         ],
         movement=2,
-        jump=False
+        jump=True
     )
 ]
 
