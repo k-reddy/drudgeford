@@ -95,10 +95,12 @@ Kill it or be killed..."""
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
             if acting_character.shield[0]>0:
-                self.pyxel_manager.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}"))
+                self.pyxel_manager.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}\n"))
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
+            self.pyxel_manager.log.append(f"{acting_character.name} chose {action_card.attack_name}\n")
+
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
@@ -125,6 +127,7 @@ Kill it or be killed..."""
                     return
         except SlipAndLoseTurn:
             if not self.all_ai_mode:
+                self.pyxel_manager.log.append(f"{acting_character.name} slipped and lost their turn!")
                 self.disp.get_user_input(
                     prompt=f"{acting_character.name} slipped! Hit enter to continue"
                 )
