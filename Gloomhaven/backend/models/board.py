@@ -152,7 +152,7 @@ class Board:
                     self.terrain[effect_row][effect_col] = terrain_obj
                     self.pyxel_manager.add_entity(terrain_obj,effect_row,effect_col)
                     # if there's a character there, deal damage to them unless it's ice
-                    if isinstance(potential_char, Character):
+                    if isinstance(potential_char, Character) and not effect_type == obstacle.Ice:
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
     def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
