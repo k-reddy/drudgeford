@@ -157,6 +157,8 @@ class Board:
 
     def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
         starting_coord = self.find_location_of_target(attacker)
+        # don't attack yourself
+        shape.discard((0,0))
         for coordinate in shape:
             attack_row = starting_coord[0] + coordinate[0]
             attack_col = starting_coord[1] + coordinate[1]
