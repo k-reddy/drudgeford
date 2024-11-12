@@ -86,6 +86,4 @@ cards = [
 
 health = 9
 
-backstory='''
-After losing their sibling to disease, this former town resident devoted themselves to the dark arts, spending years mastering forbidden rituals to bridge the gap between life and death so they can talk together again. While they hated their sibling in life, in death their spirit is the only one who knows the location of the family treasure, a cheap but sentimental tortilla press. Now banished from their hometown for using the dark arts, they command shadows and raise the dead in their obsessive quest to recover this simple but priceless piece of their past. A fragile but powerful controller who must use their ability to curse and summon shadows to protect themselves as they deal out wide melee area attacks.
-'''
+backstory='''After losing their sibling to disease, this former town resident devoted themselves to the dark arts, spending years mastering forbidden rituals to bridge the gap between life and death so they can talk together again. While they hated their sibling in life, in death their spirit is the only one who knows the location of the family treasure, a cheap but sentimental tortilla press. Now banished from their hometown for using the dark arts, they command shadows and raise the dead in their obsessive quest to recover this simple but priceless piece of their past. A fragile but powerful controller who must use their ability to curse and summon shadows to protect themselves as they deal out wide melee area attacks.'''
