@@ -53,7 +53,8 @@ class PixelFont:
 
         lines = []
         for paragraph in text.split("\n"):
-            words = paragraph.split()
+            # Split on space but keep empty strings to preserve spacing
+            words = paragraph.split(' ')
             if not words:
                 lines.append("")
                 continue
@@ -62,10 +63,12 @@ class PixelFont:
             current_width = self.get_text_width(current_line, size)
 
             for word in words[1:]:
-                word_width = self.get_text_width(" " + word, size)
+                # Add the space and word even if word is empty (was a space in original)
+                next_piece = ' ' + word
+                word_width = self.get_text_width(next_piece, size)
 
                 if current_width + word_width <= max_width:
-                    current_line += " " + word
+                    current_line += next_piece
                     current_width += word_width
                 else:
                     lines.append(current_line)

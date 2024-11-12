@@ -3,7 +3,7 @@ import pyxel
 from collections import deque
 import time
 
-from .constants import (
+from pyxel_ui.constants import (
     WINDOW_LENGTH,
     DEFAULT_PYXEL_WIDTH,
     DEFAULT_PYXEL_HEIGHT,
@@ -33,13 +33,13 @@ class PyxelEngine:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
 
-    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_map_coordinates):
+    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_map_coordinates, floor_color_map=[], wall_color_map=[]):
         pyxel_width = max(DEFAULT_PYXEL_WIDTH, map_width_tiles*MAP_TILE_WIDTH_PX)
         pyxel_height = max(DEFAULT_PYXEL_HEIGHT, map_height_tiles*MAP_TILE_HEIGHT_PX*1.5)
         pyxel.init(pyxel_width, pyxel_height)
         pyxel.load("../my_resource.pyxres")
 
-        self.view_manager = ViewManager(pyxel_width, pyxel_height)
+        self.view_manager = ViewManager(pyxel_width, pyxel_height, floor_color_map, wall_color_map)
         self.view_manager.update_map(valid_floor_coordinates=valid_map_coordinates)
 
     def start(self):
@@ -54,7 +54,9 @@ class PyxelEngine:
                     self.init_pyxel_map(
                         self.current_task.map_width, 
                         self.current_task.map_height,
-                        self.current_task.valid_map_coordinates 
+                        self.current_task.valid_map_coordinates,
+                        self.current_task.floor_color_map,
+                        self.current_task.wall_color_map
                     )
                     self.current_task = None  # clear
                     self.is_board_initialized = True

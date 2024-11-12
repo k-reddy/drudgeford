@@ -9,7 +9,7 @@ from pyxel_ui.views.sprite import SpriteManager
 from pyxel_ui.models import view_section as view
 
 class ViewManager:
-    def __init__(self, pyxel_width, pyxel_height):
+    def __init__(self, pyxel_width, pyxel_height, floor_color_map=[], wall_color_map=[]):
         self.view_border = 10
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
@@ -23,7 +23,9 @@ class ViewManager:
         self.map_view = view.MapView(
             self.font, 
             [self.initiative_bar_view.start_pos[0], self.initiative_bar_view.bounding_coordinate[1]+self.view_border],
-            [self.initiative_bar_view.bounding_coordinate[0], BITS*11+self.view_border*2]
+            [self.initiative_bar_view.bounding_coordinate[0], BITS*11+self.view_border*2],
+            floor_color_map=floor_color_map,
+            wall_color_map=wall_color_map
             )
         self.log_view = view.LogView(
             self.font,

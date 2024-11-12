@@ -42,6 +42,25 @@ def cone(length: int):
             directions.add((0,y))
     return directions
     
+def ring(radius):
+    """Creates a ring shape with the given radius.
+    Only includes cells at exactly the specified radius (outer edge only).
+    
+    Args:
+        radius (int): The radius of the ring
+        
+    Returns:
+        set: Set of (x,y) coordinates forming a ring
+    """
+    shape = set()
+    # Add all points at distance radius from center
+    for x in range(-radius, radius + 1):
+        for y in range(-radius, radius + 1):
+            # Use manhattan distance for consistent spacing
+            if abs(x) + abs(y) == radius:
+                shape.add((x, y))
+    return shape
+
 def print_shape(shape):
     print_str = ''
     ymin = min([y for y, _ in shape])
