@@ -162,6 +162,8 @@ Kill it or be killed..."""
         for char in self.board.characters:
             self.refresh_character_cards(char)
         if not self.all_ai_mode:
+            # 0 because that's the default round number
+            self.pyxel_manager.load_round_turn_info(0, None)
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
             self.pyxel_manager.log.clear() 
 
