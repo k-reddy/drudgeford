@@ -528,7 +528,7 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
         elif damage > 0:
-            self.pyxel_manager.log.append(f"\n{target.name} takes {damage} damage and has {target.health} health")
+            self.pyxel_manager.log.append(f"{target.name} takes {damage} damage and has {target.health} health")
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 

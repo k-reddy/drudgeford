@@ -42,7 +42,7 @@ class Character(abc.ABC):
         if movement == 0:
             self.log.append("No movement!")
             return
-        self.log.append(f"{self.name} is moving")
+        self.log.append(f"\n{self.name} is moving\n")
         self.agent.perform_movement(self, movement, is_jump, board)
         # add some space between the movement and attack
         self.log.append("")
