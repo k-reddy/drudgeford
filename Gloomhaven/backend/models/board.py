@@ -375,7 +375,7 @@ class Board:
         if self.is_shadow_interference(attacker, target):
             to_log+= f", missed due to shadow\n"
             return
-        to_log+= f", hits for {modified_attack_strength} damage\n"
+        to_log+= f", hits for {modified_attack_strength} damage"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -528,7 +528,7 @@ class Board:
         if target.health <= 0:
             self.kill_target(target)
         else:
-            self.pyxel_manager.log.append(f"{target.name}'s new health: {target.health}")
+            self.pyxel_manager.log.append(f"{target.name}'s new health: {target.health}\n")
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 

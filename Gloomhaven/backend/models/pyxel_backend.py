@@ -70,6 +70,10 @@ class PyxelManager:
         self.shared_action_queue.enqueue(task)
         self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
 
+    def clear_log(self):
+        self.log = ListWithUpdate([], self.load_log)
+        self.load_log(self.log)
+        
     def move_character(self, char, old_location, new_location):
         task = tasks.ActionTask(
             char.id,
