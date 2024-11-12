@@ -36,7 +36,7 @@ class Character(abc.ABC):
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        self.log.append(f"{self.name} is performing {action_card}\n")
+        self.log.append(f"{self.name} is performing {action_card.attack_name}\n")
         return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, movement, is_jump, board):
