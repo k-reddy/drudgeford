@@ -99,16 +99,19 @@ Kill it or be killed..."""
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
-            move_first = acting_character.decide_if_move_first(action_card)
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
                 lambda: acting_character.perform_movement(action_card.movement, action_card.jump, self.board),
                 lambda: action_card.perform_attack(acting_character, self.board, round_num),
             ]
-            # if not move_first, swap the order of movement and attack
-            if not move_first:
-                actions[1], actions[2] = actions[2], actions[1]
+            if action_card.movement == 0:
+                actions = [actions[0]] + [actions[2]]
+            else:
+                move_first = acting_character.decide_if_move_first(action_card)
+                # if not move_first, swap the order of movement and attack
+                if not move_first:
+                    actions[1], actions[2] = actions[2], actions[1]
 
             for action in actions:
                 action()
