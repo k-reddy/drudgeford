@@ -206,3 +206,27 @@ class Corpse(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "corpse"
+
+class Fiend(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "fiend"
+        
+    def create_action_cards(self):
+        return character_classes.fiend.cards
+
+class Demon(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "demon"
+
+    def create_action_cards(self):
+        return character_classes.demon.cards
+
+class FireSprite(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "firesprite"
+
+    def create_action_cards(self):
+        return character_classes.firesprite.cards
