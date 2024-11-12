@@ -131,5 +131,6 @@ cards = [
         jump=False
     )
 ]
-backstory = "I'm a miner"
+backstory = '''A former tax auditor turned mason with an obsession for crystals, driven to the mountains by her passionate belief in their power. Her journey began when a debtor introduced her to the mystical world of crystal energy. Now incredibly strong from years of mining, she uses her power to collect ever more precious gems. Though others mock her new-age beliefs, her connection to the stones only grows stronger - as does her ability to wield her tools in combat. A durable melee fighter who packs big punches while preserving their health with shields and healing crystals.'''
+
 health = 16
