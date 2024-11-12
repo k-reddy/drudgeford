@@ -362,20 +362,20 @@ class Board:
         ]
 
     def attack_target(self, attacker, strength, target):
-        to_log = f"{attacker.name} is attempting to attack {target.name}\n"
-        modified_attack_strength = self.select_and_apply_attack_modifier(
+        modified_attack_strength, attack_modifier_string = self.select_and_apply_attack_modifier(
             attacker, strength
         )
+        to_log = f'Attack targets {target.name}\n{attack_modifier_string} modifier'
         if target.shield[0] > 0:
-            to_log+= f"Target has shield {target.shield[0]}\n"
+            to_log+= f"{target.name} has shield {target.shield[0]}\n"
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
-            to_log+= "Darn, attack does no damage!\n"
+            to_log+= f", does no damage!\n"
             return
         if self.is_shadow_interference(attacker, target):
-            to_log+= "Attack missed due to shadow\n"
+            to_log+= f", missed due to shadow\n"
             return
-        to_log+= f"Attack hits {target.name} with a modified strength of {modified_attack_strength}\n"
+        to_log+= f", hits for {modified_attack_strength} damage\n"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -538,8 +538,7 @@ class Board:
         attack_modifier_function, modifier_string = attacker.attack_modifier_deck.pop()
         if len(attacker.attack_modifier_deck) == 0:
             attacker.make_attack_modifier_deck()
-        self.pyxel_manager.log.append(f"Attack modifier: {modifier_string}")
-        return attack_modifier_function(initial_attack_strength)
+        return attack_modifier_function(initial_attack_strength), modifier_string
 
     def clear_terrain_square(self, row, col):
         el = self.terrain[row][col]
