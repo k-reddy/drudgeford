@@ -488,6 +488,7 @@ class Board:
         element = self.terrain[row][col]
         # if they have an elemental affinity for this element, they heal instead of take damage
         if acting_character.elemental_affinity == element.__class__:
+            self.pyxel_manager.log.append(f"{acting_character.name} has an affinity for {element.__class__.__name__}")
             damage = damage*-1
         if damage:
             self.pyxel_manager.log.append(
