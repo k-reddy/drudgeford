@@ -219,22 +219,30 @@ Kill it or be killed..."""
 
     def set_up_players(self, disp, num_players, all_ai_mode):
         players = []
-        emoji = ["🧙", "🕺", "🐣"]
+        emoji = ["🧙", "🕺", "🐣", "🐣"]
         default_names = ["Happy", "Glad", "Jolly"]
         char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard, ]
-        random.shuffle(char_classes)
-
+        chars = []
+        # set up potential characters
+        for i, char_class in enumerate(char_classes):
+            player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
+            chars.append(char_class("", disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         # get some user input before starting the game
         num_players = (
             int(
                 disp.get_user_input(
-                    "How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
+                    "Let's set up the game. How players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
                 )
             )
             if not all_ai_mode
             else num_players
         )
         for i in range(num_players):
+            disp.print_message("It's time to pick characters. Here are your options:\n",True)
+            for j, char in enumerate(chars):
+                disp.print_message(f"{j}: {char.__class__.__name__}",False)
+                disp.print_message(f"{char.backstory}\n", False)
+            player_char_num = int(disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{k}" for k,_ in enumerate(chars)]))
             player_name = (
                 disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
                 if not all_ai_mode
@@ -242,8 +250,9 @@ Kill it or be killed..."""
             )
             # default to happy :D
             player_name = player_name if player_name != "" else default_names[i]
-            player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
-            players.append(char_classes[i](player_name, disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+            player_char = chars.pop(player_char_num)
+            player_char.name = player_name
+            players.append(player_char)
         if not all_ai_mode:
             disp.clear_display()
         return players
