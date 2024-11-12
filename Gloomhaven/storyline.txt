@@ -27,17 +27,17 @@ Forest:
 - cockroach 
 
 Inferno:
-- demon2 x
-- demon x
-- fire sprites x
+- demon2 x elementalist
+- demon x tank_melee
+- fire sprites x mobile striker
 
 Orchestrator:
 - faces drama x
 - black joker 
 
 Tundra:
-- dragon x
-- ice monster x
+- dragon x 
+- ice monster x trap specialist
 - icy ghost x
 
 necromancer 

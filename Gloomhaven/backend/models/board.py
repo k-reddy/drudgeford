@@ -147,10 +147,10 @@ class Board:
                     if isinstance(potential_char, obstacle.Wall):
                         continue
                     terrain_obj = effect_type(self.round_num, next(self.id_generator))
+                    # if there's something there already, clear it
+                    self.clear_terrain_square(effect_row, effect_col)
                     self.terrain[effect_row][effect_col] = terrain_obj
-                    self.pyxel_manager.add_entity(
-                        terrain_obj, effect_row, effect_col
-                    )
+                    self.pyxel_manager.add_entity(terrain_obj,effect_row,effect_col)
                     # if there's a character there, deal damage to them
                     if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
@@ -543,8 +543,9 @@ class Board:
 
     def clear_terrain_square(self, row, col):
         el = self.terrain[row][col]
-        self.terrain[row][col] = None
-        self.pyxel_manager.remove_entity(el.id)
+        if el:
+            self.terrain[row][col] = None
+            self.pyxel_manager.remove_entity(el.id)
 
     def update_terrain(self):
         for i, _ in enumerate(self.terrain):
