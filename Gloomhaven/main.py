@@ -14,11 +14,18 @@ def main(num_players: int = 1, all_ai_mode=False):
     # pyxel setup
     shared_action_queue = PyxelTaskQueue()
     pyxel_view = PyxelEngine(shared_action_queue)
+    # level 1
     level = Level(
         floor_color_map=[(1,3), (5,11)],
         wall_color_map=[(1,4), (13,15)],
         monster_classes=[character.Treeman, character.MushroomMan, character.Fairy]
     )
+    # # level 2
+    # level = Level(
+    #     floor_color_map=[(1,8), (5,2)],
+    #     wall_color_map=[(1,2), (13,14)],
+    #     monster_classes=[character.Treeman, character.MushroomMan, character.Fairy]
+    # )
 
     # set up terminal
     if os.getenv("TERM") is None:
