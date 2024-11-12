@@ -2,3 +2,12 @@ from . import wizard
 from . import miner
 from . import necromancer
 from . import monk
+from . import tank_melee
+from . import support_fungal
+from . import fairy
+from . import elementalist
+from . import support_mage
+from . import mobile_striker
+from . import demon
+from . import fiend
+from . import firesprite

@@ -8,8 +8,7 @@ import backend.models.agent
 from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-
+from backend.models.level import Level
 
 
 class GameState(Enum):
@@ -21,9 +20,10 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager):
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager, level: Level):
         self.id_generator = count(start=1)
         self.pyxel_manager = pyxel_manager
+        self.level=level
         players = self.set_up_players(disp, num_players, all_ai_mode)
         monsters = self.set_up_monsters(disp, len(players))
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
@@ -95,20 +95,25 @@ Kill it or be killed..."""
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         try:
             if acting_character.shield[0]>0:
-                self.pyxel_manager.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}"))
+                self.pyxel_manager.log.append((f"{acting_character.name} has shield {acting_character.shield[0]}\n"))
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(acting_character.available_action_cards)
             action_card = acting_character.select_action_card()
-            move_first = acting_character.decide_if_move_first(action_card)
+            self.pyxel_manager.log.append(f"{acting_character.name} chose {action_card.attack_name}\n")
+
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(acting_character),
                 lambda: acting_character.perform_movement(action_card.movement, action_card.jump, self.board),
                 lambda: action_card.perform_attack(acting_character, self.board, round_num),
             ]
-            # if not move_first, swap the order of movement and attack
-            if not move_first:
-                actions[1], actions[2] = actions[2], actions[1]
+            if action_card.movement == 0:
+                actions = [actions[0]] + [actions[2]]
+            else:
+                move_first = acting_character.decide_if_move_first(action_card)
+                # if not move_first, swap the order of movement and attack
+                if not move_first:
+                    actions[1], actions[2] = actions[2], actions[1]
 
             for action in actions:
                 action()
@@ -122,6 +127,7 @@ Kill it or be killed..."""
                     return
         except SlipAndLoseTurn:
             if not self.all_ai_mode:
+                self.pyxel_manager.log.append(f"{acting_character.name} slipped and lost their turn!")
                 self.disp.get_user_input(
                     prompt=f"{acting_character.name} slipped! Hit enter to continue"
                 )
@@ -162,6 +168,8 @@ Kill it or be killed..."""
         for char in self.board.characters:
             self.refresh_character_cards(char)
         if not self.all_ai_mode:
+            # 0 because that's the default round number
+            self.pyxel_manager.load_round_turn_info(0, None)
             self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
             self.pyxel_manager.log.clear() 
 
@@ -243,11 +251,10 @@ Kill it or be killed..."""
 
     def set_up_monsters(self, disp, num_players):
         monsters = []
-        names = ["Tree Man", "Evil Blob", "Living Skeleton", "Corpse"]
-        char_classes = [character.Treeman, character.EvilBlob, character.Skeleton, character.Corpse]
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        healths = [3, 3, 7, 8]
-        for i in range(num_players + 1):
-            monster = char_classes[i](names[i], disp, emoji[i], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
+        for i in range(num_players + 2):
+            class_num = i%len(self.level.monster_classes)
+            monster_name = self.level.monster_classes[class_num].__name__
+            monster = self.level.monster_classes[class_num](monster_name, disp, emoji[class_num], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
             monsters.append(monster)
         return monsters

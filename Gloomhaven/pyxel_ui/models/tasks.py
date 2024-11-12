@@ -114,6 +114,8 @@ class BoardInitTask():
     map_height: int
     map_width: int
     valid_map_coordinates: list[tuple[int,int]]
+    floor_color_map: Optional[list[tuple[int,int]]] = None
+    wall_color_map: Optional[list[tuple[int,int]]] = None
 
 @dataclass
 class ActionTask(Task):

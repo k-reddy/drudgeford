@@ -44,6 +44,7 @@ class Trap(TerrainObject):
         self.emoji = "🗯️ "
         self.damage = 3
         self.pyxel_sprite_name="trap"
+        self.duration = 1000
     
     def perform(self, row, col, board):
         board.clear_terrain_square(row,col)

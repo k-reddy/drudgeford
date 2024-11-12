@@ -16,9 +16,9 @@ Graveyard:
 - troll
 
 Forest:
-- tree warrior x
-- mushroom man x
-- fairy x
+- tree warrior x -> tank_melee
+- mushroom man x -> support_mage
+- fairy x -> mobile_striker
 
 - spore traps
 
@@ -27,17 +27,17 @@ Forest:
 - cockroach 
 
 Inferno:
-- demon2 x
-- demon x
-- fire sprites x
+- demon x elementalist
+- fiend x tank_melee
+- fire sprites x mobile striker
 
 Orchestrator:
 - faces drama x
 - black joker 
 
 Tundra:
-- dragon x
-- ice monster x
+- dragon x 
+- ice monster x trap specialist
 - icy ghost x
 
 necromancer 
