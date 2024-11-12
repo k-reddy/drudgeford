@@ -103,13 +103,15 @@ class Human(Agent):
     
     @staticmethod
     def select_attack_target(disp, in_range_opponents: list, board, char):
+        if len(in_range_opponents) == 1:
+            return in_range_opponents[0]
         # show in range opponents
         board.pyxel_manager.log.append("Opponents in range: ")
         for i, opponent in enumerate(in_range_opponents):
             board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
 
         # get user input on which to attack
-        prompt = "Please type the number of the opponent you want to attack"
+        prompt = "Please type the number of the character you want to target"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
         return in_range_opponents[int(target_num)]
