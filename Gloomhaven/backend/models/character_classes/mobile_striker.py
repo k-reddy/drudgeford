@@ -1,7 +1,7 @@
 import backend.models.action_model as actions
 import backend.utils.attack_shapes as shapes
 
-striker_cards = [
+cards = [
     actions.ActionCard(
         attack_name="Forceful Strike",
         actions=[

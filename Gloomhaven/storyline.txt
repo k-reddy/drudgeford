@@ -27,8 +27,8 @@ Forest:
 - cockroach 
 
 Inferno:
-- demon2 x elementalist
-- demon x tank_melee
+- demon x elementalist
+- fiend x tank_melee
 - fire sprites x mobile striker
 
 Orchestrator:

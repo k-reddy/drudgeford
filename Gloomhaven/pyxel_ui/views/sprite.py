@@ -68,6 +68,15 @@ class SpriteManager:
             "mushroomman": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=64, v=32, w=32, h=32),
             },
+            "demon": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=96, v=0, w=32, h=32),
+            },
+            "fiend": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=128, v=0, w=32, h=32),
+            },
+             "firesprite": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=96, v=32, w=32, h=32),
+            },
             "ice": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=0, v=0, w=32, h=32),
             },

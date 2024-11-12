@@ -153,7 +153,7 @@ class ShieldSelf(ActionStep):
         attacker.shield = (self.strength, round_num+self.duration)
     
     def __str__(self):
-        return f"Shield {self.strength} self, {self.duration} turn{"s" if self.duration>1 else ""}"
+        return f"Shield {self.strength} self, {self.duration} turn{'s' if self.duration>1 else ''}"
 
 @dataclass
 class ShieldAllAllies(ActionStep):
