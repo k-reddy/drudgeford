@@ -106,9 +106,10 @@ class Human(Agent):
         if len(in_range_opponents) == 1:
             return in_range_opponents[0]
         # show in range opponents
-        board.pyxel_manager.log.append("Opponents in range: ")
+        board.pyxel_manager.log.append("Characters in range: ")
         for i, opponent in enumerate(in_range_opponents):
             board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
+        board.pyxel_manager.log.append("\n")
 
         # get user input on which to attack
         prompt = "Please type the number of the character you want to target"

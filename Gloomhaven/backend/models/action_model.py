@@ -29,7 +29,7 @@ class AreaAttack(ActionStep):
         board.attack_area(attacker, self.shape, self.strength)
 
     def __str__(self):
-        return f"Area Attack\nStrength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"
+        return f"Area Attack, Strength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class SingleTargetAttack(ActionStep):
@@ -44,7 +44,7 @@ class SingleTargetAttack(ActionStep):
             board.pyxel_manager.log.append("No targets in range")
 
     def __str__(self):
-        return f"Single Target Attack\nStrength {self.strength}\nRange {self.att_range}"
+        return f"Single Target Attack, Strength {self.strength}, Range {self.att_range}"
 
 @dataclass
 class ElementAreaEffectWithTarget(ActionStep):
@@ -65,7 +65,7 @@ class ElementAreaEffectWithTarget(ActionStep):
             board.pyxel_manager.log.append("No target in range")
 
     def __str__(self):
-        return f"{self.element_type.__name__} Attack\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+        return f"{self.element_type.__name__} Attack, Targets Opponent @\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class ElementAreaEffectFromSelf(ActionStep):
@@ -82,7 +82,7 @@ class ElementAreaEffectFromSelf(ActionStep):
         )
 
     def __str__(self):
-        return f"{self.element_type.__name__} Attack\nShape:\n{shapes.print_shape(self.shape)}"
+        return f"{self.element_type.__name__} Attack, Fires from Self @\nShape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class Teleport(ActionStep):
@@ -95,7 +95,7 @@ class Teleport(ActionStep):
             board.teleport_character(target)
 
     def __str__(self):
-        return f"Teleport Another Characte\nRange {self.att_range}"
+        return f"Teleport Another Character, Range {self.att_range}"
 
 @dataclass
 class ChargeNextAttack(ActionStep):
@@ -120,9 +120,11 @@ class WeakenEnemy(ActionStep):
         if not target:
             return
         target.attack_modifier_deck.append(modifier)
+        board.pyxel_manager.log.append(f"Weakend {target.name}")
+
 
     def __str__(self):
-        return f"Cause one enemy to\ndraw {self.strength} as next attack modifier\nRange {self.att_range}"
+        return f"Cause one enemy to draw {self.strength} as next attack modifier, Range {self.att_range}"
 
 @dataclass
 class WeakenAllEnemies(ActionStep):
@@ -136,9 +138,11 @@ class WeakenAllEnemies(ActionStep):
         for enemy in enemies:
             modifier = utils.make_additive_modifier(-self.strength)
             enemy.attack_modifier_deck.append(modifier)
+            board.pyxel_manager.log.append(f"Weakened {enemy.name}")
+
     
     def __str__(self):
-        return f"Weaken all enemies by {self.strength}\nRange {self.att_range}"
+        return f"Weaken all enemies by {self.strength}, Range {self.att_range}"
 
 @dataclass
 class ShieldSelf(ActionStep):
@@ -149,7 +153,7 @@ class ShieldSelf(ActionStep):
         attacker.shield = (self.strength, round_num+self.duration)
     
     def __str__(self):
-        return f"Shield {self.strength} self\n{self.duration} turns"
+        return f"Shield {self.strength} self, {self.duration} turn{"s" if self.duration>1 else ""}"
 
 @dataclass
 class ShieldAllAllies(ActionStep):
@@ -163,9 +167,11 @@ class ShieldAllAllies(ActionStep):
         )
         for ally in in_range_allies:
             ally.shield = (self.strength, round_num+self.duration)
+            board.pyxel_manager.log.append(f"Shielded {ally.name}")
+
     
     def __str__(self):
-        return f"Shield {self.strength}\n all allies\nRange {self.att_range}, {self.duration} turns"
+        return f"Shield {self.strength} all allies, Range {self.att_range}, {self.duration} turns"
    
 @dataclass
 class ModifySelfHealth(ActionStep):
@@ -188,9 +194,11 @@ class HealAlly(ActionStep):
     def perform(self, board, attacker, round_num):
         target=select_in_range_target(board, attacker, self.att_range, False)
         board.modify_target_health(target, -self.strength)
+        board.pyxel_manager.log.append(f"Healed {target.name}")
+
     
     def __str__(self):
-        return f"Heal ally {self.strength}\nRange {self.att_range}"
+        return f"Heal ally {self.strength}, Range {self.att_range}"
 
 @dataclass
 class HealAllAllies(ActionStep):
@@ -203,9 +211,11 @@ class HealAllAllies(ActionStep):
         )
         for ally in in_range_allies:
             board.modify_target_health(ally, -self.strength)
+            board.pyxel_manager.log.append(f"Healed {ally.name}")
+
     
     def __str__(self):
-        return f"Heal all allies for {self.strength}\nRange {self.att_range}"
+        return f"Heal all allies for {self.strength}, Range {self.att_range}"
 @dataclass
 class BlessSelf(ActionStep):
     def perform(self, board, attacker, round_num):
@@ -214,7 +224,7 @@ class BlessSelf(ActionStep):
         attacker.attack_modifier_deck.insert(rand_index, modifier)
     
     def __str__(self):
-        return "Bless self\nOne 2x modifier card"
+        return "Bless self, one 2x modifier card"
 
 
 @dataclass
@@ -228,10 +238,11 @@ class BlessAndChargeAlly(ActionStep):
         bless = utils.make_multiply_modifier(2, "2x Bless")
         charge = utils.make_additive_modifier(self.strength)
         target.attack_modifier_deck.insert(rand_index, bless)
-        target.attack_modifier_deck.append(charge)  
+        target.attack_modifier_deck.append(charge)
+        board.pyxel_manager.log.append(f"Bless and charged {target.name}")  
     
     def __str__(self):
-        return f"Bless one ally\nRange {self.att_range}\nCharge their next attack +{self.strength}"
+        return f"Bless one ally, Range {self.att_range}, and charge their next attack +{self.strength}"
      
 @dataclass
 class BlessAllAllies(ActionStep):
@@ -245,9 +256,10 @@ class BlessAllAllies(ActionStep):
             rand_index = random.randint(0, len(ally.attack_modifier_deck))
             modifier = utils.make_multiply_modifier(2, "2x Bless")
             ally.attack_modifier_deck.insert(rand_index, modifier)
+            board.pyxel_manager.log.append(f"Blessed {ally.name}")
     
     def __str__(self):
-        return f"Bless all allies\nRange {self.att_range}\nOne 2x modifier card each"
+        return f"Bless all allies, Range {self.att_range}, One 2x modifier card each"
 
 @dataclass
 class Curse(ActionStep):
@@ -260,9 +272,10 @@ class Curse(ActionStep):
         rand_index = random.randint(0, len(target.attack_modifier_deck))
         modifier = utils.make_multiply_modifier(0, "Null Curse")
         target.attack_modifier_deck.insert(rand_index, modifier)
+        board.pyxel_manager.log.append(f"Cursed {target.name}")
     
     def __str__(self):
-        return f"Curse an enemy\nRange {self.att_range}\nOne null modifier card"
+        return f"Curse an enemy, Range {self.att_range}\nOne null modifier card"
 
 @dataclass
 class CurseSelf(ActionStep):
@@ -272,7 +285,7 @@ class CurseSelf(ActionStep):
         attacker.attack_modifier_deck.insert(rand_index, modifier)
     
     def __str__(self):
-        return "Curse self\nOne null modifier card"
+        return "Curse self, One null modifier card"
 
 @dataclass
 class CurseAllEnemies(ActionStep):
@@ -286,9 +299,10 @@ class CurseAllEnemies(ActionStep):
             rand_index = random.randint(0, len(enemy.attack_modifier_deck))
             modifier = utils.make_multiply_modifier(0, "Null Curse")
             enemy.attack_modifier_deck.insert(rand_index, modifier)
+            board.pyxel_manager.log.append(f"Cursed {enemy.name}")
     
     def __str__(self):
-        return f"Curse all enemies\nRange {self.att_range}"
+        return f"Curse all enemies, Range {self.att_range}"
 
 @dataclass  
 class Pull(ActionStep):
@@ -312,9 +326,10 @@ class Pull(ActionStep):
             board,
             is_legal_pull_check
         )
+        board.pyxel_manager.log.append(f"Pulled {target.name}")
 
     def __str__(self):
-        return f"Pull {self.squares}\nAny enemy\nRange {self.att_range}"
+        return f"Pull {self.squares}, any enemy, range {self.att_range}"
 
 @dataclass  
 class Push(ActionStep):
@@ -338,9 +353,10 @@ class Push(ActionStep):
             board,
             is_legal_push_check
         )
+        board.pyxel_manager.log.append(f"Pushed {target.name}")
 
     def __str__(self): 
-        return f"Push {self.squares}\nAny enemy\nRange {self.att_range}"
+        return f"Push {self.squares}, Any enemy, Range {self.att_range}"
 
 @dataclass
 class PushAllEnemies(ActionStep):
@@ -371,7 +387,7 @@ class PushAllEnemies(ActionStep):
             )
 
     def __str__(self): 
-        return f"Push {self.squares} all enemies\nRange {self.att_range}"
+        return f"Push {self.squares} all enemies, Range {self.att_range}"
 
 @dataclass
 class SummonSkeleton(ActionStep):
@@ -380,7 +396,7 @@ class SummonSkeleton(ActionStep):
         board.add_new_skeleton(attacker.team_monster)
 
     def __str__(self):
-        return "Summon a skeleton\nTo fight alongside you."
+        return "Summon a skeleton to fight alongside you."
 
 
 @dataclass
@@ -399,7 +415,7 @@ class MakeObstableArea(ActionStep):
             )
     
     def __str__(self):
-        return f"Set {self.obstacle_type.__name__}\nShape:\n{shapes.print_shape(self.shape)}"
+        return f"Set {self.obstacle_type.__name__}, Shape:\n{shapes.print_shape(self.shape)}"
 
 @dataclass
 class MoveAlly(ActionStep):
@@ -419,9 +435,10 @@ class MoveAlly(ActionStep):
             board=board,
             movement_check=None
         )
+        board.pyxel_manager.log.append(f"Moved {target.name}")
     
     def __str__(self):
-        return f"Move {self.squares}, one ally\nRange {self.att_range}"
+        return f"Move {self.squares}, one ally, Range {self.att_range}"
 
 
 @dataclass
@@ -434,8 +451,9 @@ class ActionCard:
     # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
         for action in self.actions:
-            board.pyxel_manager.log.append(f"{attacker.name} is performing {action}!")
+            board.pyxel_manager.log.append(f"{attacker.name} is performing {action}")
             action.perform(board, attacker, round_num)
+            board.pyxel_manager.log.append("\n")
 
     def __getitem__(self, key):
         return getattr(self, key)

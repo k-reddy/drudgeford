@@ -151,7 +151,7 @@ class Board:
                     self.clear_terrain_square(effect_row, effect_col)
                     self.terrain[effect_row][effect_col] = terrain_obj
                     self.pyxel_manager.add_entity(terrain_obj,effect_row,effect_col)
-                    # if there's a character there, deal damage to them
+                    # if there's a character there, deal damage to them unless it's ice
                     if isinstance(potential_char, Character):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
@@ -365,9 +365,9 @@ class Board:
         modified_attack_strength, attack_modifier_string = self.select_and_apply_attack_modifier(
             attacker, strength
         )
-        to_log = f'Attack targets {target.name}\n{attack_modifier_string} modifier'
+        to_log = f'\nAttack targets {target.name} with {attack_modifier_string} modifier'
         if target.shield[0] > 0:
-            to_log+= f"{target.name} has shield {target.shield[0]}\n"
+            to_log+= f"\n{target.name} has shield {target.shield[0]}"
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             to_log+= f", does no damage!\n"
@@ -375,7 +375,6 @@ class Board:
         if self.is_shadow_interference(attacker, target):
             to_log+= f", missed due to shadow\n"
             return
-        to_log+= f", hits for {modified_attack_strength} damage"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -484,9 +483,10 @@ class Board:
         col: int,
     ) -> None:
         damage = self.get_terrain_damage(row, col)
+        element_name = self.terrain[row][col].__class__.__name__
         if damage:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} took {damage} damage from terrain"
+                f"{acting_character.name} stepped on {element_name}"
             )
             self.modify_target_health(acting_character, damage)
 
@@ -527,8 +527,8 @@ class Board:
         target.health -= damage
         if target.health <= 0:
             self.kill_target(target)
-        else:
-            self.pyxel_manager.log.append(f"{target.name}'s new health: {target.health}\n")
+        elif damage > 0:
+            self.pyxel_manager.log.append(f"\n{target.name} takes {damage} damage and has {target.health} health")
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 
@@ -597,6 +597,7 @@ class Board:
         self.pyxel_manager.load_characters(self.characters)
 
     def teleport_character(self, target: Character):
+        self.pyxel_manager.log.append(f"Teleporting {target.name}")
         new_loc = self.pick_unoccupied_location()
         self.update_character_location(
             target, self.find_location_of_target(target), new_loc

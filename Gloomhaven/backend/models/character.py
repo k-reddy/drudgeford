@@ -36,7 +36,6 @@ class Character(abc.ABC):
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        self.log.append(f"{self.name} is performing {action_card.attack_name}\n")
         return self.agent.decide_if_move_first(self.disp)
 
     def perform_movement(self, movement, is_jump, board):
@@ -50,7 +49,6 @@ class Character(abc.ABC):
 
     def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
-            self.log.append("No opponents in range\n")
             return None
         return self.agent.select_attack_target(self.disp, in_range_opponents, board, self)
 
