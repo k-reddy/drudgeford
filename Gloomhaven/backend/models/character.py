@@ -189,6 +189,7 @@ class MushroomMan(Character):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.health = character_classes.support_fungal.health
         self.pyxel_sprite_name = "mushroomman"
+        self.elemental_affinity = obstacle.Spores
     
     def create_action_cards(self):
         return character_classes.support_fungal.cards
@@ -213,7 +214,6 @@ class Fiend(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "fiend"
-        self.elemental_affinity = obstacle.Fire
         
     def create_action_cards(self):
         return character_classes.fiend.cards
@@ -222,8 +222,6 @@ class Demon(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "demon"
-        self.elemental_affinity = obstacle.Fire
-
 
     def create_action_cards(self):
         return character_classes.demon.cards
