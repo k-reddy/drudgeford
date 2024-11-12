@@ -79,4 +79,4 @@ cards = [
     )
 ]
 health = 12
-backstory = "I'm a monk. Hiya!"
+backstory = '''Abandoned to a monastery after their family faced three failed harvests, this warrior-farmer channels their bitterness over their abandonment into martial prowess. Years of tending the monastery's fields have taught them that growth and destruction go hand in hand. They wield traditional farming implements as weapons, blessing allies while cursing enemies. A versatile and supportive fighter who combines mobility and melee attacks with the ability to heal and empower allies.'''

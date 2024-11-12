@@ -92,6 +92,6 @@ cards = [
     ),
 ]
 
-backstory = "wizards are cool"
+backstory = '''Raised by overbearing parents who demanded magical excellence from a young age, this young wizard spent their childhood studying ancient texts while other kids played outside. Now an Acolyte, they channel their isolation and academic pressure into devastating spells, forever striving to reach Arch Mage status to finally earn parental approval. Their magical prowess is matched only by their social awkwardness and determination to prove themselves worthy. A glass cannon spellcaster who controls the battlefield from range with powerful elemental attacks.'''
 
 health = 6
