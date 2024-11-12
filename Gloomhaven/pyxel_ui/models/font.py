@@ -38,7 +38,7 @@ class PixelFont:
 
     def wrap_text(self, text, max_width, size="medium"):
         """
-        Wrap text to fit within max_width pixels
+        Wrap text to fit within max_width pixels. Preserves lines that start with whitespace.
 
         Args:
             text: Text to wrap
@@ -53,26 +53,53 @@ class PixelFont:
 
         lines = []
         for paragraph in text.split("\n"):
-            words = paragraph.split()
-            if not words:
-                lines.append("")
-                continue
-
-            current_line = words[0]
-            current_width = self.get_text_width(current_line, size)
-
-            for word in words[1:]:
-                word_width = self.get_text_width(" " + word, size)
-
-                if current_width + word_width <= max_width:
-                    current_line += " " + word
-                    current_width += word_width
+            # Preserve lines that start with whitespace
+            if paragraph.startswith(" "):
+                if self.get_text_width(paragraph, size) <= max_width:
+                    lines.append(paragraph)
                 else:
-                    lines.append(current_line)
-                    current_line = word
-                    current_width = self.get_text_width(word, size)
+                    # If indented line is too long, we still need to wrap it
+                    # but we'll preserve the leading spaces
+                    leading_spaces = len(paragraph) - len(paragraph.lstrip())
+                    prefix = " " * leading_spaces
+                    words = paragraph.lstrip().split()
+                    
+                    current_line = prefix + words[0]
+                    current_width = self.get_text_width(current_line, size)
 
-            lines.append(current_line)
+                    for word in words[1:]:
+                        word_width = self.get_text_width(" " + word, size)
+                        if current_width + word_width <= max_width:
+                            current_line += " " + word
+                            current_width += word_width
+                        else:
+                            lines.append(current_line)
+                            current_line = prefix + word  # Keep indentation for wrapped lines
+                            current_width = self.get_text_width(current_line, size)
+                    
+                    lines.append(current_line)
+            else:
+                # Original logic for non-indented lines
+                words = paragraph.split()
+                if not words:
+                    lines.append("")
+                    continue
+
+                current_line = words[0]
+                current_width = self.get_text_width(current_line, size)
+
+                for word in words[1:]:
+                    word_width = self.get_text_width(" " + word, size)
+
+                    if current_width + word_width <= max_width:
+                        current_line += " " + word
+                        current_width += word_width
+                    else:
+                        lines.append(current_line)
+                        current_line = word
+                        current_width = self.get_text_width(word, size)
+
+                lines.append(current_line)
 
         return lines
 
