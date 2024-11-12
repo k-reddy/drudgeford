@@ -10,6 +10,7 @@ from backend.models.level import Level
 import backend.models.character as character
 
 
+GAME_PLOT = '''Welcome to Drudgeford, your home since childhood. Recently, strange events have been plaguing your village. Crops wither overnight, shadows move against the sun, and ancient runes appear carved into doors. All in the town swear innocence but darkness spreads. You journey to nearby villages in search of information and hear rumors of a puppet master working from the shadows. You decide to seek out this mysterious force before your village succumbs to its influence.'''
 def main(num_players: int = 1, all_ai_mode=False):
     # pyxel setup
     shared_action_queue = PyxelTaskQueue()
@@ -41,6 +42,10 @@ def main(num_players: int = 1, all_ai_mode=False):
         disp.clear_display()
     # if players want game help, display instructions
     provide_help_if_desired(disp, all_ai_mode)
+    disp.print_message(GAME_PLOT)
+    disp.get_user_input(prompt="Hit enter to continue")
+    disp.clear_display()
+
 
     game = GameLoop(disp, num_players, all_ai_mode, pyxel_manager, level)
     threading.Thread(target=game.start).start()
