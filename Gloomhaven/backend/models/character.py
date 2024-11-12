@@ -3,6 +3,7 @@ import abc
 import backend.models.character_classes as character_classes
 import backend.models.action_model as action_model 
 from ..utils import utilities
+from backend.models import obstacle
 
 MAX_ROUNDS = 1000
 
@@ -28,6 +29,7 @@ class Character(abc.ABC):
         self.team_monster = is_monster
         self.shield: tuple[int,int] = (0, MAX_ROUNDS)
         self.log = log
+        self.elemental_affinity = None
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
@@ -211,6 +213,7 @@ class Fiend(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "fiend"
+        self.elemental_affinity = obstacle.Fire
         
     def create_action_cards(self):
         return character_classes.fiend.cards
@@ -219,6 +222,8 @@ class Demon(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "demon"
+        self.elemental_affinity = obstacle.Fire
+
 
     def create_action_cards(self):
         return character_classes.demon.cards
@@ -227,6 +232,7 @@ class FireSprite(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
         self.pyxel_sprite_name = "firesprite"
+        self.elemental_affinity = obstacle.Fire
 
     def create_action_cards(self):
         return character_classes.firesprite.cards

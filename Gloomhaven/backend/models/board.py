@@ -485,10 +485,13 @@ class Board:
         col: int,
     ) -> None:
         damage = self.get_terrain_damage(row, col)
-        element_name = self.terrain[row][col].__class__.__name__
+        element = self.terrain[row][col]
+        # if they have an elemental affinity for this element, they heal instead of take damage
+        if acting_character.elemental_affinity == element.__class__:
+            damage = damage*-1
         if damage:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} stepped on {element_name}"
+                f"{acting_character.name} stepped on {element.__class__.__name__}"
             )
             self.modify_target_health(acting_character, damage)
 
@@ -531,6 +534,8 @@ class Board:
             self.kill_target(target)
         elif damage > 0:
             self.pyxel_manager.log.append(f"{target.name} takes {damage} damage and has {target.health} health")
+        else:
+            self.pyxel_manager.log.append(f"{target.name} heals for {-1*damage} and has {target.health} health")
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 
