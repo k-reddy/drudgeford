@@ -228,15 +228,7 @@ Kill it or be killed..."""
             player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
             chars.append(char_class("", disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         # get some user input before starting the game
-        num_players = (
-            int(
-                disp.get_user_input(
-                    "Let's set up the game. How players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
-                )
-            )
-            if not all_ai_mode
-            else num_players
-        )
+        
         for i in range(num_players):
             disp.print_message("It's time to pick characters. Here are your options:\n",True)
             for j, char in enumerate(chars):
