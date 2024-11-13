@@ -65,12 +65,17 @@ class ViewManager:
         ]
 
     def update_log(self, log: list[str]):
+        # note: drawable set in update_round_turn()
         self.log_view.log = log
         self.log_view.draw()
 
     def update_round_turn(self, round_number: int, acting_character_name: str):
         self.log_view.round_number = round_number
         self.log_view.acting_character_name = acting_character_name
+        if round_number > 0 and acting_character_name:
+            self.log_view.drawable = True
+        else:
+            self.log_view.drawable = False
         self.log_view.draw()
 
     def update_initiative_bar(
@@ -79,12 +84,20 @@ class ViewManager:
         self.initiative_bar_view.sprite_names = sprite_names
         self.initiative_bar_view.healths = healths
         self.initiative_bar_view.teams = teams
+        if sprite_names:
+            self.initiative_bar_view.drawable = True
+        else:
+            self.initiative_bar_view.drawable = False
         self.initiative_bar_view.draw()
 
     def update_action_card_log(self, action_card_log: list[str]):
         # reset the card page to 0 every time we load new action cards
         self.action_card_view.current_card_page = 0
         self.action_card_view.action_card_log = action_card_log
+        if action_card_log:
+            self.action_card_view.drawable = True
+        else:
+            self.action_card_view.drawable = False
         self.action_card_view.draw()
 
     def update_map(
@@ -93,6 +106,11 @@ class ViewManager:
             floor_color_map=[],
             wall_color_map=[]
             ) -> None:
+        if valid_floor_coordinates:
+            self.map_view.drawable = True
+        else:
+            self.map_view.drawable = False
+            
         if floor_color_map:
             self.map_view.floor_color_map = floor_color_map
         if wall_color_map:
