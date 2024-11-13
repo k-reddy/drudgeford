@@ -60,7 +60,7 @@ class Campaign:
             monster_classes=[character.Demon, character.Fiend, character.FireSprite]
         )
         self.run_level(level_1)
-        # self.run_level(level_2)
+        self.run_level(level_2)
 
     def set_num_players(self):
         if not self.all_ai_mode:
