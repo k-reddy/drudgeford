@@ -24,7 +24,7 @@ campaign_levels=[
         floor_color_map=[(1,8), (5,2)],
         wall_color_map=[],# (1,2), (13,14)
         monster_classes=[character.Demon, character.Fiend, character.FireSprite],
-        pre_level_text=textwrap.fill('''As you kill the last of the corrupted creatures, a dark figure in a hooded robe materializes at the forest's edge. Before you can focus on it, the shape dissolves into shadow. Your head erupts into searing pain, as a raspy voice booms in your mind. 'I have you in my grasp now,' it cackles. 'Good luck ever escaping me.' The world spins, then fades to black as you collapse. You wake up burning hot and open your eyes to the sight of demons and fire - you'll need to fight through them to survive.''',
+        pre_level_text=textwrap.fill('''As you kill the last of the corrupted creatures, a dark figure in a hooded robe materializes at the forest's edge. Before you can focus on it, the shape dissolves into shadow. Your head erupts into searing pain, as a raspy voice booms in your mind. 'I have you in my grasp now,' it cackles. 'Good luck ever escaping me.' The world spins, then fades to black as you collapse. You wake up burning hot, and your eyes open to the sight of demons and fire - you'll need to fight through them to survive.''',
         TEXT_WIDTH)
         ),
 ]

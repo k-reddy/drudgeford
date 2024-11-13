@@ -3,6 +3,8 @@ import backend.models.display as display
 from backend.models.campaign_manager import Campaign
 from backend.utils.utilities import get_campaign_filenames
 from backend.models.level import GAME_PLOT
+import textwrap
+from backend.utils.config import TEXT_WIDTH
 
 def offer_to_load_campaign(disp):
     file_names = get_campaign_filenames()
@@ -58,15 +60,16 @@ def main(num_players: int = 1, all_ai_mode=False):
 
 
 def provide_help_if_desired(disp, all_ai_mode):
-    help_message = """Welcome to the game! Here's how it works:
-- You and the monster will attack each other once per turn in a random order
-- You can only attack if you are within range of your enemy
-- You pick your attacks, and the monster's are randomly generated
-- Each attack has a movement associated with it. If you're not in range, you'll move that amount toward your enemy
-- If you end in range, you will attack. If not, you won't attack this turn.
-- Whoever runs out of health first loses
+    help_message = textwrap.fill("""Welcome to the game! Here's how it works:
+- All players are on the same team against the AI monsters - a green line under the character in the health bar denotes a player, red denotes a monster
+- The game is turn based, and the turn order is randomly determined each round (see the health bar for round order)
+- Each turn, you will pick an attack card. Once you use a card, it's gone until you use all your cards, so choose wisely!           
+- Movement on the card is how far you can move, strength is how much damage your attack will do, and range is how many squares away you can be and still hit a monster (range 1 is adjacent)
+- Every time you attack, you'll draw an 'attack modifier card.' This adds some randomness to your damage. Certain cards (bless, curse) add good/bad modifiers randomly to your deck, and others (charge attack) determine what the next modifier you draw will be
+- Some cards place elements/obstacles on the map, like traps and fire. Most of these do damage.
+- The exceptions are ice, which gives you a 25% chance of slipping and losing your turn when you step on it, and shadow, which gives all attacks a 10% chance of missing for each square of shadow they pass through
 
-Good luck!"""
+Good luck!""", TEXT_WIDTH)
     want_help = False
     if not all_ai_mode:
         user_input = disp.get_user_input(
