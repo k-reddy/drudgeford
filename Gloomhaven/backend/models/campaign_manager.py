@@ -9,7 +9,7 @@ from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
 from backend.models.display import Display
 from backend.models.pyxel_backend import PyxelManager
-from backend.models.level import Level
+from backend.models.level import Level, campaign_levels
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
@@ -70,7 +70,9 @@ class Campaign:
         threading.Thread(target=self.run_levels).start()
         self.pyxel_view.start()
 
-
+    def make_levels(self):
+        self.levels = campaign_levels.copy()
+        
     def run_level(self, level: Level):
         self.current_level = level
         self.pyxel_manager.set_level_map_colors(
@@ -86,20 +88,6 @@ class Campaign:
             self.id_generator,
             self.player_chars)
         return game.start()
-    
-    def make_levels(self):
-        self.levels.append(Level(
-            floor_color_map=[(1,3), (5,11)],
-            wall_color_map=[(1,4), (13,15)],
-            monster_classes=[character.Treeman, character.MushroomMan, character.Fairy],
-            pre_level_text="You decide to start off by exploring the nearby forest and quickly encounter some hostile enemies."
-        ))
-        self.levels.append(Level(
-            floor_color_map=[(1,8), (5,2)],
-            wall_color_map=[],# (1,2), (13,14)
-            monster_classes=[character.Demon, character.Fiend, character.FireSprite],
-            pre_level_text="Uh oh, the Orchestrator has tossed you into a hellish fire realm. You'd better defeat these enemies to save your life!"
-        ))
 
     def run_levels(self):
         for i, _ in enumerate(self.levels):
