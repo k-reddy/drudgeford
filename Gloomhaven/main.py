@@ -2,8 +2,7 @@ import os
 import backend.models.display as display
 from backend.models.campaign_manager import Campaign
 from backend.utils.utilities import get_campaign_filenames
-
-GAME_PLOT = '''Welcome to Drudgeford, your home since childhood. Recently, strange events have been plaguing your village. Crops wither overnight, shadows move against the sun, and ancient runes appear carved into doors. All in the town swear innocence but darkness spreads. You journey to nearby villages in search of information and hear rumors of a puppet master working from the shadows. You decide to seek out this mysterious force before your village succumbs to its influence.'''
+from backend.models.level import GAME_PLOT
 
 def offer_to_load_campaign(disp):
     file_names = get_campaign_filenames()
