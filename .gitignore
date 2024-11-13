@@ -11,3 +11,4 @@ Gloomhaven/ai_mode_log.txt
 Gloomhaven/notes.txt
 Gloomhaven/debug_log.txt
 Gloomhaven/pixel_art/
+*.pickle
