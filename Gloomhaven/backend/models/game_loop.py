@@ -36,11 +36,6 @@ class GameLoop:
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-        if not self.all_ai_mode:
-            self.disp.print_message(
-                message=self.level.pre_level_text, clear_display=True
-            )
-            self.disp.get_user_input(prompt="Hit enter to continue\n")
 
         round_number = 1
         while self.game_state == GameState.RUNNING:
