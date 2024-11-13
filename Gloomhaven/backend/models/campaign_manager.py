@@ -1,4 +1,5 @@
 import threading
+from dataclasses import dataclass
 from itertools import count
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.engine import PyxelEngine
@@ -9,6 +10,18 @@ from backend.models.level import Level
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
+import pickle
+from backend.utils.utilities import get_campaign_filenames
+
+
+@dataclass
+class CampaignState:
+    remaining_levels: int
+    player_classes: list[str]
+    player_names: list[str]
+    num_players: int
+    all_ai_mode: bool
+    id_gen_start: int
 
 class Campaign:
     '''
@@ -25,10 +38,33 @@ class Campaign:
         self.id_generator = count(start=1)
         self.available_chars = []
         self.player_chars = []
+        self.levels = []
+        self.initialized = False
+
+    def load_campaign(self, filename):
+        # get the data needed to recreate the campaign
+        with open(filename, 'rb') as f:
+            campaign_state = pickle.load(f)
+
+        # recreate it
+        self.initialized = True
+        self.id_generator = count(start=campaign_state.id_gen_start)
+        self.make_levels()
+        self.levels = self.levels[-campaign_state.remaining_levels:]
+        self.all_ai_mode = campaign_state.all_ai_mode
+        self.num_players = campaign_state.num_players
+        self.player_chars = self.load_player_characters(
+            campaign_state.player_names,
+            campaign_state.player_classes
+        )
 
     def start_campaign(self):
-        self.set_num_players()
-        self.set_up_player_chars()
+        # if we load a campaign, we don't want to reset everything
+        if not self.initialized:
+            self.set_num_players()
+            self.set_up_player_chars()
+            self.make_levels()
+            self.initialized = True
         threading.Thread(target=self.run_levels).start()
         self.pyxel_view.start()
 
@@ -48,26 +84,29 @@ class Campaign:
             self.player_chars)
         return game.start()
     
-    def run_levels(self):
-        levels = []
-        levels.append(Level(
+    def make_levels(self):
+        self.levels.append(Level(
             floor_color_map=[(1,3), (5,11)],
             wall_color_map=[(1,4), (13,15)],
             monster_classes=[character.Treeman, character.MushroomMan, character.Fairy],
             pre_level_text="You decide to start off by exploring the nearby forest and quickly encounter some hostile enemies."
         ))
-        levels.append(Level(
+        self.levels.append(Level(
             floor_color_map=[(1,8), (5,2)],
             wall_color_map=[],# (1,2), (13,14)
             monster_classes=[character.Demon, character.Fiend, character.FireSprite],
             pre_level_text="Uh oh, the Orchestrator has tossed you into a hellish fire realm. You'd better defeat these enemies to save your life!"
         ))
-        for level in levels:
-            output = self.run_level(level)
+
+    def run_levels(self):
+        for i, _ in enumerate(self.levels):
+            output = self.run_level(self.levels.pop(i))
 
             # if you don't win the level, end here
             if output != GameState.WIN:
                 return
+            
+            self.offer_to_save_campaign()
 
     def set_num_players(self):
         if not self.all_ai_mode:
@@ -100,17 +139,62 @@ class Campaign:
         return player_char
 
     def set_up_player_chars(self):
-        emoji = ["🧙", "🕺", "🐣", "🐣"]
+        emojis = ["🧙", "🕺", "🐣", "🐣"]
         default_names = ["Happy", "Glad", "Jolly", "Cheery"]
         char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard]
         
         # set up characters players can choose from
-        for i, char_class in enumerate(char_classes):
+        for char_class, emoji, default_name in zip(char_classes, emojis, default_names):
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
-            self.available_chars.append(char_class(default_names[i], self.disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+            self.available_chars.append(char_class(default_name, self.disp, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         
         for i in range(self.num_players):
             self.player_chars.append(self.select_player_character(i))
 
         if not self.all_ai_mode:
             self.disp.clear_display()
+
+    def load_player_characters(self, player_names, char_classes):
+        emojis = ["🧙", "🕺", "🐣", "🐣"]
+        
+        # recreate the same characters 
+        player_chars = []
+        for char_class_name, player_name, emoji in zip(char_classes, player_names, emojis):
+            char_class = getattr(character, char_class_name)
+            player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
+            player_chars.append(char_class(player_name, self.disp, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+        return player_chars
+    
+    def offer_to_save_campaign(self):
+        user_input = self.disp.get_user_input("Would you like to save your progress? Type (y)es or (n)o. ",["y","n"])
+        should_save = True if user_input == "y" else False
+        if should_save:
+            self.save_campaign()
+
+    def get_unused_filename(self):
+        file_names = get_campaign_filenames()
+        i=0
+        filename = f"game_{i}.pickle"
+        while True:
+            if filename in file_names:
+                i += 1
+                filename = f"game_{i}.pickle"
+            else:
+                break
+        return filename
+    
+    def save_campaign(self):
+        # Create a simple dict with just the essential data
+        campaign_state = CampaignState(
+            remaining_levels=len(self.levels),
+            player_classes=[type(char).__name__ for char in self.player_chars],  
+            player_names=[char.name for char in self.player_chars],
+            num_players=self.num_players,
+            all_ai_mode=self.all_ai_mode,
+            id_gen_start=next(self.id_generator)
+        )
+
+        filename = self.get_unused_filename()
+        with open(filename, 'wb') as f:
+            pickle.dump(campaign_state, f)
+        self.disp.get_user_input(f"Successfully saved {filename}. Hit enter to continue. ")
