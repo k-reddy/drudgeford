@@ -32,44 +32,33 @@ class PyxelEngine:
         # To measure framerate and loop duration
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
-
-    def init_pyxel_map(self, map_width_tiles, map_height_tiles, valid_map_coordinates, floor_color_map=[], wall_color_map=[]):
-        pyxel_width = max(DEFAULT_PYXEL_WIDTH, map_width_tiles*MAP_TILE_WIDTH_PX)
-        pyxel_height = max(DEFAULT_PYXEL_HEIGHT, map_height_tiles*MAP_TILE_HEIGHT_PX*1.5)
-        pyxel.init(pyxel_width, pyxel_height)
+        pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
-
-        self.view_manager = ViewManager(pyxel_width, pyxel_height, floor_color_map, wall_color_map)
-        self.view_manager.update_map(valid_floor_coordinates=valid_map_coordinates)
+        self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
 
     def start(self):
         # print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
         # canvas + map = board
-        while not self.is_board_initialized:
-            if not self.current_task and not self.task_queue.is_empty():
-                self.current_task = self.task_queue.dequeue()
-                # ensure our first task is board initialization
-                if isinstance(self.current_task, BoardInitTask):
-                    self.init_pyxel_map(
-                        self.current_task.map_width, 
-                        self.current_task.map_height,
-                        self.current_task.valid_map_coordinates,
-                        self.current_task.floor_color_map,
-                        self.current_task.wall_color_map
-                    )
-                    self.current_task = None  # clear
-                    self.is_board_initialized = True
-
+        # while not self.is_board_initialized:
+        #     if not self.current_task and not self.task_queue.is_empty():
+        #         self.current_task = self.task_queue.dequeue()
+        #         # ensure our first task is board initialization
+        #         if isinstance(self.current_task, BoardInitTask):
+        #             self.init_pyxel_map(
+        #                 self.current_task.map_width, 
+        #                 self.current_task.map_height,
+        #                 self.current_task.valid_map_coordinates,
+        #                 self.current_task.floor_color_map,
+        #                 self.current_task.wall_color_map
+        #             )
+        #             self.current_task = None  # clear
         pyxel.run(self.update, self.draw)
 
     def update(self):
         self.start_time = time.time()
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
-
-        if not self.is_board_initialized:
-            return
 
         if not self.current_task and not self.task_queue.is_empty():
             self.current_task = self.task_queue.dequeue()
