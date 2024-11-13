@@ -10,10 +10,10 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
-from .models.tasks import BoardInitTask, ActionTask
+from .models.tasks import ActionTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.controllers.view_manager import ViewManager
-from .utils import round_to_multiple
+from .utils import round_down_to_nearest_multiple
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -85,26 +85,27 @@ class PyxelEngine:
                 self.view_manager.action_card_view.current_card_page -= 1
                 self.view_manager.action_card_view.draw()
 
-        # Handle cursor redraws
+        # Handle cursor redraws and grid
         curr_mouse_x, curr_mouse_y = pyxel.mouse_x, pyxel.mouse_y
         if self.last_mouse_pos != (curr_mouse_x, curr_mouse_y):
             last_mouse_x, last_mouse_y = self.last_mouse_pos
             if view := self.view_manager.get_view_for_coordinate_px(
                 last_mouse_x, last_mouse_y
             ):
-                view.draw()
+                view.redraw()
 
-            grid_left_px = round_to_multiple(curr_mouse_x, MAP_TILE_WIDTH_PX)
-            grid_top_px = round_to_multiple(curr_mouse_y, MAP_TILE_HEIGHT_PX)
-            print(f"{grid_left_px=} - {grid_top_px=}")
+            # Grid concerns
+            grid_left_px = round_down_to_nearest_multiple(
+                curr_mouse_x, MAP_TILE_WIDTH_PX
+            )
+            grid_top_px = round_down_to_nearest_multiple(
+                curr_mouse_y, MAP_TILE_HEIGHT_PX
+            )
             self.view_manager.draw_grid(
                 grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
             )
 
             self.last_mouse_pos = (curr_mouse_x, curr_mouse_y)
-
-        # Handle grid draw
-        # if self.last_mouse_pos != (curr_mouse_x, curr_mouse_y):
 
     def draw(self):
         """everything in the task queue draws itself,
@@ -112,8 +113,6 @@ class PyxelEngine:
         we're not redrawing the canvas unless there's something
         new to draw!
         """
-        # this is also very slow with the new font implementation
-        # self.view_manager.draw_whole_game()
         # Calculate duration and framerate
         # loop_duration = time.time() - self.start_time
         # self.loop_durations.append(loop_duration)

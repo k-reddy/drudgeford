@@ -131,12 +131,11 @@ class BoardInitTask:
     floor_color_map: Optional[list[tuple[int, int]]] = None
     wall_color_map: Optional[list[tuple[int, int]]] = None
 
-
     def perform(self, view_manager):
         view_manager.update_map(
-            self.valid_map_coordinates,
-            self.floor_color_map,
-            self.wall_color_map)
+            self.valid_map_coordinates, self.floor_color_map, self.wall_color_map
+        )
+
 
 @dataclass
 class ActionTask(Task):
