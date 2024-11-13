@@ -72,9 +72,14 @@ class Campaign:
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
-        
+
     def run_level(self, level: Level):
         self.current_level = level
+        if not self.all_ai_mode:
+            self.disp.print_message(message=self.current_level.pre_level_text, clear_display=True)
+            self.disp.get_user_input(
+                prompt="Hit enter to continue\n"
+            )
         self.pyxel_manager.set_level_map_colors(
             self.current_level.floor_color_map,
             self.current_level.wall_color_map
