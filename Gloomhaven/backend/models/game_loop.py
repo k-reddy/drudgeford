@@ -1,5 +1,4 @@
 import random
-from itertools import count
 import backend.models.character as character
 from backend.utils.config import DEBUG
 from backend.models.display import Display
@@ -203,10 +202,6 @@ class GameLoop:
    /   \\
         """
         return message
-
-
-    
-
 
     def set_up_monsters(self):
         monsters = []

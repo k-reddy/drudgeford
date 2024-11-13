@@ -10,7 +10,6 @@ import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
 
-
 class Campaign:
     '''
     a campaign is a series of games, each of which has level metadata
