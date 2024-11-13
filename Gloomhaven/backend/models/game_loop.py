@@ -24,12 +24,14 @@ class GameLoop:
         self.id_generator = count(start=1)
         self.pyxel_manager = pyxel_manager
         self.level=level
-        players = self.set_up_players(disp, num_players, all_ai_mode)
-        monsters = self.set_up_monsters(disp, len(players))
-        self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
-        self.game_state = GameState.START
+        self.num_players = num_players
         self.disp = disp
         self.all_ai_mode = all_ai_mode
+        players = self.set_up_players()
+        monsters = self.set_up_monsters()
+        self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
+        self.game_state = GameState.START
+
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
@@ -217,7 +219,7 @@ Kill it or be killed..."""
         return message
 
 
-    def set_up_players(self, disp, num_players, all_ai_mode):
+    def set_up_players(self):
         players = []
         emoji = ["🧙", "🕺", "🐣", "🐣"]
         default_names = ["Happy", "Glad", "Jolly"]
@@ -225,19 +227,19 @@ Kill it or be killed..."""
         chars = []
         # set up potential characters
         for i, char_class in enumerate(char_classes):
-            player_agent = backend.models.agent.Ai() if all_ai_mode else backend.models.agent.Human()
-            chars.append(char_class("", disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+            player_agent = backend.models.agent.Ai() if self.all_ai_mode else backend.models.agent.Human()
+            chars.append(char_class("", self.disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         # get some user input before starting the game
         
-        for i in range(num_players):
-            disp.print_message("It's time to pick characters. Here are your options:\n",True)
+        for i in range(self.num_players):
+            self.disp.print_message("It's time to pick characters. Here are your options:\n",True)
             for j, char in enumerate(chars):
-                disp.print_message(f"{j}: {char.__class__.__name__}",False)
-                disp.print_message(f"{char.backstory}\n", False)
-            player_char_num = int(disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{k}" for k,_ in enumerate(chars)]))
+                self.disp.print_message(f"{j}: {char.__class__.__name__}",False)
+                self.disp.print_message(f"{char.backstory}\n", False)
+            player_char_num = int(self.disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{k}" for k,_ in enumerate(chars)]))
             player_name = (
-                disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
-                if not all_ai_mode
+                self.disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
+                if not self.all_ai_mode
                 else ""
             )
             # default to happy :D
@@ -245,17 +247,17 @@ Kill it or be killed..."""
             player_char = chars.pop(player_char_num)
             player_char.name = player_name
             players.append(player_char)
-        if not all_ai_mode:
-            disp.clear_display()
+        if not self.all_ai_mode:
+            self.disp.clear_display()
         return players
 
 
-    def set_up_monsters(self, disp, num_players):
+    def set_up_monsters(self):
         monsters = []
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        for i in range(num_players + 2):
+        for i in range(self.num_players + 2):
             class_num = i%len(self.level.monster_classes)
             monster_name = self.level.monster_classes[class_num].__name__
-            monster = self.level.monster_classes[class_num](monster_name, disp, emoji[class_num], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
+            monster = self.level.monster_classes[class_num](monster_name, self.disp, emoji[class_num], backend.models.agent.Ai(), char_id = next(self.id_generator), is_monster=True, log=self.pyxel_manager.log)
             monsters.append(monster)
         return monsters
