@@ -9,7 +9,7 @@ import backend.models.character as character
 
 class Campaign:
     '''
-    a campaign is a series of games, each of which is also a level
+    a campaign is a series of games, each of which has level metadata
     '''
     def __init__(self, disp: Display, num_players: int, all_ai_mode: bool):
         self.current_level: Level
