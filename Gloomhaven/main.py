@@ -1,6 +1,5 @@
 import os
 import backend.models.display as display
-import pickle
 from backend.models.campaign_manager import Campaign
 from backend.utils.utilities import get_campaign_filenames
 
