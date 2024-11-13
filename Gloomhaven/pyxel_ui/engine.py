@@ -43,7 +43,7 @@ class PyxelEngine:
         self.view_manager.update_map(valid_floor_coordinates=valid_map_coordinates)
 
     def start(self):
-        print("Starting Pyxel game loop...")
+        # print("Starting Pyxel game loop...")
         # init pyxel canvas and map that align with those of GH backend
         # canvas + map = board
         while not self.is_board_initialized:
