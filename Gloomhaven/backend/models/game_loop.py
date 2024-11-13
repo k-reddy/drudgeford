@@ -1,6 +1,5 @@
 import random
 from itertools import count
-from enum import Enum, auto
 import backend.models.character as character
 from backend.utils.config import DEBUG
 from backend.models.display import Display
@@ -9,14 +8,7 @@ from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
-
-
-class GameState(Enum):
-    START = auto()
-    RUNNING = auto()
-    WIN = auto()
-    GAME_OVER = auto()
-    EXHAUSTED = auto()
+from backend.utils.utilities import GameState
 
 
 class GameLoop:
@@ -31,23 +23,18 @@ class GameLoop:
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
 
-
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-        
-        message = """Welcome to your quest.
-As you enter the dungeon, you see a terrifying monster ahead! 
-Kill it or be killed..."""
         if not self.all_ai_mode:
-            self.disp.print_message(message=message, clear_display=True)
+            self.disp.print_message(message=self.level.pre_level_text, clear_display=True)
             self.disp.get_user_input(
-                prompt="Time to start the game! Hit enter to continue\n"
+                prompt="Hit enter to continue\n"
             )
 
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.run_round(round_number)
-            # print(self.game_state)
+            print(self.game_state)
             round_number += 1
             self.board.round_num = round_number
         # once we're no longer playing, end the game

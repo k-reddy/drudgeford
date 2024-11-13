@@ -8,6 +8,8 @@ from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
 import backend.models.character as character
 import backend.models.agent as agent
+from backend.utils.utilities import GameState
+
 
 class Campaign:
     '''
@@ -45,22 +47,28 @@ class Campaign:
             self.current_level,
             self.id_generator,
             self.player_chars)
-        game.start()
+        return game.start()
     
     def run_levels(self):
-        level_1 = Level(
+        levels = []
+        levels.append(Level(
             floor_color_map=[(1,3), (5,11)],
             wall_color_map=[(1,4), (13,15)],
-            monster_classes=[character.Treeman, character.MushroomMan, character.Fairy]
-        )
-        # level 2
-        level_2 = Level(
+            monster_classes=[character.Treeman, character.MushroomMan, character.Fairy],
+            pre_level_text="You decide to start off by exploring the nearby forest and quickly encounter some hostile enemies."
+        ))
+        levels.append(Level(
             floor_color_map=[(1,8), (5,2)],
             wall_color_map=[],# (1,2), (13,14)
-            monster_classes=[character.Demon, character.Fiend, character.FireSprite]
-        )
-        self.run_level(level_1)
-        self.run_level(level_2)
+            monster_classes=[character.Demon, character.Fiend, character.FireSprite],
+            pre_level_text="Uh oh, the Orchestrator has tossed you into a hellish fire realm. You'd better defeat these enemies to save your life!"
+        ))
+        for level in levels:
+            output = self.run_level(level)
+
+            # if you don't win the level, end here
+            if output != GameState.WIN:
+                return
 
     def set_num_players(self):
         if not self.all_ai_mode:
