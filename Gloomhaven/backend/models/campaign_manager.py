@@ -1,6 +1,9 @@
 import threading
 from dataclasses import dataclass
 from itertools import count
+import pickle
+import os
+
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
@@ -10,10 +13,8 @@ from backend.models.level import Level
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
-import pickle
 from backend.utils.utilities import get_campaign_filenames
 from backend.utils.config import SAVE_FILE_DIR 
-import os
 
 @dataclass
 class CampaignState:
