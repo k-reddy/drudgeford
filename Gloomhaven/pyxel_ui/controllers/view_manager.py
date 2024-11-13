@@ -61,7 +61,16 @@ class ViewManager:
         self.action_card_view.action_card_log = action_card_log
         self.action_card_view.draw()
 
-    def update_map(self, valid_floor_coordinates: list[tuple[int, int]]) -> None:
+    def update_map(
+            self, 
+            valid_floor_coordinates: list[tuple[int, int]], 
+            floor_color_map=[],
+            wall_color_map=[]
+            ) -> None:
+        if floor_color_map:
+            self.map_view.floor_color_map = floor_color_map
+        if wall_color_map:
+            self.map_view.wall_color_map = wall_color_map
         self.map_view.valid_map_coordinates = valid_floor_coordinates
         self.map_view.draw()
         self.map_view.draw_sprites()

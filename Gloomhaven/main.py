@@ -1,55 +1,61 @@
 import os
-import threading
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
-from pyxel_ui.engine import PyxelEngine
-
-from backend.models.game_loop import GameLoop
 import backend.models.display as display
-import backend.models.pyxel_backend as pyxel_backend
-from backend.models.level import Level
-import backend.models.character as character
-
+from backend.models.campaign_manager import Campaign
+from backend.utils.utilities import get_campaign_filenames
 
 GAME_PLOT = '''Welcome to Drudgeford, your home since childhood. Recently, strange events have been plaguing your village. Crops wither overnight, shadows move against the sun, and ancient runes appear carved into doors. All in the town swear innocence but darkness spreads. You journey to nearby villages in search of information and hear rumors of a puppet master working from the shadows. You decide to seek out this mysterious force before your village succumbs to its influence.'''
-def main(num_players: int = 1, all_ai_mode=False):
-    # pyxel setup
-    shared_action_queue = PyxelTaskQueue()
-    pyxel_view = PyxelEngine(shared_action_queue)
-    # level 1
-    level = Level(
-        floor_color_map=[(1,3), (5,11)],
-        wall_color_map=[(1,4), (13,15)],
-        monster_classes=[character.Treeman, character.MushroomMan, character.Fairy]
-    )
-    # # level 2
-    # level = Level(
-    #     floor_color_map=[(1,8), (5,2)],
-    #     wall_color_map=[(1,2), (13,14)],
-    #     monster_classes=[character.Demon, character.Fiend, character.FireSprite]
-    # )
 
+def offer_to_load_campaign(disp):
+    file_names = get_campaign_filenames()
+
+    user_input = disp.get_user_input("Would you like to load an existing campaign? Type (y)es or hit enter to start new campaign.")
+    if user_input != "y":
+        return 
+    
+    if not file_names:
+        disp.get_user_input("No existing campaign files. Hit enter to start new campaign") 
+        return 
+    filename = get_user_to_pick_filename(file_names, disp)
+    return filename
+
+def get_user_to_pick_filename(file_names, disp):
+    disp.print_message("WARNING: do not load a file you got from the internet or any other file that isn't yours. This file type is not secure.")
+    message = "Which game would you like to load? Type just the number\n"
+    valid_inputs = []
+    file_names.sort()
+    for i, name in enumerate(file_names):
+        message+=f"{i}: {name}\n"
+        valid_inputs.append(str(i))
+    file_num = int(disp.get_user_input(message, valid_inputs))
+    return file_names[file_num]
+
+def main(num_players: int = 1, all_ai_mode=False):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
 
+    # set up and clear display
     disp = display.Display(all_ai_mode)
-    pyxel_manager = pyxel_backend.PyxelManager(shared_action_queue)
-    pyxel_manager.set_level_map_colors(
-        level.floor_color_map,
-        level.wall_color_map
-    )
     if not all_ai_mode:
         disp.clear_display()
+
     # if players want game help, display instructions
     provide_help_if_desired(disp, all_ai_mode)
-    disp.print_message(GAME_PLOT)
-    disp.get_user_input(prompt="Hit enter to continue")
-    disp.clear_display()
 
+    # make a campaign
+    campaign = Campaign(disp, num_players, all_ai_mode)
 
-    game = GameLoop(disp, num_players, all_ai_mode, pyxel_manager, level)
-    threading.Thread(target=game.start).start()
-    pyxel_view.start()
+    # offer to load a campaign
+    potential_campaign_filename = offer_to_load_campaign(disp)
+    # if there's a campaign to load, load it
+    if potential_campaign_filename:
+        campaign.load_campaign(potential_campaign_filename)
+    # otherwise, display the plot (since it's a new campaign)
+    else:
+        disp.print_message(GAME_PLOT)
+        disp.get_user_input(prompt="Hit enter to continue")
+        disp.clear_display()
+    campaign.start_campaign()
 
 
 def provide_help_if_desired(disp, all_ai_mode):
@@ -73,7 +79,6 @@ Good luck!"""
         disp.clear_display_and_print_message(help_message)
         disp.get_user_input(prompt="Hit enter to continue")
         disp.clear_display()
-
 
 if __name__ == "__main__":
     main()
