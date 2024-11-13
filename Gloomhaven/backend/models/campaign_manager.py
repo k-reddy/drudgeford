@@ -12,7 +12,8 @@ import backend.models.agent as agent
 from backend.utils.utilities import GameState
 import pickle
 from backend.utils.utilities import get_campaign_filenames
-
+from backend.utils.config import SAVE_FILE_DIR 
+import os
 
 @dataclass
 class CampaignState:
@@ -43,7 +44,7 @@ class Campaign:
 
     def load_campaign(self, filename):
         # get the data needed to recreate the campaign
-        with open(filename, 'rb') as f:
+        with open(SAVE_FILE_DIR+filename, 'rb') as f:
             campaign_state = pickle.load(f)
 
         # recreate it
@@ -67,6 +68,7 @@ class Campaign:
             self.initialized = True
         threading.Thread(target=self.run_levels).start()
         self.pyxel_view.start()
+
 
     def run_level(self, level: Level):
         self.current_level = level
@@ -174,11 +176,11 @@ class Campaign:
     def get_unused_filename(self):
         file_names = get_campaign_filenames()
         i=0
-        filename = f"game_{i}.pickle"
+        filename = f"campaign_{i}.pickle"
         while True:
             if filename in file_names:
                 i += 1
-                filename = f"game_{i}.pickle"
+                filename = f"campaign_{i}.pickle"
             else:
                 break
         return filename
@@ -193,8 +195,8 @@ class Campaign:
             all_ai_mode=self.all_ai_mode,
             id_gen_start=next(self.id_generator)
         )
-
         filename = self.get_unused_filename()
-        with open(filename, 'wb') as f:
+        os.makedirs(SAVE_FILE_DIR, exist_ok=True)
+        with open(SAVE_FILE_DIR+filename, 'wb') as f:
             pickle.dump(campaign_state, f)
         self.disp.get_user_input(f"Successfully saved {filename}. Hit enter to continue. ")
