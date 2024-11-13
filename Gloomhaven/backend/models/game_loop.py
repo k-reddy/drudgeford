@@ -20,14 +20,13 @@ class GameState(Enum):
 
 
 class GameLoop:
-    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager, level: Level):
-        self.id_generator = count(start=1)
+    def __init__(self, disp: Display, num_players: int, all_ai_mode: bool, pyxel_manager: PyxelManager, level: Level, id_generator, players):
+        self.id_generator = id_generator
         self.pyxel_manager = pyxel_manager
         self.level=level
         self.num_players = num_players
         self.disp = disp
         self.all_ai_mode = all_ai_mode
-        players = self.set_up_players()
         monsters = self.set_up_monsters()
         self.board = Board(10, monsters, players, disp, pyxel_manager, self.id_generator)
         self.game_state = GameState.START
@@ -219,37 +218,7 @@ Kill it or be killed..."""
         return message
 
 
-    def set_up_players(self):
-        players = []
-        emoji = ["🧙", "🕺", "🐣", "🐣"]
-        default_names = ["Happy", "Glad", "Jolly"]
-        char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard, ]
-        chars = []
-        # set up potential characters
-        for i, char_class in enumerate(char_classes):
-            player_agent = backend.models.agent.Ai() if self.all_ai_mode else backend.models.agent.Human()
-            chars.append(char_class("", self.disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
-        # get some user input before starting the game
-        
-        for i in range(self.num_players):
-            self.disp.print_message("It's time to pick characters. Here are your options:\n",True)
-            for j, char in enumerate(chars):
-                self.disp.print_message(f"{j}: {char.__class__.__name__}",False)
-                self.disp.print_message(f"{char.backstory}\n", False)
-            player_char_num = int(self.disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{k}" for k,_ in enumerate(chars)]))
-            player_name = (
-                self.disp.get_user_input(prompt=f"What's Player {i+1}'s character's name? ")
-                if not self.all_ai_mode
-                else ""
-            )
-            # default to happy :D
-            player_name = player_name if player_name != "" else default_names[i]
-            player_char = chars.pop(player_char_num)
-            player_char.name = player_name
-            players.append(player_char)
-        if not self.all_ai_mode:
-            self.disp.clear_display()
-        return players
+    
 
 
     def set_up_monsters(self):

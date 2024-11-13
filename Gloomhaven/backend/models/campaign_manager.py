@@ -1,4 +1,5 @@
 import threading
+from itertools import count
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
@@ -6,6 +7,7 @@ from backend.models.display import Display
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
 import backend.models.character as character
+import backend.models.agent as agent
 
 class Campaign:
     '''
@@ -19,9 +21,13 @@ class Campaign:
         self.disp = disp
         self.num_players = num_players_default
         self.all_ai_mode = all_ai_mode
+        self.id_generator = count(start=1)
+        self.available_chars = []
+        self.player_chars = []
 
     def start_campaign(self):
         self.set_num_players()
+        self.set_up_player_chars()
         threading.Thread(target=self.run_levels).start()
         self.pyxel_view.start()
 
@@ -36,7 +42,9 @@ class Campaign:
             self.num_players, 
             self.all_ai_mode, 
             self.pyxel_manager, 
-            self.current_level)
+            self.current_level,
+            self.id_generator,
+            self.player_chars)
         game.start()
     
     def run_levels(self):
@@ -62,3 +70,40 @@ class Campaign:
                     )
                 )
 
+    def select_player_character(self, player_num):
+        # don't get input for all ai mode
+        if self.all_ai_mode:
+            return self.available_chars.pop()
+        
+        self.disp.print_message(f"It's time to pick Player {player_num}'s character. Here are your options:\n",True)
+        # print the backstory for every available char
+        for i, char in enumerate(self.available_chars):
+            self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
+            self.disp.print_message(f"{char.backstory}\n", False)
+
+        # let user pick a character
+        player_char_num = int(self.disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{j}" for j,_ in enumerate(self.available_chars)]))
+        player_char = self.available_chars.pop(player_char_num)
+
+        # reset default name if player provides a name
+        player_name = self.disp.get_user_input(prompt="What's your character's name? ")
+        if player_name != "":
+            player_char.name = player_name
+
+        return player_char
+
+    def set_up_player_chars(self):
+        emoji = ["🧙", "🕺", "🐣", "🐣"]
+        default_names = ["Happy", "Glad", "Jolly", "Cheery"]
+        char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard]
+        
+        # set up characters players can choose from
+        for i, char_class in enumerate(char_classes):
+            player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
+            self.available_chars.append(char_class(default_names[i], self.disp, emoji[i], player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+        
+        for i in range(self.num_players):
+            self.player_chars.append(self.select_player_character(i))
+
+        if not self.all_ai_mode:
+            self.disp.clear_display()
