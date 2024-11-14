@@ -28,6 +28,7 @@ class ViewSection(abc.ABC):
         self.start_pos = start_pos
         self.bounding_coordinate = bounding_coordinate
         self.end_pos = self.bounding_coordinate
+        self.drawable = False
 
     def clear_bounds(self):
         """a function to clear the view's area before redrawing itself"""
@@ -56,7 +57,7 @@ class LogView(ViewSection):
 
     def draw(self) -> None:
         self.clear_bounds()
-        if not self.log and self.round_number <= 0:
+        if not self.drawable:
             return
 
         def get_line_height(text: str) -> int:
@@ -133,6 +134,8 @@ class MapView(ViewSection):
 
     def draw(self):
         self.clear_bounds()
+        if not self.drawable:
+            return
         self.draw_map_background()
         self.draw_map_grid()
         self.draw_sprites()
@@ -140,7 +143,6 @@ class MapView(ViewSection):
     def draw_map_background(self):
         # ensure we get the same floor tiles each time we draw the floor
         random.seed(100)
-
         for x, y in self.valid_map_coordinates:
             # get coordinates
             x_px = x * self.tile_width_px + self.start_pos[0]
@@ -181,7 +183,7 @@ class MapView(ViewSection):
             )
 
     def draw_map_grid(self) -> None:
-        # draw grid only on valid map coordinates
+        # draw grid only on valid map coordinates'
         for x, y in self.valid_map_coordinates:
             pyxel.rectb(
                 x * self.tile_width_px + self.start_pos[0],
@@ -238,7 +240,7 @@ class ActionCardView(ViewSection):
 
     def draw(self) -> None:
         self.clear_bounds()
-        if not self.action_card_log:
+        if not self.drawable:
             return
 
         self.draw_page_indicator(self.start_pos[1])
