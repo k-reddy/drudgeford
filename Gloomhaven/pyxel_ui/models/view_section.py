@@ -366,6 +366,24 @@ class InitiativeBarView(ViewSection):
                 )
 
 
+class SpriteView(ViewSection):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sprite_name = "wizard"
+        self.sprite_manager = SpriteManager()
+        self.drawable = True
+
+    def _draw(self) -> None:
+        draw_sprite(
+            0,
+            0,
+            self.sprite_manager.get_sprite(self.sprite_name, AnimationFrame.SOUTH),
+            colkey=0,
+            scale=4,
+        )
+
+
 def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
     pyxel.blt(
         x,
