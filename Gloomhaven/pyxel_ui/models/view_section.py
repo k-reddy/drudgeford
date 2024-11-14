@@ -373,11 +373,16 @@ class SpriteView(ViewSection):
         self.sprite_name = "wizard"
         self.sprite_manager = SpriteManager()
         self.drawable = True
+        self.sprite_width = BITS
+        self.sprite_x = (
+            self.bounding_coordinate[0] - self.start_pos[0]
+        ) / 2 - self.sprite_width
+        self.sprite_y = 100
 
     def _draw(self) -> None:
         draw_sprite(
-            0,
-            0,
+            self.sprite_x,
+            self.sprite_y,
             self.sprite_manager.get_sprite(self.sprite_name, AnimationFrame.SOUTH),
             colkey=0,
             scale=4,
