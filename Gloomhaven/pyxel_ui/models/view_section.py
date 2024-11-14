@@ -40,8 +40,15 @@ class ViewSection(abc.ABC):
             0,
         )
 
+    def draw(self) -> None:
+        self.clear_bounds()
+        if not self.drawable:
+            return
+
+        self._draw()
+
     @abc.abstractmethod
-    def draw(self):
+    def _draw(self):
         pass
 
 
@@ -55,11 +62,7 @@ class LogView(ViewSection):
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
 
-    def draw(self) -> None:
-        self.clear_bounds()
-        if not self.drawable:
-            return
-
+    def _draw(self) -> None:
         def get_line_height(text: str) -> int:
             return (
                 self.font.get_text_height(
@@ -132,10 +135,7 @@ class MapView(ViewSection):
         self.floor_color_map = floor_color_map
         self.wall_color_map = wall_color_map
 
-    def draw(self):
-        self.clear_bounds()
-        if not self.drawable:
-            return
+    def _draw(self):
         self.draw_map_background()
         self.draw_map_grid()
         self.draw_sprites()
@@ -238,11 +238,7 @@ class ActionCardView(ViewSection):
         self.current_card_page = 0
         self.cards_per_page = 3
 
-    def draw(self) -> None:
-        self.clear_bounds()
-        if not self.drawable:
-            return
-
+    def _draw(self) -> None:
         self.draw_page_indicator(self.start_pos[1])
 
         # Draw action cards
@@ -297,7 +293,7 @@ class InitiativeBarView(ViewSection):
         self.vertical_gap = BITS  # Gap between rows
         self.sprite_manager = SpriteManager()
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         """
         Draw a bar showing health and initiative for sprites, with team indicators.
 
@@ -306,8 +302,6 @@ class InitiativeBarView(ViewSection):
             healths: List of health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
-        self.clear_bounds()
-
         # Calculate maximum items per row based on screen width
         item_width = self.sprite_width + self.horiz_gap
         # Leave some margin on both sides
