@@ -114,14 +114,16 @@ class Board:
         # pick a random shape for our element
         shape_to_draw = random.choice(potential_shapes)
         max_loc = self.size - 1
-        # try to start the shape on a random square
+        # start the shape on a random square
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
-            # if we successfully find an unoccupied square, draw the rest of the shape
-            if self.add_starting_effect_if_valid_square(row, col, effect_type):
-                for offset in shape_to_draw:
-                    self.add_starting_effect_if_valid_square(row+offset[0], col+offset[1],effect_type)
+            drew_anything = False
+            # draw what you can
+            for offset in shape_to_draw:
+                if self.add_starting_effect_if_valid_square(row+offset[0], col+offset[1],effect_type):
+                    drew_anything = True
+            if drew_anything: 
                 return
 
     def add_starting_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
