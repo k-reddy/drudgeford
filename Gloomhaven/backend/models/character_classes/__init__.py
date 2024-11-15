@@ -11,3 +11,6 @@ from . import mobile_striker
 from . import demon
 from . import fiend
 from . import firesprite
+from . import snow_stalker
+from . import ice_dragon
+from . import ice_monster
