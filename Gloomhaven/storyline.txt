@@ -32,12 +32,12 @@ Inferno:
 - fire sprites x mobile striker
 
 Orchestrator:
-- faces drama x
+- faces drama x trap specialist
 - black joker 
 
 Tundra:
 - dragon x 
-- ice monster x trap specialist
+- ice monster x 
 - icy ghost x
 
 necromancer 
