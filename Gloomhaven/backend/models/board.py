@@ -10,6 +10,7 @@ from backend.models.display import Display
 from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
+from backend.utils import attack_shapes as shapes
 
 
 MAX_ROUNDS = 1000
@@ -51,7 +52,7 @@ class Board:
         self.reshape_board()
         self.set_character_starting_locations()
         for element in starting_elements:
-            self.add_starting_effect_to_terrain(element, random.choice([True, False]), 1000, random.randint(0, 10))
+            self.add_starting_effect_to_terrain(element,1000,)
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
 
@@ -101,21 +102,26 @@ class Board:
         ]
 
     def add_starting_effect_to_terrain(
-        self, effect_type: Type[obstacle.TerrainObject], is_contiguous: bool, num_tries: int, target_num: int
+        self, effect_type: Type[obstacle.TerrainObject], num_tries: int
     ) -> None:
+        potential_shapes = [
+            shapes.circle(1), 
+            shapes.line((1,0),random.randint(1,3)),
+            shapes.line((0,1),random.randint(1,3)),
+            shapes.arc(random.randint(2,3)),
+            shapes.cone(2),
+            shapes.ring(random.randint(2,3))]
+        # pick a random shape for our element
+        shape_to_draw = random.choice(potential_shapes)
         max_loc = self.size - 1
-        counter = 0
+        # try to start the shape on a random square
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
-            # don't put fire on characters or map edge
+            # if we successfully find an unoccupied square, draw the rest of the shape
             if self.add_starting_effect_if_valid_square(row, col, effect_type):
-                counter += 1
-            if is_contiguous:
-                for i in [-1, 0, 1]:
-                    if self.add_starting_effect_if_valid_square(row + i, col, effect_type):
-                        counter += 1
-            if counter >= target_num:
+                for offset in shape_to_draw:
+                    self.add_starting_effect_if_valid_square(row+offset[0], col+offset[1],effect_type)
                 return
 
     def add_starting_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
