@@ -246,7 +246,7 @@ class FireSprite(Character):
 class IceMonster(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
-        self.pyxel_sprite_name = "firesprite"
+        self.pyxel_sprite_name = "icemonster"
         self.health = character_classes.ice_monster.health
 
 
@@ -256,7 +256,7 @@ class IceMonster(Character):
 class SnowStalker(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
-        self.pyxel_sprite_name = "firesprite"
+        self.pyxel_sprite_name = "snowstalker"
         self.health = character_classes.snow_stalker.health
 
 
@@ -266,7 +266,7 @@ class SnowStalker(Character):
 class IceDragon(Character):
     def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
         super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
-        self.pyxel_sprite_name = "firesprite"
+        self.pyxel_sprite_name = "icedragon"
         self.health = character_classes.ice_dragon.health
 
     def create_action_cards(self):
