@@ -98,6 +98,15 @@ class SpriteManager:
             "shadow": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=64, v=0, w=32, h=32),
             },
+            "icemonster": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=160, v=0, w=32, h=32),
+            },
+            "icedragon": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=128, v=32, w=32, h=32),
+            },
+            "snowstalker": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=160, v=32, w=32, h=32),
+            },
             
         }
 
