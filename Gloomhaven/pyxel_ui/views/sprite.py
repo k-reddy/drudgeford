@@ -107,6 +107,21 @@ class SpriteManager:
             "snowstalker": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=160, v=32, w=32, h=32),
             },
+            "orchestratorgolem": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=0, v=192, w=32, h=32),
+            },
+            "ghost": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=0, v=224, w=32, h=32),
+            },
+            "fleshgolem": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=192, w=32, h=32),
+            },
+            "wailingspirit": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=160, w=32, h=32),
+            },
+            "bloodooze": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=224, w=32, h=32),
+            },
             
         }
 
