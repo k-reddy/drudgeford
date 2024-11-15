@@ -29,7 +29,8 @@ class Board:
         players: list[character.Character],
         disp: Display,
         pyxel_manager: pyxel_backend.PyxelManager,
-        id_generator: count
+        id_generator: count,
+        starting_elements: list[obstacle.TerrainObject]
     ) -> None:
         self.round_num = 0
         self.size = size
@@ -49,11 +50,8 @@ class Board:
         self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain(obstacle.Fire, False, 1000, random.randint(0, 10))
-        self.add_starting_effect_to_terrain(obstacle.Ice, True, 1000, random.randint(0, 5))
-        self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
-        # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
+        for element in starting_elements:
+            self.add_starting_effect_to_terrain(element, random.choice([True, False]), 1000, random.randint(0, 10))
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
 
