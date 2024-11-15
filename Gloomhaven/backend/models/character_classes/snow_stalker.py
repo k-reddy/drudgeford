@@ -19,7 +19,7 @@ cards = [
         attack_name="Warming Fire",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
+                shape=shapes.circle(1),
                 element_type=obstacle.Fire
             ),
             actions.HealAllAllies(2, 2)
