@@ -101,16 +101,15 @@ class ViewManager:
         self.action_card_view.draw()
 
     def update_map(
-            self, 
-            valid_floor_coordinates: list[tuple[int, int]], 
-            floor_color_map=[],
-            wall_color_map=[]
-            ) -> None:
+        self, 
+        valid_floor_coordinates: list[tuple[int, int]], 
+        floor_color_map=[],
+        wall_color_map=[]
+    ) -> None:
         if valid_floor_coordinates:
             self.map_view.drawable = True
         else:
             self.map_view.drawable = False
-            
         if floor_color_map:
             self.map_view.floor_color_map = floor_color_map
         if wall_color_map:

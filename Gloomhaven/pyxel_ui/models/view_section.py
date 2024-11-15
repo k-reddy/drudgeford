@@ -30,7 +30,7 @@ class ViewSection(abc.ABC):
         self.end_pos = self.bounding_coordinate
         self.drawable = False
 
-    def clear_bounds(self):
+    def clear_bounds(self) -> None:
         """a function to clear the view's area before redrawing itself"""
         pyxel.rect(
             self.start_pos[0],
@@ -39,6 +39,9 @@ class ViewSection(abc.ABC):
             self.end_pos[1] - self.start_pos[1],
             0,
         )
+
+    def redraw(self) -> None:
+        self.draw()
 
     @abc.abstractmethod
     def draw(self):
@@ -49,13 +52,36 @@ class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.log: list[str] = []
+        self._log: list[str] = []
+        self.is_log_changed = False
         self.round_number: int = 0
         self.acting_character_name: str = ""
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
+        self.text_pixels: list[tuple[int, int]] = None
+
+    @property
+    def log(self):
+        return self._log
+
+    @log.setter
+    def log(self, new_log: list[str]):
+        """Prevents unnecessary redraws by rejecting log updates when content has not changed"""
+        if new_log != self._log:
+            self._log = new_log
+            self.is_log_changed = True
+
+    def redraw(self) -> None:
+        self.clear_bounds()
+        if not self.log and self.round_number <= 0:
+            return
+        self.font.redraw_text(7, self.text_pixels)
 
     def draw(self) -> None:
+        if not self.is_log_changed:
+            return
+
+        self.text_pixels = []
         self.clear_bounds()
         if not self.drawable:
             return
@@ -71,13 +97,15 @@ class LogView(ViewSection):
             )
 
         def draw_line(text: str, y_pos: int, size: str = "medium") -> int:
-            self.font.draw_text(
-                self.start_pos[0],
-                y_pos,
-                text,
-                col=7,
-                size=size,
-                max_width=self.bounding_coordinate[0] - self.start_pos[0],
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    self.start_pos[0],
+                    y_pos,
+                    text,
+                    col=7,
+                    size=size,
+                    max_width=self.bounding_coordinate[0] - self.start_pos[0],
+                )
             )
             return y_pos + get_line_height(text)
 
@@ -106,8 +134,7 @@ class LogView(ViewSection):
         for line in lines:
             current_y = draw_line(line, current_y)
 
-        # Why are we re-sizing the log view port?
-        # self.end_pos = (self.bounding_coordinate[0], current_y)
+        self.is_log_changed = False
 
 
 class MapView(ViewSection):
@@ -237,8 +264,17 @@ class ActionCardView(ViewSection):
         self.action_card_log: list[str] = []
         self.current_card_page = 0
         self.cards_per_page = 3
+        self.text_pixels: list[tuple[int, int]] = None
+
+    def redraw(self) -> None:
+        self.clear_bounds()
+        if not self.action_card_log:
+            return
+        self.font.redraw_text(7, self.text_pixels)
 
     def draw(self) -> None:
+        print("action card draw")
+        self.text_pixels = []
         self.clear_bounds()
         if not self.drawable:
             return
@@ -260,7 +296,11 @@ class ActionCardView(ViewSection):
         ) // self.cards_per_page
         # Draw only the current page of cards
         for card in self.action_card_log[start_idx:end_idx]:
-            self.font.draw_text(x, y, card, col=7, size="medium", max_width=card_width)
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    x, y, card, col=7, size="medium", max_width=card_width
+                )
+            )
             x += card_width + card_border
 
         # !!! should change this to measure the height of the cards and page indicator
@@ -392,5 +432,8 @@ def draw_grid(
     px_width: int,
     px_height: int,
     color: int = 3,
+    dither: float = 0.4,
 ) -> None:
+    pyxel.dither(dither)
     pyxel.rect(px_x, px_y, px_width, px_height, color)
+    pyxel.dither(1)
