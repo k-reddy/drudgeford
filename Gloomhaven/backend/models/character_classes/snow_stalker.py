@@ -58,8 +58,9 @@ cards = [
         jump=False
     ),
     actions.ActionCard(
-        attack_name="Lure",
+        attack_name="Shadow Attack",
         actions=[
+            actions.ElementAreaEffectFromSelf(shapes.circle(2),obstacle.Shadow),
             actions.Pull(2, 3),
             actions.SingleTargetAttack(3, 1)
         ],
