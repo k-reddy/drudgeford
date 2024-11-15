@@ -82,6 +82,8 @@ class PixelFont:
         return lines
 
     def redraw_text(self, col, text_pixels) -> None:
+        if not text_pixels:
+            return
         for px_x, px_y in text_pixels:
             self.pyxel.pset(px_x, px_y, col)
 
