@@ -30,7 +30,7 @@ class GameLoop:
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
-            10, monsters, players, disp, pyxel_manager, self.id_generator
+            10, monsters, players, disp, pyxel_manager, self.id_generator, level.starting_elements
         )
         self.game_state = GameState.START
 
