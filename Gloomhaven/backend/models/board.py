@@ -51,8 +51,15 @@ class Board:
         self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
+
+        self.potential_shapes = [
+            shapes.line((1,0),random.randint(2,3)),
+            shapes.line((0,1),random.randint(2,3)),
+            shapes.arc(random.randint(2,3)),
+            shapes.cone(random.randint(1,2)),
+            shapes.ring(random.randint(2,3))]
         for element in starting_elements:
-            self.add_starting_effect_to_terrain(element,1000,)
+            self.add_starting_effect_to_terrain(element,1000)
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
 
@@ -104,28 +111,30 @@ class Board:
     def add_starting_effect_to_terrain(
         self, effect_type: Type[obstacle.TerrainObject], num_tries: int
     ) -> None:
-        potential_shapes = [
-            shapes.circle(1), 
-            shapes.line((1,0),random.randint(1,3)),
-            shapes.line((0,1),random.randint(1,3)),
-            shapes.arc(random.randint(2,3)),
-            shapes.cone(2),
-            shapes.ring(random.randint(2,3))]
-        # pick a random shape for our element
-        shape_to_draw = random.choice(potential_shapes)
+        # pick a random shape for our element, and use each one only once
+        shape_offsets = random.choice(self.potential_shapes)
+        self.potential_shapes.remove(shape_offsets)
         max_loc = self.size - 1
-        # start the shape on a random square
+        # try to start the shape on a random square
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
-            drew_anything = False
-            # draw what you can
-            for offset in shape_to_draw:
-                if self.add_starting_effect_if_valid_square(row+offset[0], col+offset[1],effect_type):
-                    drew_anything = True
-            if drew_anything: 
-                return
-
+            # if we can't draw our whole shape, try again
+            if not self.whole_shape_unoccupied(row, col, shape_offsets):
+                continue
+            # otherwise, draw!
+            for offset in shape_offsets:
+                self.add_starting_effect_if_valid_square(row+offset[0], col+offset[1],effect_type)
+            return
+    def whole_shape_unoccupied(self, row, col, shape_offsets):
+        shape_coords = [(row+offset[0], col+offset[1]) for offset in shape_offsets]
+        for coord in shape_coords:
+            if coord[0] >= self.size or coord[1] >= self.size:
+                return False
+            if self.locations[coord[0]][coord[1]] is not None:
+                return False
+        return True
+    
     def add_starting_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
         if row >= self.size or col >= self.size:
             return False
