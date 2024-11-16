@@ -298,3 +298,30 @@ class WailingSpirit(Character):
     def create_action_cards(self):
         return character_classes.wailing_spirit.cards
 
+class FleshGolem(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "fleshgolem"
+        self.health = character_classes.fleshgolem.health
+
+    def create_action_cards(self):
+        return character_classes.fleshgolem.cards
+    
+class BloodOoze(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "bloodooze"
+        self.health = character_classes.bloodooze.health
+
+    def create_action_cards(self):
+        return character_classes.bloodooze.cards
+    
+class MalformedFlesh(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "evilblob"
+        self.health = character_classes.malformed.health
+
+    def create_action_cards(self):
+        return character_classes.malformed.cards
+
