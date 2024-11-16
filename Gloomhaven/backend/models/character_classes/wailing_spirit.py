@@ -4,11 +4,11 @@ from backend.models import obstacle
 
 cards = [
     actions.ActionCard(
-        attack_name="Firey Tears",
+        attack_name="Cold Tears",
         actions=[
             actions.ElementAreaEffectWithTarget(
                 shape=shapes.ring(1),
-                element_type=obstacle.Fire,
+                element_type=obstacle.Ice,
                 att_range=3
             ),
             actions.CurseAllEnemies(3)
