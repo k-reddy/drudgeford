@@ -7,7 +7,8 @@ cards = [
     actions.ActionCard(
         attack_name="Pull Strings",
         actions=[
-            actions.SummonPuppet()
+            actions.SummonPuppet(),
+            actions.WeakenAllEnemies(1,2)
         ],
         movement=0,
         jump=False
@@ -48,7 +49,8 @@ cards = [
                 shape=shapes.circle(2),
                 element_type=obstacle.Shadow
             ),
-            actions.WeakenAllEnemies(2,2)
+            actions.WeakenAllEnemies(2,2),
+            actions.HealAllAllies(3,3)
         ],
         movement=3,
         jump=True
