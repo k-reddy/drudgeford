@@ -43,7 +43,7 @@ campaign_levels=[
         floor_color_map=[],
         wall_color_map=[],
         monster_classes=[character.Ghost, character.WailingSpirit, character.Corpse, character.Skeleton],
-        pre_level_text=textwrap.fill('''''',
+        pre_level_text=textwrap.fill('''Your last enemy crashes to the frozen earth with a thunderous impact that splinters the ice beneath. But as the snow settles, the ground continues to crack and decay, the pristine white turning to rotting soil. The crisp winter air grows thick with the stench of decay, and through the mist rising from freshly disturbed graves, you see hands prying their way out of the earth. Horrors beyond your darkest nightmares emerge from the shadows - translucent spirits wailing in eternal agony, ethereal wraiths drifting between tombstones, and things for which you have no name. The sheer number and intensity of these abominations makes one thing clear: whatever force has been testing you is now desperate to ensure you don't survive this nightmare.''',
         TEXT_WIDTH),
         starting_elements=[obstacle.Shadow, obstacle.Trap, obstacle.Shadow]
     ),
