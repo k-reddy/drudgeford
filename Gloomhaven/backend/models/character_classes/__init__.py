@@ -18,3 +18,6 @@ from . import skeleton
 from . import ghost
 from . import wailing_spirit
 from . import corpse
+from . import fleshgolem
+from . import malformed
+from . import bloodooze
