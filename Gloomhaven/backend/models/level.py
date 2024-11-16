@@ -31,12 +31,20 @@ campaign_levels=[
     #     TEXT_WIDTH),
     #     starting_elements=[obstacle.Fire, obstacle.Trap, obstacle.Shadow]
     #     ),
+    # Level(
+    #     floor_color_map=[(1,6), (5,7)],
+    #     wall_color_map=[(13,12)],
+    #     monster_classes=[character.IceDragon, character.SnowStalker, character.IceMonster],
+    #     pre_level_text=textwrap.fill('''As the last demon falls, the infernal heat suddenly crystallizes into deadly cold. Your victory over the demons is cut short by a sinister laugh echoing through your mind and the realization that your journey is not taking you homeward. You crash onto a vast tundra, where howling winds whip endless sheets of snow and ice in every direction. Through the blinding white, you glimpse an ancient dragon's massive form circling overhead, its scales gleaming like shards of frozen starlight. You know instantly that this battle will be harder than all that came before.''',
+    #     TEXT_WIDTH),
+    #     starting_elements=[obstacle.Ice, obstacle.Trap]
+    # ),
     Level(
-        floor_color_map=[(1,6), (5,7)],
-        wall_color_map=[(13,12)],
-        monster_classes=[character.IceDragon, character.SnowStalker, character.IceMonster],
-        pre_level_text=textwrap.fill('''As the last demon falls, the infernal heat suddenly crystallizes into deadly cold. Your victory over the demons is cut short by a sinister laugh echoing through your mind and the realization that your journey is not taking you homeward. You crash onto a vast tundra, where howling winds whip endless sheets of snow and ice in every direction. Through the blinding white, you glimpse an ancient dragon's massive form circling overhead, its scales gleaming like shards of frozen starlight. You know instantly that this battle will be harder than all that came before.''',
+        floor_color_map=[],
+        wall_color_map=[],
+        monster_classes=[character.Ghost, character.WailingSpirit, character.Corpse, character.Skeleton],
+        pre_level_text=textwrap.fill('''''',
         TEXT_WIDTH),
-        starting_elements=[obstacle.Ice, obstacle.Trap]
+        starting_elements=[obstacle.Shadow, obstacle.Trap, obstacle.Shadow]
     ),
 ]

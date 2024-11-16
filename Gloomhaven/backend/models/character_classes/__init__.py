@@ -14,3 +14,7 @@ from . import firesprite
 from . import snow_stalker
 from . import ice_dragon
 from . import ice_monster
+from . import skeleton
+from . import ghost
+from . import wailing_spirit
+from . import corpse
