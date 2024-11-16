@@ -13,4 +13,4 @@ def round_down_to_nearest_multiple(value: int, multiple: int, offset: int) -> in
         round_down_to_nearest_multiple(37, 10) -> 30
         round_down_to_nearest_multiple(25, 7) -> 21
     """
-    return value // multiple * multiple + offset
+    return (value - offset) // multiple * multiple + offset
