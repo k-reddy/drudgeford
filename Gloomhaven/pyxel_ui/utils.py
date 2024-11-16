@@ -5,7 +5,7 @@ def draw_tile(x, y, img_bank, u, v, w, h, colkey=0):
     pyxel.blt(x, y, img_bank, u, v, w, h, colkey)
 
 
-def round_down_to_nearest_multiple(value: int, multiple: int) -> int:
+def round_down_to_nearest_multiple(value: int, multiple: int, offset: int) -> int:
     """
     Rounds down the given value to the nearest multiple of `multiple`.
 
@@ -13,4 +13,4 @@ def round_down_to_nearest_multiple(value: int, multiple: int) -> int:
         round_down_to_nearest_multiple(37, 10) -> 30
         round_down_to_nearest_multiple(25, 7) -> 21
     """
-    return value // multiple * multiple
+    return value // multiple * multiple + offset
