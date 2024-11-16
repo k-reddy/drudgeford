@@ -1,42 +1,60 @@
-# 1. Reality Warp
+from backend.models import action_model as actions
+from backend.utils import attack_shapes as shapes
+from backend.models import obstacle
 
-# Pull all enemies AND allies in range 4 toward you by 2 spaces
-# Apply Strengthen to all allies pulled
-# Move 0
-# Space bends and warps around the Orchestrator, drawing all beings toward their nexus of power
+# The Orchestrator - Reality-bending puppet master boss
+cards = [
+    actions.ActionCard(
+        attack_name="Pull Strings",
+        actions=[
+            actions.SummonPuppet(),
+            actions.WeakenAllEnemies(1,2)
+        ],
+        movement=0,
+        jump=False
+    ),
+    actions.ActionCard(
+        attack_name="Reality Warp",
+        actions=[
+            actions.ElementAreaEffectFromSelf(
+                shape=shapes.cone(3),
+                element_type=obstacle.Shadow
+            ),
+            actions.Teleport(3),
+            actions.Teleport(3),
+            actions.Teleport(3)
 
-# 2. Echo of Creation
+        ],
+        movement=3,
+        jump=True
+    ),
+    actions.ActionCard(
+        attack_name="Nightmare Web",
+        actions=[
+            actions.MakeObstableArea(
+                obstacle_type=obstacle.Trap,
+                shape=shapes.ring(2)
+            ),
+            actions.Pull(2,3),
+            actions.PushAllEnemies(2,3),
+            actions.CurseAllEnemies(3)
+        ],
+        movement=2,
+        jump=True
+    ),
+    actions.ActionCard(
+        attack_name="Dance of Darkness",
+        actions=[
+            actions.ElementAreaEffectFromSelf(
+                shape=shapes.circle(2),
+                element_type=obstacle.Shadow
+            ),
+            actions.WeakenAllEnemies(2,2),
+            actions.HealAllAllies(3,3)
+        ],
+        movement=3,
+        jump=True
+    ),
+]
 
-# Summon 2 Orchestrator Golems in any spaces within range 3
-# Bless all summoned Golems
-# Move 1
-# The Orchestrator splits reality, creating mirror images of their perfect form
-
-# 3. Chaos Spiral
-
-# Push all enemies in range 3 in different random directions by 2 spaces
-# Apply Curse to any enemy that collides with another unit
-# Move 0
-# Reality fragments, sending enemies tumbling through dimensional rifts
-
-# 4. Dimensional Barrier
-
-# Create 3 impassable barriers in any spaces within range 4
-# Duration: 2 turns
-# Move 2
-# Tears in space-time manifest as impenetrable walls
-
-# 5. Convergence of Power
-
-# Heal all allies in range 4 for 2
-# If any ally is at full health, give them Shield 1 instead
-# Move 1
-# The Orchestrator draws power from parallel dimensions to strengthen their forces
-
-# 6. Time Recursion
-
-# Resurrect all defeated Orchestrator Golems at half health
-# Place them anywhere within range 3
-# Apply Curse to all enemies in range 3
-# Move 0
-# Time folds back on itself as fallen allies are pulled from moments before their defeat
+health = 15

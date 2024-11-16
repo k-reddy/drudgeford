@@ -59,6 +59,7 @@ class Ai(Agent):
         shortest_dist = 1000
         nearest_opponent = None
         attacker_location = board.find_location_of_target(char)
+        # pick the closest opponent
         for opponent in in_range_opponents:
             opponent_location = board.find_location_of_target(opponent)
             opponent_dist = len(board.get_shortest_valid_path(attacker_location, opponent_location))

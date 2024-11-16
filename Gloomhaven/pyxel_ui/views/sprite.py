@@ -98,6 +98,33 @@ class SpriteManager:
             "shadow": {
                 AnimationFrame.SOUTH: Sprite(img_bank=2, u=64, v=0, w=32, h=32),
             },
+            "icemonster": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=160, v=0, w=32, h=32),
+            },
+            "icedragon": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=128, v=32, w=32, h=32),
+            },
+            "snowstalker": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=160, v=32, w=32, h=32),
+            },
+            "orchestratorgolem": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=0, v=192, w=32, h=32),
+            },
+            "ghost": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=0, v=224, w=32, h=32),
+            },
+            "fleshgolem": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=192, w=32, h=32),
+            },
+            "wailingspirit": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=160, w=32, h=32),
+            },
+            "bloodooze": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=224, w=32, h=32),
+            },
+            "orchestrator": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=192, v=0, w=32, h=32),
+            },
             
         }
 

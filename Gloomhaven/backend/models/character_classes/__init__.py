@@ -11,3 +11,15 @@ from . import mobile_striker
 from . import demon
 from . import fiend
 from . import firesprite
+from . import snow_stalker
+from . import ice_dragon
+from . import ice_monster
+from . import skeleton
+from . import ghost
+from . import wailing_spirit
+from . import corpse
+from . import fleshgolem
+from . import malformed
+from . import bloodooze
+from . import puppet
+from . import orchestrator
