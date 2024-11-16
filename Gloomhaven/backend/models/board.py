@@ -602,10 +602,10 @@ class Board:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
-    def add_new_skeleton(self, is_monster):
+    def add_new_ai_char(self, is_monster, char_class: Type[Character]):
         from backend.models.agent import Ai
-        new_char = character.Skeleton(
-            "Spooky Skeleton", 
+        new_char = char_class(
+            f"Spooky {char_class.__name__}", 
             self.disp, 
             "💀",
             Ai(), 

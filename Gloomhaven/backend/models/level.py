@@ -47,12 +47,21 @@ campaign_levels=[
     #     TEXT_WIDTH),
     #     starting_elements=[obstacle.Shadow, obstacle.Trap, obstacle.Shadow]
     # ),
+    # Level(
+    #     floor_color_map=[(1,8), (5,14)],
+    #     wall_color_map=[(1,2), (13,8)],
+    #     monster_classes=[character.MalformedFlesh, character.FleshGolem, character.BloodOoze],
+    #     pre_level_text=textwrap.fill('''Your victory over the undead hordes is cut short as the mist-shrouded graveyard begins to pulse with an unnatural rhythm. Through the fog, you finally glimpse the hooded figure again - but this time they're stumbling backward, their confident posture replaced with panic. "No... impossible... you weren't supposed to make it this far!" they shriek before dissolving into shadow. The ground beneath you softens sickeningly, transforming from packed earth into something warm and organic. You find yourself in a grotesque chamber of living tissue, where half-formed creatures writhe in pools of viscous crimson, and monstrous flesh-golems lumber through pulsing tunnels of raw meat and sinew. The wet, rhythmic sounds of this place make your skin crawl as you realize you're trapped inside something impossibly vast and alive - but you're close now, so close to ending this nightmare.''',
+    #     TEXT_WIDTH),
+    #     starting_elements=[]
+    # ),
     Level(
-        floor_color_map=[(1,8), (5,14)],
-        wall_color_map=[(1,2), (13,8)],
-        monster_classes=[character.MalformedFlesh, character.FleshGolem, character.BloodOoze],
-        pre_level_text=textwrap.fill('''Your victory over the undead hordes is cut short as the mist-shrouded graveyard begins to pulse with an unnatural rhythm. Through the fog, you finally glimpse the hooded figure again - but this time they're stumbling backward, their confident posture replaced with panic. "No... impossible... you weren't supposed to make it this far!" they shriek before dissolving into shadow. The ground beneath you softens sickeningly, transforming from packed earth into something warm and organic. You find yourself in a grotesque chamber of living tissue, where half-formed creatures writhe in pools of viscous crimson, and monstrous flesh-golems lumber through pulsing tunnels of raw meat and sinew. The wet, rhythmic sounds of this place make your skin crawl as you realize you're trapped inside something impossibly vast and alive - but you're close now, so close to ending this nightmare.''',
+        floor_color_map=[(5,13),(1,5)],
+        wall_color_map=[],
+        monster_classes=[character.Puppet, character.Puppet, character.Orchestrator],
+        pre_level_text=textwrap.fill('''As the flesh-chamber convulses one final time, reality tears itself apart and then snaps back into focus. You find yourself standing in Drudgeford once again - but not as you remember it. The village square stretches before you, warped by unnatural shadows, and at its center stands the one you've been pursuing: the Orchestrator. Their hood falls back revealing a face that's both ancient and impossibly young, twisted by the dark forces they command. "You've survived every nightmare I could conjure," they snarl, dark energy crackling between their fingers. "But here, where it all began, I'll show you my true power." The fate of your home hangs in the balance as you ready yourself for the final battle, knowing that either your village will see another dawn - or be lost forever to the Orchestrator's darkness.''',
         TEXT_WIDTH),
         starting_elements=[]
     ),
 ]
+

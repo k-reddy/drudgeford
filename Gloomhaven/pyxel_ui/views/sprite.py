@@ -122,6 +122,9 @@ class SpriteManager:
             "bloodooze": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=32, v=224, w=32, h=32),
             },
+            "orchestrator": {
+                AnimationFrame.SOUTH: Sprite(img_bank=1, u=192, v=0, w=32, h=32),
+            },
             
         }
 

@@ -21,3 +21,5 @@ from . import corpse
 from . import fleshgolem
 from . import malformed
 from . import bloodooze
+from . import puppet
+from . import orchestrator
