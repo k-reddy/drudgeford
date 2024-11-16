@@ -158,3 +158,14 @@ class ViewManager:
         self.map_view.draw()
         self.log_view.draw()
         self.action_card_view.draw()
+
+    def is_pyxel_in_valid_map_area(self, px_x, px_y):
+        # get rid of offsets
+        px_x -= self.map_view.start_pos[0]
+        px_y -= self.map_view.start_pos[1]
+        # figure out the tile number (not px)
+        x_num = px_x/self.map_view.tile_width_px
+        y_num = px_y/self.map_view.tile_height_px
+        if (x_num, y_num) in self.map_view.valid_map_coordinates:
+            return True
+        return False
