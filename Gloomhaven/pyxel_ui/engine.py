@@ -14,6 +14,7 @@ from .models.tasks import ActionTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
+from pyxel_ui.models.view_section import MapView
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -96,14 +97,19 @@ class PyxelEngine:
 
             # Grid concerns
             grid_left_px = round_down_to_nearest_multiple(
-                curr_mouse_x, MAP_TILE_WIDTH_PX
+                curr_mouse_x, MAP_TILE_WIDTH_PX, self.view_manager.view_border
             )
             grid_top_px = round_down_to_nearest_multiple(
-                curr_mouse_y, MAP_TILE_HEIGHT_PX
+                curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.view_border
             )
-            self.view_manager.draw_grid(
-                grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
+            current_view = self.view_manager.get_view_for_coordinate_px(
+                curr_mouse_x, curr_mouse_y
             )
+            # draw the grid only if it's on mapview
+            if isinstance(current_view, MapView) and self.view_manager.is_pyxel_in_valid_map_area(grid_left_px, grid_top_px):
+                self.view_manager.draw_grid(
+                    grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
+                )
 
             self.last_mouse_pos = (curr_mouse_x, curr_mouse_y)
 
