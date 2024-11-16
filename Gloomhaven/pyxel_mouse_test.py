@@ -25,6 +25,7 @@ def main(num_players: int = 1, all_ai_mode=False):
             wall_color_map=[(1, 4), (13, 15)],
             monster_classes=[character.Treeman, character.MushroomMan, character.Fairy],
             pre_level_text="You decide to start off by exploring the nearby forest and quickly encounter some hostile enemies.",
+            starting_elements=[],
         )
     ]
 

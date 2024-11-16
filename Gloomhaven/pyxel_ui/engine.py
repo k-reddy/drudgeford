@@ -101,9 +101,6 @@ class PyxelEngine:
             grid_top_px = round_down_to_nearest_multiple(
                 curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.view_border
             )
-            current_view = self.view_manager.get_view_for_coordinate_px(
-                curr_mouse_x, curr_mouse_y
-            )
             # draw the grid only if it's on mapview
             if self.view_manager.is_pyxel_in_valid_map_area(grid_left_px, grid_top_px):
                 self.view_manager.draw_grid(
