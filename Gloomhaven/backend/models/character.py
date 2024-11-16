@@ -324,4 +324,22 @@ class MalformedFlesh(Character):
 
     def create_action_cards(self):
         return character_classes.malformed.cards
+    
+class Orchestrator(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "orchestrator"
+        self.health = character_classes.orchestrator.health
+
+    def create_action_cards(self):
+        return character_classes.malformed.cards
+    
+class Puppet(Character):
+    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+        super().__init__(name, disp, emoji, agent, char_id, is_monster, log)
+        self.pyxel_sprite_name = "orchestratorgolem"
+        self.health = character_classes.puppet.health
+
+    def create_action_cards(self):
+        return character_classes.puppet.cards
 
