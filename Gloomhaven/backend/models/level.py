@@ -56,12 +56,12 @@ campaign_levels=[
     #     starting_elements=[]
     # ),
     Level(
-        floor_color_map=[(5,13),(1,5)],
+        floor_color_map=[(5,13),],
         wall_color_map=[],
         monster_classes=[character.Puppet, character.Puppet, character.Orchestrator],
         pre_level_text=textwrap.fill('''As the flesh-chamber convulses one final time, reality tears itself apart and then snaps back into focus. You find yourself standing in Drudgeford once again - but not as you remember it. The village square stretches before you, warped by unnatural shadows, and at its center stands the one you've been pursuing: the Orchestrator. Their hood falls back revealing a face that's both ancient and impossibly young, twisted by the dark forces they command. "You've survived every nightmare I could conjure," they snarl, dark energy crackling between their fingers. "But here, where it all began, I'll show you my true power." The fate of your home hangs in the balance as you ready yourself for the final battle, knowing that either your village will see another dawn - or be lost forever to the Orchestrator's darkness.''',
         TEXT_WIDTH),
-        starting_elements=[]
+        starting_elements=[obstacle.Shadow]*5
     ),
 ]
 
