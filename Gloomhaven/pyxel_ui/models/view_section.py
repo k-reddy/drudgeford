@@ -48,6 +48,14 @@ class ViewSection(abc.ABC):
         pass
 
 
+class BorderView(ViewSection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def draw(self) -> None:
+        self.clear_bounds()
+
+
 class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
