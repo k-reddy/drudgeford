@@ -26,7 +26,6 @@ from .utils import round_down_to_nearest_multiple
 class PyxelEngine:
     def __init__(self, task_queue: PyxelTaskQueue, action_queue: PyxelActionQueue):
         self.current_task = None
-        self.is_board_initialized = False
 
         self.last_mouse_pos = (-1, -1)
 
@@ -124,8 +123,9 @@ class PyxelEngine:
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             if self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
-                print(f"{tile_pos_x}, {tile_pos_y}")
-                move_action = MoveAction(1, (tile_pos_x, tile_pos_y))
+                # BUG: location seems to be relative to character starting position so
+                # the target location will always be off by some amount, e.g. always 2 over.
+                move_action = MoveAction(1, (int(tile_pos_y), int(tile_pos_x)))
                 self.action_queue.enqueue(move_action)
 
     def draw(self):
