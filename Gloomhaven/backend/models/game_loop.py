@@ -30,7 +30,13 @@ class GameLoop:
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
-            10, monsters, players, disp, pyxel_manager, self.id_generator, level.starting_elements
+            10,
+            monsters,
+            players,
+            disp,
+            pyxel_manager,
+            self.id_generator,
+            level.starting_elements,
         )
         self.game_state = GameState.START
 
@@ -110,7 +116,14 @@ class GameLoop:
     def run_turn_move_only(
         self, acting_character: character.Character, round_num: int
     ) -> None:
+        get_input = True
         try:
+            # Taking over user input with check on action queue
+            while get_input:
+                if not self.pyxel_manager.shared_action_queue.is_empty():
+                    action = self.pyxel_manager.shared_action_queue.dequeue()
+                    action.perform()  # make these async?
+
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(
                     acting_character.available_action_cards
