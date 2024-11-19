@@ -119,10 +119,11 @@ class GameLoop:
         get_input = True
         try:
             # Taking over user input with check on action queue
+            print(f"{acting_character=}")
             while get_input:
                 if not self.pyxel_manager.shared_action_queue.is_empty():
                     action = self.pyxel_manager.shared_action_queue.dequeue()
-                    action.perform()  # make these async?
+                    action.perform(self.board, acting_character)  # make these async?
 
             if not acting_character.team_monster:
                 self.pyxel_manager.load_action_cards(

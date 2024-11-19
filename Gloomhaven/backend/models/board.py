@@ -317,8 +317,8 @@ class Board:
             closed.add(current)
 
             for direction in directions:
-                new_row = current[0] + direction[0]
-                new_col = current[1] + direction[1]
+                new_row = int(current[0] + direction[0])
+                new_col = int(current[1] + direction[1])
                 new_pos = (new_row, new_col)
                 if new_pos not in closed and (
                     self.is_legal_move(new_row, new_col) or new_pos == end
