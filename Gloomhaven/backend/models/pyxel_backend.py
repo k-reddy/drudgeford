@@ -1,4 +1,5 @@
 import backend.models.character as character
+from pyxel_ui.models.pyxel_action_queue import PyxelActionQueue
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
@@ -9,8 +10,13 @@ OTHER_PRIORITY = 10
 
 
 class PyxelManager:
-    def __init__(self, shared_action_queue: PyxelTaskQueue):
+    def __init__(
+        self,
+        shared_task_queue: PyxelTaskQueue,
+        shared_action_queue: PyxelActionQueue,
+    ):
         self.shared_action_queue = shared_action_queue
+        self.shared_task_queue = shared_task_queue
         self.move_duration = 700
         self.log = ListWithUpdate([], self.load_log)
         self.floor_color_map = []
@@ -67,8 +73,8 @@ class PyxelManager:
             floor_color_map=self.floor_color_map,
             wall_color_map=self.wall_color_map,
         )
-        self.shared_action_queue.enqueue(task)
-        self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
+        self.shared_task_queue.enqueue(task)
+        self.shared_task_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
 
     def clear_log(self):
         self.log = ListWithUpdate([], self.load_log)
@@ -81,7 +87,7 @@ class PyxelManager:
             self.normalize_coordinate((new_location[1], new_location[0])),
             self.move_duration,
         )
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def add_entity(self, entity, row, col):
         if isinstance(entity, character.Character):
@@ -99,11 +105,11 @@ class PyxelManager:
                 }
             ]
         )
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def remove_entity(self, entity_id):
         task = tasks.RemoveEntityTask(entity_id)
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def set_x_y_offset(self, coordinates: list[tuple[int, int]]):
         min_x = min(x for x, y in coordinates)
@@ -135,24 +141,24 @@ class PyxelManager:
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
         task = tasks.LoadCharactersTask(healths, sprite_names, teams)
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def load_log(self, log):
         task = tasks.LoadLogTask(log)
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def load_action_cards(self, action_cards):
         action_card_log = []
         for i, action_card in enumerate(action_cards):
             action_card_log.append(f"{i}: {action_card}")
         task = tasks.LoadActionCardsTask(action_card_log=action_card_log)
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def load_round_turn_info(self, round_num, acting_character_name):
         task = tasks.LoadRoundTurnInfoTask(
             round_number=round_num, acting_character_name=acting_character_name
         )
-        self.shared_action_queue.enqueue(task)
+        self.shared_task_queue.enqueue(task)
 
     def set_level_map_colors(
         self,
