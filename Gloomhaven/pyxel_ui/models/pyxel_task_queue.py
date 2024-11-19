@@ -6,9 +6,10 @@ from .tasks import Task, BoardInitTask
 # all tasks are children of Task except BoardInitTask
 task_type = Task | BoardInitTask
 
+
 class PyxelTaskQueue:
     """
-    Manages a queue of character actions, ensuring actions are processed in a
+    Manages a queue of game actions, ensuring actions are processed in a
     first-in, first-out (FIFO) order.
 
     Attributes:
