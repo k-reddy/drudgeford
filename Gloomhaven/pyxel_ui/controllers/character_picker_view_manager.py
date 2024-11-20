@@ -23,3 +23,9 @@ class CharacterPickerViewManager:
 
     def draw(self):
         self.character_picker.draw()
+
+    def handle_btn_press(self, btn):
+        if btn == pyxel.KEY_RIGHT:
+            self.character_picker.go_to_next_page()
+        elif btn == pyxel.KEY_LEFT:
+            self.character_picker.go_to_prev_page()
