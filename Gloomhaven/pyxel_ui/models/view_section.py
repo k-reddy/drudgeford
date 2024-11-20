@@ -433,6 +433,47 @@ class CarouselView(ViewSection):
             self.draw()
 
 
+class CharacterPickerView(CarouselView):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cards_per_page = 1
+        self.drawable = True
+
+    def draw_items(self):
+        # Draw cards
+        start_idx = self.current_card_page * self.cards_per_page
+        end_idx = min(start_idx + self.cards_per_page, len(self.items))
+
+        x = self.start_pos[0]
+        # !!! ideally put something here that measures the height of the page indicator
+        y = self.start_pos[1] + 200
+        card_border = 4
+        card_width = (
+            self.bounding_coordinate[0]
+            - self.start_pos[0]
+            - self.cards_per_page * card_border
+        ) // self.cards_per_page
+        # Draw only the current page of cards
+        for card in self.items[start_idx:end_idx]:
+            sprite = SpriteView(self.font, [0, 10], self.end_pos)
+            sprite.sprite_name = card["sprite_name"]
+            sprite.draw()
+            self.font.draw_text(
+                self.end_pos[0] / 2
+                - self.font.get_text_width(card["name"], size="large") / 2,
+                y,
+                card["name"],
+                col=7,
+                size="large",
+                max_width=card_width,
+            )
+            self.font.draw_text(
+                x, y + 30, card["backstory"], col=7, size="medium", max_width=card_width
+            )
+            x += card_width + card_border
+
+
 def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
     pyxel.blt(
         x,
