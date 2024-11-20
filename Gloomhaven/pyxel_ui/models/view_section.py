@@ -389,6 +389,50 @@ class SpriteView(ViewSection):
         )
 
 
+class CarouselView(ViewSection):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # !!! we should probably set a card width and then
+        # set cards per page dynamically rather than the other
+        # way around
+        self.items: list[str] = []
+        self.current_card_page = 0
+        self.cards_per_page = 3
+
+    def _draw(self) -> None:
+        self.draw_page_indicator(self.start_pos[1])
+        self.draw_items()
+        self.draw_navigation_hints()
+
+    @abc.abstractmethod
+    def draw_items(self):
+        pass
+
+    def draw_page_indicator(self, y_start) -> None:
+        total_pages = (len(self.items) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
+
+    def draw_navigation_hints(self) -> None:
+        y_start = self.end_pos[1] - 20
+        if self.current_card_page > 0:
+            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=7)
+
+    def go_to_next_page(self):
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            self.current_card_page += 1
+            self.draw()
+
+    def go_to_prev_page(self):
+        if self.current_card_page > 0:
+            self.current_card_page -= 1
+            self.draw()
+
+
 def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
     pyxel.blt(
         x,
