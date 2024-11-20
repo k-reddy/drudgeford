@@ -13,7 +13,7 @@ from pyxel_ui.constants import (
 from pyxel_ui.controllers.character_picker_view_manager import (
     CharacterPickerViewManager,
 )
-from .models.tasks import BoardInitTask, ActionTask
+from .models.tasks import BoardInitTask, ActionTask, ShowCharacterPickerTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_to_multiple
@@ -42,11 +42,11 @@ class PyxelEngine:
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
-        self.view_manager = CharacterPickerViewManager(
+        self.character_picker_view_manager = CharacterPickerViewManager(
             DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT
         )
-        
-        # self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
+
+        self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
@@ -64,7 +64,13 @@ class PyxelEngine:
             self.current_task = self.task_queue.dequeue()
 
         if self.current_task:
-            self.current_task.perform(self.view_manager)
+            # make this better
+            if isinstance(self.current_task, ShowCharacterPickerTask):
+                self.current_view_manager = self.character_picker_view_manager
+            else:
+                self.current_view_manager = self.view_manager
+
+            self.current_task.perform(self.current_view_manager)
             # don't clear the task if it's an action task and has steps to do
             if (
                 isinstance(self.current_task, ActionTask)
