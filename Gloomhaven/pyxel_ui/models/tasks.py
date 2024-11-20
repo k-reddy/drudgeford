@@ -4,6 +4,9 @@ from typing import Optional
 import abc
 
 from pyxel_ui.controllers.view_manager import ViewManager
+from pyxel_ui.controllers.character_picker_view_manager import (
+    CharacterPickerViewManager,
+)
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import FRAME_DURATION_MS
@@ -131,12 +134,11 @@ class BoardInitTask:
     floor_color_map: Optional[list[tuple[int, int]]] = None
     wall_color_map: Optional[list[tuple[int, int]]] = None
 
-
     def perform(self, view_manager):
         view_manager.update_map(
-            self.valid_map_coordinates,
-            self.floor_color_map,
-            self.wall_color_map)
+            self.valid_map_coordinates, self.floor_color_map, self.wall_color_map
+        )
+
 
 @dataclass
 class ActionTask(Task):
@@ -200,3 +202,23 @@ class ActionTask(Task):
             )
             for i in range(step_count + 1)
         )
+
+
+@dataclass
+class ShowCharacterPickerTask(Task):
+    """
+    A task that tells pyxel to show the character picker so player can choose their character class
+    """
+
+    names: list[str]
+    sprite_names: list[str]
+    backstories: list[str]
+
+    def perform(self, view_manager: CharacterPickerViewManager):
+        view_manager.character_picker.items = [
+            {"name": name, "sprite_name": sprite_name, "backstory": backstory}
+            for name, sprite_name, backstory in zip(
+                self.names, self.sprite_names, self.backstories
+            )
+        ]
+        view_manager.draw()
