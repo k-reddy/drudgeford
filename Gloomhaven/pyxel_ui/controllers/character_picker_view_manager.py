@@ -17,8 +17,9 @@ class CharacterPickerViewManager:
         self.canvas_width = pyxel_width
         self.canvas_height = pyxel_height
 
-        self.character_sprite = view.SpriteView(
+        self.character_picker = view.CharacterPickerView(
             self.font, [0, 0], [self.canvas_width, self.canvas_height]
         )
-        self.character_sprite.draw()
-        self.views = []
+
+    def draw(self):
+        self.character_picker.draw()
