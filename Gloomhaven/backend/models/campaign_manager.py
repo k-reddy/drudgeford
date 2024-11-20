@@ -117,11 +117,14 @@ class Campaign:
         if self.all_ai_mode:
             return self.available_chars.pop()
         
-        self.disp.print_message(f"It's time to pick Player {player_num}'s character. Here are your options:\n",True)
+
+        # self.disp.print_message(f"It's time to pick Player {player_num}'s character. Here are your options:\n",True)
+        self.pyxel_manager.show_character_picker(self.available_chars)
+        self.pyxel_view.start()
         # print the backstory for every available char
-        for i, char in enumerate(self.available_chars):
-            self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
-            self.disp.print_message(f"{char.backstory}\n", False)
+        # for i, char in enumerate(self.available_chars):
+        #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
+        #     self.disp.print_message(f"{char.backstory}\n", False)
 
         # let user pick a character
         player_char_num = int(self.disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{j}" for j,_ in enumerate(self.available_chars)]))
