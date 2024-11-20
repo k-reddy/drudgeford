@@ -82,6 +82,7 @@ class PyxelEngine:
         # Add controls for scrolling
         # !!! this is a yucky fix
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
+            self.character_picker_view_manager.handle_btn_press(pyxel.KEY_RIGHT)
             # Go to next page if there are more cards to show
             if (
                 self.view_manager.action_card_view.current_card_page + 1
@@ -93,6 +94,7 @@ class PyxelEngine:
 
         # !!! another yucky fix
         if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
+            self.character_picker_view_manager.handle_btn_press(pyxel.KEY_LEFT)
             # Go to previous page if we're not at the start
             if self.view_manager.action_card_view.current_card_page > 0:
                 self.view_manager.action_card_view.current_card_page -= 1
