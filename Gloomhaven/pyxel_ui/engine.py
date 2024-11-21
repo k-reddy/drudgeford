@@ -82,23 +82,11 @@ class PyxelEngine:
         # Add controls for scrolling
         # !!! this is a yucky fix
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
-            self.character_picker_view_manager.handle_btn_press(pyxel.KEY_RIGHT)
-            # Go to next page if there are more cards to show
-            if (
-                self.view_manager.action_card_view.current_card_page + 1
-            ) * self.view_manager.action_card_view.cards_per_page < len(
-                self.view_manager.action_card_view.action_card_log
-            ):
-                self.view_manager.action_card_view.current_card_page += 1
-                self.view_manager.action_card_view.draw()
+            self.current_view_manager.handle_btn_press(pyxel.KEY_RIGHT)
 
         # !!! another yucky fix
         if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
-            self.character_picker_view_manager.handle_btn_press(pyxel.KEY_LEFT)
-            # Go to previous page if we're not at the start
-            if self.view_manager.action_card_view.current_card_page > 0:
-                self.view_manager.action_card_view.current_card_page -= 1
-                self.view_manager.action_card_view.draw()
+            self.current_view_manager.handle_btn_press(pyxel.KEY_LEFT)
 
         # Handle cursor redraws
         # curr_mouse_x, curr_mouse_y = pyxel.mouse_x, pyxel.mouse_y

@@ -93,7 +93,7 @@ class ViewManager:
     def update_action_card_log(self, action_card_log: list[str]):
         # reset the card page to 0 every time we load new action cards
         self.action_card_view.current_card_page = 0
-        self.action_card_view.action_card_log = action_card_log
+        self.action_card_view.items = action_card_log
         if action_card_log:
             self.action_card_view.drawable = True
         else:
@@ -101,16 +101,16 @@ class ViewManager:
         self.action_card_view.draw()
 
     def update_map(
-            self, 
-            valid_floor_coordinates: list[tuple[int, int]], 
-            floor_color_map=[],
-            wall_color_map=[]
-            ) -> None:
+        self,
+        valid_floor_coordinates: list[tuple[int, int]],
+        floor_color_map=[],
+        wall_color_map=[],
+    ) -> None:
         if valid_floor_coordinates:
             self.map_view.drawable = True
         else:
             self.map_view.drawable = False
-            
+
         if floor_color_map:
             self.map_view.floor_color_map = floor_color_map
         if wall_color_map:
@@ -159,3 +159,9 @@ class ViewManager:
         self.map_view.draw()
         self.log_view.draw()
         self.action_card_view.draw()
+
+    def handle_btn_press(self, btn):
+        if btn == pyxel.KEY_RIGHT:
+            self.action_card_view.go_to_next_page()
+        elif btn == pyxel.KEY_LEFT:
+            self.action_card_view.go_to_prev_page()
