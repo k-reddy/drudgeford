@@ -24,6 +24,7 @@ board_init_dict = {
 }
 @pytest.mark.parametrize(["data","task_class"],[
     pytest.param({"log":["hello","sup"]},tasks.LoadLogTask,id="test_log"),
+    pytest.param({"log":["hel\nlo","sup"]},tasks.LoadLogTask,id="test_newline"),
     pytest.param({"entities":test_entities},tasks.AddEntitiesTask,id="test_add_entities"),
     pytest.param({"entity_id":1},tasks.RemoveEntityTask,id="test_rem_entities"),
     pytest.param(load_characters_dict,tasks.LoadCharactersTask,id="test_load_char"),

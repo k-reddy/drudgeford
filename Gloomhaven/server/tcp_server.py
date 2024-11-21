@@ -59,7 +59,7 @@ class TCPServer:
         """Handle individual client connections"""
         while self.running:
             try:
-                data = client_socket.recv(1024).decode('utf-8')
+                data = client_socket.recv(4096).decode('utf-8')
                 if not data:
                     break
 
