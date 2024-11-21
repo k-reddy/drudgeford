@@ -2,10 +2,12 @@ import threading
 import time
 from .tcp_server import TCPServer
 from .tcp_client import TCPClient
-server = TCPServer()
-server.start()
+from .task_jsonifier import TaskJsonifier
+from ..pyxel_ui.models import tasks
 
 def test_task():
+    server = TCPServer()
+    server.start()
     client = TCPClient()
     task_list = [{"task_type":"test_task"}, {"task_type":"test_task_2"}]
     for task in task_list:
@@ -81,4 +83,17 @@ def test_get_task_doesnt_block():
     
     # Verify the call was blocked 
     assert completed 
+    server.stop()
+
+# this is sort of an integration test b/c it also tests jsonifier
+def test_task_with_real_task():
+    server = TCPServer()
+    server.start()
+    client = TCPClient()
+    task = tasks.LoadLogTask(["hi","hello"])
+    tj = TaskJsonifier()
+    jsonified_task = tj.convert_task_to_json(task)
+    client.post_task(jsonified_task)
+    actual = client.get_task()
+    assert actual == jsonified_task
     server.stop()
