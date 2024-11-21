@@ -44,6 +44,8 @@ class TaskJsonifier:
             AttributeError: If the task class doesn't exist in tasks module
             json.JSONDecodeError: If the JSON string is invalid
         """
+        if not json_str:
+            return None
         # Parse the JSON
         task_dict = json.loads(json_str)
         

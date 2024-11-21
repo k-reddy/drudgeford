@@ -69,7 +69,7 @@ class TCPServer:
 
                 if command == 'get_task':
                     with self.lock:
-                        task = self.tasks[0] if self.tasks else None
+                        task = self.tasks.pop(0) if self.tasks else None
                     response = {'task': task}
                 elif command == 'post_task':
                     with self.lock:

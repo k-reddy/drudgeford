@@ -4,7 +4,6 @@ from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 from server.tcp_client import TCPClient
-from server.tcp_server import TCPServer
 from server.task_jsonifier import TaskJsonifier
 
 CHAR_PRIORITY = 20
