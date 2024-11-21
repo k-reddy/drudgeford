@@ -69,8 +69,7 @@ class Campaign:
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
-        threading.Thread(target=self.run_levels).start()
-        self.pyxel_view.start()
+        self.run_levels()
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
@@ -120,9 +119,11 @@ class Campaign:
         if self.all_ai_mode:
             return self.available_chars.pop()
 
-        # self.disp.print_message(f"It's time to pick Player {player_num}'s character. Here are your options:\n",True)
+        self.disp.print_message(
+            f"It's time to pick Player {player_num}'s character. Here are your options:\n",
+            True,
+        )
         self.pyxel_manager.show_character_picker(self.available_chars)
-        self.pyxel_view.start()
         # print the backstory for every available char
         # for i, char in enumerate(self.available_chars):
         #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
