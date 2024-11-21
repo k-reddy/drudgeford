@@ -15,6 +15,7 @@ import backend.models.agent as agent
 from backend.utils.utilities import GameState
 from backend.utils.utilities import get_campaign_filenames
 from backend.utils.config import SAVE_FILE_DIR 
+from server.tcp_server import TCPServer
 
 @dataclass
 class CampaignState:
@@ -31,6 +32,10 @@ class Campaign:
     '''
     def __init__(self, disp: Display, num_players_default: int, all_ai_mode: bool):
         self.current_level: Level
+        # right now, the server and client defaults are the same
+        # if we change this, we'll need to pass through the port etc.
+        self.server = TCPServer()
+        self.server.start()
         shared_action_queue = PyxelTaskQueue()
         self.pyxel_view = PyxelEngine(shared_action_queue)
         self.pyxel_manager = PyxelManager(shared_action_queue)
@@ -67,6 +72,7 @@ class Campaign:
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
+                # temp just to test this
         threading.Thread(target=self.run_levels).start()
         self.pyxel_view.start()
 
