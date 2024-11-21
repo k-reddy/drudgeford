@@ -18,9 +18,6 @@ class PyxelManager:
         self.floor_color_map = []
         self.wall_color_map = []
         self.tj = TaskJsonifier()
-        # temp just to test this
-        self.server = TCPServer()
-        self.server.start()
         self.server_client = TCPClient()
 
 
