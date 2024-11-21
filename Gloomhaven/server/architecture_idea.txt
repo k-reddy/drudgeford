@@ -33,11 +33,16 @@ idea:
 - game_loop acts through pyxel_manager
 - pyxel_manager
     - instead of pushing to queue, post to server
-    - when waiting on data, run a while loop? 
-        - is there something more elegant here?
+    - use a threadsafe queue to block if the queue is empty
 - pyxel 
     - do the same thing you're already doing, but instead
         of checking queue, get from server - if nothing, continue
 - I don't think we need to reimplement the queue with a wrapper
     - so instead of server task queue, just have server
     - kill client task queue
+
+talk over TCP socket
+    - will need to pickle it 
+    - socket reads usually blocking by default 
+    - will listen for new connections
+    - client will use address to connect 
