@@ -13,7 +13,7 @@ class TCPClient:
         
         try:
             self.socket.send(json.dumps(request).encode('utf-8'))
-            data = self.socket.recv(1024).decode('utf-8')
+            data = self.socket.recv(4096).decode('utf-8')
             if not data:  # Connection closed
                 raise ConnectionError("Connection closed by server")
             return json.loads(data)

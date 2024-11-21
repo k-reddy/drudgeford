@@ -14,6 +14,8 @@ from .models.tasks import ActionTask
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
+from server.tcp_client import TCPClient
+from server.task_jsonifier import TaskJsonifier
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -23,6 +25,8 @@ from .utils import round_down_to_nearest_multiple
 
 class PyxelEngine:
     def __init__(self, task_queue: PyxelTaskQueue):
+        self.server_client = TCPClient()
+        self.tj = TaskJsonifier()
         self.current_task = None
         self.is_board_initialized = False
 
@@ -55,6 +59,9 @@ class PyxelEngine:
 
         if not self.current_task and not self.task_queue.is_empty():
             self.current_task = self.task_queue.dequeue()
+            jsonified_task = self.server_client.get_task()
+            server_task = self.tj.make_task_from_json(jsonified_task)
+
 
         if self.current_task:
             self.current_task.perform(self.view_manager)
