@@ -227,23 +227,58 @@ class MapView(ViewSection):
         return (pixel_x, pixel_y)
 
 
-class ActionCardView(ViewSection):
+class CarouselView(ViewSection):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # !!! we should probably set a card width and then
         # set cards per page dynamically rather than the other
         # way around
-        self.action_card_log: list[str] = []
+        self.items: list[str] = []
         self.current_card_page = 0
         self.cards_per_page = 3
 
     def _draw(self) -> None:
         self.draw_page_indicator(self.start_pos[1])
+        self.draw_items()
+        self.draw_navigation_hints()
 
+    @abc.abstractmethod
+    def draw_items(self):
+        pass
+
+    def draw_page_indicator(self, y_start) -> None:
+        total_pages = (len(self.items) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
+
+    def draw_navigation_hints(self) -> None:
+        y_start = self.end_pos[1] - 20
+        if self.current_card_page > 0:
+            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=7)
+
+    def go_to_next_page(self):
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            self.current_card_page += 1
+            self.draw()
+
+    def go_to_prev_page(self):
+        if self.current_card_page > 0:
+            self.current_card_page -= 1
+            self.draw()
+
+
+class ActionCardView(CarouselView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def draw_items(self) -> None:
         # Draw action cards
         start_idx = self.current_card_page * self.cards_per_page
-        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
+        end_idx = min(start_idx + self.cards_per_page, len(self.items))
 
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
@@ -255,28 +290,12 @@ class ActionCardView(ViewSection):
             - self.cards_per_page * card_border
         ) // self.cards_per_page
         # Draw only the current page of cards
-        for card in self.action_card_log[start_idx:end_idx]:
+        for card in self.items[start_idx:end_idx]:
             self.font.draw_text(x, y, card, col=7, size="medium", max_width=card_width)
             x += card_width + card_border
 
         # !!! should change this to measure the height of the cards and page indicator
         navigation_start_y = self.start_pos[1] + BITS * 6 + card_border + 10
-        self.draw_navigation_hints(x - card_width // 2, navigation_start_y)
-
-    def draw_page_indicator(self, y_start) -> None:
-        total_pages = (
-            len(self.action_card_log) + self.cards_per_page - 1
-        ) // self.cards_per_page
-        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
-
-    def draw_navigation_hints(self, x_start_next, y_start) -> None:
-        if self.current_card_page > 0:
-            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
-        if (self.current_card_page + 1) * self.cards_per_page < len(
-            self.action_card_log
-        ):
-            pyxel.text(x_start_next, y_start, "-> Next", col=7)
 
 
 class InitiativeBarView(ViewSection):
@@ -387,50 +406,6 @@ class SpriteView(ViewSection):
             colkey=0,
             scale=4,
         )
-
-
-class CarouselView(ViewSection):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # !!! we should probably set a card width and then
-        # set cards per page dynamically rather than the other
-        # way around
-        self.items: list[str] = []
-        self.current_card_page = 0
-        self.cards_per_page = 3
-
-    def _draw(self) -> None:
-        self.draw_page_indicator(self.start_pos[1])
-        self.draw_items()
-        self.draw_navigation_hints()
-
-    @abc.abstractmethod
-    def draw_items(self):
-        pass
-
-    def draw_page_indicator(self, y_start) -> None:
-        total_pages = (len(self.items) + self.cards_per_page - 1) // self.cards_per_page
-        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
-
-    def draw_navigation_hints(self) -> None:
-        y_start = self.end_pos[1] - 20
-        if self.current_card_page > 0:
-            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
-        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
-            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=7)
-
-    def go_to_next_page(self):
-        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
-            self.current_card_page += 1
-            self.draw()
-
-    def go_to_prev_page(self):
-        if self.current_card_page > 0:
-            self.current_card_page -= 1
-            self.draw()
 
 
 class CharacterPickerView(CarouselView):
