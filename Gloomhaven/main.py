@@ -1,4 +1,5 @@
 import os
+import threading
 import backend.models.display as display
 from backend.models.campaign_manager import Campaign
 from backend.utils.utilities import get_campaign_filenames
@@ -6,29 +7,38 @@ from backend.models.level import GAME_PLOT
 import textwrap
 from backend.utils.config import TEXT_WIDTH
 
+
 def offer_to_load_campaign(disp):
     file_names = get_campaign_filenames()
 
-    user_input = disp.get_user_input("Would you like to load an existing campaign? Type (y)es or hit enter to start new campaign.")
+    user_input = disp.get_user_input(
+        "Would you like to load an existing campaign? Type (y)es or hit enter to start new campaign."
+    )
     if user_input != "y":
-        return 
-    
+        return
+
     if not file_names:
-        disp.get_user_input("No existing campaign files. Hit enter to start new campaign") 
-        return 
+        disp.get_user_input(
+            "No existing campaign files. Hit enter to start new campaign"
+        )
+        return
     filename = get_user_to_pick_filename(file_names, disp)
     return filename
 
+
 def get_user_to_pick_filename(file_names, disp):
-    disp.print_message("WARNING: do not load a file you got from the internet or any other file that isn't yours. This file type is not secure.")
+    disp.print_message(
+        "WARNING: do not load a file you got from the internet or any other file that isn't yours. This file type is not secure."
+    )
     message = "Which game would you like to load? Type just the number\n"
     valid_inputs = []
     file_names.sort()
     for i, name in enumerate(file_names):
-        message+=f"{i}: {name}\n"
+        message += f"{i}: {name}\n"
         valid_inputs.append(str(i))
     file_num = int(disp.get_user_input(message, valid_inputs))
     return file_names[file_num]
+
 
 def main(num_players: int = 1, all_ai_mode=False):
     # set up terminal
@@ -56,7 +66,8 @@ def main(num_players: int = 1, all_ai_mode=False):
         disp.print_message(GAME_PLOT)
         disp.get_user_input(prompt="Hit enter to continue")
         disp.clear_display()
-    campaign.start_campaign()
+    threading.Thread(target=campaign.start_campaign).start()
+    campaign.pyxel_view.start()
 
 
 def provide_help_if_desired(disp, all_ai_mode):
@@ -69,7 +80,7 @@ def provide_help_if_desired(disp, all_ai_mode):
         "- Every time you attack, you'll draw an 'attack modifier card.' This adds some randomness to your damage. Certain cards (bless, curse) add good/bad modifiers randomly to your deck, and others (charge attack) determine what the next modifier you draw will be",
         "- Some cards place elements/obstacles on the map, like traps and fire. Most of these do damage.",
         "- The exceptions are ice, which gives you a 25% chance of slipping and losing your turn when you step on it, and shadow, which gives all attacks a 10% chance of missing for each square of shadow they pass through",
-        "Good luck!"
+        "Good luck!",
     ]
     want_help = False
     if not all_ai_mode:
@@ -85,6 +96,7 @@ def provide_help_if_desired(disp, all_ai_mode):
             disp.print_message("", False)
         disp.get_user_input(prompt="Hit enter to continue")
         disp.clear_display()
+
 
 if __name__ == "__main__":
     main()
