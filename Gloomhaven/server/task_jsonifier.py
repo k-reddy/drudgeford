@@ -2,7 +2,7 @@ import json
 import pickle
 import base64
 from typing import Any
-from ..pyxel_ui.models import tasks
+from pyxel_ui.models import tasks
 
 
 class TaskJsonifier:
@@ -19,12 +19,7 @@ class TaskJsonifier:
             str: JSON string representation of the task
         """
         class_name = task.__class__.__name__
-        
-        # Get the instance attributes
-        instance_data = task.__dict__
-        
-        # Pickle and encode the data
-        pickled_data = pickle.dumps(instance_data)
+        pickled_data = pickle.dumps(task.__dict__)
         encoded_data = base64.b64encode(pickled_data).decode('utf-8')
         
         task_dict = {
@@ -32,7 +27,7 @@ class TaskJsonifier:
             "data": encoded_data
         }
         
-        return json.dumps(task_dict)
+        return json.dumps(task_dict, ensure_ascii=False)
     
     @staticmethod
     def make_task_from_json(json_str: str) -> Any:

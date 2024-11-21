@@ -3,10 +3,12 @@ from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
+from server.tcp_client import TCPClient
+from server.tcp_server import TCPServer
+from server.task_jsonifier import TaskJsonifier
 
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
-
 
 class PyxelManager:
     def __init__(self, shared_action_queue: PyxelTaskQueue):
@@ -15,6 +17,12 @@ class PyxelManager:
         self.log = ListWithUpdate([], self.load_log)
         self.floor_color_map = []
         self.wall_color_map = []
+        self.tj = TaskJsonifier()
+        # temp just to test this
+        self.server = TCPServer()
+        self.server.start()
+        self.server_client = TCPClient()
+
 
     def load_board(self, locations, terrain):
         entities = []
@@ -59,16 +67,18 @@ class PyxelManager:
                             "priority": OTHER_PRIORITY,
                         }
                     )
-
-        task = tasks.BoardInitTask(
+        tasks_to_send = []
+        tasks_to_send.append(tasks.BoardInitTask(
             map_height=self.board_height,
             map_width=self.board_width,
             valid_map_coordinates=valid_map_coordinates,
             floor_color_map=self.floor_color_map,
             wall_color_map=self.wall_color_map,
-        )
-        self.shared_action_queue.enqueue(task)
-        self.shared_action_queue.enqueue(tasks.AddEntitiesTask(entities=entities))
+        ))
+        tasks_to_send.append(tasks.AddEntitiesTask(entities=entities))
+        for task in tasks_to_send:
+            self.shared_action_queue.enqueue(task)
+            self.jsonify_and_send_task(task)
 
     def clear_log(self):
         self.log = ListWithUpdate([], self.load_log)
@@ -82,6 +92,8 @@ class PyxelManager:
             self.move_duration,
         )
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
+
 
     def add_entity(self, entity, row, col):
         if isinstance(entity, character.Character):
@@ -100,10 +112,12 @@ class PyxelManager:
             ]
         )
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def remove_entity(self, entity_id):
         task = tasks.RemoveEntityTask(entity_id)
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def set_x_y_offset(self, coordinates: list[tuple[int, int]]):
         min_x = min(x for x, y in coordinates)
@@ -136,23 +150,27 @@ class PyxelManager:
         teams = [character.team_monster for character in characters]
         task = tasks.LoadCharactersTask(healths, sprite_names, teams)
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def load_log(self, log):
         task = tasks.LoadLogTask(log)
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def load_action_cards(self, action_cards):
         action_card_log = []
         for i, action_card in enumerate(action_cards):
-            action_card_log.append(f"{i}: {action_card}")
+            action_card_log.append(f'''{i}: {action_card}''')
         task = tasks.LoadActionCardsTask(action_card_log=action_card_log)
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def load_round_turn_info(self, round_num, acting_character_name):
         task = tasks.LoadRoundTurnInfoTask(
             round_number=round_num, acting_character_name=acting_character_name
         )
         self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
 
     def set_level_map_colors(
         self,
@@ -161,3 +179,7 @@ class PyxelManager:
     ):
         self.floor_color_map = floor_color_map
         self.wall_color_map = wall_color_map
+
+    def jsonify_and_send_task(self, task):
+        json_task = self.tj.convert_task_to_json(task)
+        self.server_client.post_task(json_task)
