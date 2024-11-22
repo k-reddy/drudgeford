@@ -6,7 +6,6 @@ import os
 import time
 
 from backend.models.game_loop import GameLoop
-from backend.models.display import Display
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level, campaign_levels
 import backend.models.character as character
@@ -14,7 +13,7 @@ import backend.models.agent as agent
 from backend.utils.utilities import GameState
 from backend.utils.utilities import get_campaign_filenames
 from backend.utils.config import SAVE_FILE_DIR 
-from server.tcp_server import TCPServer
+from server.tcp_server import TCPServer, ClientType
 
 @dataclass
 class CampaignState:
@@ -29,14 +28,10 @@ class Campaign:
     '''
     a campaign is a series of games, each of which has level metadata
     '''
-    def __init__(self, disp: Display, num_players_default: int, all_ai_mode: bool):
+    def __init__(self, num_players_default: int, all_ai_mode: bool, server: TCPServer):
         self.current_level: Level
-        # right now, the server and client defaults are the same
-        # if we change this, we'll need to pass through the port etc.
-        self.server = TCPServer()
-        self.server.start()
+        self.server = server
         self.pyxel_manager = PyxelManager()
-        self.disp = disp
         self.num_players = num_players_default
         self.all_ai_mode = all_ai_mode
         self.id_generator = count(start=1)
@@ -66,18 +61,22 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
+            self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
-        # wait for all players to join
+        else:
+            self.wait_for_all_players_to_join()
+        self.run_levels()
+    
+    def wait_for_all_players_to_join(self):
         while True:
             # +1 because the backend also connects
             if len(self.server.clients) == self.num_players+1:
                 break
             else:
-                print("Waiting for all players to join")
+                self.pyxel_manager.print_message("Waiting for all players to join")
                 time.sleep(3)
-        self.run_levels()
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
@@ -85,10 +84,7 @@ class Campaign:
     def run_level(self, level: Level):
         self.current_level = level
         if not self.all_ai_mode:
-            self.disp.print_message(message=self.current_level.pre_level_text, clear_display=True)
-            self.disp.get_user_input(
-                prompt="Hit enter to continue\n"
-            )
+            self.pyxel_manager.print_message(message=self.current_level.pre_level_text)
         self.pyxel_manager.set_level_map_colors(
             self.current_level.floor_color_map,
             self.current_level.wall_color_map
@@ -115,8 +111,9 @@ class Campaign:
     def set_num_players(self):
         if not self.all_ai_mode:
             self.num_players = int(
-                    self.disp.get_user_input(
-                        "Let's set up the game. How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"]
+                    self.pyxel_manager.get_user_input(
+                        "How many players are playing? Type 1, 2, or 3.", ["1", "2", "3"],
+                        'frontend_1'
                     )
                 )
 
@@ -125,18 +122,25 @@ class Campaign:
         if self.all_ai_mode:
             return self.available_chars.pop()
         
-        self.disp.print_message(f"It's time to pick Player {player_num}'s character. Here are your options:\n",True)
+        # let other players know what's happening 
+        player_id = f"frontend_{player_num+1}"
+        for client in self.server.clients.values():
+            if client.client_id != player_id and client.client_type == ClientType.FRONTEND:
+                self.pyxel_manager.print_message(f"Waiting for player {player_num+1} to pick a character",client.client_id)
+        
+        # send the message only to the appropriate character
+        self.pyxel_manager.print_message("It's time to pick your character. Here are your options:\n",player_id)
         # print the backstory for every available char
         for i, char in enumerate(self.available_chars):
-            self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
-            self.disp.print_message(f"{char.backstory}\n", False)
+            self.pyxel_manager.print_message(f"{i}: {char.__class__.__name__}",player_id)
+            self.pyxel_manager.print_message(f"{char.backstory}\n", player_id)
 
         # let user pick a character
-        player_char_num = int(self.disp.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{j}" for j,_ in enumerate(self.available_chars)]))
+        player_char_num = int(self.pyxel_manager.get_user_input(prompt="Type the number of the character you want to play. ", valid_inputs=[f"{j}" for j,_ in enumerate(self.available_chars)],client_id=player_id))
         player_char = self.available_chars.pop(player_char_num)
 
         # reset default name if player provides a name
-        player_name = self.disp.get_user_input(prompt="What's your character's name? ")
+        player_name = self.pyxel_manager.get_user_input(prompt="What's your character's name? ", client_id=player_id)
         if player_name != "":
             player_char.name = player_name
 
@@ -155,9 +159,6 @@ class Campaign:
         for i in range(self.num_players):
             self.player_chars.append(self.select_player_character(i))
 
-        if not self.all_ai_mode:
-            self.disp.clear_display()
-
     def load_player_characters(self, player_names, char_classes):
         emojis = ["🧙", "🕺", "🐣", "🐣"]
         
@@ -166,11 +167,11 @@ class Campaign:
         for char_class_name, player_name, emoji in zip(char_classes, player_names, emojis):
             char_class = getattr(character, char_class_name)
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
-            player_chars.append(char_class(player_name, self.disp, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+            player_chars.append(char_class(player_name, self.pyxel_manager, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         return player_chars
     
     def offer_to_save_campaign(self):
-        user_input = self.disp.get_user_input("Would you like to save your progress? Type (y)es or (n)o. ",["y","n"])
+        user_input = self.pyxel_manager.get_user_input("Would you like to save your progress? Type (y)es or (n)o. ",["y","n"])
         should_save = True if user_input == "y" else False
         if should_save:
             self.save_campaign()
@@ -187,6 +188,7 @@ class Campaign:
                 break
         return filename
     
+    # !!! will need to reimplement this
     def save_campaign(self):
         # Create a simple dict with just the essential data
         campaign_state = CampaignState(
@@ -201,4 +203,4 @@ class Campaign:
         os.makedirs(SAVE_FILE_DIR, exist_ok=True)
         with open(SAVE_FILE_DIR+filename, 'wb') as f:
             pickle.dump(campaign_state, f)
-        self.disp.get_user_input(f"Successfully saved {filename}. Hit enter to continue. ")
+        self.pyxel_manager.get_user_input(f"Successfully saved {filename}. Hit enter to continue. ")
