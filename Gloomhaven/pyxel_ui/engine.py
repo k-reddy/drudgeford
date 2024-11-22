@@ -13,7 +13,7 @@ from pyxel_ui.constants import (
 from .models.tasks import ActionTask, InputTask
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
-from server.tcp_client import TCPClient
+from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
 
 # TODO(john): enable mouse control
@@ -24,7 +24,7 @@ from server.task_jsonifier import TaskJsonifier
 
 class PyxelEngine:
     def __init__(self):
-        self.server_client = TCPClient()
+        self.server_client = TCPClient(ClientType.FRONTEND)
         self.tj = TaskJsonifier()
         self.current_task = None
         self.is_board_initialized = False

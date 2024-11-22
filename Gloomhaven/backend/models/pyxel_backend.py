@@ -2,7 +2,7 @@ import backend.models.character as character
 from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
-from server.tcp_client import TCPClient
+from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
 
 CHAR_PRIORITY = 20
@@ -15,7 +15,7 @@ class PyxelManager:
         self.floor_color_map = []
         self.wall_color_map = []
         self.tj = TaskJsonifier()
-        self.server_client = TCPClient()
+        self.server_client = TCPClient(ClientType.BACKEND)
 
 
     def load_board(self, locations, terrain):
@@ -166,14 +166,15 @@ class PyxelManager:
         self.floor_color_map = floor_color_map
         self.wall_color_map = wall_color_map
 
-    def jsonify_and_send_task(self, task):
+    def jsonify_and_send_task(self, task, client_id='ALL_FRONTEND'):
         json_task = self.tj.convert_task_to_json(task)
-        self.server_client.post_task(json_task)
+        self.server_client.post_task(json_task, client_id)
 
     def get_user_input(self, prompt, valid_inputs=None):
         task = tasks.InputTask(prompt, valid_inputs)
         self.jsonify_and_send_task(task)
-        return self.server_client.get_user_input()
+        # !!! may want to do something with ['source_client_id']
+        return self.server_client.get_user_input()['input']
     
     def print_message(self, message):
         task = tasks.PrintTerminalMessage(message)
