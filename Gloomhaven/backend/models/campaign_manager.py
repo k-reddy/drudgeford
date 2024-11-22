@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from itertools import count
 import pickle
 import os
+import time
 
-from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
 from backend.models.display import Display
 from backend.models.pyxel_backend import PyxelManager
@@ -35,7 +35,6 @@ class Campaign:
         # if we change this, we'll need to pass through the port etc.
         self.server = TCPServer()
         self.server.start()
-        self.pyxel_view = PyxelEngine()
         self.pyxel_manager = PyxelManager()
         self.disp = disp
         self.num_players = num_players_default
@@ -70,9 +69,15 @@ class Campaign:
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
-                # temp just to test this
-        threading.Thread(target=self.run_levels).start()
-        self.pyxel_view.start()
+        # wait for all players to join
+        while True:
+            # +1 because the backend also connects
+            if len(self.server.clients) == self.num_players+1:
+                break
+            else:
+                print("Waiting for all players to join")
+                time.sleep(3)
+        self.run_levels()
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
