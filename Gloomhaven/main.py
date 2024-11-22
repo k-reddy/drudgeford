@@ -40,11 +40,11 @@ def main(num_players: int = 1, all_ai_mode=False):
     if not all_ai_mode:
         disp.clear_display()
 
+    # offer to load a campaign
+    potential_campaign_filename = offer_to_load_campaign(disp)
     # make a campaign
     campaign = Campaign(disp, num_players, all_ai_mode)
 
-    # offer to load a campaign
-    potential_campaign_filename = offer_to_load_campaign(disp)
     # if there's a campaign to load, load it
     if potential_campaign_filename:
         campaign.load_campaign(potential_campaign_filename)
