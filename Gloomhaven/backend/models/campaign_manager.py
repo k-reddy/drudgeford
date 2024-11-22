@@ -143,6 +143,8 @@ class Campaign:
         player_name = self.pyxel_manager.get_user_input(prompt="What's your character's name? ", client_id=player_id)
         if player_name != "":
             player_char.name = player_name
+        # set the client_id
+        player_char.client_id = player_id
 
         return player_char
 

@@ -32,36 +32,37 @@ class Character(abc.ABC):
         self.shield: tuple[int,int] = (0, MAX_ROUNDS)
         self.log = log
         self.elemental_affinity = None
+        self.client_id = None
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
-                self.pyxel_manager, self.available_action_cards
+                self.pyxel_manager, self.available_action_cards, self.client_id
             )
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        return self.agent.decide_if_move_first(self.pyxel_manager)
+        return self.agent.decide_if_move_first(self.pyxel_manager, self.client_id)
 
     def perform_movement(self, movement, is_jump, board):
         if movement == 0:
             self.log.append("No movement!")
             return
         self.log.append(f"\n{self.name} is moving\n")
-        self.agent.perform_movement(self, movement, is_jump, board)
+        self.agent.perform_movement(self, movement, is_jump, board, self.client_id)
         # add some space between the movement and attack
         self.log.append("")
 
     def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
             return None
-        return self.agent.select_attack_target(self.pyxel_manager, in_range_opponents, board, self)
+        return self.agent.select_attack_target(self.pyxel_manager, in_range_opponents, board, self, self.client_id)
 
     def short_rest(self) -> None:
         # reset our available cards
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
         # kill a random card, update the user, remove it from play, and keep track for next round
         killed_card = random.choice(self.available_action_cards)
-        self.log.append(f"You lost {killed_card}")
+        self.log.append(f"{self.name} short rested and lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
 
