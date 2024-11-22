@@ -3,8 +3,9 @@ import backend.models.display as display
 from backend.models.campaign_manager import Campaign
 from backend.utils.utilities import get_campaign_filenames
 from backend.models.level import GAME_PLOT
-import textwrap
-from backend.utils.config import TEXT_WIDTH
+from server.tcp_server import TCPServer, ClientType
+from backend.models.pyxel_backend import PyxelManager
+
 
 def offer_to_load_campaign(disp):
     file_names = get_campaign_filenames()
@@ -34,25 +35,33 @@ def main(num_players: int = 1, all_ai_mode=False):
     # set up terminal
     if os.getenv("TERM") is None:
         os.environ["TERM"] = "xterm"
-
-    # set up and clear display
-    disp = display.Display(all_ai_mode)
-    if not all_ai_mode:
-        disp.clear_display()
-
-    # offer to load a campaign
-    potential_campaign_filename = offer_to_load_campaign(disp)
+    
+    print("Game started, waiting for Player 1 to connect")
+    # start the server and wait for a connection from a frontend client
+    # right now, the server and client defaults are the same
+    # if we change this, we'll need to pass through the port etc.
+    server = TCPServer()
+    server.start()
+    while True:
+        if len([1 for client in server.clients.values() if client.client_type == ClientType.FRONTEND]) == 1:
+            print("Player 1 connected! Game running")
+            break
+    
+    # offer to load a campaign - will have to re-implement this
+    # potential_campaign_filename = offer_to_load_campaign(disp)
     # make a campaign
-    campaign = Campaign(disp, num_players, all_ai_mode)
+    campaign = Campaign(num_players, all_ai_mode, server)
 
-    # if there's a campaign to load, load it
-    if potential_campaign_filename:
-        campaign.load_campaign(potential_campaign_filename)
+    # # if there's a campaign to load, load it
+    # if potential_campaign_filename:
+    #     campaign.load_campaign(potential_campaign_filename)
     # otherwise, display the plot (since it's a new campaign)
-    else:
-        disp.print_message(GAME_PLOT)
-        disp.get_user_input(prompt="Hit enter to continue")
-        disp.clear_display()
+    # if False:
+    #     pass
+    # else:
+    #     # pyxel_manager.print_message(GAME_PLOT)
+    #     # pyxel_manager.get_user_input(prompt="Hit enter to continue")
+    #     # disp.clear_display()
     campaign.start_campaign()
 
 if __name__ == "__main__":
