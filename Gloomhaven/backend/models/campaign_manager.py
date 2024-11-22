@@ -36,9 +36,8 @@ class Campaign:
         # if we change this, we'll need to pass through the port etc.
         self.server = TCPServer()
         self.server.start()
-        shared_action_queue = PyxelTaskQueue()
-        self.pyxel_view = PyxelEngine(shared_action_queue)
-        self.pyxel_manager = PyxelManager(shared_action_queue)
+        self.pyxel_view = PyxelEngine()
+        self.pyxel_manager = PyxelManager()
         self.disp = disp
         self.num_players = num_players_default
         self.all_ai_mode = all_ai_mode

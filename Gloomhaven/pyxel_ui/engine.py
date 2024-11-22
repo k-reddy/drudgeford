@@ -11,7 +11,6 @@ from pyxel_ui.constants import (
     MAP_TILE_WIDTH_PX,
 )
 from .models.tasks import ActionTask
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient
@@ -24,7 +23,7 @@ from server.task_jsonifier import TaskJsonifier
 
 
 class PyxelEngine:
-    def __init__(self, task_queue: PyxelTaskQueue):
+    def __init__(self):
         self.server_client = TCPClient()
         self.tj = TaskJsonifier()
         self.current_task = None
@@ -34,8 +33,7 @@ class PyxelEngine:
 
         self.hover_grid = None
 
-        # Controllers and queues
-        self.task_queue = task_queue
+        # Controller
         self.view_manager = None
 
         # To measure framerate and loop duration
@@ -57,8 +55,7 @@ class PyxelEngine:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
-        if not self.current_task: #and not self.task_queue.is_empty():
-            # self.current_task = self.task_queue.dequeue()
+        if not self.current_task: 
             jsonified_task = self.server_client.get_task()
             self.current_task = self.tj.make_task_from_json(jsonified_task)
 
@@ -117,7 +114,7 @@ class PyxelEngine:
             self.last_mouse_pos = (curr_mouse_x, curr_mouse_y)
 
     def draw(self):
-        """everything in the task queue draws itself,
+        """everything in the tasks draws itself,
         so there's nothing to draw here - this ensures
         we're not redrawing the canvas unless there's something
         new to draw!
