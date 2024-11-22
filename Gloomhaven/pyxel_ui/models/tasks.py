@@ -199,3 +199,35 @@ class ActionTask(Task):
             )
             for i in range(step_count + 1)
         )
+
+@dataclass
+class InputTask(Task):
+    """
+    task that asks user for input in the terminal
+    """
+    prompt: str
+    valid_inputs: Optional[list] = None
+
+    def perform(self, view_manager: ViewManager):
+        user_input = input(self.prompt)
+
+        # if there's no validation, return any input given
+        if self.valid_inputs is None:
+            return user_input
+
+        while user_input not in self.valid_inputs:
+            user_input = input("Invalid key pressed. Try again.")
+
+        # send this input to the server
+        return user_input
+        
+
+@dataclass
+class PrintTerminalMessage(Task):
+    """
+    task that asks user for input in the terminal
+    """
+    message: str
+
+    def perform(self, view_manager: ViewManager):
+        print(self.message)

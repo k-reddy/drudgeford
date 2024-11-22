@@ -169,3 +169,12 @@ class PyxelManager:
     def jsonify_and_send_task(self, task):
         json_task = self.tj.convert_task_to_json(task)
         self.server_client.post_task(json_task)
+
+    def get_user_input(self, prompt, valid_inputs=None):
+        task = tasks.InputTask(prompt, valid_inputs)
+        self.jsonify_and_send_task(task)
+        return self.server_client.get_user_input()
+    
+    def print_message(self, message):
+        task = tasks.PrintTerminalMessage(message)
+        self.jsonify_and_send_task(task)

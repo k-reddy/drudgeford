@@ -14,14 +14,14 @@ MAX_ROUNDS = 1000
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+    def __init__(self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log):
         self.id = char_id
         self.health = 8
         self.name = name
         self.action_cards = self.create_action_cards()
         self.killed_action_cards: list = []
         self.available_action_cards = self.action_cards.copy()
-        self.disp = disp
+        self.pyxel_manager = pyxel_manager
         self.emoji = emoji
         # a default sprite 
         self.pyxel_sprite_name = "knight"
@@ -35,12 +35,12 @@ class Character(abc.ABC):
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
-                self.disp, self.available_action_cards
+                self.pyxel_manager, self.available_action_cards
             )
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        return self.agent.decide_if_move_first(self.disp)
+        return self.agent.decide_if_move_first(self.pyxel_manager)
 
     def perform_movement(self, movement, is_jump, board):
         if movement == 0:
@@ -54,7 +54,7 @@ class Character(abc.ABC):
     def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
             return None
-        return self.agent.select_attack_target(self.disp, in_range_opponents, board, self)
+        return self.agent.select_attack_target(self.pyxel_manager, in_range_opponents, board, self)
 
     def short_rest(self) -> None:
         # reset our available cards
