@@ -209,6 +209,7 @@ class InputTask(Task):
     valid_inputs: Optional[list] = None
 
     def perform(self, view_manager: ViewManager):
+        self.clear_input()
         user_input = input(self.prompt)
 
         # if there's no validation, return any input given
@@ -220,6 +221,17 @@ class InputTask(Task):
 
         # send this input to the server
         return user_input
+    
+    def clear_input(self):
+        # windows
+        try:
+            import msvcrt
+            while msvcrt.kbhit():
+                msvcrt.getch()
+        # Unix/Linux
+        except ImportError:
+            import sys, termios
+            termios.tcflush(sys.stdin, termios.TCIOFLUSH)
         
 
 @dataclass
