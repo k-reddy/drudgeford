@@ -57,10 +57,10 @@ class PyxelEngine:
         if pyxel.btnp(pyxel.KEY_Q):
             pyxel.quit()
 
-        if not self.current_task and not self.task_queue.is_empty():
-            self.current_task = self.task_queue.dequeue()
+        if not self.current_task: #and not self.task_queue.is_empty():
+            # self.current_task = self.task_queue.dequeue()
             jsonified_task = self.server_client.get_task()
-            server_task = self.tj.make_task_from_json(jsonified_task)
+            self.current_task = self.tj.make_task_from_json(jsonified_task)
 
 
         if self.current_task:
