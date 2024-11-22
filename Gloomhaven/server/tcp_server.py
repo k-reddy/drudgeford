@@ -40,7 +40,7 @@ class TCPServer:
         while self.running:
             try:
                 client_socket, address = self.server_socket.accept()
-                print(f"New connection from {address}")
+                # print(f"New connection from {address}")
                 client_socket.settimeout(0.5)  # Non-blocking client socket
                 with self.lock:
                     self.clients.append(client_socket)
