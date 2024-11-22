@@ -4,7 +4,6 @@ from itertools import count
 import pickle
 import os
 
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.engine import PyxelEngine
 from backend.models.game_loop import GameLoop
 from backend.models.display import Display
