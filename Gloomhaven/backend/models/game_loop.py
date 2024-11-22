@@ -145,7 +145,7 @@ class GameLoop:
         except SlipAndLoseTurn:
             if not self.all_ai_mode:
                 self.pyxel_manager.get_user_input(
-                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue",
                 )
 
         self._end_turn()
@@ -201,7 +201,8 @@ class GameLoop:
                     f"{acting_character.name} slipped and lost their turn!"
                 )
                 self.pyxel_manager.get_user_input(
-                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue",
+                    client_id="frontend_1"
                 )
 
         self._end_turn()
