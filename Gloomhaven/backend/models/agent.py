@@ -1,8 +1,8 @@
 import abc
 import random
 from backend.models.action_model import ActionCard
-from backend.models.display import Display
 from typing import Callable
+from backend.models.pyxel_backend import PyxelManager
 
 DIRECTION_MAP = {
     "w": [-1, 0],
@@ -19,17 +19,17 @@ DIRECTION_MAP = {
 class Agent(abc.ABC):
     @staticmethod
     @abc.abstractmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard]) -> ActionCard:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def decide_if_move_first(disp: Display) -> bool:
+    def decide_if_move_first(pyxel_manager: PyxelManager) -> bool:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char):
         pass
 
     @staticmethod
@@ -44,17 +44,17 @@ class Agent(abc.ABC):
 
 class Ai(Agent):
     @staticmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard]) -> ActionCard:
         action_card_num = random.randrange(len(available_action_cards))
         return available_action_cards.pop(action_card_num)
     
     @staticmethod
-    def decide_if_move_first(disp: Display) -> bool:
+    def decide_if_move_first(pyxel_manager: PyxelManager) -> bool:
         # monster always moves first - won't move if they're within range
         return True
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char):
         # monster picks a random opponent
         shortest_dist = 1000
         nearest_opponent = None
@@ -87,23 +87,23 @@ class Ai(Agent):
     
 class Human(Agent):
     @staticmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard]) -> ActionCard:
         # let them pick a valid action_card
         prompt = "Which action card would you like to pick? Type the number exactly."
         valid_inputs = [str(i) for i, _ in enumerate(available_action_cards)]
 
-        action_card_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        action_card_num = pyxel_manager.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
 
         return action_card_to_perform
     
     @staticmethod
-    def decide_if_move_first(disp: Display) -> bool:
-        key_press = disp.get_user_input(prompt="Type 1 to move first or 2 to perform actions first.", valid_inputs=["1","2"])
+    def decide_if_move_first(pyxel_manager: PyxelManager) -> bool:
+        key_press = pyxel_manager.get_user_input(prompt="Type 1 to move first or 2 to perform actions first.", valid_inputs=["1","2"])
         return key_press == "1"
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char):
         if len(in_range_opponents) == 1:
             return in_range_opponents[0]
         # show in range opponents
@@ -115,7 +115,7 @@ class Human(Agent):
         # get user input on which to attack
         prompt = "Please type the number of the character you want to target"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        target_num = pyxel_manager.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
         return in_range_opponents[int(target_num)]
     
     @staticmethod
@@ -124,7 +124,7 @@ class Human(Agent):
         while remaining_movement > 0:
             board.pyxel_manager.log.append(f"\nMovement remaining: {remaining_movement}")    
             prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            direction = char.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
+            direction = char.pyxel_manager.get_user_input(prompt=prompt, valid_inputs=list(DIRECTION_MAP.keys()))
             
             if direction == "f":
                 break

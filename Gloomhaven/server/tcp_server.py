@@ -30,7 +30,7 @@ class TCPServer:
 
     def start(self):
         """Start the server and listen for connections"""
-        print(f"Server started on {self.host}:{self.port}" + (" (testing mode)" if self.testing_mode else ""))
+        # print(f"Server started on {self.host}:{self.port}" + (" (testing mode)" if self.testing_mode else ""))
         self.running = True
         self.accept_thread = threading.Thread(target=self._accept_connections, daemon=True)
         self.accept_thread.start()

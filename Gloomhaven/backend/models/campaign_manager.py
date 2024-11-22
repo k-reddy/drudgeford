@@ -94,7 +94,6 @@ class Campaign:
             self.current_level.wall_color_map
         )
         game = GameLoop(
-            self.disp, 
             self.num_players, 
             self.all_ai_mode, 
             self.pyxel_manager, 
@@ -151,7 +150,7 @@ class Campaign:
         # set up characters players can choose from
         for char_class, emoji, default_name in zip(char_classes, emojis, default_names):
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
-            self.available_chars.append(char_class(default_name, self.disp, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
+            self.available_chars.append(char_class(default_name, self.pyxel_manager, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         
         for i in range(self.num_players):
             self.player_chars.append(self.select_player_character(i))

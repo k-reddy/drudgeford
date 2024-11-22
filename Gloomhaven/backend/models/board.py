@@ -28,14 +28,12 @@ class Board:
         size: int,
         monsters: list[character.Character],
         players: list[character.Character],
-        disp: Display,
         pyxel_manager: pyxel_backend.PyxelManager,
         id_generator: count,
         starting_elements: list[obstacle.TerrainObject],
     ) -> None:
         self.round_num = 0
         self.size = size
-        self.disp = disp
         self.id_generator = id_generator
         self.pyxel_manager = pyxel_manager
 
@@ -620,7 +618,7 @@ class Board:
 
         new_char = char_class(
             f"Spooky {char_class.__name__}",
-            self.disp,
+            self.pyxel_manager,
             "💀",
             Ai(),
             next(self.id_generator),

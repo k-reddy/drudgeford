@@ -10,7 +10,7 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
-from .models.tasks import ActionTask
+from .models.tasks import ActionTask, InputTask
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient
@@ -59,15 +59,17 @@ class PyxelEngine:
             jsonified_task = self.server_client.get_task()
             self.current_task = self.tj.make_task_from_json(jsonified_task)
 
-
         if self.current_task:
-            self.current_task.perform(self.view_manager)
+            task_output = self.current_task.perform(self.view_manager)
             # don't clear the task if it's an action task and has steps to do
             if (
                 isinstance(self.current_task, ActionTask)
                 and self.current_task.action_steps
             ):
                 return
+            # if we're asked for user input, send what we get to the server
+            elif isinstance(self.current_task, InputTask):
+                self.server_client.post_user_input(task_output)
             self.current_task = None
 
         # Add controls for scrolling

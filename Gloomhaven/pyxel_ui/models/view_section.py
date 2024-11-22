@@ -281,7 +281,7 @@ class ActionCardView(ViewSection):
         self.font.redraw_text(7, self.text_pixels)
 
     def draw(self) -> None:
-        print("action card draw")
+        # print("action card draw")
         self.text_pixels = []
         self.clear_bounds()
         if not self.drawable:
