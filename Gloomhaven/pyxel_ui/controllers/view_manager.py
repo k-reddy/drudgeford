@@ -87,21 +87,7 @@ class ViewManager:
         )
         self.views.extend([self.action_card_view, *action_card_borders])
 
-        # keyborad_view_params = ViewParams(
-        #     font=self.font,
-        #     start_pos=[
-        #         0,
-        #         self.action_card_view.bounding_coordinate[1],
-        #     ],
-        #     bounding_coordinate=[self.canvas_width, self.canvas_height],
-        # )
-        # self.keyboard_view, keyboard_borders = (
-        #     self.view_factory.create_view_with_border(
-        #         view.KeyboardView, keyborad_view_params, [60, 10, 0, 10]
-        #     )
-        # )
-        # self.views.extend([self.keyboard_view, *keyboard_borders])
-        keyborad_view_params = ViewParams(
+        personal_log_params = ViewParams(
             font=self.font,
             start_pos=[
                 0,
@@ -109,14 +95,14 @@ class ViewManager:
             ],
             bounding_coordinate=[self.canvas_width, self.canvas_height],
         )
-        self.keyboard_view, keyboard_borders = (
+        self.personal_log, personal_log_borders = (
             self.view_factory.create_view_with_border(
-                view.LogView, keyborad_view_params, [60, 10, 0, 10]
+                view.LogView, personal_log_params, [60, 10, 0, 10]
             )
         )
-        self.views.extend([self.keyboard_view, *keyboard_borders])
-        self.keyboard_view.font_color = 2
-        self.keyboard_view.display_round_turn = False
+        self.views.extend([self.personal_log, *personal_log_borders])
+        self.personal_log.font_color = 2
+        self.personal_log.display_round_turn = False
 
     def update_log(self, log: list[str]):
         # note: drawable set in update_round_turn()
@@ -247,13 +233,13 @@ class ViewManager:
     #     self.keyboard_view.draw()
     def update_keyboard(self, output, clear=True):
         if clear:
-            self.keyboard_view.log = [output]
+            self.personal_log.log = [output]
         else:
-            self.keyboard_view.log += output
-        self.keyboard_view.drawable = True
-        self.keyboard_view.draw()
+            self.personal_log.log += output
+        self.personal_log.drawable = True
+        self.personal_log.draw()
     
     def reset_keyboard(self):
-        self.keyboard_view.drawable = False
-        self.keyboard_view.log = []
-        self.keyboard_view.draw()
+        self.personal_log.drawable = False
+        self.personal_log.log = []
+        self.personal_log.draw()
