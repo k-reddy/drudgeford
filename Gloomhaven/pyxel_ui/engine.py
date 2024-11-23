@@ -43,7 +43,7 @@ class PyxelEngine:
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
-        self.keyboard_manager = KeyboardManager(self.view_manager)
+        self.keyboard_manager = KeyboardManager(self.view_manager, self.server_client)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
@@ -61,7 +61,7 @@ class PyxelEngine:
             self.current_task = self.tj.make_task_from_json(jsonified_task)
 
         if self.current_task:
-            task_output = self.current_task.perform(self.view_manager)
+            task_output = self.current_task.perform(self.view_manager, self.keyboard_manager)
             # don't clear the task if it's an action task and has steps to do
             if (
                 isinstance(self.current_task, ActionTask)
@@ -69,7 +69,8 @@ class PyxelEngine:
             ):
                 return
             # if we're asked for user input or a campaign, send what we get to the server
-            elif isinstance(self.current_task, (InputTask, LoadCampaign)): 
+            # elif isinstance(self.current_task, (InputTask, LoadCampaign)): 
+            elif isinstance(self.current_task, LoadCampaign): 
                 self.server_client.post_user_input(task_output)
             self.current_task = None
 

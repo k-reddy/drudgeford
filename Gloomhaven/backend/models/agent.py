@@ -126,9 +126,10 @@ class Human(Agent):
     @staticmethod
     def perform_movement(char, movement, is_jump, board, client_id: str|None =None, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
+        orig_prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+        prompt = orig_prompt
         while remaining_movement > 0:
             board.pyxel_manager.log.append(f"\nMovement remaining: {remaining_movement}")    
-            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
             direction = char.pyxel_manager.get_user_input(prompt=prompt, valid_inputs=list(DIRECTION_MAP.keys()),client_id=client_id)
             
             if direction == "f":
@@ -148,11 +149,11 @@ class Human(Agent):
                 # do this instead of update location because it deals with terrain
                 board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
                 remaining_movement -= 1
+                prompt = orig_prompt
                 continue
             else:
-                board.pyxel_manager.log.append(
-                    "Invalid movement direction (obstacle, character, or board edge) - try again"
-                )
+                prompt = "Invalid movement direction (obstacle, character, or board edge) - try again\n" + prompt
+                
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)

@@ -172,11 +172,20 @@ class PyxelManager:
 
     def get_user_input(self, prompt, valid_inputs=None, client_id='ALL_FRONTEND'):
         # tell client to get user input
-        task = tasks.InputTask(prompt, valid_inputs)
+        task = tasks.InputTask(prompt)
         self.jsonify_and_send_task(task, client_id)
-        # retrieve the latest input from the client
-        # !!! may want to do something with ['source_client_id']
-        return self.server_client.get_user_input()['input']
+        # get input back
+        user_input = self.server_client.get_user_input()['input']
+
+        if not valid_inputs:
+            return user_input
+
+        # if there's validation, keep asking for input until you get what you need
+        while user_input not in valid_inputs:
+            task = tasks.InputTask("Invalid key pressed. Try again.\n"+prompt)
+            self.jsonify_and_send_task(task, client_id)
+            user_input = self.server_client.get_user_input()['input']
+        return user_input
     
     def print_message(self, message, client_id='ALL_FRONTEND'):
         task = tasks.PrintTerminalMessage(message)
