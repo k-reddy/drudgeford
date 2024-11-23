@@ -4,6 +4,7 @@ from typing import Optional
 import abc
 
 from pyxel_ui.controllers.view_manager import ViewManager
+from pyxel_ui.controllers.keyboard_manager import KeyboardManager
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import FRAME_DURATION_MS
@@ -11,7 +12,7 @@ from pyxel_ui.constants import FRAME_DURATION_MS
 @dataclass
 class Task(abc.ABC):
     @abc.abstractmethod
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         pass
 
 
@@ -30,7 +31,7 @@ class AddEntitiesTask(Task):
 
     entities: list
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         entities = view_manager.map_view.entities
         for entity in self.entities:
             row_px, col_px = view_manager.convert_grid_to_pixel_pos(
@@ -60,7 +61,7 @@ class RemoveEntityTask(Task):
 
     entity_id: int
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.remove_entity(self.entity_id)
 
 
@@ -75,7 +76,7 @@ class LoadCharactersTask(Task):
     sprite_names: list[str]
     teams: list[bool]
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.update_initiative_bar(self.sprite_names, self.healths, self.teams)
 
 
@@ -87,7 +88,7 @@ class LoadLogTask(Task):
 
     log: list[str]
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.update_log(self.log)
 
 
@@ -99,7 +100,7 @@ class LoadActionCardsTask(Task):
 
     action_card_log: list[str]
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.update_action_card_log(self.action_card_log)
 
 
@@ -112,7 +113,7 @@ class LoadRoundTurnInfoTask(Task):
     round_number: int
     acting_character_name: str
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.update_round_turn(self.round_number, self.acting_character_name)
 
 
@@ -130,7 +131,7 @@ class BoardInitTask:
     floor_color_map: Optional[list[tuple[int, int]]] = None
     wall_color_map: Optional[list[tuple[int, int]]] = None
 
-    def perform(self, view_manager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         view_manager.update_map(
             self.valid_map_coordinates, self.floor_color_map, self.wall_color_map
         )
@@ -157,7 +158,7 @@ class ActionTask(Task):
     duration_ms: int = 1000
     action_steps: Optional[deque[tuple[int, int]]] = None
 
-    def perform(self, view_manager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         # if you don't have action steps, create them
         if not self.action_steps:
             self.action_steps = self.get_px_move_steps_between_tiles(view_manager)
@@ -205,21 +206,9 @@ class InputTask(Task):
     task that asks user for input in the terminal
     """
     prompt: str
-    valid_inputs: Optional[list] = None
 
-    def perform(self, view_manager: ViewManager):
-        self.clear_input()
-        user_input = input(self.prompt)
-
-        # if there's no validation, return any input given
-        if self.valid_inputs is None:
-            return user_input
-
-        while user_input not in self.valid_inputs:
-            user_input = input("Invalid key pressed. Try again.")
-
-        # send this input to the server
-        return user_input
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
+        keyboard_manager.get_keyboard_input(self.prompt)
     
     def clear_input(self):
         # windows
@@ -231,16 +220,48 @@ class InputTask(Task):
         except ImportError:
             import sys, termios
             termios.tcflush(sys.stdin, termios.TCIOFLUSH)
-        
+
+# @dataclass
+# class InputTask(Task):
+#     """
+#     task that asks user for input in the terminal
+#     """
+#     prompt: str
+#     valid_inputs: Optional[list] = None
+
+#     def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
+#         self.clear_input()
+#         user_input = input(self.prompt)
+
+#         # if there's no validation, return any input given
+#         if self.valid_inputs is None:
+#             return user_input
+
+#         while user_input not in self.valid_inputs:
+#             user_input = input("Invalid key pressed. Try again.")
+
+#         # send this input to the server
+#         return user_input
+    
+#     def clear_input(self):
+#         # windows
+#         try:
+#             import msvcrt
+#             while msvcrt.kbhit():
+#                 msvcrt.getch()
+#         # Unix/Linux
+#         except ImportError:
+#             import sys, termios
+#             termios.tcflush(sys.stdin, termios.TCIOFLUSH)
 
 @dataclass
 class PrintTerminalMessage(Task):
     """
-    task that asks user for input in the terminal
+    task that prints message in user terminal
     """
     message: str
 
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         print(self.message)
 
 @dataclass
@@ -251,7 +272,7 @@ class SaveCampaign(Task):
     # ideally this would be a CampaignState but it's creating circular dependencies
     campaign_state: any
     
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         if self.should_save():
             self.save_campaign()
         
@@ -289,7 +310,7 @@ class LoadCampaign(Task):
     displays potential campaigns to load, loads the one of your choice
     and sends data back to server
     '''
-    def perform(self, view_manager: ViewManager):
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         import pickle
         from backend.utils.utilities import get_campaign_filenames
         from backend.utils.config import SAVE_FILE_DIR 

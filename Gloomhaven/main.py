@@ -6,31 +6,6 @@ from backend.models.level import GAME_PLOT
 from server.tcp_server import TCPServer, ClientType
 from backend.models.pyxel_backend import PyxelManager
 
-
-def offer_to_load_campaign(disp):
-    file_names = get_campaign_filenames()
-
-    user_input = disp.get_user_input("Would you like to load an existing campaign? Type (y)es or hit enter to start new campaign.")
-    if user_input != "y":
-        return 
-    
-    if not file_names:
-        disp.get_user_input("No existing campaign files. Hit enter to start new campaign") 
-        return 
-    filename = get_user_to_pick_filename(file_names, disp)
-    return filename
-
-def get_user_to_pick_filename(file_names, disp):
-    disp.print_message("WARNING: do not load a file you got from the internet or any other file that isn't yours. This file type is not secure.")
-    message = "Which game would you like to load? Type just the number\n"
-    valid_inputs = []
-    file_names.sort()
-    for i, name in enumerate(file_names):
-        message+=f"{i}: {name}\n"
-        valid_inputs.append(str(i))
-    file_num = int(disp.get_user_input(message, valid_inputs))
-    return file_names[file_num]
-
 def main(num_players: int = 1, all_ai_mode=False):
     # set up terminal
     if os.getenv("TERM") is None:
