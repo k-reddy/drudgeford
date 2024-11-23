@@ -145,6 +145,10 @@ class PyxelManager:
         task = tasks.LoadLogTask(log)
         self.jsonify_and_send_task(task)
 
+    def add_to_personal_log(self, log, clear=True):
+        task = tasks.AddToPersonalLog(log, clear)
+        self.jsonify_and_send_task(task)
+
     def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
         action_card_log = []
         for i, action_card in enumerate(action_cards):

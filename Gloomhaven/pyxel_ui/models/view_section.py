@@ -86,6 +86,7 @@ class LogView(ViewSection):
         self.max_log_lines: int = MAX_LOG_LINES
         self.text_pixels: list[tuple[int, int]] = None
         self.font_color = 7
+        self.display_round_turn = True
 
     @property
     def log(self):
@@ -140,12 +141,13 @@ class LogView(ViewSection):
         available_height = self.bounding_coordinate[1] - self.start_pos[1]
 
         # Try to draw header
-        header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
-        header_height = get_line_height(header)
+        if self.display_round_turn:
+            header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
+            header_height = get_line_height(header)
 
-        if header_height <= available_height:
-            current_y = draw_line(header, current_y, "large")
-            available_height -= header_height
+            if header_height <= available_height:
+                current_y = draw_line(header, current_y, "large")
+                available_height -= header_height
 
         # Get displayable log lines
         lines = []
