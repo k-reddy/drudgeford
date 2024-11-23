@@ -59,6 +59,7 @@ class Board:
             self.add_starting_effect_to_terrain(element, 1000)
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
+        self.acting_character = None
 
     # @property
     # def locations(self):
@@ -504,27 +505,31 @@ class Board:
 
     def deal_terrain_damage(
         self,
-        acting_character: Character,
+        affected_character: Character,
         row: int,
         col: int,
     ) -> None:
-        damage = self.get_terrain_damage(row, col)
+        element = self.terrain[row][col]
+        if not element:
+            return
+        damage = element.damage
+        element.perform(row, col, self, affected_character)
         element = self.terrain[row][col]
         # if they have an elemental affinity for this element, they heal instead of take damage
-        if acting_character.elemental_affinity == element.__class__:
+        if affected_character.elemental_affinity == element.__class__:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} has an affinity for {element.__class__.__name__}"
+                f"{affected_character.name} has an affinity for {element.__class__.__name__}"
             )
             damage = damage * -1
         if damage:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} stepped on {element.__class__.__name__}"
+                f"{affected_character.name} stepped on {element.__class__.__name__}"
             )
-            self.modify_target_health(acting_character, damage)
+            self.modify_target_health(affected_character, damage)
 
-    def deal_terrain_damage_current_location(self, acting_character: Character):
-        row, col = self.find_location_of_target(acting_character)
-        self.deal_terrain_damage(acting_character, row, col)
+    def deal_terrain_damage_current_location(self, affected_character: Character):
+        row, col = self.find_location_of_target(affected_character)
+        self.deal_terrain_damage(affected_character, row, col)
 
     def update_character_location(
         self,
@@ -542,14 +547,6 @@ class Board:
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
         return is_position_within_board and self.locations[row][col] is None
-
-    def get_terrain_damage(self, row: int, col: int) -> int | None:
-        el = self.terrain[row][col]
-        if el:
-            el.perform(row, col, self)
-            return el.damage
-        else:
-            return None
 
     def modify_target_health(self, target: Character, damage: int) -> None:
         target.health -= damage
