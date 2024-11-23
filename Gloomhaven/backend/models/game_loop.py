@@ -152,6 +152,12 @@ class GameLoop:
         self._end_turn()
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
+        self.board.acting_character = acting_character
+        if acting_character.lose_turn:
+            acting_character.lose_turn = False
+            self.pyxel_manager.log.append(f"{acting_character.name} was knocked down and lost their turn.")
+            self._end_turn()
+            return    
         try:
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
@@ -224,10 +230,11 @@ class GameLoop:
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.pyxel_manager.print_message(message, clear_display=False)
+            self.pyxel_manager.print_message(message)
         return self.game_state
 
     def _end_turn(self) -> None:
+        self.board.acting_character = None
         if not self.all_ai_mode:
             for i in range(1,self.num_players):
                 self.pyxel_manager.print_message("End of turn. Waiting for Player 1 to hit continue", f"frontend_{i+1}")

@@ -33,6 +33,7 @@ class Character(abc.ABC):
         self.log = log
         self.elemental_affinity = None
         self.client_id = None
+        self.lose_turn = False
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
