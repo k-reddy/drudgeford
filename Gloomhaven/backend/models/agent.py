@@ -95,6 +95,10 @@ class Human(Agent):
 
         action_card_num = pyxel_manager.get_user_input(prompt=prompt, valid_inputs=valid_inputs, client_id=client_id)
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
+        # load the new action cards now that you've popped from the list
+        pyxel_manager.load_action_cards(
+                available_action_cards, client_id
+        )
 
         return action_card_to_perform
     

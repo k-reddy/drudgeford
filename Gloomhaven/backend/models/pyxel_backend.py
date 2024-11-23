@@ -145,12 +145,12 @@ class PyxelManager:
         task = tasks.LoadLogTask(log)
         self.jsonify_and_send_task(task)
 
-    def load_action_cards(self, action_cards):
+    def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
         action_card_log = []
         for i, action_card in enumerate(action_cards):
             action_card_log.append(f'''{i}: {action_card}''')
         task = tasks.LoadActionCardsTask(action_card_log=action_card_log)
-        self.jsonify_and_send_task(task)
+        self.jsonify_and_send_task(task, client_id)
 
     def load_round_turn_info(self, round_num, acting_character_name):
         task = tasks.LoadRoundTurnInfoTask(
