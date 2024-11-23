@@ -129,9 +129,8 @@ class Human(Agent):
         orig_prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
         prompt = orig_prompt
         while remaining_movement > 0:
-            board.pyxel_manager.log.append(f"\nMovement remaining: {remaining_movement}")    
-            direction = char.pyxel_manager.get_user_input(prompt=prompt, valid_inputs=list(DIRECTION_MAP.keys()),client_id=client_id)
-            
+            direction = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", valid_inputs=list(DIRECTION_MAP.keys()),client_id=client_id)
+
             if direction == "f":
                 break
 

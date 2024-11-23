@@ -265,6 +265,18 @@ class PrintTerminalMessage(Task):
         print(self.message)
 
 @dataclass
+class AddToPersonalLog(Task):
+    """
+    task that updates the personal log
+    """
+
+    log: list[str]
+    clear: bool
+
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
+        view_manager.update_keyboard(self.log, self.clear)
+
+@dataclass
 class SaveCampaign(Task):
     '''
     task that asks the user if they'd like to save and saves if so

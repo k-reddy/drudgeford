@@ -25,6 +25,7 @@ class KeyboardManager:
                 self.accept_input = False
                 self.return_input_to_server()
                 return 
+                
         
             # Handle backspace
             elif pyxel.btnp(pyxel.KEY_BACKSPACE):
