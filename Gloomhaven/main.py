@@ -46,22 +46,10 @@ def main(num_players: int = 1, all_ai_mode=False):
         if len([1 for client in server.clients.values() if client.client_type == ClientType.FRONTEND]) == 1:
             print("Player 1 connected! Game running")
             break
-    
-    # offer to load a campaign - will have to re-implement this
-    # potential_campaign_filename = offer_to_load_campaign(disp)
-    # make a campaign
-    campaign = Campaign(num_players, all_ai_mode, server)
 
-    # # if there's a campaign to load, load it
-    # if potential_campaign_filename:
-    #     campaign.load_campaign(potential_campaign_filename)
-    # otherwise, display the plot (since it's a new campaign)
-    # if False:
-    #     pass
-    # else:
-    #     # pyxel_manager.print_message(GAME_PLOT)
-    #     # pyxel_manager.get_user_input(prompt="Hit enter to continue")
-    #     # disp.clear_display()
+    # make a campaign, which either starts afresh or loads an existing campaign
+    # depending on what user wants to do 
+    campaign = Campaign(num_players, all_ai_mode, server)
     campaign.start_campaign()
 
 if __name__ == "__main__":

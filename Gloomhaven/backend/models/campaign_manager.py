@@ -40,11 +40,15 @@ class Campaign:
         self.levels = []
         self.initialized = False
 
-    def load_campaign(self, filename):
-        # get the data needed to recreate the campaign
-        with open(SAVE_FILE_DIR+filename, 'rb') as f:
-            campaign_state = pickle.load(f)
+        # see if the user wants to load an existing campaign 
+        # and do so if desired
+        campaign_pickle_to_load = self.pyxel_manager.get_campaign_to_load()
+        if campaign_pickle_to_load:
+            self.load_campaign(campaign_pickle_to_load)
 
+    def load_campaign(self, campaign_pickle_to_load):
+        # get the data needed to recreate the campaign
+        campaign_state = pickle.loads(campaign_pickle_to_load)
         # recreate it
         self.initialized = True
         self.id_generator = count(start=campaign_state.id_gen_start)
@@ -106,7 +110,8 @@ class Campaign:
             if output != GameState.WIN:
                 return
             
-            self.offer_to_save_campaign()
+            # otherwise, offer to save and continue to next level
+            self.save_campaign()
 
     def set_num_players(self):
         if not self.all_ai_mode:
@@ -171,26 +176,7 @@ class Campaign:
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
             player_chars.append(char_class(player_name, self.pyxel_manager, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
         return player_chars
-    
-    def offer_to_save_campaign(self):
-        user_input = self.pyxel_manager.get_user_input("Would you like to save your progress? Type (y)es or (n)o. ",["y","n"])
-        should_save = True if user_input == "y" else False
-        if should_save:
-            self.save_campaign()
 
-    def get_unused_filename(self):
-        file_names = get_campaign_filenames()
-        i=0
-        filename = f"campaign_{i}.pickle"
-        while True:
-            if filename in file_names:
-                i += 1
-                filename = f"campaign_{i}.pickle"
-            else:
-                break
-        return filename
-    
-    # !!! will need to reimplement this
     def save_campaign(self):
         # Create a simple dict with just the essential data
         campaign_state = CampaignState(
@@ -201,8 +187,4 @@ class Campaign:
             all_ai_mode=self.all_ai_mode,
             id_gen_start=next(self.id_generator)
         )
-        filename = self.get_unused_filename()
-        os.makedirs(SAVE_FILE_DIR, exist_ok=True)
-        with open(SAVE_FILE_DIR+filename, 'wb') as f:
-            pickle.dump(campaign_state, f)
-        self.pyxel_manager.get_user_input(f"Successfully saved {filename}. Hit enter to continue. ")
+        self.pyxel_manager.save_campign(campaign_state)
