@@ -7,7 +7,7 @@ from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
-from backend.utils.utilities import GameState
+from backend.utils.utilities import GameState, DieAndEndTurn
 
 
 class GameLoop:
@@ -148,6 +148,8 @@ class GameLoop:
                 self.pyxel_manager.get_user_input(
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
                 )
+        except DieAndEndTurn:
+            pass
 
         self._end_turn()
 
