@@ -55,7 +55,25 @@ class BorderView(ViewSection):
     def draw(self) -> None:
         self.clear_bounds()
 
+class KeyboardView(ViewSection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.output = ""
+        self.drawable = False
 
+    def draw(self) -> None:
+        self.clear_bounds()
+        if not self.drawable:
+            return
+        self.font.draw_text(
+                    self.start_pos[0], 
+                    self.start_pos[1],
+                    self.output,
+                    col=2, 
+                    size="medium", 
+                    max_width=self.bounding_coordinate[0]-self.start_pos[0]
+                )
+        
 class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
