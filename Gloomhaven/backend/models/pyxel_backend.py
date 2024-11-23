@@ -181,3 +181,17 @@ class PyxelManager:
     def print_message(self, message, client_id='ALL_FRONTEND'):
         task = tasks.PrintTerminalMessage(message)
         self.jsonify_and_send_task(task, client_id)
+
+    def save_campign(self, campaign_state):
+        task = tasks.SaveCampaign(campaign_state)
+        self.jsonify_and_send_task(task)
+
+    def get_campaign_to_load(self):
+        '''
+        gets pickle file of the campaign data if user wants to load one, 
+        otherwise returns None
+        only asks frontend_1 if they want to load to avoid conflicts
+        '''
+        task = tasks.LoadCampaign()
+        self.jsonify_and_send_task(task, 'frontend_1')
+        return self.server_client.get_user_input()['input']

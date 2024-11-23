@@ -10,7 +10,7 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
-from .models.tasks import ActionTask, InputTask
+from .models.tasks import ActionTask, InputTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient, ClientType
@@ -67,11 +67,10 @@ class PyxelEngine:
                 and self.current_task.action_steps
             ):
                 return
-            # if we're asked for user input, send what we get to the server
-            elif isinstance(self.current_task, InputTask):
+            # if we're asked for user input or a campaign, send what we get to the server
+            elif isinstance(self.current_task, (InputTask, LoadCampaign)): 
                 self.server_client.post_user_input(task_output)
             self.current_task = None
-
         # Add controls for scrolling
         # !!! this is a yucky fix
         if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
