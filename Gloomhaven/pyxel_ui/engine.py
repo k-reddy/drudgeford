@@ -15,6 +15,7 @@ from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
+from .controllers.keyboard_manager import KeyboardManager
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -42,6 +43,7 @@ class PyxelEngine:
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
+        self.keyboard_manager = KeyboardManager(self.view_manager)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
@@ -52,8 +54,7 @@ class PyxelEngine:
 
     def update(self):
         self.start_time = time.time()
-        if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
+        self.keyboard_manager.update()
 
         if not self.current_task: 
             jsonified_task = self.server_client.get_task()
@@ -71,25 +72,8 @@ class PyxelEngine:
             elif isinstance(self.current_task, (InputTask, LoadCampaign)): 
                 self.server_client.post_user_input(task_output)
             self.current_task = None
-        # Add controls for scrolling
-        # !!! this is a yucky fix
-        if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
-            # Go to next page if there are more cards to show
-            if (
-                self.view_manager.action_card_view.current_card_page + 1
-            ) * self.view_manager.action_card_view.cards_per_page < len(
-                self.view_manager.action_card_view.action_card_log
-            ):
-                self.view_manager.action_card_view.current_card_page += 1
-                self.view_manager.action_card_view.draw()
 
-        # !!! another yucky fix
-        if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
-            # Go to previous page if we're not at the start
-            if self.view_manager.action_card_view.current_card_page > 0:
-                self.view_manager.action_card_view.current_card_page -= 1
-                self.view_manager.action_card_view.draw()
-
+        
         # Handle cursor redraws and grid
         curr_mouse_x, curr_mouse_y = pyxel.mouse_x, pyxel.mouse_y
         if self.last_mouse_pos != (curr_mouse_x, curr_mouse_y):

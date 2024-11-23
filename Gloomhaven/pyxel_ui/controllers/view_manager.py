@@ -192,3 +192,18 @@ class ViewManager:
         if (x_num, y_num) in self.map_view.valid_map_coordinates:
             return True
         return False
+    
+    def scroll_action_cards_right(self):
+        if (
+                self.action_card_view.current_card_page + 1
+            ) * self.action_card_view.cards_per_page < len(
+                self.action_card_view.action_card_log
+            ):
+                self.action_card_view.current_card_page += 1
+                self.action_card_view.draw()
+
+    def scroll_action_cards_left(self):
+        # Go to previous page if we're not at the start
+        if self.action_card_view.current_card_page > 0:
+            self.action_card_view.current_card_page -= 1
+            self.action_card_view.draw()
