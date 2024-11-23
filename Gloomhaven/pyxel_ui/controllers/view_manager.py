@@ -78,14 +78,29 @@ class ViewManager:
                 0,
                 self.map_view.bounding_coordinate[1],
             ],
-            bounding_coordinate=[self.canvas_width, self.canvas_height],
+            bounding_coordinate=[self.canvas_width, BITS * 18],
         )
         self.action_card_view, action_card_borders = (
             self.view_factory.create_view_with_border(
-                view.ActionCardView, action_card_view_params
+                view.ActionCardView, action_card_view_params, [0, 10, 10, 10]
             )
         )
         self.views.extend([self.action_card_view, *action_card_borders])
+
+        keyborad_view_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.action_card_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, self.canvas_height],
+        )
+        self.keyboard_view, keyboard_borders = (
+            self.view_factory.create_view_with_border(
+                view.KeyboardView, keyborad_view_params, [60, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.keyboard_view, *keyboard_borders])
 
     def update_log(self, log: list[str]):
         # note: drawable set in update_round_turn()
@@ -177,10 +192,8 @@ class ViewManager:
         view.draw_grid(px_x, px_y, px_width, px_height)
 
     def draw_whole_game(self):
-        self.initiative_bar_view.draw()
-        self.map_view.draw()
-        self.log_view.draw()
-        self.action_card_view.draw()
+        for v in self.views:
+            v.draw()
 
     def is_pyxel_in_valid_map_area(self, px_x, px_y):
         # get rid of offsets
@@ -207,3 +220,8 @@ class ViewManager:
         if self.action_card_view.current_card_page > 0:
             self.action_card_view.current_card_page -= 1
             self.action_card_view.draw()
+
+    def update_keyboard(self, output, drawable):
+        self.keyboard_view.output = output
+        self.keyboard_view.drawable = drawable
+        self.keyboard_view.draw()
