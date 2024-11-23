@@ -25,6 +25,7 @@ class GameLoop:
         self.pyxel_manager = pyxel_manager
         self.level = level
         self.num_players = num_players
+        self.players = players
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
@@ -34,7 +35,11 @@ class GameLoop:
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-
+        # load everyone's action cards
+        for player in self.players:
+            self.pyxel_manager.load_action_cards(
+                player.available_action_cards, player.client_id
+            )
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.run_round(round_number)
@@ -109,10 +114,6 @@ class GameLoop:
         self, acting_character: character.Character, round_num: int
     ) -> None:
         try:
-            if not acting_character.team_monster:
-                self.pyxel_manager.load_action_cards(
-                    acting_character.available_action_cards
-                )
             action_card = acting_character.select_action_card()
             print(f"{action_card=}")
             move_first = acting_character.decide_if_move_first(action_card)
@@ -156,15 +157,10 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
                 )
-            if not acting_character.team_monster:
-                self.pyxel_manager.load_action_cards(
-                    acting_character.available_action_cards
-                )
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
             )
-
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(
@@ -233,10 +229,9 @@ class GameLoop:
 
     def _end_turn(self) -> None:
         if not self.all_ai_mode:
-            self.pyxel_manager.get_user_input(prompt="End of turn. Hit enter to continue", client_id="frontend_1")
             for i in range(1,self.num_players):
                 self.pyxel_manager.print_message("End of turn. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
-            self.pyxel_manager.load_action_cards([])
+            self.pyxel_manager.get_user_input(prompt="End of turn. Hit enter to continue", client_id="frontend_1")
             self.pyxel_manager.log.clear()
 
     def _end_round(self) -> None:
@@ -245,9 +240,9 @@ class GameLoop:
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            self.pyxel_manager.get_user_input(prompt="End of round. Hit enter to continue", client_id="frontend_1")
             for i in range(1,self.num_players):
                 self.pyxel_manager.print_message("End of round. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
+            self.pyxel_manager.get_user_input(prompt="End of round. Hit enter to continue", client_id="frontend_1")
             self.pyxel_manager.log.clear()
 
     def refresh_character_cards(self, char: character.Character) -> None:
