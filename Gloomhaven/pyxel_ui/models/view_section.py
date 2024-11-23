@@ -85,6 +85,7 @@ class LogView(ViewSection):
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
         self.text_pixels: list[tuple[int, int]] = None
+        self.font_color = 7
 
     @property
     def log(self):
@@ -101,7 +102,7 @@ class LogView(ViewSection):
         self.clear_bounds()
         if not self.log and self.round_number <= 0:
             return
-        self.font.redraw_text(7, self.text_pixels)
+        self.font.redraw_text(self.font_color, self.text_pixels)
 
     def draw(self) -> None:
         if not self.is_log_changed:
@@ -128,7 +129,7 @@ class LogView(ViewSection):
                     self.start_pos[0],
                     y_pos,
                     text,
-                    col=7,
+                    col=self.font_color,
                     size=size,
                     max_width=self.bounding_coordinate[0] - self.start_pos[0],
                 )
