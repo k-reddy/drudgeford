@@ -429,12 +429,6 @@ class Board:
         # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: Character) -> None:
-        # !!! to fix
-        # weird bug where you can kill someone who's already killed
-        # by walking through fire after you're dead since
-        # movement doesn't auto-end
-        # we need to fix this upstream by ending turn immediately when die,
-        # not by ending turn after each action
         if target not in self.characters:
             return
         self.remove_character(target)
@@ -445,10 +439,6 @@ class Board:
         # if it's your turn, end it immediately
         if target==self.acting_character:
             raise DieAndEndTurn()
-        # !!! for pair coding
-        # !!! if the target is the player, end game
-        # !!! if the target is the acting_character, end turn
-        # - to do this, end turn and end game need to actually work, not just be place holders
 
     def find_in_range_opponents_or_allies(
         self, actor: Character, distance: int, opponents=True
