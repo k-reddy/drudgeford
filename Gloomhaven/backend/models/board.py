@@ -6,11 +6,11 @@ from typing import Type
 
 import backend.models.agent as agent
 import backend.models.character as character
-from backend.models.display import Display
 from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
 from backend.utils import attack_shapes as shapes
+from backend.utils.utilities import DieAndEndTurn
 
 
 MAX_ROUNDS = 1000
@@ -442,6 +442,9 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
         self.pyxel_manager.log.append(f"{target.name} has been killed.")
+        # if it's your turn, end it immediately
+        if target==self.acting_character:
+            raise DieAndEndTurn()
         # !!! for pair coding
         # !!! if the target is the player, end game
         # !!! if the target is the acting_character, end turn
