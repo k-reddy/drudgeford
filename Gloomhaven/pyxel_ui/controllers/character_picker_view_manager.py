@@ -29,3 +29,6 @@ class CharacterPickerViewManager:
             self.character_picker.go_to_next_page()
         elif btn == pyxel.KEY_LEFT:
             self.character_picker.go_to_prev_page()
+
+    def clear_screen(self):
+        self.character_picker.clear_bounds()
