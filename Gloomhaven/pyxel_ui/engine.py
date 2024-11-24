@@ -68,6 +68,7 @@ class PyxelEngine:
             if isinstance(self.current_task, ShowCharacterPickerTask):
                 self.current_view_manager = self.character_picker_view_manager
             else:
+                self.current_view_manager.clear_screen()
                 self.current_view_manager = self.view_manager
 
             self.current_task.perform(self.current_view_manager)

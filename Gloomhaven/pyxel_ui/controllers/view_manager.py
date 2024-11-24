@@ -165,3 +165,6 @@ class ViewManager:
             self.action_card_view.go_to_next_page()
         elif btn == pyxel.KEY_LEFT:
             self.action_card_view.go_to_prev_page()
+
+    def clear_screen(self):
+        pass
