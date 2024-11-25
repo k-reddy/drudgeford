@@ -58,7 +58,6 @@ class KeyboardManager:
         if self.accept_mouse_input and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             if self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
-                print(tile_pos_x, tile_pos_y)
                 # BUG: location seems to be relative to character starting position so
                 # the target location will always be off by some amount, e.g. always 2 over.
                 self.view_manager.reset_keyboard()

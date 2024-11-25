@@ -152,7 +152,7 @@ class Human(Agent):
                 prompt = orig_prompt
                 continue
             else:
-                prompt = "Invalid movement direction (obstacle, character, or board edge) - try again\n" + prompt
+                prompt = "Invalid square (obstacle, character, or board edge) - try again\n" + prompt
                 
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
