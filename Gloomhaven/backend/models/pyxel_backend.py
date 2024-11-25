@@ -9,13 +9,13 @@ CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
 
 class PyxelManager:
-    def __init__(self,):
+    def __init__(self,port):
         self.move_duration = 700
         self.log = ListWithUpdate([], self.load_log)
         self.floor_color_map = []
         self.wall_color_map = []
         self.tj = TaskJsonifier()
-        self.server_client = TCPClient(ClientType.BACKEND)
+        self.server_client = TCPClient(ClientType.BACKEND, port=port)
 
 
     def load_board(self, locations, terrain):
