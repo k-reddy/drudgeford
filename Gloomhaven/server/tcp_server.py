@@ -6,9 +6,11 @@ import json
 from typing import List, Dict
 from enum import Enum
 
+
 class ClientType(Enum):
     BACKEND = "backend"
     FRONTEND = "frontend"
+
 
 @dataclass
 class ClientData:
@@ -18,8 +20,9 @@ class ClientData:
     tasks: List[Dict]
     thread: threading.Thread
 
+
 class TCPServer:
-    def __init__(self, host="13.59.128.25", port=8080, testing_mode=True):
+    def __init__(self, host="0.0.0.0", port=8080, testing_mode=True):
         self.host = host
         self.port = port
         self.testing_mode = testing_mode
@@ -27,10 +30,10 @@ class TCPServer:
         self.frontend_counter = 0
         self.user_input_queue = queue.Queue()
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
+
         if self.testing_mode:
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        
+
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen(5)
         self.lock = threading.Lock()
@@ -47,7 +50,9 @@ class TCPServer:
     def start(self):
         """Start the server and listen for connections"""
         self.running = True
-        self.accept_thread = threading.Thread(target=self._accept_connections, daemon=True)
+        self.accept_thread = threading.Thread(
+            target=self._accept_connections, daemon=True
+        )
         self.accept_thread.start()
 
     def _accept_connections(self):
@@ -55,32 +60,30 @@ class TCPServer:
         while self.running:
             client_socket, _ = self.server_socket.accept()
             client_socket.settimeout(0.5)
-            
+
             # Wait for client to identify itself
-            data = client_socket.recv(4096).decode('utf-8')
+            data = client_socket.recv(4096).decode("utf-8")
             if not data:
                 continue
             client_info = json.loads(data)
-            client_type = ClientType(client_info.get('client_type'))
-            
+            client_type = ClientType(client_info.get("client_type"))
+
             # Generate client ID and send it back
             client_id = self._generate_client_id(client_type)
-            client_socket.send(json.dumps({"client_id": client_id}).encode('utf-8'))
-            
+            client_socket.send(json.dumps({"client_id": client_id}).encode("utf-8"))
+
             # Create and start client thread
             client_thread = threading.Thread(
-                target=self._handle_client,
-                daemon=True,
-                args=(client_socket, client_id)
+                target=self._handle_client, daemon=True, args=(client_socket, client_id)
             )
-            
+
             with self.lock:
                 self.clients[client_id] = ClientData(
                     socket=client_socket,
                     client_id=client_id,
                     client_type=client_type,
                     tasks=[],
-                    thread=client_thread
+                    thread=client_thread,
                 )
 
             client_thread.start()
@@ -89,60 +92,59 @@ class TCPServer:
         """Handle individual client connections"""
         while self.running:
             try:
-                data = client_socket.recv(4096).decode('utf-8')
+                data = client_socket.recv(4096).decode("utf-8")
 
                 request = json.loads(data)
-                command = request.get('command')
-                payload = request.get('payload', {})
-                
+                command = request.get("command")
+                payload = request.get("payload", {})
+
                 response = self._process_command(command, payload, client_id)
-                client_socket.send(json.dumps(response).encode('utf-8'))
+                client_socket.send(json.dumps(response).encode("utf-8"))
             except socket.timeout:
                 continue
 
     def _process_command(self, command: str, payload: Dict, client_id: str) -> Dict:
         """Process commands and return appropriate response"""
         client_data = self.clients[client_id]
-        
-        if command == 'get_task':
+
+        if command == "get_task":
             with self.lock:
                 task = None
                 if client_data.tasks:
                     task = client_data.tasks.pop(0)
-            return {'task': task}
-            
-        elif command == 'post_task':
+            return {"task": task}
+
+        elif command == "post_task":
             self._process_post_task(payload)
-            
-        elif command == 'get_user_input':
+
+        elif command == "get_user_input":
             if client_data.client_type != ClientType.BACKEND:
-                raise PermissionError("Only backend client is allowed to get user input")                
+                raise PermissionError(
+                    "Only backend client is allowed to get user input"
+                )
             # Get user input with source client information
             user_input_data = self.user_input_queue.get()
-            return {'user_input': user_input_data}
-            
-        elif command == 'post_user_input':
+            return {"user_input": user_input_data}
+
+        elif command == "post_user_input":
             if client_data.client_type != ClientType.FRONTEND:
-                return {'error': 'Only frontend can post user input'}
-                
+                return {"error": "Only frontend can post user input"}
+
             # Include client ID with user input
-            user_input_data = {
-                'source_client_id': client_id,
-                'input': payload
-            }
+            user_input_data = {"source_client_id": client_id, "input": payload}
             self.user_input_queue.put(user_input_data)
-            return {'status': 'success'}
-            
+            return {"status": "success"}
+
         else:
             raise ValueError("unknown command")
 
     def _process_post_task(self, payload):
-        target_client_id = payload.get('target_client_id')
-        task_data = payload.get('task')
-        
+        target_client_id = payload.get("target_client_id")
+        task_data = payload.get("task")
+
         if not target_client_id:
             raise ValueError("No target client id")
-        
+
         if target_client_id == "ALL_FRONTEND":
             with self.lock:
                 for client_data in self.clients.values():
@@ -153,40 +155,44 @@ class TCPServer:
                 self.clients[target_client_id].tasks.append(task_data)
         else:
             raise ValueError("unknown client id")
-        return {'status': 'success'}
-    
+        return {"status": "success"}
+
     def stop(self):
         """Stop the server and clean up all resources gracefully"""
         print("Initiating server shutdown...")
-        
+
         self.running = False
-        
+
         if self.accept_thread and self.accept_thread.is_alive():
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((self.host, self.port))
             self.accept_thread.join(timeout=2)
-        
+
         # Wait for client threads to finish
         with self.lock:
-            active_threads = [client.thread for client in self.clients.values() if client.thread.is_alive()]
-        
+            active_threads = [
+                client.thread
+                for client in self.clients.values()
+                if client.thread.is_alive()
+            ]
+
         for thread in active_threads:
             thread.join(timeout=2)
-        
+
         # Clear queue
         while not self.user_input_queue.empty():
             try:
                 self.user_input_queue.get_nowait()
             except queue.Empty:
                 break
-        
+
         # Close all client connections
         with self.lock:
             for client_data in self.clients.values():
                 client_data.socket.close()
             self.clients.clear()
-        
+
         # Close server socket
         self.server_socket.close()
-        
+
         print("Server shutdown complete")
