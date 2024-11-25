@@ -19,7 +19,7 @@ class ClientData:
     thread: threading.Thread
 
 class TCPServer:
-    def __init__(self, host='localhost', port=8080, testing_mode=True):
+    def __init__(self, host="13.59.128.25", port=8080, testing_mode=True):
         self.host = host
         self.port = port
         self.testing_mode = testing_mode

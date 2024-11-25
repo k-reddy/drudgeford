@@ -29,7 +29,11 @@ def provide_help_if_desired(all_ai_mode=False):
         input("Hit enter to continue")
 
 def main():
-    port = int(input("Please enter the port number"))
+    port = input("Please enter the port number")
+    valid_ports = ["5000", "5001", "5002", "5003", "5004"]
+    while port not in valid_ports:
+        port = input("Please enter a valid port number")
+    port = int(port)
     # if players want game help, display instructions
     provide_help_if_desired()
     pyxel_view = PyxelEngine(port)
