@@ -9,15 +9,15 @@ from server.task_jsonifier import TaskJsonifier
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
 
+
 class PyxelManager:
-    def __init__(self,port):
+    def __init__(self, port):
         self.move_duration = 700
         self.log = ListWithUpdate([], self.load_log)
         self.floor_color_map = []
         self.wall_color_map = []
         self.tj = TaskJsonifier()
         self.server_client = TCPClient(ClientType.BACKEND, port=port)
-
 
     def load_board(self, locations, terrain):
         entities = []
@@ -63,13 +63,15 @@ class PyxelManager:
                         }
                     )
         tasks_to_send = []
-        tasks_to_send.append(tasks.BoardInitTask(
-            map_height=self.board_height,
-            map_width=self.board_width,
-            valid_map_coordinates=valid_map_coordinates,
-            floor_color_map=self.floor_color_map,
-            wall_color_map=self.wall_color_map,
-        ))
+        tasks_to_send.append(
+            tasks.BoardInitTask(
+                map_height=self.board_height,
+                map_width=self.board_width,
+                valid_map_coordinates=valid_map_coordinates,
+                floor_color_map=self.floor_color_map,
+                wall_color_map=self.wall_color_map,
+            )
+        )
         tasks_to_send.append(tasks.AddEntitiesTask(entities=entities))
         for task in tasks_to_send:
             self.jsonify_and_send_task(task)
@@ -86,7 +88,6 @@ class PyxelManager:
             self.move_duration,
         )
         self.jsonify_and_send_task(task)
-
 
     def add_entity(self, entity, row, col):
         if isinstance(entity, character.Character):
@@ -153,7 +154,7 @@ class PyxelManager:
     def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
         action_card_log = []
         for i, action_card in enumerate(action_cards):
-            action_card_log.append(f'''{i}: {action_card}''')
+            action_card_log.append(f"""{i}: {action_card}""")
         task = tasks.LoadActionCardsTask(action_card_log=action_card_log)
         self.jsonify_and_send_task(task, client_id)
 
@@ -171,28 +172,33 @@ class PyxelManager:
         self.floor_color_map = floor_color_map
         self.wall_color_map = wall_color_map
 
-    def jsonify_and_send_task(self, task, client_id='ALL_FRONTEND'):
+    def jsonify_and_send_task(self, task, client_id="ALL_FRONTEND"):
         json_task = self.tj.convert_task_to_json(task)
         self.server_client.post_task(json_task, client_id)
 
-    def get_user_input(self, prompt, valid_inputs=None, client_id='ALL_FRONTEND'):
+    def get_user_input(
+        self, prompt, valid_inputs=None, client_id="ALL_FRONTEND", is_mouse=False
+    ):
         # tell client to get user input
-        task = tasks.InputTask(prompt)
+        task_class = tasks.MouseInputTask if is_mouse else tasks.InputTask
+        print(task_class)
+        task = task_class(prompt)
+
         self.jsonify_and_send_task(task, client_id)
         # get input back
-        user_input = self.server_client.get_user_input()['input']
+        user_input = self.server_client.get_user_input()["input"]
 
         if not valid_inputs:
             return user_input
 
         # if there's validation, keep asking for input until you get what you need
         while user_input not in valid_inputs:
-            task = tasks.InputTask("Invalid key pressed. Try again.\n"+prompt)
+            task = task_class("Invalid key pressed. Try again.\n" + prompt)
             self.jsonify_and_send_task(task, client_id)
-            user_input = self.server_client.get_user_input()['input']
+            user_input = self.server_client.get_user_input()["input"]
         return user_input
-    
-    def print_message(self, message, client_id='ALL_FRONTEND'):
+
+    def print_message(self, message, client_id="ALL_FRONTEND"):
         task = tasks.PrintTerminalMessage(message)
         self.jsonify_and_send_task(task, client_id)
 
@@ -201,11 +207,11 @@ class PyxelManager:
         self.jsonify_and_send_task(task)
 
     def get_campaign_to_load(self):
-        '''
-        gets pickle file of the campaign data if user wants to load one, 
+        """
+        gets pickle file of the campaign data if user wants to load one,
         otherwise returns None
         only asks frontend_1 if they want to load to avoid conflicts
-        '''
+        """
         task = tasks.LoadCampaign()
-        self.jsonify_and_send_task(task, 'frontend_1')
-        return self.server_client.get_user_input()['input']
+        self.jsonify_and_send_task(task, "frontend_1")
+        return self.server_client.get_user_input()["input"]

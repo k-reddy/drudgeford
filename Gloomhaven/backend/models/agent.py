@@ -126,10 +126,10 @@ class Human(Agent):
     @staticmethod
     def perform_movement(char, movement, is_jump, board, client_id: str|None =None, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
-        orig_prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+        orig_prompt = "Click where you want to move."
         prompt = orig_prompt
         while remaining_movement > 0:
-            direction = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", valid_inputs=list(DIRECTION_MAP.keys()),client_id=client_id)
+            direction = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", is_mouse = True,client_id=client_id)
 
             if direction == "f":
                 break

@@ -203,7 +203,7 @@ class ActionTask(Task):
 @dataclass
 class InputTask(Task):
     """
-    task that asks user for input in the terminal
+    task that asks user for input in pyxel
     """
     prompt: str
 
@@ -221,6 +221,19 @@ class InputTask(Task):
     #     except ImportError:
     #         import sys, termios
     #         termios.tcflush(sys.stdin, termios.TCIOFLUSH)
+
+
+@dataclass
+class MouseInputTask(Task):
+    """
+    task that asks for mouse input in pyxel
+    """
+
+    prompt: str
+
+    def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
+        keyboard_manager.get_mouse_input(self.prompt)
+
 
 # @dataclass
 # class InputTask(Task):
@@ -243,7 +256,7 @@ class InputTask(Task):
 
 #         # send this input to the server
 #         return user_input
-    
+
 #     def clear_input(self):
 #         # windows
 #         try:
@@ -316,7 +329,7 @@ class SaveCampaign(Task):
         user_input = input("Would you like to save your progress? Type (y)es or (n)o. ")
         should_save = True if user_input == "y" else False
         return should_save
-    
+
 @dataclass
 class LoadCampaign(Task):
     '''
