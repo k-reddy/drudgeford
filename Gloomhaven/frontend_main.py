@@ -2,6 +2,7 @@ import textwrap
 from pyxel_ui.engine import PyxelEngine
 from backend.utils.config import TEXT_WIDTH
 
+
 def provide_help_if_desired(all_ai_mode=False):
     help_message = [
         "Welcome to the game! Here's how it works:",
@@ -12,7 +13,7 @@ def provide_help_if_desired(all_ai_mode=False):
         "- Every time you attack, you'll draw an 'attack modifier card.' This adds some randomness to your damage. Certain cards (bless, curse) add good/bad modifiers randomly to your deck, and others (charge attack) determine what the next modifier you draw will be",
         "- Some cards place elements/obstacles on the map, like traps and fire. Most of these do damage.",
         "- The exceptions are ice, which gives you a 25% chance of slipping and losing your turn when you step on it, and shadow, which gives all attacks a 10% chance of missing for each square of shadow they pass through",
-        "Good luck!"
+        "Good luck!",
     ]
     want_help = False
     if not all_ai_mode:
@@ -28,6 +29,7 @@ def provide_help_if_desired(all_ai_mode=False):
             print("")
         input("Hit enter to continue")
 
+
 def main():
     port = input("Please enter the port number")
     valid_ports = ["5000", "5001", "5002", "5003", "5004"]
@@ -39,5 +41,6 @@ def main():
     pyxel_view = PyxelEngine(port)
     pyxel_view.start()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()
