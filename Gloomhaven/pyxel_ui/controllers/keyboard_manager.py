@@ -66,6 +66,8 @@ class KeyboardManager:
                 self.return_input_to_server()
                 return
 
+            self.print_keyboard(self.input)
+
         if self.accept_input:
             # Handle enter
             if pyxel.btnp(pyxel.KEY_RETURN):

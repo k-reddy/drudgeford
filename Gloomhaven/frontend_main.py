@@ -32,7 +32,7 @@ def provide_help_if_desired(all_ai_mode=False):
 
 def main():
     port = input("Please enter the port number")
-    valid_ports = ["5000", "5001", "5002", "5003", "5004"]
+    valid_ports = ["5000", "5001", "5002", "5003", "5004", "8000"]
     while port not in valid_ports:
         port = input("Please enter a valid port number")
     port = int(port)
