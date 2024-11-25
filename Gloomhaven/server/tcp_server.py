@@ -1,10 +1,9 @@
 import socket
 import threading
-import time
 from dataclasses import dataclass
 import queue
 import json
-from typing import List, Dict, Optional
+from typing import List, Dict
 from enum import Enum
 
 class ClientType(Enum):
