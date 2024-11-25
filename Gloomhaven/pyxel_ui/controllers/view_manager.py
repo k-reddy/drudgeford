@@ -78,14 +78,31 @@ class ViewManager:
                 0,
                 self.map_view.bounding_coordinate[1],
             ],
-            bounding_coordinate=[self.canvas_width, self.canvas_height],
+            bounding_coordinate=[self.canvas_width, BITS * 18],
         )
         self.action_card_view, action_card_borders = (
             self.view_factory.create_view_with_border(
-                view.ActionCardView, action_card_view_params
+                view.ActionCardView, action_card_view_params, [0, 10, 10, 10]
             )
         )
         self.views.extend([self.action_card_view, *action_card_borders])
+
+        personal_log_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.action_card_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, self.canvas_height],
+        )
+        self.personal_log, personal_log_borders = (
+            self.view_factory.create_view_with_border(
+                view.LogView, personal_log_params, [60, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.personal_log, *personal_log_borders])
+        self.personal_log.font_color = 2
+        self.personal_log.display_round_turn = False
 
     def update_log(self, log: list[str]):
         # note: drawable set in update_round_turn()
@@ -177,10 +194,8 @@ class ViewManager:
         view.draw_grid(px_x, px_y, px_width, px_height)
 
     def draw_whole_game(self):
-        self.initiative_bar_view.draw()
-        self.map_view.draw()
-        self.log_view.draw()
-        self.action_card_view.draw()
+        for v in self.views:
+            v.draw()
 
     def get_valid_map_coords_for_cursor_pos(
         self, px_x: int, px_y: int
@@ -194,3 +209,39 @@ class ViewManager:
         if (x_num, y_num) in self.map_view.valid_map_coordinates:
             return (x_num, y_num)
         return None
+    
+    def scroll_action_cards_right(self):
+        if (
+                self.action_card_view.current_card_page + 1
+            ) * self.action_card_view.cards_per_page < len(
+                self.action_card_view.action_card_log
+            ):
+                self.action_card_view.current_card_page += 1
+                self.action_card_view.draw()
+
+    def scroll_action_cards_left(self):
+        # Go to previous page if we're not at the start
+        if self.action_card_view.current_card_page > 0:
+            self.action_card_view.current_card_page -= 1
+            self.action_card_view.draw()
+
+    # def update_keyboard(self, output):
+    #     self.keyboard_view.output = output
+    #     self.keyboard_view.drawable = True
+    #     self.keyboard_view.draw()
+    
+    # def reset_keyboard(self):
+    #     self.keyboard_view.drawable = False
+    #     self.keyboard_view.draw()
+    def update_keyboard(self, output, clear=True):
+        if clear:
+            self.personal_log.log = [output]
+        else:
+            self.personal_log.log += output
+        self.personal_log.drawable = True
+        self.personal_log.draw()
+    
+    def reset_keyboard(self):
+        self.personal_log.drawable = False
+        self.personal_log.log = []
+        self.personal_log.draw()

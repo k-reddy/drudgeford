@@ -1,0 +1,147 @@
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #222034;
+    color: #fff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #3f3f74;
+    border: 4px solid #fff;
+    image-rendering: pixelated;
+    box-shadow: 10px 10px 0px #000;
+}
+
+h1 {
+    color: #fff;
+    text-align: center;
+    font-size: 24px;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}
+
+p {
+    font-size: 12px;
+    margin: 1rem 0;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin: 2rem 0;
+}
+
+.download-button {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: #ff004d;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+}
+
+.host-button {
+    display: block;
+    width: 200px;
+    padding: 1rem;
+    background-color: #00b543;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+}
+
+.download-button:hover, .host-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+.download-button:active, .host-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+.note {
+    background-color: #1a1a2e;
+    padding: 1rem;
+    border: 4px solid #fff;
+    margin: 2rem 0;
+    font-size: 10px;
+}
+
+.note strong {
+    color: #ffec27;
+}
+
+ol {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+}
+
+li {
+    margin: 0.8rem 0;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+}
+
+.game-link {
+    display: none;
+    background-color: #1a1a2e;
+    padding: 1rem;
+    border: 4px solid #fff;
+    margin: 1rem 0;
+    word-break: break-all;
+    font-size: 10px;
+    text-align: center;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.host-button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 4px 4px 0px #000;
+}
+
+/* Error page specific styles */
+.error-container {
+    text-align: center;
+}
+
+.error-heading {
+    color: #ff004d;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}
+
+/* Success page specific styles */
+.success-heading {
+    color: #00b543;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}

@@ -1,8 +1,8 @@
 import abc
 import random
 from backend.models.action_model import ActionCard
-from backend.models.display import Display
 from typing import Callable
+from backend.models.pyxel_backend import PyxelManager
 
 DIRECTION_MAP = {
     "w": [-1, 0],
@@ -19,42 +19,43 @@ DIRECTION_MAP = {
 class Agent(abc.ABC):
     @staticmethod
     @abc.abstractmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard], client_id: str|None =None) -> ActionCard:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def decide_if_move_first(disp: Display) -> bool:
+    def decide_if_move_first(pyxel_manager: PyxelManager, client_id: str|None =None) -> bool:
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char, client_id: str|None =None):
         pass
 
     @staticmethod
     @abc.abstractmethod
-    def perform_movement(char, movement: int, is_jump: bool, board):
+    def perform_movement(char, movement: int, is_jump: bool, board, client_id: str|None =None):
         pass 
 
     @staticmethod
-    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+    @abc.abstractmethod
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check, client_id: str|None =None):
         pass
 
 
 class Ai(Agent):
     @staticmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard], client_id: str|None =None) -> ActionCard:
         action_card_num = random.randrange(len(available_action_cards))
         return available_action_cards.pop(action_card_num)
     
     @staticmethod
-    def decide_if_move_first(disp: Display) -> bool:
+    def decide_if_move_first(pyxel_manager: PyxelManager, client_id: str|None =None) -> bool:
         # monster always moves first - won't move if they're within range
         return True
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char, client_id: str|None =None):
         # monster picks a random opponent
         shortest_dist = 1000
         nearest_opponent = None
@@ -69,7 +70,7 @@ class Ai(Agent):
         return nearest_opponent
     
     @staticmethod
-    def perform_movement(char, movement, is_jump, board):
+    def perform_movement(char, movement, is_jump, board, client_id: str|None =None):
         targets = board.find_opponents(char)
         target = Ai.select_attack_target(None, targets, board, char)
         target_loc = board.find_location_of_target(target)
@@ -77,7 +78,7 @@ class Ai(Agent):
 
     @staticmethod
     # !!! found bug: this is a pull, not a push/movement
-    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check, client_id: str|None =None):
         board.move_character_toward_location(
             char_to_move, 
             mover_loc,
@@ -87,23 +88,27 @@ class Ai(Agent):
     
 class Human(Agent):
     @staticmethod
-    def select_action_card(disp: Display, available_action_cards: list[ActionCard]) -> ActionCard:
+    def select_action_card(pyxel_manager: PyxelManager, available_action_cards: list[ActionCard], client_id: str|None =None) -> ActionCard:
         # let them pick a valid action_card
         prompt = "Which action card would you like to pick? Type the number exactly."
         valid_inputs = [str(i) for i, _ in enumerate(available_action_cards)]
 
-        action_card_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        action_card_num = pyxel_manager.get_user_input(prompt=prompt, valid_inputs=valid_inputs, client_id=client_id)
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
+        # load the new action cards now that you've popped from the list
+        pyxel_manager.load_action_cards(
+                available_action_cards, client_id
+        )
 
         return action_card_to_perform
     
     @staticmethod
-    def decide_if_move_first(disp: Display) -> bool:
-        key_press = disp.get_user_input(prompt="Type 1 to move first or 2 to perform actions first.", valid_inputs=["1","2"])
+    def decide_if_move_first(pyxel_manager: PyxelManager, client_id: str|None =None) -> bool:
+        key_press = pyxel_manager.get_user_input(prompt="Type 1 to move first or 2 to perform actions first.", valid_inputs=["1","2"], client_id=client_id)
         return key_press == "1"
     
     @staticmethod
-    def select_attack_target(disp, in_range_opponents: list, board, char):
+    def select_attack_target(pyxel_manager, in_range_opponents: list, board, char, client_id: str|None =None):
         if len(in_range_opponents) == 1:
             return in_range_opponents[0]
         # show in range opponents
@@ -115,17 +120,17 @@ class Human(Agent):
         # get user input on which to attack
         prompt = "Please type the number of the character you want to target"
         valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = disp.get_user_input(prompt=prompt, valid_inputs=valid_inputs)
+        target_num = pyxel_manager.get_user_input(prompt=prompt, valid_inputs=valid_inputs, client_id=client_id)
         return in_range_opponents[int(target_num)]
     
     @staticmethod
-    def perform_movement(char, movement, is_jump, board, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
+    def perform_movement(char, movement, is_jump, board, client_id: str|None =None, additional_movement_check: Callable[[tuple[int, int], tuple[int, int]], bool] | None=None):
         remaining_movement = movement
+        orig_prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
+        prompt = orig_prompt
         while remaining_movement > 0:
-            board.pyxel_manager.log.append(f"\nMovement remaining: {remaining_movement}")    
-            prompt = "Type w for up, a for left, d for right, s for down, (q, e, z or c) to move diagonally, or f to finish. "
-            direction = char.disp.get_user_input(prompt=prompt, valid_inputs=DIRECTION_MAP.keys())
-            
+            direction = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", valid_inputs=list(DIRECTION_MAP.keys()),client_id=client_id)
+
             if direction == "f":
                 break
 
@@ -143,22 +148,23 @@ class Human(Agent):
                 # do this instead of update location because it deals with terrain
                 board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
                 remaining_movement -= 1
+                prompt = orig_prompt
                 continue
             else:
-                board.pyxel_manager.log.append(
-                    "Invalid movement direction (obstacle, character, or board edge) - try again"
-                )
+                prompt = "Invalid movement direction (obstacle, character, or board edge) - try again\n" + prompt
+                
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
         board.pyxel_manager.log.append("Movement done! \n")
 
     @staticmethod
-    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check):
+    def move_other_character(char_to_move, mover_loc, movement: int, is_jump: bool, board, movement_check, client_id: str|None =None):
         Human.perform_movement(
             char_to_move,
             movement,
             False,
             board,
-            movement_check
+            client_id,
+            movement_check,
         )

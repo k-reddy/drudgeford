@@ -14,14 +14,14 @@ MAX_ROUNDS = 1000
 # they will belong to a board, and they will send attacks out to the board to be carried out
 class Character(abc.ABC):
     # basic monster setup
-    def __init__(self, name, disp, emoji, agent, char_id: int, is_monster, log):
+    def __init__(self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log):
         self.id = char_id
         self.health = 8
         self.name = name
         self.action_cards = self.create_action_cards()
         self.killed_action_cards: list = []
         self.available_action_cards = self.action_cards.copy()
-        self.disp = disp
+        self.pyxel_manager = pyxel_manager
         self.emoji = emoji
         # a default sprite 
         self.pyxel_sprite_name = "knight"
@@ -32,36 +32,38 @@ class Character(abc.ABC):
         self.shield: tuple[int,int] = (0, MAX_ROUNDS)
         self.log = log
         self.elemental_affinity = None
+        self.client_id = None
+        self.lose_turn = False
 
     def select_action_card(self):
         action_card_to_perform = self.agent.select_action_card(
-                self.disp, self.available_action_cards
+                self.pyxel_manager, self.available_action_cards, self.client_id
             )
         return action_card_to_perform
 
     def decide_if_move_first(self, action_card):
-        return self.agent.decide_if_move_first(self.disp)
+        return self.agent.decide_if_move_first(self.pyxel_manager, self.client_id)
 
     def perform_movement(self, movement, is_jump, board):
         if movement == 0:
             self.log.append("No movement!")
             return
         self.log.append(f"\n{self.name} is moving\n")
-        self.agent.perform_movement(self, movement, is_jump, board)
+        self.agent.perform_movement(self, movement, is_jump, board, self.client_id)
         # add some space between the movement and attack
         self.log.append("")
 
     def select_attack_target(self, in_range_opponents, board):
         if not in_range_opponents:
             return None
-        return self.agent.select_attack_target(self.disp, in_range_opponents, board, self)
+        return self.agent.select_attack_target(self.pyxel_manager, in_range_opponents, board, self, self.client_id)
 
     def short_rest(self) -> None:
         # reset our available cards
         self.available_action_cards = [card for card in self.action_cards if card not in self.killed_action_cards]
         # kill a random card, update the user, remove it from play, and keep track for next round
         killed_card = random.choice(self.available_action_cards)
-        self.log.append(f"You lost {killed_card}")
+        self.log.append(f"{self.name} short rested and lost {killed_card}")
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
 

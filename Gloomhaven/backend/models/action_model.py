@@ -322,7 +322,8 @@ class Pull(ActionStep):
             self.squares,
             False,
             board,
-            is_legal_pull_check
+            is_legal_pull_check,
+            attacker.client_id
         )
         board.pyxel_manager.log.append(f"Pulled {target.name}")
 
@@ -349,7 +350,8 @@ class Push(ActionStep):
             self.squares,
             False,
             board,
-            is_legal_push_check
+            is_legal_push_check,
+            attacker.client_id
         )
         board.pyxel_manager.log.append(f"Pushed {target.name}")
 
@@ -381,7 +383,8 @@ class PushAllEnemies(ActionStep):
                 self.squares,
                 False,
                 board,
-                is_legal_push_check
+                is_legal_push_check,
+                attacker.client_id
             )
 
     def __str__(self): 
@@ -441,7 +444,8 @@ class MoveAlly(ActionStep):
             self.squares,
             is_jump=False,
             board=board,
-            movement_check=None
+            movement_check=None,
+            client_id=attacker.client_id
         )
         board.pyxel_manager.log.append(f"Moved {target.name}")
     

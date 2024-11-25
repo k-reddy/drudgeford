@@ -1,0 +1,48 @@
+background
+- game running in game_loop
+    - in specific places, we want to push tasks synchronously
+    - sometimes we want to wait for responses before continuing 
+        - e.g. we will push "get user input"
+        - we want to wait until we get that input before continuing
+    - right now, all the pushing of tasks is done in pyxel_manager
+- pyxel running its own loop
+    - at the start of each loop, we want to check for tasks 
+        and process them
+- campaign 
+    - sets up pyxel_task_queue and passes it to pyxel and 
+        pyxel_manager
+    - campaign.start() runs all levels on a thread, then 
+        kicks off pyxel in the main thread
+
+notes:
+- was having trouble with anything async b/c don't want to make
+    all code async
+- i think running a server in the background that handles requests
+    and letting everything keep looping is the way to go?
+
+idea:
+- create a server in campaign with:
+    - tasks (sent from backend)
+    - user_input (sent from front_end)
+    - methods:
+        - get_tasks
+        - post_task
+        - get_user_input
+        - post_user_input
+    - server starts itself on a thread
+- game_loop acts through pyxel_manager
+- pyxel_manager
+    - instead of pushing to queue, post to server
+    - use a threadsafe queue to block if the queue is empty
+- pyxel 
+    - do the same thing you're already doing, but instead
+        of checking queue, get from server - if nothing, continue
+- I don't think we need to reimplement the queue with a wrapper
+    - so instead of server task queue, just have server
+    - kill client task queue
+
+talk over TCP socket
+    - will need to pickle it 
+    - socket reads usually blocking by default 
+    - will listen for new connections
+    - client will use address to connect 
