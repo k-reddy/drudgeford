@@ -1,0 +1,27 @@
+one time only:
+chmod 400 Documents/developer_creds/drudgeford_key.pem
+
+# copy the code over - once i figure out the executable stuff, we should send that over instead 
+rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
+--include="backend/***" \
+--include="executable/***" \
+--include="pyxel_ui/***" \
+--include="server/***" \
+--include="__init__.py" \
+--include="frontend_main.py" \
+--include="main.py" \
+--include="my_resource.pyxres" \
+--include="requirements.txt" \
+--exclude="**/__pycache__/**" \
+--exclude="**/.pytest_cache/**" \
+--exclude="*" \
+Documents/rc/rc/gloomhaven/ ec2-user@13.59.128.25:gloomhaven/
+
+# ssh into the linux instance
+ssh -i Documents/developer_creds/drudgeford_key.pem ec2-user@13.59.128.25
+
+# run the code
+cd ~/gloomhaven/
+source .venv/bin/activate
+cd executable
+python3 lobby.py
