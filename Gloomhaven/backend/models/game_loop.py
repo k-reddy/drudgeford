@@ -32,7 +32,6 @@ class GameLoop:
             10,
             monsters,
             players,
-            disp,
             pyxel_manager,
             self.id_generator,
             level.starting_elements,
@@ -164,9 +163,11 @@ class GameLoop:
         self.board.acting_character = acting_character
         if acting_character.lose_turn:
             acting_character.lose_turn = False
-            self.pyxel_manager.log.append(f"{acting_character.name} was knocked down and lost their turn.")
+            self.pyxel_manager.log.append(
+                f"{acting_character.name} was knocked down and lost their turn."
+            )
             self._end_turn()
-            return    
+            return
         try:
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
@@ -213,7 +214,7 @@ class GameLoop:
                 )
                 self.pyxel_manager.get_user_input(
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
-                    client_id="frontend_1"
+                    client_id="frontend_1",
                 )
 
         self._end_turn()
@@ -245,9 +246,14 @@ class GameLoop:
     def _end_turn(self) -> None:
         self.board.acting_character = None
         if not self.all_ai_mode:
-            for i in range(1,self.num_players):
-                self.pyxel_manager.print_message("End of turn. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
-            self.pyxel_manager.get_user_input(prompt="End of turn. Hit enter to continue", client_id="frontend_1")
+            for i in range(1, self.num_players):
+                self.pyxel_manager.print_message(
+                    "End of turn. Waiting for Player 1 to hit continue",
+                    f"frontend_{i+1}",
+                )
+            self.pyxel_manager.get_user_input(
+                prompt="End of turn. Hit enter to continue", client_id="frontend_1"
+            )
             self.pyxel_manager.log.clear()
 
     def _end_round(self) -> None:
@@ -256,9 +262,14 @@ class GameLoop:
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            for i in range(1,self.num_players):
-                self.pyxel_manager.print_message("End of round. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
-            self.pyxel_manager.get_user_input(prompt="End of round. Hit enter to continue", client_id="frontend_1")
+            for i in range(1, self.num_players):
+                self.pyxel_manager.print_message(
+                    "End of round. Waiting for Player 1 to hit continue",
+                    f"frontend_{i+1}",
+                )
+            self.pyxel_manager.get_user_input(
+                prompt="End of round. Hit enter to continue", client_id="frontend_1"
+            )
             self.pyxel_manager.log.clear()
 
     def refresh_character_cards(self, char: character.Character) -> None:

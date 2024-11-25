@@ -209,17 +209,18 @@ class InputTask(Task):
 
     def perform(self, view_manager: ViewManager, keyboard_manager: KeyboardManager):
         keyboard_manager.get_keyboard_input(self.prompt)
-    
-    def clear_input(self):
-        # windows
-        try:
-            import msvcrt
-            while msvcrt.kbhit():
-                msvcrt.getch()
-        # Unix/Linux
-        except ImportError:
-            import sys, termios
-            termios.tcflush(sys.stdin, termios.TCIOFLUSH)
+
+    # this was just for terminal input
+    # def clear_input(self):
+    #     # windows
+    #     try:
+    #         import msvcrt
+    #         while msvcrt.kbhit():
+    #             msvcrt.getch()
+    #     # Unix/Linux
+    #     except ImportError:
+    #         import sys, termios
+    #         termios.tcflush(sys.stdin, termios.TCIOFLUSH)
 
 # @dataclass
 # class InputTask(Task):
