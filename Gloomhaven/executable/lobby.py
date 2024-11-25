@@ -6,7 +6,9 @@ import threading
 from typing import Dict
 from dataclasses import dataclass
 from queue import Queue
+
 # from ..backend.utils.config import PORT_START, NUM_PORTS
+
 
 @dataclass
 class GameInstance:
@@ -15,68 +17,71 @@ class GameInstance:
     process: subprocess.Popen
     status: str
 
+
 class PortManager:
     def __init__(self, start_port: int, num_ports: int):
         self.ports = Queue()
         for port in range(start_port, start_port + num_ports):
             self.ports.put(port)
-    
+
     def get_port(self) -> int:
         if not self.ports.empty():
             return self.ports.get()
         return None
-    
+
     def release_port(self, port: int):
         self.ports.put(port)
+
 
 app = Flask(__name__)
 
 # Store active games and their info
 active_games: Dict[str, GameInstance] = {}
 
-# Initialize port manager 
+# Initialize port manager
 # port_manager = PortManager(PORT_START, NUM_PORTS)
 port_manager = PortManager(5000, 5)
 
 
 # Get the directory where the script is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, 'static')
-CSS_FILE = os.path.join(BASE_DIR, 'styles.css')
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(CURRENT_DIR)
+STATIC_DIR = os.path.join(CURRENT_DIR, "static")
+CSS_FILE = os.path.join(CURRENT_DIR, "styles.css")
+main_path = os.path.join(BASE_DIR, "main.py")
+
 
 def run_game_server(game_id: str, port: int):
     """Run the game server in a separate process"""
     try:
         # Run main.py with the port as a parameter
         process = subprocess.Popen(
-            ['python', 'main.py', str(port)],
+            ["python", main_path, str(port)],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
         )
-        
+
         active_games[game_id] = GameInstance(
-            id=game_id,
-            port=port,
-            process=process,
-            status='running'
+            id=game_id, port=port, process=process, status="running"
         )
-        
+
         # Monitor the process
         stdout, stderr = process.communicate()
-        
+
         if process.returncode != 0:
             print(f"Game {game_id} ended with error: {stderr.decode()}")
-        
+
         # Clean up game data when process ends
         if game_id in active_games:
-            active_games[game_id].status = 'ended'
+            active_games[game_id].status = "ended"
             port_manager.release_port(port)
-        
+
     except Exception as e:
         print(f"Error running game {game_id}: {str(e)}")
         if game_id in active_games:
-            active_games[game_id].status = 'error'
+            active_games[game_id].status = "error"
             port_manager.release_port(port)
+
 
 MAIN_HTML = """
 <!DOCTYPE html>
@@ -216,78 +221,75 @@ JOIN_HTML = """
 </html>
 """
 
-@app.route('/')
+
+@app.route("/")
 def home():
     return render_template_string(MAIN_HTML)
 
-@app.route('/static/<path:path>')
+
+@app.route("/static/<path:path>")
 def send_static(path):
     return send_from_directory(STATIC_DIR, path)
 
-@app.route('/download')
-def download():
-    exe_path = '../frontend_main.dist/frontend_main.bin'
-    return send_file(
-        exe_path,
-        as_attachment=True,
-        download_name='gloomhaven.bin'
-    )
 
-@app.route('/host-game')
+@app.route("/download")
+def download():
+    exe_path = "../frontend_main.dist/frontend_main.bin"
+    return send_file(exe_path, as_attachment=True, download_name="gloomhaven.bin")
+
+
+@app.route("/host-game")
 def host_game():
     try:
         port = port_manager.get_port()
         if port is None:
-            return jsonify({
-                'success': False,
-                'error': 'No ports available. Please try again later.'
-            })
+            return jsonify(
+                {
+                    "success": False,
+                    "error": "No ports available. Please try again later.",
+                }
+            )
 
         game_id = str(uuid.uuid4())
-        
+
         thread = threading.Thread(target=run_game_server, args=(game_id, port))
         thread.start()
-        
-        return jsonify({
-            'success': True,
-            'game_id': game_id,
-            'port': port
-        })
+
+        return jsonify({"success": True, "game_id": game_id, "port": port})
     except Exception as e:
         if port:
             port_manager.release_port(port)
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        })
+        return jsonify({"success": False, "error": str(e)})
 
-@app.route('/join/<game_id>')
+
+@app.route("/join/<game_id>")
 def join_game(game_id):
     if game_id not in active_games:
         return render_template_string(ERROR_HTML), 404
-        
+
     game = active_games[game_id]
-    if game.status != 'running':
+    if game.status != "running":
         return render_template_string(ENDED_HTML), 400
-        
+
     return render_template_string(JOIN_HTML.format(port=game.port))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Create static folder if it doesn't exist
     os.makedirs(STATIC_DIR, exist_ok=True)
-    
+
     # Write CSS file
     try:
-        with open(CSS_FILE, 'r') as source:
+        with open(CSS_FILE, "r") as source:
             css_content = source.read()
-            
-        css_destination = os.path.join(STATIC_DIR, 'styles.css')
-        with open(css_destination, 'w') as dest:
+
+        css_destination = os.path.join(STATIC_DIR, "styles.css")
+        with open(css_destination, "w") as dest:
             dest.write(css_content)
-            
+
         print(f"Successfully copied CSS from {CSS_FILE} to {css_destination}")
     except Exception as e:
         print(f"Error copying CSS file: {str(e)}")
         raise
-    
-    app.run(host='0.0.0.0', port=8000)
+
+    app.run(host="0.0.0.0", port=8000)
