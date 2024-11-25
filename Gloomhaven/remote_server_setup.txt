@@ -1,0 +1,15 @@
+one time only:
+chmod 400 Documents/developer_creds/drudgeford_key.pem
+
+# copy the code over - once i figure out the executable stuff, we should send that over instead 
+# maybe should also zip, send, unzip 
+scp -i Documents/developer_creds/drudgeford_key.pem -r Documents/rc/rc/gloomhaven ec2-user@13.59.128.25:~
+
+# ssh into the linux instance
+ssh -i Documents/developer_creds/drudgeford_key.pem ec2-user@13.59.128.25
+
+# run the code
+cd ~/gloomhaven/
+source .venv/bin/activate
+cd gloomhaven/executable
+python3 lobby.py

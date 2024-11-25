@@ -7,7 +7,7 @@ class ClientType(Enum):
     FRONTEND = "frontend"
 
 class TCPClient:
-    def __init__(self, client_type: ClientType, host='localhost', port=8080):
+    def __init__(self, client_type: ClientType, host="13.59.128.25", port=8080):
         self.client_type = client_type
         self.client_id = None
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
