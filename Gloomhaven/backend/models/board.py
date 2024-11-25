@@ -6,11 +6,11 @@ from typing import Type
 
 import backend.models.agent as agent
 import backend.models.character as character
-from backend.models.display import Display
 from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
 from backend.utils import attack_shapes as shapes
+from backend.utils.utilities import DieAndEndTurn
 
 
 MAX_ROUNDS = 1000
@@ -28,14 +28,12 @@ class Board:
         size: int,
         monsters: list[character.Character],
         players: list[character.Character],
-        disp: Display,
         pyxel_manager: pyxel_backend.PyxelManager,
         id_generator: count,
         starting_elements: list[obstacle.TerrainObject],
     ) -> None:
         self.round_num = 0
         self.size = size
-        self.disp = disp
         self.id_generator = id_generator
         self.pyxel_manager = pyxel_manager
 
@@ -61,6 +59,7 @@ class Board:
             self.add_starting_effect_to_terrain(element, 1000)
         pyxel_manager.load_board(self.locations, self.terrain)
         pyxel_manager.load_characters(self.characters)
+        self.acting_character = None
 
     # @property
     # def locations(self):
@@ -430,12 +429,6 @@ class Board:
         # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: Character) -> None:
-        # !!! to fix
-        # weird bug where you can kill someone who's already killed
-        # by walking through fire after you're dead since
-        # movement doesn't auto-end
-        # we need to fix this upstream by ending turn immediately when die,
-        # not by ending turn after each action
         if target not in self.characters:
             return
         self.remove_character(target)
@@ -443,10 +436,9 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
         self.pyxel_manager.log.append(f"{target.name} has been killed.")
-        # !!! for pair coding
-        # !!! if the target is the player, end game
-        # !!! if the target is the acting_character, end turn
-        # - to do this, end turn and end game need to actually work, not just be place holders
+        # if it's your turn, end it immediately
+        if target==self.acting_character:
+            raise DieAndEndTurn()
 
     def find_in_range_opponents_or_allies(
         self, actor: Character, distance: int, opponents=True
@@ -506,27 +498,31 @@ class Board:
 
     def deal_terrain_damage(
         self,
-        acting_character: Character,
+        affected_character: Character,
         row: int,
         col: int,
     ) -> None:
-        damage = self.get_terrain_damage(row, col)
+        element = self.terrain[row][col]
+        if not element:
+            return
+        damage = element.damage
+        element.perform(row, col, self, affected_character)
         element = self.terrain[row][col]
         # if they have an elemental affinity for this element, they heal instead of take damage
-        if acting_character.elemental_affinity == element.__class__:
+        if affected_character.elemental_affinity == element.__class__:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} has an affinity for {element.__class__.__name__}"
+                f"{affected_character.name} has an affinity for {element.__class__.__name__}"
             )
             damage = damage * -1
         if damage:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} stepped on {element.__class__.__name__}"
+                f"{affected_character.name} stepped on {element.__class__.__name__}"
             )
-            self.modify_target_health(acting_character, damage)
+            self.modify_target_health(affected_character, damage)
 
-    def deal_terrain_damage_current_location(self, acting_character: Character):
-        row, col = self.find_location_of_target(acting_character)
-        self.deal_terrain_damage(acting_character, row, col)
+    def deal_terrain_damage_current_location(self, affected_character: Character):
+        row, col = self.find_location_of_target(affected_character)
+        self.deal_terrain_damage(affected_character, row, col)
 
     def update_character_location(
         self,
@@ -544,14 +540,6 @@ class Board:
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
         return is_position_within_board and self.locations[row][col] is None
-
-    def get_terrain_damage(self, row: int, col: int) -> int | None:
-        el = self.terrain[row][col]
-        if el:
-            el.perform(row, col, self)
-            return el.damage
-        else:
-            return None
 
     def modify_target_health(self, target: Character, damage: int) -> None:
         target.health -= damage
@@ -620,7 +608,7 @@ class Board:
 
         new_char = char_class(
             f"Spooky {char_class.__name__}",
-            self.disp,
+            self.pyxel_manager,
             "💀",
             Ai(),
             next(self.id_generator),

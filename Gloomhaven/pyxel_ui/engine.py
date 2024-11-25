@@ -11,11 +11,12 @@ from pyxel_ui.constants import (
     MAP_TILE_WIDTH_PX,
 )
 from .models.action import MoveAction
-from .models.tasks import ActionTask
-from pyxel_ui.models.pyxel_action_queue import PyxelActionQueue
-from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
+from .models.tasks import ActionTask, InputTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
+from server.tcp_client import TCPClient, ClientType
+from server.task_jsonifier import TaskJsonifier
+from .controllers.keyboard_manager import KeyboardManager
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -24,16 +25,16 @@ from .utils import round_down_to_nearest_multiple
 
 
 class PyxelEngine:
-    def __init__(self, task_queue: PyxelTaskQueue, action_queue: PyxelActionQueue):
+    def __init__(self, port):
+        self.server_client = TCPClient(ClientType.FRONTEND, port=port)
+        self.tj = TaskJsonifier()
         self.current_task = None
 
         self.last_mouse_pos = (-1, -1)
 
         self.hover_grid = None
 
-        # Controllers and queues
-        self.action_queue = action_queue
-        self.task_queue = task_queue
+        # Controller
         self.view_manager = None
 
         # To measure framerate and loop duration
@@ -43,6 +44,7 @@ class PyxelEngine:
         pyxel.load("../my_resource.pyxres")
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         self.mouse_tile_pos = None
+        self.keyboard_manager = KeyboardManager(self.view_manager, self.server_client)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
@@ -52,19 +54,25 @@ class PyxelEngine:
         pyxel.run(self.update, self.draw)
 
     def update(self):
-        # self.start_time = time.time()
+        self.start_time = time.time()
+        self.keyboard_manager.update()
 
-        if not self.current_task and not self.task_queue.is_empty():
-            self.current_task = self.task_queue.dequeue()
+        if not self.current_task: 
+            jsonified_task = self.server_client.get_task()
+            self.current_task = self.tj.make_task_from_json(jsonified_task)
 
         if self.current_task:
-            self.current_task.perform(self.view_manager)
+            task_output = self.current_task.perform(self.view_manager, self.keyboard_manager)
             # don't clear the task if it's an action task and has steps to do
             if (
                 isinstance(self.current_task, ActionTask)
                 and self.current_task.action_steps
             ):
                 return
+            # if we're asked for user input or a campaign, send what we get to the server
+            # elif isinstance(self.current_task, (InputTask, LoadCampaign)): 
+            elif isinstance(self.current_task, LoadCampaign): 
+                self.server_client.post_user_input(task_output)
             self.current_task = None
 
         # Handle cursor redraws and grid
@@ -98,28 +106,6 @@ class PyxelEngine:
             self.last_mouse_pos = (curr_mouse_x, curr_mouse_y)
 
         # User Input Land
-        if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
-
-        # Add controls for scrolling
-        # !!! this is a yucky fix
-        if pyxel.btnp(pyxel.KEY_RIGHT) or pyxel.btnp(pyxel.KEY_D):
-            # Go to next page if there are more cards to show
-            if (
-                self.view_manager.action_card_view.current_card_page + 1
-            ) * self.view_manager.action_card_view.cards_per_page < len(
-                self.view_manager.action_card_view.action_card_log
-            ):
-                self.view_manager.action_card_view.current_card_page += 1
-                self.view_manager.action_card_view.draw()
-
-        # !!! another yucky fix
-        if pyxel.btnp(pyxel.KEY_LEFT) or pyxel.btnp(pyxel.KEY_A):
-            # Go to previous page if we're not at the start
-            if self.view_manager.action_card_view.current_card_page > 0:
-                self.view_manager.action_card_view.current_card_page -= 1
-                self.view_manager.action_card_view.draw()
-
         if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
             if self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
@@ -129,7 +115,7 @@ class PyxelEngine:
                 self.action_queue.enqueue(move_action)
 
     def draw(self):
-        """everything in the task queue draws itself,
+        """everything in the tasks draws itself,
         so there's nothing to draw here - this ensures
         we're not redrawing the canvas unless there's something
         new to draw!

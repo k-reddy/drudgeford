@@ -7,13 +7,12 @@ from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
-from backend.utils.utilities import GameState
+from backend.utils.utilities import GameState, DieAndEndTurn
 
 
 class GameLoop:
     def __init__(
         self,
-        disp: Display,
         num_players: int,
         all_ai_mode: bool,
         pyxel_manager: PyxelManager,
@@ -26,7 +25,7 @@ class GameLoop:
         self.pyxel_manager = pyxel_manager
         self.level = level
         self.num_players = num_players
-        self.disp = disp
+        self.players = players
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
@@ -42,7 +41,11 @@ class GameLoop:
 
     def start(self) -> GameState:
         self.game_state = GameState.RUNNING
-
+        # load everyone's action cards
+        for player in self.players:
+            self.pyxel_manager.load_action_cards(
+                player.available_action_cards, player.client_id
+            )
         round_number = 1
         while self.game_state == GameState.RUNNING:
             self.run_round(round_number)
@@ -118,17 +121,6 @@ class GameLoop:
     ) -> None:
         get_input = True
         try:
-            # Taking over user input with check on action queue
-            print(f"{acting_character=}")
-            while get_input:
-                if not self.pyxel_manager.shared_action_queue.is_empty():
-                    action = self.pyxel_manager.shared_action_queue.dequeue()
-                    action.perform(self.board, acting_character)  # make these async?
-
-            if not acting_character.team_monster:
-                self.pyxel_manager.load_action_cards(
-                    acting_character.available_action_cards
-                )
             action_card = acting_character.select_action_card()
             print(f"{action_card=}")
             move_first = acting_character.decide_if_move_first(action_card)
@@ -160,27 +152,30 @@ class GameLoop:
                     return
         except SlipAndLoseTurn:
             if not self.all_ai_mode:
-                self.disp.get_user_input(
-                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                self.pyxel_manager.get_user_input(
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue",
                 )
+        except DieAndEndTurn:
+            pass
 
         self._end_turn()
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
+        self.board.acting_character = acting_character
+        if acting_character.lose_turn:
+            acting_character.lose_turn = False
+            self.pyxel_manager.log.append(f"{acting_character.name} was knocked down and lost their turn.")
+            self._end_turn()
+            return    
         try:
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
                 )
-            if not acting_character.team_monster:
-                self.pyxel_manager.load_action_cards(
-                    acting_character.available_action_cards
-                )
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
             )
-
             actions = [
                 # if you start in fire, take damage first
                 lambda: self.board.deal_terrain_damage_current_location(
@@ -216,8 +211,9 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     f"{acting_character.name} slipped and lost their turn!"
                 )
-                self.disp.get_user_input(
-                    prompt=f"{acting_character.name} slipped! Hit enter to continue"
+                self.pyxel_manager.get_user_input(
+                    prompt=f"{acting_character.name} slipped! Hit enter to continue",
+                    client_id="frontend_1"
                 )
 
         self._end_turn()
@@ -243,13 +239,15 @@ class GameLoop:
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.disp.print_message(message, clear_display=False)
+            self.pyxel_manager.print_message(message)
         return self.game_state
 
     def _end_turn(self) -> None:
+        self.board.acting_character = None
         if not self.all_ai_mode:
-            self.disp.get_user_input(prompt="End of turn. Hit enter to continue")
-            self.pyxel_manager.load_action_cards([])
+            for i in range(1,self.num_players):
+                self.pyxel_manager.print_message("End of turn. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
+            self.pyxel_manager.get_user_input(prompt="End of turn. Hit enter to continue", client_id="frontend_1")
             self.pyxel_manager.log.clear()
 
     def _end_round(self) -> None:
@@ -258,7 +256,9 @@ class GameLoop:
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            self.disp.get_user_input(prompt="End of round. Hit Enter to continue")
+            for i in range(1,self.num_players):
+                self.pyxel_manager.print_message("End of round. Waiting for Player 1 to hit continue", f"frontend_{i+1}")
+            self.pyxel_manager.get_user_input(prompt="End of round. Hit enter to continue", client_id="frontend_1")
             self.pyxel_manager.log.clear()
 
     def refresh_character_cards(self, char: character.Character) -> None:
@@ -316,7 +316,7 @@ class GameLoop:
             monster_name = self.level.monster_classes[class_num].__name__
             monster = self.level.monster_classes[class_num](
                 monster_name,
-                self.disp,
+                self.pyxel_manager,
                 emoji[class_num],
                 backend.models.agent.Ai(),
                 char_id=next(self.id_generator),

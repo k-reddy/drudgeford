@@ -54,8 +54,7 @@ class BorderView(ViewSection):
 
     def draw(self) -> None:
         self.clear_bounds()
-
-
+        
 class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -67,6 +66,8 @@ class LogView(ViewSection):
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
         self.text_pixels: list[tuple[int, int]] = None
+        self.font_color = 7
+        self.display_round_turn = True
 
     @property
     def log(self):
@@ -83,7 +84,7 @@ class LogView(ViewSection):
         self.clear_bounds()
         if not self.log and self.round_number <= 0:
             return
-        self.font.redraw_text(7, self.text_pixels)
+        self.font.redraw_text(self.font_color, self.text_pixels)
 
     def draw(self) -> None:
         if not self.is_log_changed:
@@ -110,7 +111,7 @@ class LogView(ViewSection):
                     self.start_pos[0],
                     y_pos,
                     text,
-                    col=7,
+                    col=self.font_color,
                     size=size,
                     max_width=self.bounding_coordinate[0] - self.start_pos[0],
                 )
@@ -121,12 +122,13 @@ class LogView(ViewSection):
         available_height = self.bounding_coordinate[1] - self.start_pos[1]
 
         # Try to draw header
-        header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
-        header_height = get_line_height(header)
+        if self.display_round_turn:
+            header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
+            header_height = get_line_height(header)
 
-        if header_height <= available_height:
-            current_y = draw_line(header, current_y, "large")
-            available_height -= header_height
+            if header_height <= available_height:
+                current_y = draw_line(header, current_y, "large")
+                available_height -= header_height
 
         # Get displayable log lines
         lines = []
@@ -281,7 +283,7 @@ class ActionCardView(ViewSection):
         self.font.redraw_text(7, self.text_pixels)
 
     def draw(self) -> None:
-        print("action card draw")
+        # print("action card draw")
         self.text_pixels = []
         self.clear_bounds()
         if not self.drawable:
