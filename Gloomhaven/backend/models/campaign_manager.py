@@ -24,6 +24,7 @@ class CampaignState:
     all_ai_mode: bool
     id_gen_start: int
 
+
 class Campaign:
     '''
     a campaign is a series of games, each of which has level metadata
@@ -53,12 +54,11 @@ class Campaign:
         self.initialized = True
         self.id_generator = count(start=campaign_state.id_gen_start)
         self.make_levels()
-        self.levels = self.levels[-campaign_state.remaining_levels:]
+        self.levels = self.levels[-campaign_state.remaining_levels :]
         self.all_ai_mode = campaign_state.all_ai_mode
         self.num_players = campaign_state.num_players
         self.player_chars = self.load_player_characters(
-            campaign_state.player_names,
-            campaign_state.player_classes
+            campaign_state.player_names, campaign_state.player_classes
         )
 
     def start_campaign(self):
@@ -90,8 +90,7 @@ class Campaign:
         if not self.all_ai_mode:
             self.pyxel_manager.print_message(message=self.current_level.pre_level_text)
         self.pyxel_manager.set_level_map_colors(
-            self.current_level.floor_color_map,
-            self.current_level.wall_color_map
+            self.current_level.floor_color_map, self.current_level.wall_color_map
         )
         game = GameLoop(
             self.num_players, 
@@ -99,7 +98,8 @@ class Campaign:
             self.pyxel_manager, 
             self.current_level,
             self.id_generator,
-            self.player_chars)
+            self.player_chars,
+        )
         return game.start()
 
     def run_levels(self):
@@ -156,8 +156,13 @@ class Campaign:
     def set_up_player_chars(self):
         emojis = ["🧙", "🕺", "🐣", "🐣"]
         default_names = ["Happy", "Glad", "Jolly", "Cheery"]
-        char_classes = [character.Monk, character.Necromancer, character.Miner, character.Wizard]
-        
+        char_classes = [
+            character.Monk,
+            character.Necromancer,
+            character.Miner,
+            character.Wizard,
+        ]
+
         # set up characters players can choose from
         for char_class, emoji, default_name in zip(char_classes, emojis, default_names):
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
@@ -168,10 +173,12 @@ class Campaign:
 
     def load_player_characters(self, player_names, char_classes):
         emojis = ["🧙", "🕺", "🐣", "🐣"]
-        
-        # recreate the same characters 
+
+        # recreate the same characters
         player_chars = []
-        for char_class_name, player_name, emoji in zip(char_classes, player_names, emojis):
+        for char_class_name, player_name, emoji in zip(
+            char_classes, player_names, emojis
+        ):
             char_class = getattr(character, char_class_name)
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
             player_chars.append(char_class(player_name, self.pyxel_manager, emoji, player_agent, char_id = next(self.id_generator), is_monster=False, log=self.pyxel_manager.log))
@@ -181,7 +188,7 @@ class Campaign:
         # Create a simple dict with just the essential data
         campaign_state = CampaignState(
             remaining_levels=len(self.levels),
-            player_classes=[type(char).__name__ for char in self.player_chars],  
+            player_classes=[type(char).__name__ for char in self.player_chars],
             player_names=[char.name for char in self.player_chars],
             num_players=self.num_players,
             all_ai_mode=self.all_ai_mode,

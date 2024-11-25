@@ -1,6 +1,7 @@
 import threading
 from itertools import count
 
+from pyxel_ui.models.pyxel_action_queue import PyxelActionQueue
 from pyxel_ui.models.pyxel_task_queue import PyxelTaskQueue
 from pyxel_ui.engine import PyxelEngine
 
@@ -15,8 +16,9 @@ import backend.models.pyxel_backend as pyxel_backend
 
 def main(num_players: int = 1, all_ai_mode=False):
     # pyxel setup
-    shared_action_queue = PyxelTaskQueue()
-    pyxel_view = PyxelEngine(shared_action_queue)
+    shared_task_queue = PyxelTaskQueue()
+    shared_action_queue = PyxelActionQueue()
+    pyxel_view = PyxelEngine(shared_task_queue, shared_action_queue)
 
     # levels
     levels = [
@@ -31,7 +33,7 @@ def main(num_players: int = 1, all_ai_mode=False):
 
     disp = display.Display(all_ai_mode)
     print("starting")
-    pyxel_manager = pyxel_backend.PyxelManager(shared_action_queue)
+    pyxel_manager = pyxel_backend.PyxelManager(shared_task_queue, shared_action_queue)
 
     new_char = character.Monk(
         "happy",
