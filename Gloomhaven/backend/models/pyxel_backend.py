@@ -1,4 +1,5 @@
 import backend.models.character as character
+from pyxel_ui.models.pyxel_action_queue import PyxelActionQueue
 from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate

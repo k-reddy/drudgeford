@@ -10,6 +10,7 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
+from .models.action import MoveAction
 from .models.tasks import ActionTask, InputTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
@@ -28,7 +29,6 @@ class PyxelEngine:
         self.server_client = TCPClient(ClientType.FRONTEND, port=port)
         self.tj = TaskJsonifier()
         self.current_task = None
-        self.is_board_initialized = False
 
         self.last_mouse_pos = (-1, -1)
 
@@ -43,6 +43,7 @@ class PyxelEngine:
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
+        self.mouse_tile_pos = None
         self.keyboard_manager = KeyboardManager(self.view_manager, self.server_client)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
@@ -74,7 +75,6 @@ class PyxelEngine:
                 self.server_client.post_user_input(task_output)
             self.current_task = None
 
-        
         # Handle cursor redraws and grid
         curr_mouse_x, curr_mouse_y = pyxel.mouse_x, pyxel.mouse_y
         if self.last_mouse_pos != (curr_mouse_x, curr_mouse_y):
@@ -92,12 +92,27 @@ class PyxelEngine:
                 curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.view_border
             )
             # draw the grid only if it's on mapview
-            if self.view_manager.is_pyxel_in_valid_map_area(grid_left_px, grid_top_px):
+            # store valid current map tile pos
+            if tile_pos := self.view_manager.get_valid_map_coords_for_cursor_pos(
+                grid_left_px, grid_top_px
+            ):
                 self.view_manager.draw_grid(
                     grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
                 )
+                self.mouse_tile_pos = tile_pos
+            else:
+                self.mouse_tile_pos = None
 
             self.last_mouse_pos = (curr_mouse_x, curr_mouse_y)
+
+        # User Input Land
+        if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
+            if self.mouse_tile_pos:
+                tile_pos_x, tile_pos_y = self.mouse_tile_pos
+                # BUG: location seems to be relative to character starting position so
+                # the target location will always be off by some amount, e.g. always 2 over.
+                move_action = MoveAction(1, (int(tile_pos_y), int(tile_pos_x)))
+                self.action_queue.enqueue(move_action)
 
     def draw(self):
         """everything in the tasks draws itself,

@@ -29,7 +29,13 @@ class GameLoop:
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
-            10, monsters, players, pyxel_manager, self.id_generator, level.starting_elements
+            10,
+            monsters,
+            players,
+            disp,
+            pyxel_manager,
+            self.id_generator,
+            level.starting_elements,
         )
         self.game_state = GameState.START
 
@@ -113,6 +119,7 @@ class GameLoop:
     def run_turn_move_only(
         self, acting_character: character.Character, round_num: int
     ) -> None:
+        get_input = True
         try:
             action_card = acting_character.select_action_card()
             print(f"{action_card=}")
