@@ -459,7 +459,7 @@ class Board:
         target_location: tuple[int, int],
         movement: int,
         is_jump=False,
-    ) -> None:
+    ) -> int:
         if movement == 0:
             return
 
@@ -469,6 +469,9 @@ class Board:
             start=acting_character_loc, end=target_location
         )
         path_traveled = []
+        print(path_to_target)
+        print(f"acting_car_loc: {acting_character_loc}")
+        print(f"target: {target_location}")
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
@@ -495,7 +498,7 @@ class Board:
             # humans move step by step, so they should not take damage on a jump
             if not (is_jump and isinstance(acting_character.agent, agent.Human)):
                 self.deal_terrain_damage(acting_character, loc[0], loc[1])
-
+        return len(path_traveled)
     def deal_terrain_damage(
         self,
         affected_character: Character,

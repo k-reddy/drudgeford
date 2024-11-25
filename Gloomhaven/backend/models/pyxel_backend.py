@@ -187,6 +187,13 @@ class PyxelManager:
         self.jsonify_and_send_task(task, client_id)
         # get input back
         user_input = self.server_client.get_user_input()["input"]
+        if is_mouse:
+            new_row, new_col = user_input.split(",")
+            new_row = int(float(new_row))
+            new_col = int(float(new_col))
+            new_row += self.x_offset
+            new_col += self.y_offset
+            user_input = (new_row, new_col)
 
         if not valid_inputs:
             return user_input

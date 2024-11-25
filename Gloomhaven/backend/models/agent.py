@@ -129,16 +129,16 @@ class Human(Agent):
         orig_prompt = "Click where you want to move."
         prompt = orig_prompt
         while remaining_movement > 0:
-            direction = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", is_mouse = True,client_id=client_id)
+            new_row, new_col = char.pyxel_manager.get_user_input(prompt=prompt+f"\nMovement remaining: {remaining_movement}", is_mouse = True,client_id=client_id)
 
-            if direction == "f":
-                break
+            # if direction == "f":
+            #     break
 
             # get your currnet and new locations, then find out if the move is legal
             current_loc = board.find_location_of_target(char)
-            new_row, new_col = [
-                a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
-            ]
+            # new_row, new_col = [
+            #     a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
+            # ]
             # perform any additional movement checks
 
             additional_movement_check_result = additional_movement_check(current_loc, (new_row, new_col)) if additional_movement_check else True
@@ -146,8 +146,9 @@ class Human(Agent):
             legal_move = board.is_legal_move(new_row, new_col)
             if legal_move and additional_movement_check_result:
                 # do this instead of update location because it deals with terrain
-                board.move_character_toward_location(char, (new_row, new_col), 1, is_jump)
-                remaining_movement -= 1
+                squares_moved = board.move_character_toward_location(char, (new_row, new_col), remaining_movement, is_jump)
+                # !!! change this to length of movement
+                remaining_movement -= squares_moved
                 prompt = orig_prompt
                 continue
             else:
