@@ -4,31 +4,62 @@ import subprocess
 import uuid
 import threading
 from typing import Dict
+from dataclasses import dataclass
+from queue import Queue
+# from ..backend.utils.config import PORT_START, NUM_PORTS
+
+@dataclass
+class GameInstance:
+    id: str
+    port: int
+    process: subprocess.Popen
+    status: str
+
+class PortManager:
+    def __init__(self, start_port: int, num_ports: int):
+        self.ports = Queue()
+        for port in range(start_port, start_port + num_ports):
+            self.ports.put(port)
+    
+    def get_port(self) -> int:
+        if not self.ports.empty():
+            return self.ports.get()
+        return None
+    
+    def release_port(self, port: int):
+        self.ports.put(port)
 
 app = Flask(__name__)
 
 # Store active games and their info
-active_games: Dict[str, dict] = {}
+active_games: Dict[str, GameInstance] = {}
+
+# Initialize port manager 
+# port_manager = PortManager(PORT_START, NUM_PORTS)
+port_manager = PortManager(5000, 5)
+
 
 # Get the directory where the script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Define paths
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 CSS_FILE = os.path.join(BASE_DIR, 'styles.css')
 
-def run_game_server(game_id: str):
+def run_game_server(game_id: str, port: int):
     """Run the game server in a separate process"""
     try:
-        # Modify this path to point to your main.py
-        process = subprocess.Popen(['python', 'main.py'], 
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
+        # Run main.py with the port as a parameter
+        process = subprocess.Popen(
+            ['python', 'main.py', str(port)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
         
-        active_games[game_id] = {
-            'process': process,
-            'status': 'running'
-        }
+        active_games[game_id] = GameInstance(
+            id=game_id,
+            port=port,
+            process=process,
+            status='running'
+        )
         
         # Monitor the process
         stdout, stderr = process.communicate()
@@ -37,14 +68,15 @@ def run_game_server(game_id: str):
             print(f"Game {game_id} ended with error: {stderr.decode()}")
         
         # Clean up game data when process ends
-        active_games[game_id]['status'] = 'ended'
+        if game_id in active_games:
+            active_games[game_id].status = 'ended'
+            port_manager.release_port(port)
         
     except Exception as e:
         print(f"Error running game {game_id}: {str(e)}")
-        active_games[game_id]['status'] = 'error'
-
-# HTML templates
-# [Previous imports and setup code remains the same...]
+        if game_id in active_games:
+            active_games[game_id].status = 'error'
+            port_manager.release_port(port)
 
 MAIN_HTML = """
 <!DOCTYPE html>
@@ -72,6 +104,7 @@ MAIN_HTML = """
                     gameLinkDiv.innerHTML = `
                         <p>GO TO THIS LINK FOR START-UP INSTRUCTIONS:</p>
                         <a href="${gameUrl}" class="game-link-button">${gameUrl}</a>
+                        <p>GAME PORT: ${data.port}</p>
                     `;
                     gameLinkDiv.style.display = 'block';
                 } else {
@@ -173,9 +206,11 @@ JOIN_HTML = """
             <strong>INSTRUCTIONS:</strong>
             <p>1. RUN YOUR GLOOMHAVEN FILE</p>
             <p>2. SET A NUMBER OF PLAYERS</p>
-            <p>3. TELL YOUR FRIENDS TO RUN THEIR FILES AND JOIN THE ADVENTURE!</p>
+            <p>3. SHARE THE PORT NUMBER WITH YOUR FRIENDS</p>
+            <p>4. TELL THEM TO RUN THEIR FILES AND JOIN THE ADVENTURE!</p>
         </div>
         <p>Game Status: RUNNING</p>
+        <p>Game Port: {port}</p>
     </div>
 </body>
 </html>
@@ -201,16 +236,26 @@ def download():
 @app.route('/host-game')
 def host_game():
     try:
+        port = port_manager.get_port()
+        if port is None:
+            return jsonify({
+                'success': False,
+                'error': 'No ports available. Please try again later.'
+            })
+
         game_id = str(uuid.uuid4())
         
-        thread = threading.Thread(target=run_game_server, args=(game_id,))
+        thread = threading.Thread(target=run_game_server, args=(game_id, port))
         thread.start()
         
         return jsonify({
             'success': True,
-            'game_id': game_id
+            'game_id': game_id,
+            'port': port
         })
     except Exception as e:
+        if port:
+            port_manager.release_port(port)
         return jsonify({
             'success': False,
             'error': str(e)
@@ -221,10 +266,11 @@ def join_game(game_id):
     if game_id not in active_games:
         return render_template_string(ERROR_HTML), 404
         
-    if active_games[game_id]['status'] != 'running':
+    game = active_games[game_id]
+    if game.status != 'running':
         return render_template_string(ENDED_HTML), 400
         
-    return render_template_string(JOIN_HTML)
+    return render_template_string(JOIN_HTML.format(port=game.port))
 
 if __name__ == '__main__':
     # Create static folder if it doesn't exist
@@ -244,4 +290,4 @@ if __name__ == '__main__':
         print(f"Error copying CSS file: {str(e)}")
         raise
     
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=8000)

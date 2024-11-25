@@ -28,10 +28,10 @@ class Campaign:
     '''
     a campaign is a series of games, each of which has level metadata
     '''
-    def __init__(self, num_players_default: int, all_ai_mode: bool, server: TCPServer):
+    def __init__(self, num_players_default: int, all_ai_mode: bool, server: TCPServer, port: int):
         self.current_level: Level
         self.server = server
-        self.pyxel_manager = PyxelManager()
+        self.pyxel_manager = PyxelManager(port)
         self.num_players = num_players_default
         self.all_ai_mode = all_ai_mode
         self.id_generator = count(start=1)

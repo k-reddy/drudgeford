@@ -24,8 +24,8 @@ from .controllers.keyboard_manager import KeyboardManager
 
 
 class PyxelEngine:
-    def __init__(self):
-        self.server_client = TCPClient(ClientType.FRONTEND)
+    def __init__(self, port):
+        self.server_client = TCPClient(ClientType.FRONTEND, port=port)
         self.tj = TaskJsonifier()
         self.current_task = None
         self.is_board_initialized = False

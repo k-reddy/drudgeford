@@ -1,5 +1,4 @@
 import textwrap
-import os
 from pyxel_ui.engine import PyxelEngine
 from backend.utils.config import TEXT_WIDTH
 
@@ -30,9 +29,10 @@ def provide_help_if_desired(all_ai_mode=False):
         input("Hit enter to continue")
 
 def main():
-        # if players want game help, display instructions
+    port = int(input("Please enter the port number"))
+    # if players want game help, display instructions
     provide_help_if_desired()
-    pyxel_view = PyxelEngine()
+    pyxel_view = PyxelEngine(port)
     pyxel_view.start()
 
 if __name__=="__main__":
