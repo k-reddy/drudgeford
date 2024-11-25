@@ -16,7 +16,7 @@ class KeyboardManager:
         self.last_mouse_pos = (-1, -1)
 
     def update(self):
-        if pyxel.btnp(pyxel.KEY_Q):
+        if pyxel.btnp(pyxel.KEY_ESCAPE):
             pyxel.quit()
 
         # Handle cursor redraws and grid
