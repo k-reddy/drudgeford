@@ -191,8 +191,8 @@ class PyxelManager:
             new_row, new_col = user_input.split(",")
             new_row = int(float(new_row))
             new_col = int(float(new_col))
-            new_row += self.x_offset
-            new_col += self.y_offset
+            new_row += self.y_offset
+            new_col += self.x_offset
             user_input = (new_row, new_col)
 
         if not valid_inputs:
