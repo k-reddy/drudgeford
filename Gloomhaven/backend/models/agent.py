@@ -171,19 +171,21 @@ class Human(Agent):
     ):
         if len(in_range_opponents) == 1:
             return in_range_opponents[0]
-        # show in range opponents
+        # show in range opponents and collect info
+        valid_inputs = []
         board.pyxel_manager.log.append("Characters in range: ")
         for i, opponent in enumerate(in_range_opponents):
             board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
+            valid_inputs.append(board.find_location_of_target(opponent))
         board.pyxel_manager.log.append("\n")
 
         # get user input on which to attack
-        prompt = "Please type the number of the character you want to target"
-        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = pyxel_manager.get_user_input(
-            prompt=prompt, valid_inputs=valid_inputs, client_id=client_id
+        prompt = "Please click on the character you want to target"
+        # valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
+        row, col = pyxel_manager.get_user_input(
+            prompt=prompt, valid_inputs=valid_inputs, client_id=client_id, is_mouse=True
         )
-        return in_range_opponents[int(target_num)]
+        return board.locations[row][col]
 
     @staticmethod
     def perform_movement(

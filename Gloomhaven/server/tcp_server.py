@@ -140,7 +140,6 @@ class TCPServer:
     def _process_post_task(self, payload):
         target_client_id = payload.get("target_client_id")
         task_data = payload.get("task")
-        print(payload)
         if not target_client_id:
             raise ValueError("No target client id")
 
