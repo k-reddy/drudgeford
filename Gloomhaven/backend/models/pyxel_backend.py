@@ -187,21 +187,22 @@ class PyxelManager:
         # get input back
         user_input = self.server_client.get_user_input()["input"]
         if is_mouse:
-            new_row, new_col = user_input.split(",")
-            new_row = int(float(new_row))
-            new_col = int(float(new_col))
-            new_row += self.y_offset
-            new_col += self.x_offset
-            user_input = (new_row, new_col)
+            user_input = self.process_mouse_input(user_input)
 
         if not valid_inputs:
             return user_input
 
         # if there's validation, keep asking for input until you get what you need
         while user_input not in valid_inputs:
-            task = task_class("Invalid key pressed. Try again.\n" + prompt)
+            print(user_input)
+            print(valid_inputs)
+            task = task_class("Invalid selection pressed. Try again.\n" + prompt)
             self.jsonify_and_send_task(task, client_id)
             user_input = self.server_client.get_user_input()["input"]
+            # process our new input if it's mouse input
+            user_input = (
+                self.process_mouse_input(user_input) if is_mouse else user_input
+            )
         return user_input
 
     def print_message(self, message, client_id="ALL_FRONTEND"):
@@ -221,3 +222,16 @@ class PyxelManager:
         task = tasks.LoadCampaign()
         self.jsonify_and_send_task(task, "frontend_1")
         return self.server_client.get_user_input()["input"]
+
+    def process_mouse_input(self, user_input):
+        """
+        This function converts string to a tuple of ints to represent
+        coordinates and also converts from offset pyxel coordinates
+        to the backend coordinates (which aren't offset)
+        """
+        new_row, new_col = user_input.split(",")
+        new_row = int(float(new_row))
+        new_col = int(float(new_col))
+        new_row += self.y_offset
+        new_col += self.x_offset
+        return (new_row, new_col)

@@ -1,4 +1,5 @@
 import random
+import copy
 import backend.models.character as character
 from backend.utils.config import DEBUG
 from backend.models.display import Display
@@ -74,12 +75,18 @@ class GameLoop:
         self.board.update_character_statuses()
 
         # randomize who starts the turn
-        character_dict = {
-            character.id: character for character in self.board.characters
-        }
-        character_ids = [character.id for character in self.board.characters]
-        random.shuffle(character_ids)
-        round_character_list = [character_dict[cid] for cid in character_ids]
+        # character_dict = {
+        #     character.id: character for character in self.board.characters
+        # }
+        # character_ids = [character.id for character in self.board.characters]
+        # random.shuffle(character_ids)
+        # round_character_list = [character_dict[cid] for cid in character_ids]
+
+        # if we don't shuffle the actual list, we will create ordering issues
+        # b/c when we kill a character, we send a copy of characters over to
+        # pyxel, same when we update healths
+        random.shuffle(self.board.characters)
+        round_character_list = copy.copy((self.board.characters))
         self.pyxel_manager.load_characters(round_character_list)
         for acting_character in round_character_list:
             # since we use a copy, we need to make sure the character is still alive
@@ -161,6 +168,8 @@ class GameLoop:
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
+        # shouldn't be the case, but somehow we got to here without refreshing cards, so adding this as a safety check
+        self.refresh_character_cards(acting_character)
         if acting_character.lose_turn:
             acting_character.lose_turn = False
             self.pyxel_manager.log.append(

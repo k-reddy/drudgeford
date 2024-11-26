@@ -58,7 +58,7 @@ class Board:
         for element in starting_elements:
             self.add_starting_effect_to_terrain(element, 1000)
         pyxel_manager.load_board(self.locations, self.terrain)
-        pyxel_manager.load_characters(self.characters)
+        # pyxel_manager.load_characters(self.characters)
         self.acting_character = None
 
     # @property
@@ -271,7 +271,7 @@ class Board:
             self.locations[row][col] = x
 
     def get_shortest_valid_path(
-        self, start: tuple[int, int], end: tuple[int, int]
+        self, start: tuple[int, int], end: tuple[int, int], is_jump: bool = False
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
@@ -320,7 +320,7 @@ class Board:
                 new_col = int(current[1] + direction[1])
                 new_pos = (new_row, new_col)
                 if new_pos not in closed and (
-                    self.is_legal_move(new_row, new_col) or new_pos == end
+                    self.is_legal_move(new_row, new_col, is_jump) or new_pos == end
                 ):
                     new_g_score = g_scores[current] + 1
                     if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
@@ -437,7 +437,7 @@ class Board:
         self.pyxel_manager.remove_entity(target.id)
         self.pyxel_manager.log.append(f"{target.name} has been killed.")
         # if it's your turn, end it immediately
-        if target==self.acting_character:
+        if target == self.acting_character:
             raise DieAndEndTurn()
 
     def find_in_range_opponents_or_allies(
@@ -466,12 +466,10 @@ class Board:
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
         path_to_target = self.get_shortest_valid_path(
-            start=acting_character_loc, end=target_location
+            start=acting_character_loc, end=target_location, is_jump=is_jump
         )
         path_traveled = []
-        print(path_to_target)
-        print(f"acting_car_loc: {acting_character_loc}")
-        print(f"target: {target_location}")
+        path_length_jump = 0
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
@@ -489,16 +487,19 @@ class Board:
         else:
             path_traveled = path_to_target[:-1]
         # go along the path and take any terrain damage! if you jump, go straight to end
-        if is_jump and isinstance(acting_character.agent, agent.Ai):
+        if is_jump:
+            path_length_jump = len(path_traveled)
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc
-            # humans move step by step, so they should not take damage on a jump
+            # humans move step by step, so they should not take damage on a jump - we'll have them take damage
+            # at the end of their movement later
             if not (is_jump and isinstance(acting_character.agent, agent.Human)):
                 self.deal_terrain_damage(acting_character, loc[0], loc[1])
-        return len(path_traveled)
+        return max(len(path_traveled), path_length_jump)
+
     def deal_terrain_damage(
         self,
         affected_character: Character,
@@ -538,14 +539,18 @@ class Board:
         self.update_locations(new_location[0], new_location[1], actor)
         self.pyxel_manager.move_character(actor, old_location, new_location)
 
-    def is_legal_move(self, row: int, col: int) -> bool:
+    def is_legal_move(self, row: int, col: int, jump_intermediate_move=False) -> bool:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
-        return is_position_within_board and self.locations[row][col] is None
+        if jump_intermediate_move:
+            return is_position_within_board
+        else:
+            return is_position_within_board and self.locations[row][col] is None
 
     def modify_target_health(self, target: Character, damage: int) -> None:
-        target.health -= damage
+        # if this is a heal (damage is -), don't allow them to heal beyond max health
+        target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
             self.kill_target(target)
         elif damage > 0:
