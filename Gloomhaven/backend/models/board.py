@@ -469,9 +469,6 @@ class Board:
             start=acting_character_loc, end=target_location
         )
         path_traveled = []
-        print(path_to_target)
-        print(f"acting_car_loc: {acting_character_loc}")
-        print(f"target: {target_location}")
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
