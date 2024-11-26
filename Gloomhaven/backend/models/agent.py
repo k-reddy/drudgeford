@@ -199,7 +199,7 @@ class Human(Agent):
         ] = None,
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move. You can move step by step to control your path. \nOr if you want to jump, pick the endpoint and the board will move you there.\nWhen you're done with your movement, click on your character."
+        orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
             new_row, new_col = char.pyxel_manager.get_user_input(
