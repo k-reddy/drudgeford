@@ -55,8 +55,9 @@ class KeyboardManager:
         if pyxel.btnp(pyxel.KEY_LEFT):
             self.view_manager.scroll_action_cards_left()
 
-        if self.accept_mouse_input and pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT):
-            if self.mouse_tile_pos:
+        if self.accept_mouse_input:
+            self.print_keyboard(self.input)
+            if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
                 # BUG: location seems to be relative to character starting position so
                 # the target location will always be off by some amount, e.g. always 2 over.
@@ -65,8 +66,6 @@ class KeyboardManager:
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
                 self.return_input_to_server()
                 return
-
-            self.print_keyboard(self.input)
 
         if self.accept_input:
             # Handle enter
