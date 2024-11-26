@@ -161,6 +161,8 @@ class GameLoop:
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
+        # shouldn't be the case, but somehow we got to here without refreshing cards, so adding this as a safety check
+        self.refresh_character_cards(acting_character)
         if acting_character.lose_turn:
             acting_character.lose_turn = False
             self.pyxel_manager.log.append(
