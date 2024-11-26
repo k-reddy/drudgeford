@@ -437,7 +437,7 @@ class Board:
         self.pyxel_manager.remove_entity(target.id)
         self.pyxel_manager.log.append(f"{target.name} has been killed.")
         # if it's your turn, end it immediately
-        if target==self.acting_character:
+        if target == self.acting_character:
             raise DieAndEndTurn()
 
     def find_in_range_opponents_or_allies(
@@ -499,6 +499,7 @@ class Board:
             if not (is_jump and isinstance(acting_character.agent, agent.Human)):
                 self.deal_terrain_damage(acting_character, loc[0], loc[1])
         return len(path_traveled)
+
     def deal_terrain_damage(
         self,
         affected_character: Character,
@@ -545,7 +546,8 @@ class Board:
         return is_position_within_board and self.locations[row][col] is None
 
     def modify_target_health(self, target: Character, damage: int) -> None:
-        target.health -= damage
+        # if this is a heal (damage is -), don't allow them to heal beyond max health
+        target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
             self.kill_target(target)
         elif damage > 0:
