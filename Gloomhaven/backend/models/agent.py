@@ -135,7 +135,7 @@ class Human(Agent):
     def select_action_card(
         pyxel_manager: PyxelManager,
         available_action_cards: list[ActionCard],
-        client_id: Optional[str] = None,
+        client_id: str,
     ) -> ActionCard:
         # let them pick a valid action_card
         prompt = "Which action card would you like to pick? Type the number exactly."

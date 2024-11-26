@@ -116,6 +116,7 @@ class ViewManager:
             self.log_view.drawable = True
         else:
             self.log_view.drawable = False
+        self.log_view.is_log_changed = True
         self.log_view.draw()
 
     def update_initiative_bar(
@@ -209,15 +210,15 @@ class ViewManager:
         if (x_num, y_num) in self.map_view.valid_map_coordinates:
             return (x_num, y_num)
         return None
-    
+
     def scroll_action_cards_right(self):
         if (
-                self.action_card_view.current_card_page + 1
-            ) * self.action_card_view.cards_per_page < len(
-                self.action_card_view.action_card_log
-            ):
-                self.action_card_view.current_card_page += 1
-                self.action_card_view.draw()
+            self.action_card_view.current_card_page + 1
+        ) * self.action_card_view.cards_per_page < len(
+            self.action_card_view.action_card_log
+        ):
+            self.action_card_view.current_card_page += 1
+            self.action_card_view.draw()
 
     def scroll_action_cards_left(self):
         # Go to previous page if we're not at the start
@@ -229,7 +230,7 @@ class ViewManager:
     #     self.keyboard_view.output = output
     #     self.keyboard_view.drawable = True
     #     self.keyboard_view.draw()
-    
+
     # def reset_keyboard(self):
     #     self.keyboard_view.drawable = False
     #     self.keyboard_view.draw()
@@ -240,7 +241,7 @@ class ViewManager:
             self.personal_log.log += output
         self.personal_log.drawable = True
         self.personal_log.draw()
-    
+
     def reset_keyboard(self):
         self.personal_log.drawable = False
         self.personal_log.log = []

@@ -11,8 +11,6 @@ from backend.models.level import Level, campaign_levels
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
-from backend.utils.utilities import get_campaign_filenames
-from backend.utils.config import SAVE_FILE_DIR
 from server.tcp_server import TCPServer, ClientType
 
 
@@ -24,6 +22,7 @@ class CampaignState:
     num_players: int
     all_ai_mode: bool
     id_gen_start: int
+    player_ids: list
 
 
 class Campaign:
@@ -42,6 +41,10 @@ class Campaign:
         self.id_generator = count(start=1)
         self.available_chars = []
         self.player_chars = []
+        # we need these to reconstruct our players between levels
+        self.player_names = []
+        self.player_classes = []
+        self.player_ids = []
         self.levels = []
         self.initialized = False
 
@@ -55,15 +58,16 @@ class Campaign:
         # get the data needed to recreate the campaign
         campaign_state = pickle.loads(campaign_pickle_to_load)
         # recreate it
-        self.initialized = True
         self.id_generator = count(start=campaign_state.id_gen_start)
         self.make_levels()
         self.levels = self.levels[-campaign_state.remaining_levels :]
         self.all_ai_mode = campaign_state.all_ai_mode
         self.num_players = campaign_state.num_players
-        self.player_chars = self.load_player_characters(
-            campaign_state.player_names, campaign_state.player_classes
-        )
+        self.player_names = campaign_state.player_names
+        self.player_classes = campaign_state.player_classes
+        self.player_ids = campaign_state.player_ids
+        # remember that we already have a set up campaign
+        self.initialized = True
 
     def start_campaign(self):
         # if we load a campaign, we don't want to reset everything
@@ -90,6 +94,8 @@ class Campaign:
         self.levels = campaign_levels.copy()
 
     def run_level(self, level: Level):
+        # reset our player characters between each level
+        self.player_chars = self.load_player_characters()
         self.current_level = level
         if not self.all_ai_mode:
             self.pyxel_manager.print_message(message=self.current_level.pre_level_text)
@@ -204,13 +210,18 @@ class Campaign:
         for i in range(self.num_players):
             self.player_chars.append(self.select_player_character(i))
 
-    def load_player_characters(self, player_names, char_classes):
+        for char in self.player_chars:
+            self.player_names.append(char.name)
+            self.player_classes.append(type(char).__name__)
+            self.player_ids.append(char.client_id)
+
+    def load_player_characters(self):
         emojis = ["🧙", "🕺", "🐣", "🐣"]
 
         # recreate the same characters
         player_chars = []
-        for char_class_name, player_name, emoji in zip(
-            char_classes, player_names, emojis
+        for char_class_name, player_name, emoji, player_id in zip(
+            self.player_classes, self.player_names, emojis, self.player_ids
         ):
             char_class = getattr(character, char_class_name)
             player_agent = agent.Ai() if self.all_ai_mode else agent.Human()
@@ -223,6 +234,7 @@ class Campaign:
                     char_id=next(self.id_generator),
                     is_monster=False,
                     log=self.pyxel_manager.log,
+                    player_id=player_id,
                 )
             )
         return player_chars
@@ -233,6 +245,7 @@ class Campaign:
             remaining_levels=len(self.levels),
             player_classes=[type(char).__name__ for char in self.player_chars],
             player_names=[char.name for char in self.player_chars],
+            player_ids=[char.client_id for char in self.player_chars],
             num_players=self.num_players,
             all_ai_mode=self.all_ai_mode,
             id_gen_start=next(self.id_generator),

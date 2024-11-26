@@ -58,7 +58,7 @@ class Board:
         for element in starting_elements:
             self.add_starting_effect_to_terrain(element, 1000)
         pyxel_manager.load_board(self.locations, self.terrain)
-        pyxel_manager.load_characters(self.characters)
+        # pyxel_manager.load_characters(self.characters)
         self.acting_character = None
 
     # @property
