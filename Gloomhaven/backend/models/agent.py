@@ -199,7 +199,7 @@ class Human(Agent):
         ] = None,
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move. You can move step by step to control your path. \nOr if you want to jump, pick the endpoint and the board will move you there."
+        orig_prompt = "Click where you want to move. You can move step by step to control your path. \nOr if you want to jump, pick the endpoint and the board will move you there.\nWhen you're done with your movement, click on your character."
         prompt = orig_prompt
         while remaining_movement > 0:
             new_row, new_col = char.pyxel_manager.get_user_input(
@@ -208,16 +208,14 @@ class Human(Agent):
                 client_id=client_id,
             )
 
-            # if direction == "f":
-            #     break
-
-            # get your currnet and new locations, then find out if the move is legal
+            # get your current location
             current_loc = board.find_location_of_target(char)
-            # new_row, new_col = [
-            #     a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
-            # ]
-            # perform any additional movement checks
 
+            # we ask them to click on their character if they want to finish their movement
+            if current_loc == (new_row, new_col):
+                return
+
+            # perform any additional movement checks
             additional_movement_check_result = (
                 additional_movement_check(current_loc, (new_row, new_col))
                 if additional_movement_check
