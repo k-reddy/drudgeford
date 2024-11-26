@@ -63,6 +63,7 @@ class Agent(abc.ABC):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
         pass
 
@@ -117,7 +118,6 @@ class Ai(Agent):
         board.move_character_toward_location(char, target_loc, movement, is_jump)
 
     @staticmethod
-    # !!! found bug: this is a pull, not a push/movement
     def move_other_character(
         char_to_move,
         mover_loc,
@@ -126,8 +126,28 @@ class Ai(Agent):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
-        board.move_character_toward_location(char_to_move, mover_loc, movement, is_jump)
+        if is_push:
+            current_target_loc = board.find_location_of_target(char_to_move)
+            directions = DIRECTION_MAP.values().pop(None)
+            while movement > 0:
+                # grab a random direction
+                direction = directions[random.randint(0, len(directions))]
+                # simulate moving that way and see if it passes the movement check
+                new_target_loc = [a + b for a, b in zip(current_target_loc, direction)]
+                if movement_check(mover_loc, board, current_target_loc, new_target_loc):
+                    # if so, move that way, update our location, and decrement move counter
+                    board.move_character_to_location(
+                        char_to_move, new_target_loc, movement, is_jump
+                    )
+                    current_target_loc = new_target_loc
+                    movement -= 1
+        # pull is very easy, just move toward puller
+        else:
+            board.move_character_toward_location(
+                char_to_move, mover_loc, movement, is_jump
+            )
 
 
 class Human(Agent):
@@ -250,6 +270,7 @@ class Human(Agent):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
         Human.perform_movement(
             char_to_move,

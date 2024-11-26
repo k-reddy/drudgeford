@@ -419,7 +419,7 @@ class Push(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range)
 
         if not target:
-            board.pyxel_manager.log.append("No one in range to pull")
+            board.pyxel_manager.log.append("No one in range to push")
             return
 
         board.pyxel_manager.log.append(f"Pushing {target.name}")
@@ -436,6 +436,7 @@ class Push(ActionStep):
             board,
             is_legal_push_check,
             attacker.client_id,
+            is_push=True,
         )
         board.pyxel_manager.log.append("Push completed")
 
