@@ -175,7 +175,7 @@ class Human(Agent):
         valid_inputs = []
         board.pyxel_manager.log.append("Characters in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
+            board.pyxel_manager.log.append(f"{opponent.name}")
             valid_inputs.append(board.find_location_of_target(opponent))
         board.pyxel_manager.log.append("\n")
 
