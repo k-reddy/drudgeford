@@ -16,7 +16,15 @@ MAX_ROUNDS = 1000
 class Character(abc.ABC):
     # basic monster setup
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
         self.id = char_id
         self.health = self.set_health()
@@ -37,7 +45,7 @@ class Character(abc.ABC):
         self.shield: tuple[int, int] = (0, MAX_ROUNDS)
         self.log = log
         self.elemental_affinity = None
-        self.client_id = None
+        self.client_id = player_id
         self.lose_turn = False
 
     def select_action_card(self):
@@ -183,9 +191,19 @@ class Character(abc.ABC):
 class Wizard(Character):
 
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.backstory = textwrap.fill(character_classes.wizard.backstory, TEXT_WIDTH)
         self.pyxel_sprite_name = "wizard"
 
@@ -198,9 +216,19 @@ class Wizard(Character):
 
 class Miner(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.backstory = textwrap.fill(character_classes.miner.backstory, TEXT_WIDTH)
         self.pyxel_sprite_name = "miner"
 
@@ -213,9 +241,19 @@ class Miner(Character):
 
 class Necromancer(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.backstory = textwrap.fill(
             character_classes.necromancer.backstory, TEXT_WIDTH
         )
@@ -230,9 +268,19 @@ class Necromancer(Character):
 
 class Monk(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.backstory = textwrap.fill(character_classes.monk.backstory, TEXT_WIDTH)
         self.pyxel_sprite_name = "monk"
 
@@ -245,9 +293,19 @@ class Monk(Character):
 
 class Treeman(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "treeman"
 
     def create_action_cards(self):
@@ -259,9 +317,19 @@ class Treeman(Character):
 
 class Fairy(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "fairy"
 
     def create_action_cards(self):
@@ -273,9 +341,19 @@ class Fairy(Character):
 
 class MushroomMan(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "mushroomman"
         self.elemental_affinity = obstacle.Spores
 
@@ -288,15 +366,25 @@ class MushroomMan(Character):
 
 # class EvilBlob(Character):
 #     def __init__(self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log):
-#         super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+#         super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id)
 #         self.pyxel_sprite_name = "evilblob"
 
 
 class Fiend(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "fiend"
 
     def create_action_cards(self):
@@ -308,9 +396,19 @@ class Fiend(Character):
 
 class Demon(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "demon"
 
     def create_action_cards(self):
@@ -322,9 +420,19 @@ class Demon(Character):
 
 class FireSprite(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "firesprite"
         self.elemental_affinity = obstacle.Fire
 
@@ -337,9 +445,19 @@ class FireSprite(Character):
 
 class IceMonster(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "icemonster"
 
     def create_action_cards(self):
@@ -351,9 +469,19 @@ class IceMonster(Character):
 
 class SnowStalker(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "snowstalker"
 
     def create_action_cards(self):
@@ -365,9 +493,19 @@ class SnowStalker(Character):
 
 class IceDragon(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "icedragon"
 
     def create_action_cards(self):
@@ -379,9 +517,19 @@ class IceDragon(Character):
 
 class Skeleton(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "skeleton"
 
     def create_action_cards(self):
@@ -393,9 +541,19 @@ class Skeleton(Character):
 
 class Corpse(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "corpse"
 
     def create_action_cards(self):
@@ -407,9 +565,19 @@ class Corpse(Character):
 
 class Ghost(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "ghost"
 
     def create_action_cards(self):
@@ -421,9 +589,19 @@ class Ghost(Character):
 
 class WailingSpirit(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "wailingspirit"
 
     def create_action_cards(self):
@@ -435,9 +613,19 @@ class WailingSpirit(Character):
 
 class FleshGolem(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "fleshgolem"
 
     def create_action_cards(self):
@@ -449,9 +637,19 @@ class FleshGolem(Character):
 
 class BloodOoze(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "bloodooze"
 
     def create_action_cards(self):
@@ -463,9 +661,19 @@ class BloodOoze(Character):
 
 class MalformedFlesh(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "evilblob"
 
     def create_action_cards(self):
@@ -477,9 +685,19 @@ class MalformedFlesh(Character):
 
 class Orchestrator(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "orchestrator"
 
     def create_action_cards(self):
@@ -491,9 +709,19 @@ class Orchestrator(Character):
 
 class Puppet(Character):
     def __init__(
-        self, name, pyxel_manager, emoji, agent, char_id: int, is_monster, log
+        self,
+        name,
+        pyxel_manager,
+        emoji,
+        agent,
+        char_id: int,
+        is_monster,
+        log,
+        player_id=None,
     ):
-        super().__init__(name, pyxel_manager, emoji, agent, char_id, is_monster, log)
+        super().__init__(
+            name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
+        )
         self.pyxel_sprite_name = "orchestratorgolem"
 
     def create_action_cards(self):

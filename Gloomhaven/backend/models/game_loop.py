@@ -26,7 +26,7 @@ class GameLoop:
         self.pyxel_manager = pyxel_manager
         self.level = level
         self.num_players = num_players
-        self.players = copy.deepcopy(players)
+        self.players = players
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
