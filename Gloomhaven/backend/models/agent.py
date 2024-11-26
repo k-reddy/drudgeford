@@ -135,7 +135,7 @@ class Human(Agent):
     def select_action_card(
         pyxel_manager: PyxelManager,
         available_action_cards: list[ActionCard],
-        client_id: Optional[str] = None,
+        client_id: str,
     ) -> ActionCard:
         # let them pick a valid action_card
         prompt = "Which action card would you like to pick? Type the number exactly."
@@ -171,19 +171,21 @@ class Human(Agent):
     ):
         if len(in_range_opponents) == 1:
             return in_range_opponents[0]
-        # show in range opponents
+        # show in range opponents and collect info
+        valid_inputs = []
         board.pyxel_manager.log.append("Characters in range: ")
         for i, opponent in enumerate(in_range_opponents):
-            board.pyxel_manager.log.append(f"{i}: {opponent.emoji} {opponent.name}")
+            board.pyxel_manager.log.append(f"{opponent.name}")
+            valid_inputs.append(board.find_location_of_target(opponent))
         board.pyxel_manager.log.append("\n")
 
         # get user input on which to attack
-        prompt = "Please type the number of the character you want to target"
-        valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
-        target_num = pyxel_manager.get_user_input(
-            prompt=prompt, valid_inputs=valid_inputs, client_id=client_id
+        prompt = "Please click on the character you want to target"
+        # valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
+        row, col = pyxel_manager.get_user_input(
+            prompt=prompt, valid_inputs=valid_inputs, client_id=client_id, is_mouse=True
         )
-        return in_range_opponents[int(target_num)]
+        return board.locations[row][col]
 
     @staticmethod
     def perform_movement(
@@ -197,7 +199,7 @@ class Human(Agent):
         ] = None,
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move."
+        orig_prompt = "Click where you want to move. You can move step by step to control your path. \nOr if you want to jump, pick the endpoint and the board will move you there."
         prompt = orig_prompt
         while remaining_movement > 0:
             new_row, new_col = char.pyxel_manager.get_user_input(

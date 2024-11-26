@@ -97,7 +97,6 @@ class TCPServer:
                 request = json.loads(data)
                 command = request.get("command")
                 payload = request.get("payload", {})
-
                 response = self._process_command(command, payload, client_id)
                 client_socket.send(json.dumps(response).encode("utf-8"))
             except socket.timeout:
@@ -141,7 +140,6 @@ class TCPServer:
     def _process_post_task(self, payload):
         target_client_id = payload.get("target_client_id")
         task_data = payload.get("task")
-
         if not target_client_id:
             raise ValueError("No target client id")
 
