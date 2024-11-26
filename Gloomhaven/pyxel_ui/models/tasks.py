@@ -74,11 +74,14 @@ class LoadCharactersTask(Task):
     """
 
     healths: list[int]
+    max_healths: list[int]
     sprite_names: list[str]
     teams: list[bool]
 
     def perform(self, view_manager, keyboard_manager):
-        view_manager.update_initiative_bar(self.sprite_names, self.healths, self.teams)
+        view_manager.update_initiative_bar(
+            self.sprite_names, self.healths, self.max_healths, self.teams
+        )
 
 
 @dataclass

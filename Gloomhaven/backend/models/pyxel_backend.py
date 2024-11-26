@@ -137,9 +137,10 @@ class PyxelManager:
 
     def load_characters(self, characters: list[character.Character]):
         healths = [character.health for character in characters]
+        max_healths = [character.max_health for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         teams = [character.team_monster for character in characters]
-        task = tasks.LoadCharactersTask(healths, sprite_names, teams)
+        task = tasks.LoadCharactersTask(healths, max_healths, sprite_names, teams)
         self.jsonify_and_send_task(task)
 
     def load_log(self, log):
