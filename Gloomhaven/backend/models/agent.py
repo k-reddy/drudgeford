@@ -173,15 +173,13 @@ class Human(Agent):
             return in_range_opponents[0]
         # show in range opponents and collect info
         valid_inputs = []
-        board.pyxel_manager.log.append("Characters in range: ")
+        prompt = "Please click on the character you want to target:\n"
+
         for i, opponent in enumerate(in_range_opponents):
-            board.pyxel_manager.log.append(f"{opponent.name}")
+            prompt += f"{opponent.name}{": Shield " +str(opponent.shield[0]) if opponent.shield[0]> 0 else""}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
-        board.pyxel_manager.log.append("\n")
 
         # get user input on which to attack
-        prompt = "Please click on the character you want to target"
-        # valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         row, col = pyxel_manager.get_user_input(
             prompt=prompt, valid_inputs=valid_inputs, client_id=client_id, is_mouse=True
         )
