@@ -220,15 +220,18 @@ class Human(Agent):
         orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
+            current_loc = board.find_location_of_target(char)
+            # only allow user to pick a square in range
             new_row, new_col = char.pyxel_manager.get_user_input(
                 prompt=prompt + f"\nMovement remaining: {remaining_movement}",
                 is_mouse=True,
                 client_id=client_id,
             )
-
-            # get your current location
-            current_loc = board.find_location_of_target(char)
-
+            path_len = board.get_shortest_valid_path(
+                start=current_loc,
+                end=(new_row, new_col),
+                is_jump=is_jump,
+            )
             # we ask them to click on their character if they want to finish their movement
             if current_loc == (new_row, new_col):
                 return
@@ -241,18 +244,18 @@ class Human(Agent):
             )
 
             legal_move = board.is_legal_move(new_row, new_col)
-            if legal_move and additional_movement_check_result:
+            # don't let them pick out of range squares
+            if legal_move and additional_movement_check_result and path_len <= movement:
                 # do this instead of update location because it deals with terrain
                 squares_moved = board.move_character_toward_location(
                     char, (new_row, new_col), remaining_movement, is_jump
                 )
-                # !!! change this to length of movement
                 remaining_movement -= squares_moved
                 prompt = orig_prompt
                 continue
             else:
                 prompt = (
-                    "Invalid square (obstacle, character, or board edge) - try again\n"
+                    "Invalid square (obstacle, character, or out of movement range) - try again\n"
                     + prompt
                 )
 
