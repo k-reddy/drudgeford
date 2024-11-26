@@ -543,8 +543,13 @@ class Board:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
+        # for jumping, we can jump through any obstacles and players
+        # but we have to stay on board and can't go through walls
         if jump_intermediate_move:
-            return is_position_within_board
+            return (
+                is_position_within_board
+                and self.locations[row][col] is not obstacle.Wall
+            )
         else:
             return is_position_within_board and self.locations[row][col] is None
 
