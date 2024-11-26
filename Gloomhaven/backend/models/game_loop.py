@@ -1,4 +1,5 @@
 import random
+import copy
 import backend.models.character as character
 from backend.utils.config import DEBUG
 from backend.models.display import Display
@@ -25,7 +26,7 @@ class GameLoop:
         self.pyxel_manager = pyxel_manager
         self.level = level
         self.num_players = num_players
-        self.players = players
+        self.players = copy.deepcopy(players)
         self.all_ai_mode = all_ai_mode
         monsters = self.set_up_monsters()
         self.board = Board(
