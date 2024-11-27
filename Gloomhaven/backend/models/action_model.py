@@ -258,7 +258,7 @@ class HealAllAllies(ActionStep):
         return f"Heal all allies for {self.strength}, Range {self.att_range}"
 
     def perform_string(self, attacker):
-        return ""
+        return f"{attacker.name} heals allies"
 
 
 @dataclass

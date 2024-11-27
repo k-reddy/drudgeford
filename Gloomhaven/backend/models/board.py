@@ -557,7 +557,7 @@ class Board:
         self, target: Character, damage: int, damage_str: str = ""
     ) -> None:
         # add needed spacing if we have a string
-        damage_str += " " if damage_str else damage_str
+        damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:

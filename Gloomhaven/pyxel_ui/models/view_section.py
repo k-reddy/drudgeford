@@ -418,10 +418,6 @@ class InitiativeBarView(ViewSection):
                 )  # Red (8) for monsters, Green (11) for players
 
                 # make line length relative to remaining health
-                print("_________")
-                print(
-                    f"{self.healths[actual_index] / self.max_healths[actual_index]} proportion"
-                )
                 line_length = self.sprite_width - 2 * self.sprite_width // 4
                 adjusted_length = round(
                     line_length
