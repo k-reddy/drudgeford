@@ -35,6 +35,7 @@ cards = [
             actions.ElementAreaEffectFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Spores
             ),
+            actions.AreaAttack(shapes.circle(1), strength=2),
             actions.WeakenAllEnemies(2, 2),
         ],
         movement=2,
@@ -42,14 +43,14 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Growth Burst",
-        actions=[actions.HealAllAllies(2, 2), actions.BlessAllAllies(2)],
+        actions=[actions.HealAllAllies(3, 2), actions.BlessAllAllies(2)],
         movement=1,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Protective Bloom",
         actions=[
-            actions.HealAllAllies(1, 5),
+            actions.HealAllAllies(3, 5),
             actions.ElementAreaEffectFromSelf(
                 shape=shapes.ring(2), element_type=obstacle.PoisonShroom
             ),
