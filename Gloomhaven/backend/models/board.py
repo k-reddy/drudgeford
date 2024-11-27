@@ -556,6 +556,13 @@ class Board:
     def modify_target_health(
         self, target: Character, damage: int, damage_str: str = ""
     ) -> None:
+        """
+        Modifies the target health by subtracting damage. For a heal,
+        pass negative damage.
+        """
+        # if it's a heal (negative damage) and you have max health, do nothing
+        if target.health == target.max_health and damage < 0:
+            return
         # add needed spacing if we have a string
         damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
