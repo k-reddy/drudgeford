@@ -197,8 +197,8 @@ class Human(Agent):
             "Please click on the character you want to target.\nTargets in range:\n"
         )
 
-        for i, opponent in enumerate(in_range_opponents):
-            prompt += f"{opponent.name}{": Shield " +str(opponent.shield[0]) if opponent.shield[0]> 0 else""}\n"
+        for opponent in in_range_opponents:
+            prompt += f"{opponent.name}{': Shield ' + str(opponent.shield[0]) if opponent.shield[0] > 0 else ''}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
 
         # get user input on which to attack
