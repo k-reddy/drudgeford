@@ -400,10 +400,8 @@ class Board:
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             to_log += f", does no damage!\n"
-            return
-        if self.is_shadow_interference(attacker, target):
+        elif self.is_shadow_interference(attacker, target):
             to_log += f", missed due to shadow\n"
-            return
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -560,6 +558,8 @@ class Board:
         Modifies the target health by subtracting damage. For a heal,
         pass negative damage.
         """
+        if damage == 0:
+            return
         # if it's a heal (negative damage) and you have max health, do nothing
         if target.health == target.max_health and damage < 0:
             return

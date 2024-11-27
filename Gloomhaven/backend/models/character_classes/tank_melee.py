@@ -10,7 +10,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Defensive Stance",
-        actions=[actions.ShieldSelf(2, 1), actions.SingleTargetAttack(4, 1)],
+        actions=[actions.ShieldSelf(3, 1), actions.SingleTargetAttack(4, 1)],
         movement=2,
         jump=False,
     ),
@@ -23,7 +23,7 @@ cards = [
     actions.ActionCard(
         attack_name="Shield Wall",
         actions=[
-            actions.ShieldAllAllies(1, 1, 3),
+            actions.ShieldAllAllies(2, 1, 3),
             actions.ModifySelfHealth(2),
             actions.ChargeNextAttack(2),
         ],
@@ -41,7 +41,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Shield Bash",
-        actions=[actions.SingleTargetAttack(3, 1), actions.Push(2, 1)],
+        actions=[actions.SingleTargetAttack(4, 1), actions.Push(2, 1)],
         movement=2,
         jump=False,
     ),
