@@ -181,7 +181,6 @@ class PyxelManager:
     ):
         # tell client to get user input
         task_class = tasks.MouseInputTask if is_mouse else tasks.InputTask
-        print(task_class)
         task = task_class(prompt)
 
         self.jsonify_and_send_task(task, client_id)

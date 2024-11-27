@@ -231,7 +231,7 @@ class ViewManager:
             self.action_card_view.current_card_page -= 1
             self.action_card_view.draw()
 
-    def update_keyboard(self, output, clear=True):
+    def update_personal_log(self, output, clear=True):
         if clear:
             self.personal_log.log = [output]
         else:
@@ -239,7 +239,7 @@ class ViewManager:
         self.personal_log.drawable = True
         self.personal_log.draw()
 
-    def reset_keyboard(self):
+    def reset_personal_log(self):
         self.personal_log.drawable = False
         self.personal_log.log = []
         self.personal_log.draw()
