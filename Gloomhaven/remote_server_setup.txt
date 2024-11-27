@@ -21,7 +21,10 @@ Documents/rc/rc/gloomhaven/ ec2-user@13.59.128.25:gloomhaven/
 ssh -i Documents/developer_creds/drudgeford_key.pem ec2-user@13.59.128.25
 
 # run the code
-cd ~/gloomhaven/
+cd gloomhaven/
 source .venv/bin/activate
+
 cd executable
+screen
 python3 lobby.py
+ctrl+A then D to detach screen and then can close terminal

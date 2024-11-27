@@ -206,7 +206,7 @@ class ShieldAllAllies(ActionStep):
         return f"Shield {self.strength} all allies, Range {self.att_range}, {self.duration} turns"
 
     def perform_string(self, attacker):
-        return f"Shield {self.strength}, {self.duration} turn{"s" if self.duration >1 else ""} these allies:"
+        return f"Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ""} these allies:"
 
 
 @dataclass
