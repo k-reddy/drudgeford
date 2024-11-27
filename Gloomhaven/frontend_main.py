@@ -38,9 +38,9 @@ def main(dev_mode=False):
         valid_ports = ["5000", "5001", "5002", "5003", "5004", "8000"]
         while port not in valid_ports:
             port = input("Please enter a valid port number")
+        # if players want game help, display instructions
+        provide_help_if_desired()
     port = int(port)
-    # if players want game help, display instructions
-    provide_help_if_desired()
     pyxel_view = PyxelEngine(port)
     pyxel_view.start()
 
