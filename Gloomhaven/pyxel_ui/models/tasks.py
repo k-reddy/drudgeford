@@ -375,3 +375,8 @@ class LoadCampaign(Task):
         with open(SAVE_FILE_DIR + filename, "rb") as f:
             campaign_state_pickle = f.read()
         return campaign_state_pickle
+
+
+class ResetViewManager(Task):
+    def perform(self, view_manager, user_input_manager):
+        view_manager.reset_self()
