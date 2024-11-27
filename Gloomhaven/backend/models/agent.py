@@ -63,6 +63,7 @@ class Agent(abc.ABC):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
         pass
 
@@ -117,7 +118,6 @@ class Ai(Agent):
         board.move_character_toward_location(char, target_loc, movement, is_jump)
 
     @staticmethod
-    # !!! found bug: this is a pull, not a push/movement
     def move_other_character(
         char_to_move,
         mover_loc,
@@ -126,8 +126,28 @@ class Ai(Agent):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
-        board.move_character_toward_location(char_to_move, mover_loc, movement, is_jump)
+        if is_push:
+            current_target_loc = board.find_location_of_target(char_to_move)
+            directions = DIRECTION_MAP.values().pop(None)
+            while movement > 0:
+                # grab a random direction
+                direction = directions[random.randint(0, len(directions))]
+                # simulate moving that way and see if it passes the movement check
+                new_target_loc = [a + b for a, b in zip(current_target_loc, direction)]
+                if movement_check(mover_loc, board, current_target_loc, new_target_loc):
+                    # if so, move that way, update our location, and decrement move counter
+                    board.move_character_to_location(
+                        char_to_move, new_target_loc, movement, is_jump
+                    )
+                    current_target_loc = new_target_loc
+                    movement -= 1
+        # pull is very easy, just move toward puller
+        else:
+            board.move_character_toward_location(
+                char_to_move, mover_loc, movement, is_jump
+            )
 
 
 class Human(Agent):
@@ -173,15 +193,15 @@ class Human(Agent):
             return in_range_opponents[0]
         # show in range opponents and collect info
         valid_inputs = []
-        board.pyxel_manager.log.append("Characters in range: ")
+        prompt = (
+            "Please click on the character you want to target.\nTargets in range:\n"
+        )
+
         for i, opponent in enumerate(in_range_opponents):
-            board.pyxel_manager.log.append(f"{opponent.name}")
+            prompt += f"{opponent.name}{": Shield " +str(opponent.shield[0]) if opponent.shield[0]> 0 else""}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
-        board.pyxel_manager.log.append("\n")
 
         # get user input on which to attack
-        prompt = "Please click on the character you want to target"
-        # valid_inputs = [str(i) for i, _ in enumerate(in_range_opponents)]
         row, col = pyxel_manager.get_user_input(
             prompt=prompt, valid_inputs=valid_inputs, client_id=client_id, is_mouse=True
         )
@@ -199,25 +219,29 @@ class Human(Agent):
         ] = None,
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move. You can move step by step to control your path. \nOr if you want to jump, pick the endpoint and the board will move you there."
+        orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
+            current_loc = board.find_location_of_target(char)
+            # only allow user to pick a square in range
             new_row, new_col = char.pyxel_manager.get_user_input(
                 prompt=prompt + f"\nMovement remaining: {remaining_movement}",
                 is_mouse=True,
                 client_id=client_id,
             )
+            # we ask them to click on their character if they want to finish their movement
+            if current_loc == (new_row, new_col):
+                return
 
-            # if direction == "f":
-            #     break
+            path_len = len(
+                board.get_shortest_valid_path(
+                    start=current_loc,
+                    end=(new_row, new_col),
+                    is_jump=is_jump,
+                )
+            )
 
-            # get your currnet and new locations, then find out if the move is legal
-            current_loc = board.find_location_of_target(char)
-            # new_row, new_col = [
-            #     a + b for a, b in zip(current_loc, DIRECTION_MAP[direction])
-            # ]
             # perform any additional movement checks
-
             additional_movement_check_result = (
                 additional_movement_check(current_loc, (new_row, new_col))
                 if additional_movement_check
@@ -225,25 +249,25 @@ class Human(Agent):
             )
 
             legal_move = board.is_legal_move(new_row, new_col)
-            if legal_move and additional_movement_check_result:
+            # don't let them pick out of range squares
+            if legal_move and additional_movement_check_result and path_len <= movement:
                 # do this instead of update location because it deals with terrain
                 squares_moved = board.move_character_toward_location(
                     char, (new_row, new_col), remaining_movement, is_jump
                 )
-                # !!! change this to length of movement
                 remaining_movement -= squares_moved
                 prompt = orig_prompt
                 continue
             else:
                 prompt = (
-                    "Invalid square (obstacle, character, or board edge) - try again\n"
+                    "Invalid square (obstacle, character, or out of movement range) - try again\n"
                     + prompt
                 )
 
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
-        board.pyxel_manager.log.append("Movement done! \n")
+        board.pyxel_manager.log.append("Movement done!")
 
     @staticmethod
     def move_other_character(
@@ -254,6 +278,7 @@ class Human(Agent):
         board,
         movement_check,
         client_id: Optional[str] = None,
+        is_push=False,
     ):
         Human.perform_movement(
             char_to_move,

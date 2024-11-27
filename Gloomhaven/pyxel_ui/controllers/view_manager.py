@@ -120,10 +120,15 @@ class ViewManager:
         self.log_view.draw()
 
     def update_initiative_bar(
-        self, sprite_names: list[str], healths: list[int], teams: list[bool]
+        self,
+        sprite_names: list[str],
+        healths: list[int],
+        max_healths: list[int],
+        teams: list[bool],
     ):
         self.initiative_bar_view.sprite_names = sprite_names
         self.initiative_bar_view.healths = healths
+        self.initiative_bar_view.max_healths = max_healths
         self.initiative_bar_view.teams = teams
         if sprite_names:
             self.initiative_bar_view.drawable = True
@@ -226,15 +231,7 @@ class ViewManager:
             self.action_card_view.current_card_page -= 1
             self.action_card_view.draw()
 
-    # def update_keyboard(self, output):
-    #     self.keyboard_view.output = output
-    #     self.keyboard_view.drawable = True
-    #     self.keyboard_view.draw()
-
-    # def reset_keyboard(self):
-    #     self.keyboard_view.drawable = False
-    #     self.keyboard_view.draw()
-    def update_keyboard(self, output, clear=True):
+    def update_personal_log(self, output, clear=True):
         if clear:
             self.personal_log.log = [output]
         else:
@@ -242,7 +239,7 @@ class ViewManager:
         self.personal_log.drawable = True
         self.personal_log.draw()
 
-    def reset_keyboard(self):
+    def reset_personal_log(self):
         self.personal_log.drawable = False
         self.personal_log.log = []
         self.personal_log.draw()

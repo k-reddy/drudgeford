@@ -428,14 +428,15 @@ class Board:
         self.pyxel_manager.load_characters(self.characters)
         # this method is not necessary as well, keeping it till we discuss
 
-    def kill_target(self, target: Character) -> None:
+    def kill_target(self, target: Character, damage_str: str = "") -> None:
         if target not in self.characters:
             return
         self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
-        self.pyxel_manager.log.append(f"{target.name} has been killed.")
+        died_by = f" stepped on {damage_str} and" if damage_str else ""
+        self.pyxel_manager.log.append(f"{target.name}{died_by} has been killed.")
         # if it's your turn, end it immediately
         if target == self.acting_character:
             raise DieAndEndTurn()
@@ -519,10 +520,9 @@ class Board:
             )
             damage = damage * -1
         if damage:
-            self.pyxel_manager.log.append(
-                f"{affected_character.name} stepped on {element.__class__.__name__}"
+            self.modify_target_health(
+                affected_character, damage, element.__class__.__name__
             )
-            self.modify_target_health(affected_character, damage)
 
     def deal_terrain_damage_current_location(self, affected_character: Character):
         row, col = self.find_location_of_target(affected_character)
@@ -543,19 +543,35 @@ class Board:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
+        # for jumping, we can jump through any obstacles and players
+        # but we have to stay on board and can't go through walls
         if jump_intermediate_move:
-            return is_position_within_board
+            return (
+                is_position_within_board
+                and self.locations[row][col] is not obstacle.Wall
+            )
         else:
             return is_position_within_board and self.locations[row][col] is None
 
-    def modify_target_health(self, target: Character, damage: int) -> None:
+    def modify_target_health(
+        self, target: Character, damage: int, damage_str: str = ""
+    ) -> None:
+        """
+        Modifies the target health by subtracting damage. For a heal,
+        pass negative damage.
+        """
+        # if it's a heal (negative damage) and you have max health, do nothing
+        if target.health == target.max_health and damage < 0:
+            return
+        # add needed spacing if we have a string
+        damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
-            self.kill_target(target)
+            self.kill_target(target, damage_str)
         elif damage > 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes {damage} damage and has {target.health} health"
+                f"{target.name} takes {damage}{damage_str} damage and has {target.health} health"
             )
         else:
             self.pyxel_manager.log.append(

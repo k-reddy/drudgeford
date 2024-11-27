@@ -54,7 +54,8 @@ class BorderView(ViewSection):
 
     def draw(self) -> None:
         self.clear_bounds()
-        
+
+
 class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -339,6 +340,7 @@ class InitiativeBarView(ViewSection):
 
         self.sprite_names: list[str] = []
         self.healths: list[int] = []
+        self.max_healths: list[int] = []
         self.teams: list[bool] = []
         # !!! we should rename bits or something b/c this feels sort of arbitrary
         self.horiz_gap = 12
@@ -354,6 +356,7 @@ class InitiativeBarView(ViewSection):
         Args:
             sprite_names: List of sprite names to display
             healths: List of health values corresponding to sprites
+            max_healths: List of max health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
         self.clear_bounds()
@@ -402,7 +405,7 @@ class InitiativeBarView(ViewSection):
                 pyxel.text(
                     x_pos + self.font_offset,
                     y_pos,
-                    f"H:{self.healths[actual_index]}",
+                    f"{self.healths[actual_index]}/{self.max_healths[actual_index]}",
                     7,
                 )
 
@@ -413,10 +416,18 @@ class InitiativeBarView(ViewSection):
                 line_color = (
                     8 if self.teams[actual_index] else 11
                 )  # Red (8) for monsters, Green (11) for players
+
+                # make line length relative to remaining health
+                line_length = self.sprite_width - 2 * self.sprite_width // 4
+                adjusted_length = round(
+                    line_length
+                    * self.healths[actual_index]
+                    / self.max_healths[actual_index]
+                )
                 pyxel.line(
                     x_pos + self.sprite_width // 4,
                     line_y,
-                    x_pos + self.sprite_width - self.sprite_width // 4,
+                    x_pos + self.sprite_width // 4 + adjusted_length,
                     line_y,
                     line_color,
                 )
