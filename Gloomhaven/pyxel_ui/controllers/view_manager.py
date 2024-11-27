@@ -243,3 +243,12 @@ class ViewManager:
         self.personal_log.drawable = False
         self.personal_log.log = []
         self.personal_log.draw()
+
+    def reset_self(self):
+        self.update_initiative_bar([], [], [], [])
+        self.update_map([], [], [])
+        self.update_action_card_log([])
+        self.update_log([])
+        self.update_personal_log([], clear=True)
+        self.update_sprites({})
+        self.update_round_turn(0, "")

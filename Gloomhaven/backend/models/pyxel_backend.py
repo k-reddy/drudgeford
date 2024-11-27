@@ -235,3 +235,7 @@ class PyxelManager:
         new_row += self.y_offset
         new_col += self.x_offset
         return (new_row, new_col)
+
+    def reset_view_manager(self):
+        task = tasks.ResetViewManager
+        self.jsonify_and_send_task(task)
