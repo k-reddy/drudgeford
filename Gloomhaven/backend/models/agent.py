@@ -193,7 +193,9 @@ class Human(Agent):
             return in_range_opponents[0]
         # show in range opponents and collect info
         valid_inputs = []
-        prompt = "Please click on the character you want to target:\n"
+        prompt = (
+            "Please click on the character you want to target.\nTargets in range:\n"
+        )
 
         for i, opponent in enumerate(in_range_opponents):
             prompt += f"{opponent.name}{": Shield " +str(opponent.shield[0]) if opponent.shield[0]> 0 else""}\n"
@@ -227,14 +229,17 @@ class Human(Agent):
                 is_mouse=True,
                 client_id=client_id,
             )
-            path_len = board.get_shortest_valid_path(
-                start=current_loc,
-                end=(new_row, new_col),
-                is_jump=is_jump,
-            )
             # we ask them to click on their character if they want to finish their movement
             if current_loc == (new_row, new_col):
                 return
+
+            path_len = len(
+                board.get_shortest_valid_path(
+                    start=current_loc,
+                    end=(new_row, new_col),
+                    is_jump=is_jump,
+                )
+            )
 
             # perform any additional movement checks
             additional_movement_check_result = (
@@ -262,7 +267,7 @@ class Human(Agent):
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
-        board.pyxel_manager.log.append("Movement done! \n")
+        board.pyxel_manager.log.append("Movement done!")
 
     @staticmethod
     def move_other_character(
