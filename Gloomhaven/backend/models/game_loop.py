@@ -225,6 +225,8 @@ class GameLoop:
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
                     client_id="frontend_1",
                 )
+        except DieAndEndTurn:
+            pass
 
         self._end_turn()
 

@@ -130,7 +130,7 @@ class Ai(Agent):
     ):
         if is_push:
             current_target_loc = board.find_location_of_target(char_to_move)
-            directions = DIRECTION_MAP.values().pop(None)
+            directions = [v for v in DIRECTION_MAP.values() if v is not None]
             while movement > 0:
                 # grab a random direction
                 direction = directions[random.randint(0, len(directions))]
