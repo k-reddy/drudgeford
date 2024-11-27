@@ -4,10 +4,10 @@ from pyxel_ui.constants import MAP_TILE_HEIGHT_PX, MAP_TILE_WIDTH_PX
 from pyxel_ui.utils import round_down_to_nearest_multiple
 
 
-class KeyboardManager:
+class UserInputManager:
     def __init__(self, view_manager, server_client):
         self.view_manager = view_manager
-        self.accept_input = False
+        self.accept_keyboard_input = False
         self.accept_mouse_input = False
         self.input = ""
         self.prompt = ""
@@ -56,22 +56,22 @@ class KeyboardManager:
             self.view_manager.scroll_action_cards_left()
 
         if self.accept_mouse_input:
-            self.print_keyboard(self.input)
+            self.print_personal_log(self.input)
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
                 # BUG: location seems to be relative to character starting position so
                 # the target location will always be off by some amount, e.g. always 2 over.
-                self.view_manager.reset_keyboard()
+                self.view_manager.reset_personal_log()
                 self.accept_mouse_input = False
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
                 self.return_input_to_server()
                 return
 
-        if self.accept_input:
+        if self.accept_keyboard_input:
             # Handle enter
             if pyxel.btnp(pyxel.KEY_RETURN):
-                self.view_manager.reset_keyboard()
-                self.accept_input = False
+                self.view_manager.reset_personal_log()
+                self.accept_keyboard_input = False
                 self.return_input_to_server()
                 return
 
@@ -94,15 +94,15 @@ class KeyboardManager:
                 if pyxel.btnp(key):
                     self.input += chr(key)
 
-            self.print_keyboard(self.input)
+            self.print_personal_log(self.input)
 
-    def print_keyboard(self, keyboard_input):
-        self.view_manager.update_keyboard(self.prompt + "\n" + keyboard_input)
+    def print_personal_log(self, user_input):
+        self.view_manager.update_personal_log(self.prompt + "\n" + user_input)
 
     def get_keyboard_input(self, prompt):
         # clear out input
         self.input = ""
-        self.accept_input = True
+        self.accept_keyboard_input = True
         self.prompt = prompt
 
     def return_input_to_server(self):

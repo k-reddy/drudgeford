@@ -16,7 +16,7 @@ from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
-from .controllers.keyboard_manager import KeyboardManager
+from .controllers.user_input_manager import UserInputManager
 
 # TODO(john): enable mouse control
 # TODO(john): create highlighting class and methods.
@@ -44,7 +44,7 @@ class PyxelEngine:
         pyxel.load("../my_resource.pyxres")
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
-        self.keyboard_manager = KeyboardManager(self.view_manager, self.server_client)
+        self.keyboard_manager = UserInputManager(self.view_manager, self.server_client)
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
