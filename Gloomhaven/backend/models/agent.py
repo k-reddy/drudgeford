@@ -135,7 +135,7 @@ class Ai(Agent):
                 # grab a random direction
                 direction = directions[random.randint(0, len(directions))]
                 # simulate moving that way and see if it passes the movement check
-                new_target_loc = [a + b for a, b in zip(current_target_loc, direction)]
+                new_target_loc = (a + b for a, b in zip(current_target_loc, direction))
                 if movement_check(current_target_loc, new_target_loc):
                     # if so, move that way, update our location, and decrement move counter
                     board.move_character_to_location(
