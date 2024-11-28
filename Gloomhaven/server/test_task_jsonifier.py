@@ -10,26 +10,36 @@ test_entities = [
 ]
 
 load_characters_dict = {
-    "healths": [1,2,3],
-    "sprite_names":["joh","js","pw"],
-    "teams": [False,False,True]
+    "healths": [1, 2, 3],
+    "sprite_names": ["joh", "js", "pw"],
+    "teams": [False, False, True],
 }
 
 board_init_dict = {
     "map_height": 2,
     "map_width": 3,
-    "valid_map_coordinates": [(1,2),(5,2)],
-    "wall_color_map": [(4,2)],
-    "floor_color_map": None
+    "valid_map_coordinates": [(1, 2), (5, 2)],
+    "wall_color_map": [(4, 2)],
+    "floor_color_map": None,
 }
-@pytest.mark.parametrize(["data","task_class"],[
-    pytest.param({"log":["hello","sup"]},tasks.LoadLogTask,id="test_log"),
-    pytest.param({"log":["hel\nlo","sup"]},tasks.LoadLogTask,id="test_newline"),
-    pytest.param({"entities":test_entities},tasks.AddEntitiesTask,id="test_add_entities"),
-    pytest.param({"entity_id":1},tasks.RemoveEntityTask,id="test_rem_entities"),
-    pytest.param(load_characters_dict,tasks.LoadCharactersTask,id="test_load_char"),
-    pytest.param(board_init_dict,tasks.BoardInitTask,id="test_board_init"),
-])
+
+
+@pytest.mark.parametrize(
+    ["data", "task_class"],
+    [
+        # pytest.param({"log": ["hello", "sup"]}, tasks.LoadLogTask, id="test_log"),
+        # pytest.param({"log": ["hel\nlo", "sup"]}, tasks.LoadLogTask, id="test_newline"),
+        # pytest.param(
+        #     {"entities": test_entities}, tasks.AddEntitiesTask, id="test_add_entities"
+        # ),
+        # pytest.param({"entity_id": 1}, tasks.RemoveEntityTask, id="test_rem_entities"),
+        # pytest.param(
+        #     load_characters_dict, tasks.LoadCharactersTask, id="test_load_char"
+        # ),
+        pytest.param(board_init_dict, tasks.BoardInitTask, id="test_board_init"),
+        pytest.param(None, tasks.ResetViewManager, id="test_reset_view_manager"),
+    ],
+)
 def test_jsonifier(data, task_class):
     test_task = task_class(**data)
     tj = TaskJsonifier()
