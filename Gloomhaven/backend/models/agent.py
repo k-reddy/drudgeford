@@ -133,12 +133,14 @@ class Ai(Agent):
             directions = [v for v in DIRECTION_MAP.values() if v is not None]
             while movement > 0:
                 # grab a random direction
-                direction = directions[random.randint(0, len(directions))]
+                direction = directions[random.randint(0, len(directions) - 1)]
                 # simulate moving that way and see if it passes the movement check
-                new_target_loc = (a + b for a, b in zip(current_target_loc, direction))
+                new_target_loc = tuple(
+                    a + b for a, b in zip(current_target_loc, direction)
+                )
                 if movement_check(current_target_loc, new_target_loc):
                     # if so, move that way, update our location, and decrement move counter
-                    board.move_character_to_location(
+                    board.move_character_toward_location(
                         char_to_move, new_target_loc, movement, is_jump
                     )
                     current_target_loc = new_target_loc

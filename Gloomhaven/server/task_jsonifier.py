@@ -19,7 +19,7 @@ class TaskJsonifier:
             str: JSON string representation of the task
         """
         class_name = task.__class__.__name__
-        pickled_data = pickle.dumps(dict(task.__dict__))
+        pickled_data = pickle.dumps(task.__dict__)
         encoded_data = base64.b64encode(pickled_data).decode("utf-8")
 
         task_dict = {"class_name": class_name, "data": encoded_data}

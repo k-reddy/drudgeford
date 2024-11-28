@@ -377,6 +377,10 @@ class LoadCampaign(Task):
         return campaign_state_pickle
 
 
+@dataclass
 class ResetViewManager(Task):
+    # doing this b/c no data messes up the task jsonifier
+    fake_data = None
+
     def perform(self, view_manager, user_input_manager):
         view_manager.reset_self()
