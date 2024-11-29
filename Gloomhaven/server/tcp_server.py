@@ -141,6 +141,7 @@ class TCPServer:
         target_client_id = payload.get("target_client_id")
         task_data = payload.get("task")
         if not target_client_id:
+            print(payload)
             raise ValueError("No target client id")
 
         if target_client_id == "ALL_FRONTEND":

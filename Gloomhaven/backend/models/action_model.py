@@ -469,7 +469,7 @@ class PushAllEnemies(ActionStep):
         for enemy in enemies:
             board.pyxel_manager.log.append(f"Pushing {enemy.name}")
 
-            Human.move_other_character(
+            attacker.agent.move_other_character(
                 enemy,
                 board.find_location_of_target(attacker),
                 self.squares,
