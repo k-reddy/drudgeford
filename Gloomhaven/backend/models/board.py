@@ -271,11 +271,25 @@ class Board:
             self.locations[row][col] = x
 
     def get_shortest_valid_path(
-        self, start: tuple[int, int], end: tuple[int, int], is_jump: bool = False
+        self,
+        start: tuple[int, int],
+        end: tuple[int, int],
+        is_jump: bool = False,
+        num_moves: int = -1,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
         Can move in all 8 directions.
+
+        When is_jump is True and we're at exactly num_moves distance, checks is_legal_move
+        with is_jump=False to ensure the final position is valid.
+
+        Args:
+            start: Starting position as (row, col)
+            end: Target position as (row, col)
+            is_jump: Whether jumping over obstacles is allowed
+            num_moves: If positive, specifies the exact movement distance where we need to check
+                      is_legal_move with is_jump=False
 
         Returns path as list of coordinates which includes the end cell, but not the
         starting cell.
@@ -312,23 +326,34 @@ class Board:
 
             if current in closed:
                 continue
-
             closed.add(current)
 
             for direction in directions:
+                print(f"current: {current}, direction: {direction}")
                 new_row = int(current[0] + direction[0])
                 new_col = int(current[1] + direction[1])
                 new_pos = (new_row, new_col)
-                if new_pos not in closed and (
-                    self.is_legal_move(new_row, new_col, is_jump) or new_pos == end
-                ):
-                    new_g_score = g_scores[current] + 1
-                    if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
-                        h_score = calculate_chebyshev_distance(new_pos, end)
-                        g_scores[new_pos] = new_g_score
-                        f_score = new_g_score + h_score
-                        heapq.heappush(priority_queue, (f_score, new_pos))
-                        previous_cell[new_pos] = current
+
+                if new_pos not in closed:
+                    # Calculate the potential path length to this new position
+                    potential_path_length = g_scores[current] + 1
+
+                    # Determine whether to use jumping for this position check
+                    current_is_jump = is_jump
+                    if is_jump and num_moves > 0 and potential_path_length == num_moves:
+                        current_is_jump = False
+
+                    if (
+                        self.is_legal_move(new_row, new_col, current_is_jump)
+                        or new_pos == end
+                    ):
+                        new_g_score = potential_path_length
+                        if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
+                            h_score = calculate_chebyshev_distance(new_pos, end)
+                            g_scores[new_pos] = new_g_score
+                            f_score = new_g_score + h_score
+                            heapq.heappush(priority_queue, (f_score, new_pos))
+                            previous_cell[new_pos] = current
 
         return []
 
@@ -399,11 +424,11 @@ class Board:
             to_log += f"\n{target.name} has shield {target.shield[0]}"
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
+            modified_attack_strength = 0
             to_log += f", does no damage!\n"
-            return
-        if self.is_shadow_interference(attacker, target):
+        elif self.is_shadow_interference(attacker, target):
+            modified_attack_strength = 0
             to_log += f", missed due to shadow\n"
-            return
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -467,7 +492,10 @@ class Board:
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
         path_to_target = self.get_shortest_valid_path(
-            start=acting_character_loc, end=target_location, is_jump=is_jump
+            start=acting_character_loc,
+            end=target_location,
+            is_jump=is_jump,
+            num_moves=movement,
         )
         path_traveled = []
         path_length_jump = 0
@@ -546,9 +574,8 @@ class Board:
         # for jumping, we can jump through any obstacles and players
         # but we have to stay on board and can't go through walls
         if jump_intermediate_move:
-            return (
-                is_position_within_board
-                and self.locations[row][col] is not obstacle.Wall
+            return is_position_within_board and not isinstance(
+                self.locations[row][col], obstacle.Wall
             )
         else:
             return is_position_within_board and self.locations[row][col] is None
@@ -560,6 +587,8 @@ class Board:
         Modifies the target health by subtracting damage. For a heal,
         pass negative damage.
         """
+        if damage == 0:
+            return
         # if it's a heal (negative damage) and you have max health, do nothing
         if target.health == target.max_health and damage < 0:
             return
