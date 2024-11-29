@@ -12,3 +12,5 @@ Gloomhaven/notes.txt
 Gloomhaven/debug_log.txt
 Gloomhaven/pixel_art/
 *.pickle
+Gloomhaven/frontend_main.dist/
+Gloomhaven/frontend_main.spec
