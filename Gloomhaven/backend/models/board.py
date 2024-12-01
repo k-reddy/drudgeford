@@ -6,10 +6,11 @@ from typing import Type
 
 import backend.models.agent as agent
 import backend.models.character as character
-from backend.models.display import Display
 from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
+from backend.utils import attack_shapes as shapes
+from backend.utils.utilities import DieAndEndTurn
 
 
 MAX_ROUNDS = 1000
@@ -27,18 +28,15 @@ class Board:
         size: int,
         monsters: list[character.Character],
         players: list[character.Character],
-        disp: Display,
         pyxel_manager: pyxel_backend.PyxelManager,
-        id_generator: count
+        id_generator: count,
+        starting_elements: list[obstacle.TerrainObject],
     ) -> None:
         self.round_num = 0
         self.size = size
-        self.disp = disp
         self.id_generator = id_generator
         self.pyxel_manager = pyxel_manager
 
-        # TODO(john) - discuss with group whether to turn this into tuple
-        # Possibly do not remove characters from tuple, just update statuses
         self.characters: list[character.Character] = ListWithUpdate(
             players + monsters, self.pyxel_manager.load_characters
         )
@@ -49,13 +47,19 @@ class Board:
         self.terrain = self._initialize_terrain(self.size, self.size)
         self.reshape_board()
         self.set_character_starting_locations()
-        self.add_starting_effect_to_terrain(obstacle.Fire, False, 1000, random.randint(0, 10))
-        self.add_starting_effect_to_terrain(obstacle.Ice, True, 1000, random.randint(0, 5))
-        self.add_starting_effect_to_terrain(obstacle.Trap, True, 1000, random.randint(0, 3))
-        # set round_num to 100 so mushroom doesn't auto-expire
-        self.add_starting_effect_to_terrain(obstacle.PoisonShroom, False, 1000, target_num=1)
+
+        self.potential_shapes = [
+            shapes.line((1, 0), random.randint(2, 3)),
+            shapes.line((0, 1), random.randint(2, 3)),
+            shapes.arc(random.randint(2, 3)),
+            shapes.cone(random.randint(1, 2)),
+            shapes.ring(random.randint(2, 3)),
+        ]
+        for element in starting_elements:
+            self.add_starting_effect_to_terrain(element, 1000)
         pyxel_manager.load_board(self.locations, self.terrain)
-        pyxel_manager.load_characters(self.characters)
+        # pyxel_manager.load_characters(self.characters)
+        self.acting_character = None
 
     # @property
     # def locations(self):
@@ -92,35 +96,49 @@ class Board:
     # game maps are used to represent locations and terrain
     def _initialize_map(self, width: int = 5, height=5) -> list:
         return [
-            [obstacle.Wall(round_num=0, obj_id=next(self.id_generator)) for _ in range(width)]
-            for _ in range(height)
-        ]
-    
-    def _initialize_terrain(self, width: int = 5, height=5) -> list:
-        return [
-            [None for _ in range(width)]
+            [
+                obstacle.Wall(round_num=0, obj_id=next(self.id_generator))
+                for _ in range(width)
+            ]
             for _ in range(height)
         ]
 
+    def _initialize_terrain(self, width: int = 5, height=5) -> list:
+        return [[None for _ in range(width)] for _ in range(height)]
+
     def add_starting_effect_to_terrain(
-        self, effect_type: Type[obstacle.TerrainObject], is_contiguous: bool, num_tries: int, target_num: int
+        self, effect_type: Type[obstacle.TerrainObject], num_tries: int
     ) -> None:
+        # pick a random shape for our element, and use each one only once
+        shape_offsets = random.choice(self.potential_shapes)
+        self.potential_shapes.remove(shape_offsets)
         max_loc = self.size - 1
-        counter = 0
+        # try to start the shape on a random square
         for _ in range(num_tries):
             row = random.randint(0, max_loc)
             col = random.randint(0, max_loc)
-            # don't put fire on characters or map edge
-            if self.add_starting_effect_if_valid_square(row, col, effect_type):
-                counter += 1
-            if is_contiguous:
-                for i in [-1, 0, 1]:
-                    if self.add_starting_effect_if_valid_square(row + i, col, effect_type):
-                        counter += 1
-            if counter >= target_num:
-                return
+            # if we can't draw our whole shape, try again
+            if not self.whole_shape_unoccupied(row, col, shape_offsets):
+                continue
+            # otherwise, draw!
+            for offset in shape_offsets:
+                self.add_starting_effect_if_valid_square(
+                    row + offset[0], col + offset[1], effect_type
+                )
+            return
 
-    def add_starting_effect_if_valid_square(self, row, col, effect_type: Type[obstacle.TerrainObject]) -> bool:
+    def whole_shape_unoccupied(self, row, col, shape_offsets):
+        shape_coords = [(row + offset[0], col + offset[1]) for offset in shape_offsets]
+        for coord in shape_coords:
+            if coord[0] >= self.size or coord[1] >= self.size:
+                return False
+            if self.locations[coord[0]][coord[1]] is not None:
+                return False
+        return True
+
+    def add_starting_effect_if_valid_square(
+        self, row, col, effect_type: Type[obstacle.TerrainObject]
+    ) -> bool:
         if row >= self.size or col >= self.size:
             return False
         if self.locations[row][col] is None:
@@ -150,15 +168,18 @@ class Board:
                     # if there's something there already, clear it
                     self.clear_terrain_square(effect_row, effect_col)
                     self.terrain[effect_row][effect_col] = terrain_obj
-                    self.pyxel_manager.add_entity(terrain_obj,effect_row,effect_col)
+                    self.pyxel_manager.add_entity(terrain_obj, effect_row, effect_col)
                     # if there's a character there, deal damage to them unless it's ice
-                    if isinstance(potential_char, Character) and not effect_type == obstacle.Ice:
+                    if (
+                        isinstance(potential_char, Character)
+                        and not effect_type == obstacle.Ice
+                    ):
                         self.deal_terrain_damage(potential_char, effect_row, effect_col)
 
     def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
         starting_coord = self.find_location_of_target(attacker)
         # don't attack yourself
-        shape.discard((0,0))
+        shape.discard((0, 0))
         for coordinate in shape:
             attack_row = starting_coord[0] + coordinate[0]
             attack_col = starting_coord[1] + coordinate[1]
@@ -171,7 +192,9 @@ class Board:
                     if isinstance(potential_char, Character):
                         self.attack_target(attacker, strength, potential_char)
 
-    def set_obstacles_in_area(self, starting_coord, shape: set, obstacle_type: Type[obstacle.TerrainObject]):
+    def set_obstacles_in_area(
+        self, starting_coord, shape: set, obstacle_type: Type[obstacle.TerrainObject]
+    ):
         for coordinate in shape:
             obstacle_row = starting_coord[0] + coordinate[0]
             obstacle_col = starting_coord[1] + coordinate[1]
@@ -180,7 +203,9 @@ class Board:
                 if 0 <= obstacle_col < len(self.locations[obstacle_row]):
                     # if it's unoccupied, place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
-                        obs = obstacle_type(self.round_num, obj_id=next(self.id_generator))
+                        obs = obstacle_type(
+                            self.round_num, obj_id=next(self.id_generator)
+                        )
                         self.locations[obstacle_row][obstacle_col] = obs
                         self.pyxel_manager.add_entity(
                             obs,
@@ -246,11 +271,25 @@ class Board:
             self.locations[row][col] = x
 
     def get_shortest_valid_path(
-        self, start: tuple[int, int], end: tuple[int, int]
+        self,
+        start: tuple[int, int],
+        end: tuple[int, int],
+        is_jump: bool = False,
+        num_moves: int = -1,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
         Can move in all 8 directions.
+
+        When is_jump is True and we're at exactly num_moves distance, checks is_legal_move
+        with is_jump=False to ensure the final position is valid.
+
+        Args:
+            start: Starting position as (row, col)
+            end: Target position as (row, col)
+            is_jump: Whether jumping over obstacles is allowed
+            num_moves: If positive, specifies the exact movement distance where we need to check
+                      is_legal_move with is_jump=False
 
         Returns path as list of coordinates which includes the end cell, but not the
         starting cell.
@@ -287,23 +326,34 @@ class Board:
 
             if current in closed:
                 continue
-
             closed.add(current)
 
             for direction in directions:
-                new_row = current[0] + direction[0]
-                new_col = current[1] + direction[1]
+                print(f"current: {current}, direction: {direction}")
+                new_row = int(current[0] + direction[0])
+                new_col = int(current[1] + direction[1])
                 new_pos = (new_row, new_col)
-                if new_pos not in closed and (
-                    self.is_legal_move(new_row, new_col) or new_pos == end
-                ):
-                    new_g_score = g_scores[current] + 1
-                    if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
-                        h_score = calculate_chebyshev_distance(new_pos, end)
-                        g_scores[new_pos] = new_g_score
-                        f_score = new_g_score + h_score
-                        heapq.heappush(priority_queue, (f_score, new_pos))
-                        previous_cell[new_pos] = current
+
+                if new_pos not in closed:
+                    # Calculate the potential path length to this new position
+                    potential_path_length = g_scores[current] + 1
+
+                    # Determine whether to use jumping for this position check
+                    current_is_jump = is_jump
+                    if is_jump and num_moves > 0 and potential_path_length == num_moves:
+                        current_is_jump = False
+
+                    if (
+                        self.is_legal_move(new_row, new_col, current_is_jump)
+                        or new_pos == end
+                    ):
+                        new_g_score = potential_path_length
+                        if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
+                            h_score = calculate_chebyshev_distance(new_pos, end)
+                            g_scores[new_pos] = new_g_score
+                            f_score = new_g_score + h_score
+                            heapq.heappush(priority_queue, (f_score, new_pos))
+                            previous_cell[new_pos] = current
 
         return []
 
@@ -364,37 +414,37 @@ class Board:
         ]
 
     def attack_target(self, attacker, strength, target):
-        modified_attack_strength, attack_modifier_string = self.select_and_apply_attack_modifier(
-            attacker, strength
+        modified_attack_strength, attack_modifier_string = (
+            self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f'\nAttack targets {target.name} with {attack_modifier_string} modifier'
+        to_log = (
+            f"\nAttack targets {target.name} with {attack_modifier_string} modifier"
+        )
         if target.shield[0] > 0:
-            to_log+= f"\n{target.name} has shield {target.shield[0]}"
+            to_log += f"\n{target.name} has shield {target.shield[0]}"
             modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
-            to_log+= f", does no damage!\n"
-            return
-        if self.is_shadow_interference(attacker, target):
-            to_log+= f", missed due to shadow\n"
-            return
+            modified_attack_strength = 0
+            to_log += f", does no damage!\n"
+        elif self.is_shadow_interference(attacker, target):
+            modified_attack_strength = 0
+            to_log += f", missed due to shadow\n"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
     def is_shadow_interference(self, attacker, target):
-        '''returns true if the attack misses due to shadow'''
+        """returns true if the attack misses due to shadow"""
         attacker_loc = self.find_location_of_target(attacker)
         target_path = self.get_shortest_valid_path(
-            attacker_loc,
-            self.find_location_of_target(target)
+            attacker_loc, self.find_location_of_target(target)
         )
         chance_of_miss = 0
         target_path += [attacker_loc]
         for coord in target_path:
             if isinstance(self.terrain[coord[0]][coord[1]], obstacle.Shadow):
-                chance_of_miss += .1
+                chance_of_miss += 0.1
         return random.random() < chance_of_miss
 
-    
     def update_locations(self, row, col, new_item):
         self.locations[row][col] = new_item
 
@@ -403,24 +453,18 @@ class Board:
         self.pyxel_manager.load_characters(self.characters)
         # this method is not necessary as well, keeping it till we discuss
 
-    def kill_target(self, target: Character) -> None:
-        # !!! to fix
-        # weird bug where you can kill someone who's already killed
-        # by walking through fire after you're dead since
-        # movement doesn't auto-end
-        # we need to fix this upstream by ending turn immediately when die,
-        # not by ending turn after each action
+    def kill_target(self, target: Character, damage_str: str = "") -> None:
         if target not in self.characters:
             return
         self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
-        self.pyxel_manager.log.append(f"{target.name} has been killed.")
-        # !!! for pair coding
-        # !!! if the target is the player, end game
-        # !!! if the target is the acting_character, end turn
-        # - to do this, end turn and end game need to actually work, not just be place holders
+        died_by = f" stepped on {damage_str} and" if damage_str else ""
+        self.pyxel_manager.log.append(f"{target.name}{died_by} has been killed.")
+        # if it's your turn, end it immediately
+        if target == self.acting_character:
+            raise DieAndEndTurn()
 
     def find_in_range_opponents_or_allies(
         self, actor: Character, distance: int, opponents=True
@@ -441,16 +485,20 @@ class Board:
         target_location: tuple[int, int],
         movement: int,
         is_jump=False,
-    ) -> None:
+    ) -> int:
         if movement == 0:
             return
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
         path_to_target = self.get_shortest_valid_path(
-            start=acting_character_loc, end=target_location
+            start=acting_character_loc,
+            end=target_location,
+            is_jump=is_jump,
+            num_moves=movement,
         )
         path_traveled = []
+        path_length_jump = 0
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
@@ -468,37 +516,45 @@ class Board:
         else:
             path_traveled = path_to_target[:-1]
         # go along the path and take any terrain damage! if you jump, go straight to end
-        if is_jump and isinstance(acting_character.agent, agent.Ai):
+        if is_jump:
+            path_length_jump = len(path_traveled)
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
             # move character one step
             self.update_character_location(acting_character, acting_character_loc, loc)
             acting_character_loc = loc
-            # humans move step by step, so they should not take damage on a jump
+            # humans move step by step, so they should not take damage on a jump - we'll have them take damage
+            # at the end of their movement later
             if not (is_jump and isinstance(acting_character.agent, agent.Human)):
                 self.deal_terrain_damage(acting_character, loc[0], loc[1])
+        return max(len(path_traveled), path_length_jump)
 
     def deal_terrain_damage(
         self,
-        acting_character: Character,
+        affected_character: Character,
         row: int,
         col: int,
     ) -> None:
-        damage = self.get_terrain_damage(row, col)
+        element = self.terrain[row][col]
+        if not element:
+            return
+        damage = element.damage
+        element.perform(row, col, self, affected_character)
         element = self.terrain[row][col]
         # if they have an elemental affinity for this element, they heal instead of take damage
-        if acting_character.elemental_affinity == element.__class__:
-            self.pyxel_manager.log.append(f"{acting_character.name} has an affinity for {element.__class__.__name__}")
-            damage = damage*-1
-        if damage:
+        if affected_character.elemental_affinity == element.__class__:
             self.pyxel_manager.log.append(
-                f"{acting_character.name} stepped on {element.__class__.__name__}"
+                f"{affected_character.name} has an affinity for {element.__class__.__name__}"
             )
-            self.modify_target_health(acting_character, damage)
+            damage = damage * -1
+        if damage:
+            self.modify_target_health(
+                affected_character, damage, element.__class__.__name__
+            )
 
-    def deal_terrain_damage_current_location(self, acting_character: Character):
-        row, col = self.find_location_of_target(acting_character)
-        self.deal_terrain_damage(acting_character, row, col)
+    def deal_terrain_damage_current_location(self, affected_character: Character):
+        row, col = self.find_location_of_target(affected_character)
+        self.deal_terrain_damage(affected_character, row, col)
 
     def update_character_location(
         self,
@@ -509,34 +565,47 @@ class Board:
         # Add action queue logic here.
         self.update_locations(old_location[0], old_location[1], None)
         self.update_locations(new_location[0], new_location[1], actor)
-        self.pyxel_manager.move_character(
-            actor,
-            old_location,
-            new_location
-        )
+        self.pyxel_manager.move_character(actor, old_location, new_location)
 
-    def is_legal_move(self, row: int, col: int) -> bool:
+    def is_legal_move(self, row: int, col: int, jump_intermediate_move=False) -> bool:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
-        return is_position_within_board and self.locations[row][col] is None
-
-    def get_terrain_damage(self, row: int, col: int) -> int | None:
-        el = self.terrain[row][col]
-        if el:
-            el.perform(row, col, self)
-            return el.damage
+        # for jumping, we can jump through any obstacles and players
+        # but we have to stay on board and can't go through walls
+        if jump_intermediate_move:
+            return is_position_within_board and not isinstance(
+                self.locations[row][col], obstacle.Wall
+            )
         else:
-            return None
+            return is_position_within_board and self.locations[row][col] is None
 
-    def modify_target_health(self, target: Character, damage: int) -> None:
-        target.health -= damage
+    def modify_target_health(
+        self, target: Character, damage: int, damage_str: str = ""
+    ) -> None:
+        """
+        Modifies the target health by subtracting damage. For a heal,
+        pass negative damage.
+        """
+        if damage == 0:
+            return
+        # if it's a heal (negative damage) and you have max health, do nothing
+        if target.health == target.max_health and damage < 0:
+            return
+        # add needed spacing if we have a string
+        damage_str = " " + damage_str if damage_str else damage_str
+        # if this is a heal (damage is -), don't allow them to heal beyond max health
+        target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
-            self.kill_target(target)
+            self.kill_target(target, damage_str)
         elif damage > 0:
-            self.pyxel_manager.log.append(f"{target.name} takes {damage} damage and has {target.health} health")
+            self.pyxel_manager.log.append(
+                f"{target.name} takes {damage}{damage_str} damage and has {target.health} health"
+            )
         else:
-            self.pyxel_manager.log.append(f"{target.name} heals for {-1*damage} and has {target.health} health")
+            self.pyxel_manager.log.append(
+                f"{target.name} heals for {-1*damage} and has {target.health} health"
+            )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 
@@ -562,7 +631,7 @@ class Board:
                     continue
                 # if the terrain item was placed 2 or more rounds ago, clear it
                 if self.round_num - el.round_placed > el.duration:
-                    self.clear_terrain_square(i,j)
+                    self.clear_terrain_square(i, j)
 
     def update_character_statuses(self):
         for char in self.characters:
@@ -587,21 +656,22 @@ class Board:
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
-    def add_new_skeleton(self, is_monster):
+    def add_new_ai_char(self, is_monster, char_class: Type[Character]):
         from backend.models.agent import Ai
-        new_char = character.Skeleton(
-            "Spooky Skeleton", 
-            self.disp, 
+
+        new_char = char_class(
+            f"Spooky {char_class.__name__}",
+            self.pyxel_manager,
             "💀",
-            Ai(), 
-            next(self.id_generator), 
+            Ai(),
+            next(self.id_generator),
             is_monster=is_monster,
-            log=self.pyxel_manager.log
+            log=self.pyxel_manager.log,
         )
         self.characters.append(new_char)
         row, col = self.pick_unoccupied_location()
         self.locations[row][col] = new_char
-        self.pyxel_manager.add_entity(new_char,row, col)
+        self.pyxel_manager.add_entity(new_char, row, col)
         self.pyxel_manager.load_characters(self.characters)
 
     def teleport_character(self, target: Character):

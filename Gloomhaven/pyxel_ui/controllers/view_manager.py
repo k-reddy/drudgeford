@@ -2,12 +2,14 @@ import pyxel
 
 from typing import Optional
 
+from .view_factory import ViewFactory
 from pyxel_ui.constants import (
     BITS,
     FONT_PATH,
 )
 from pyxel_ui.models.font import PixelFont
 from pyxel_ui.views.sprite import SpriteManager
+from pyxel_ui.models.view_params import MapViewParams, ViewParams
 from pyxel_ui.models import view_section as view
 
 
@@ -20,49 +22,87 @@ class ViewManager:
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.canvas_width = pyxel_width
         self.canvas_height = pyxel_height
-        self.initiative_bar_view = view.InitiativeBarView(
-            self.font,
-            start_pos=[self.view_border, self.view_border // 4],
-            bounding_coordinate=[BITS * 11, BITS],
+        self.view_factory = ViewFactory()
+        self.views = []
+
+        initiative_bar_width = 11
+        initiative_bar_view_params = ViewParams(
+            font=self.font,
+            start_pos=[0, 0],
+            bounding_coordinate=[BITS * initiative_bar_width, BITS],
         )
-        self.map_view = view.MapView(
-            self.font,
-            [
-                self.initiative_bar_view.start_pos[0],
-                self.initiative_bar_view.bounding_coordinate[1] + self.view_border,
+        self.initiative_bar_view, bar_borders = (
+            self.view_factory.create_view_with_border(
+                view.InitiativeBarView, initiative_bar_view_params, [4, 0, 0, 10]
+            )
+        )
+        self.views.extend([self.initiative_bar_view, *bar_borders])
+
+        map_view_params = MapViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                BITS,
             ],
-            [
+            bounding_coordinate=[
                 self.initiative_bar_view.bounding_coordinate[0],
-                BITS * 11 + self.view_border * 2,
+                BITS * 12,
             ],
             floor_color_map=floor_color_map,
             wall_color_map=wall_color_map,
         )
-        self.log_view = view.LogView(
-            self.font,
-            [
-                self.initiative_bar_view.bounding_coordinate[0],
-                self.initiative_bar_view.start_pos[1],
+        self.map_view, map_borders = self.view_factory.create_view_with_border(
+            view.MapView, map_view_params, [10, 10, 0, 10]
+        )
+        self.views.extend([self.map_view, *map_borders])
+
+        log_view_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                initiative_bar_width * BITS,
+                0,
             ],
-            [
+            bounding_coordinate=[
                 self.canvas_width,
-                self.map_view.bounding_coordinate[1] + self.view_border,
+                self.map_view.bounding_coordinate[1],
             ],
         )
-        self.action_card_view = view.ActionCardView(
-            self.font,
-            [
-                self.map_view.start_pos[0],
-                self.map_view.bounding_coordinate[1] + self.view_border,
-            ],
-            [self.canvas_width, self.canvas_height],
+        self.log_view, log_borders = self.view_factory.create_view_with_border(
+            view.LogView, log_view_params, [4, 0, 0, 0]
         )
-        self.views = [
-            self.initiative_bar_view,
-            self.map_view,
-            self.log_view,
-            self.action_card_view,
-        ]
+        self.views.extend([self.log_view, *log_borders])
+
+        action_card_view_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.map_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, BITS * 18],
+        )
+        self.action_card_view, action_card_borders = (
+            self.view_factory.create_view_with_border(
+                view.ActionCardView, action_card_view_params, [0, 10, 10, 10]
+            )
+        )
+        self.views.extend([self.action_card_view, *action_card_borders])
+
+        personal_log_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.action_card_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, self.canvas_height],
+        )
+        self.personal_log, personal_log_borders = (
+            self.view_factory.create_view_with_border(
+                view.LogView, personal_log_params, [60, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.personal_log, *personal_log_borders])
+        self.personal_log.font_color = 2
+        self.personal_log.display_round_turn = False
 
     def update_log(self, log: list[str]):
         # note: drawable set in update_round_turn()
@@ -76,13 +116,19 @@ class ViewManager:
             self.log_view.drawable = True
         else:
             self.log_view.drawable = False
+        self.log_view.is_log_changed = True
         self.log_view.draw()
 
     def update_initiative_bar(
-        self, sprite_names: list[str], healths: list[int], teams: list[bool]
+        self,
+        sprite_names: list[str],
+        healths: list[int],
+        max_healths: list[int],
+        teams: list[bool],
     ):
         self.initiative_bar_view.sprite_names = sprite_names
         self.initiative_bar_view.healths = healths
+        self.initiative_bar_view.max_healths = max_healths
         self.initiative_bar_view.teams = teams
         if sprite_names:
             self.initiative_bar_view.drawable = True
@@ -101,6 +147,11 @@ class ViewManager:
         self.action_card_view.draw()
 
     def update_map(
+        self,
+        valid_floor_coordinates: list[tuple[int, int]],
+        floor_color_map=[],
+        wall_color_map=[],
+    ) -> None:
         self,
         valid_floor_coordinates: list[tuple[int, int]],
         floor_color_map=[],
@@ -155,16 +206,55 @@ class ViewManager:
         view.draw_grid(px_x, px_y, px_width, px_height)
 
     def draw_whole_game(self):
-        self.initiative_bar_view.draw()
-        self.map_view.draw()
-        self.log_view.draw()
-        self.action_card_view.draw()
+        for v in self.views:
+            v.draw()
 
-    def handle_btn_press(self, btn):
-        if btn == pyxel.KEY_RIGHT:
-            self.action_card_view.go_to_next_page()
-        elif btn == pyxel.KEY_LEFT:
-            self.action_card_view.go_to_prev_page()
+    def get_valid_map_coords_for_cursor_pos(
+        self, px_x: int, px_y: int
+    ) -> Optional[tuple[int, int]]:
+        # get rid of offsets
+        px_x -= self.map_view.start_pos[0]
+        px_y -= self.map_view.start_pos[1]
+        # figure out the tile number (not px)
+        x_num = px_x / self.map_view.tile_width_px
+        y_num = px_y / self.map_view.tile_height_px
+        if (x_num, y_num) in self.map_view.valid_map_coordinates:
+            return (x_num, y_num)
+        return None
 
-    def clear_screen(self):
-        pass
+    def scroll_action_cards_right(self):
+        if (
+            self.action_card_view.current_card_page + 1
+        ) * self.action_card_view.cards_per_page < len(
+            self.action_card_view.action_card_log
+        ):
+            self.action_card_view.current_card_page += 1
+            self.action_card_view.draw()
+
+    def scroll_action_cards_left(self):
+        # Go to previous page if we're not at the start
+        if self.action_card_view.current_card_page > 0:
+            self.action_card_view.current_card_page -= 1
+            self.action_card_view.draw()
+
+    def update_personal_log(self, output, clear=True):
+        if clear:
+            self.personal_log.log = [output]
+        else:
+            self.personal_log.log += output
+        self.personal_log.drawable = True
+        self.personal_log.draw()
+
+    def reset_personal_log(self):
+        self.personal_log.drawable = False
+        self.personal_log.log = []
+        self.personal_log.draw()
+
+    def reset_self(self):
+        self.update_initiative_bar([], [], [], [])
+        self.update_map([], [], [])
+        self.update_action_card_log([])
+        self.update_log([])
+        self.update_personal_log([], clear=True)
+        self.update_sprites({})
+        self.update_round_turn(0, "")

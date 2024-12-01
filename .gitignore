@@ -14,3 +14,4 @@ Gloomhaven/pixel_art/
 *.pickle
 Gloomhaven/frontend_main.dist/
 Gloomhaven/frontend_main.spec
+Gloomhaven/build/
