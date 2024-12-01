@@ -30,7 +30,7 @@ class ViewSection(abc.ABC):
         self.end_pos = self.bounding_coordinate
         self.drawable = False
 
-    def clear_bounds(self):
+    def clear_bounds(self) -> None:
         """a function to clear the view's area before redrawing itself"""
         pyxel.rect(
             self.start_pos[0],
@@ -39,6 +39,9 @@ class ViewSection(abc.ABC):
             self.end_pos[1] - self.start_pos[1],
             0,
         )
+
+    def redraw(self) -> None:
+        self.draw()
 
     def draw(self) -> None:
         self.clear_bounds()
@@ -52,17 +55,51 @@ class ViewSection(abc.ABC):
         pass
 
 
+class BorderView(ViewSection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _draw(self) -> None:
+        self.clear_bounds()
+
+
 class LogView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.log: list[str] = []
+        self._log: list[str] = []
+        self.is_log_changed = False
         self.round_number: int = 0
         self.acting_character_name: str = ""
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
+        self.text_pixels: list[tuple[int, int]] = None
+        self.font_color = 7
+        self.display_round_turn = True
+
+    @property
+    def log(self):
+        return self._log
+
+    @log.setter
+    def log(self, new_log: list[str]):
+        """Prevents unnecessary redraws by rejecting log updates when content has not changed"""
+        if new_log != self._log:
+            self._log = new_log
+            self.is_log_changed = True
+
+    def redraw(self) -> None:
+        self.clear_bounds()
+        if not self.log and self.round_number <= 0:
+            return
+        self.font.redraw_text(self.font_color, self.text_pixels)
 
     def _draw(self) -> None:
+        if not self.is_log_changed:
+            return
+
+        self.text_pixels = []
+
         def get_line_height(text: str) -> int:
             return (
                 self.font.get_text_height(
@@ -74,13 +111,15 @@ class LogView(ViewSection):
             )
 
         def draw_line(text: str, y_pos: int, size: str = "medium") -> int:
-            self.font.draw_text(
-                self.start_pos[0],
-                y_pos,
-                text,
-                col=7,
-                size=size,
-                max_width=self.bounding_coordinate[0] - self.start_pos[0],
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    self.start_pos[0],
+                    y_pos,
+                    text,
+                    col=self.font_color,
+                    size=size,
+                    max_width=self.bounding_coordinate[0] - self.start_pos[0],
+                )
             )
             return y_pos + get_line_height(text)
 
@@ -88,12 +127,13 @@ class LogView(ViewSection):
         available_height = self.bounding_coordinate[1] - self.start_pos[1]
 
         # Try to draw header
-        header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
-        header_height = get_line_height(header)
+        if self.display_round_turn:
+            header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
+            header_height = get_line_height(header)
 
-        if header_height <= available_height:
-            current_y = draw_line(header, current_y, "large")
-            available_height -= header_height
+            if header_height <= available_height:
+                current_y = draw_line(header, current_y, "large")
+                available_height -= header_height
 
         # Get displayable log lines
         lines = []
@@ -109,8 +149,7 @@ class LogView(ViewSection):
         for line in lines:
             current_y = draw_line(line, current_y)
 
-        # Why are we re-sizing the log view port?
-        # self.end_pos = (self.bounding_coordinate[0], current_y)
+        self.is_log_changed = False
 
 
 class MapView(ViewSection):
@@ -228,6 +267,17 @@ class MapView(ViewSection):
 
 
 class CarouselView(ViewSection):
+    """
+    A view that scrolls through a carousel and has text
+    The text pixels cache the current text for redrawing
+    (which we do when we pass the cursor over the view section
+    rather than fully drawing the text over again in order to
+    speed things up)
+
+    Requires you to specify how to draw items, and draw items
+    must cache all text pixels in self.text_pixels or
+    text will disappear from the screen as you move the cursor
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -238,8 +288,16 @@ class CarouselView(ViewSection):
         self.items: list[str] = []
         self.current_card_page = 0
         self.cards_per_page = 3
+        self.text_pixels: list[tuple[int, int]] = None
+
+    def redraw(self) -> None:
+        self.clear_bounds()
+        if not self.items:
+            return
+        self.font.redraw_text(7, self.text_pixels)
 
     def _draw(self) -> None:
+        self.text_pixels = []
         self.draw_page_indicator(self.start_pos[1])
         self.draw_items()
         self.draw_navigation_hints()
@@ -291,11 +349,12 @@ class ActionCardView(CarouselView):
         ) // self.cards_per_page
         # Draw only the current page of cards
         for card in self.items[start_idx:end_idx]:
-            self.font.draw_text(x, y, card, col=7, size="medium", max_width=card_width)
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    x, y, card, col=7, size="medium", max_width=card_width
+                )
+            )
             x += card_width + card_border
-
-        # !!! should change this to measure the height of the cards and page indicator
-        navigation_start_y = self.start_pos[1] + BITS * 6 + card_border + 10
 
 
 class InitiativeBarView(ViewSection):
@@ -304,6 +363,7 @@ class InitiativeBarView(ViewSection):
 
         self.sprite_names: list[str] = []
         self.healths: list[int] = []
+        self.max_healths: list[int] = []
         self.teams: list[bool] = []
         # !!! we should rename bits or something b/c this feels sort of arbitrary
         self.horiz_gap = 12
@@ -319,6 +379,7 @@ class InitiativeBarView(ViewSection):
         Args:
             sprite_names: List of sprite names to display
             healths: List of health values corresponding to sprites
+            max_healths: List of max health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
         # Calculate maximum items per row based on screen width
@@ -365,7 +426,7 @@ class InitiativeBarView(ViewSection):
                 pyxel.text(
                     x_pos + self.font_offset,
                     y_pos,
-                    f"H:{self.healths[actual_index]}",
+                    f"{self.healths[actual_index]}/{self.max_healths[actual_index]}",
                     7,
                 )
 
@@ -376,10 +437,18 @@ class InitiativeBarView(ViewSection):
                 line_color = (
                     8 if self.teams[actual_index] else 11
                 )  # Red (8) for monsters, Green (11) for players
+
+                # make line length relative to remaining health
+                line_length = self.sprite_width - 2 * self.sprite_width // 4
+                adjusted_length = round(
+                    line_length
+                    * self.healths[actual_index]
+                    / self.max_healths[actual_index]
+                )
                 pyxel.line(
                     x_pos + self.sprite_width // 4,
                     line_y,
-                    x_pos + self.sprite_width - self.sprite_width // 4,
+                    x_pos + self.sprite_width // 4 + adjusted_length,
                     line_y,
                     line_color,
                 )
@@ -475,5 +544,8 @@ def draw_grid(
     px_width: int,
     px_height: int,
     color: int = 3,
+    dither: float = 0.4,
 ) -> None:
+    pyxel.dither(dither)
     pyxel.rect(px_x, px_y, px_width, px_height, color)
+    pyxel.dither(1)

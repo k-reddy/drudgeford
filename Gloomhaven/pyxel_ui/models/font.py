@@ -9,7 +9,6 @@ class PixelFont:
         self.medium_font = ImageFont.truetype(font_path, 8)
         self.large_font = ImageFont.truetype(font_path, 12)
         self.pyxel = pyxel
-        self.text_pixels: dict[tuple[int, int], tuple[int, int, int]] = {}
 
     def get_line_height(self, size="medium"):
         """Get the line height for a given font size"""
@@ -57,7 +56,7 @@ class PixelFont:
         lines = []
         for paragraph in text.split("\n"):
             # Split on space but keep empty strings to preserve spacing
-            words = paragraph.split(' ')
+            words = paragraph.split(" ")
             if not words:
                 lines.append("")
                 continue
@@ -67,7 +66,7 @@ class PixelFont:
 
             for word in words[1:]:
                 # Add the space and word even if word is empty (was a space in original)
-                next_piece = ' ' + word
+                next_piece = " " + word
                 word_width = self.get_text_width(next_piece, size)
 
                 if current_width + word_width <= max_width:
@@ -81,6 +80,12 @@ class PixelFont:
             lines.append(current_line)
 
         return lines
+
+    def redraw_text(self, col, text_pixels) -> None:
+        if not text_pixels:
+            return
+        for px_x, px_y in text_pixels:
+            self.pyxel.pset(px_x, px_y, col)
 
     def draw_text(self, x, y, text, col, size="medium", max_width=None):
         """
@@ -97,6 +102,8 @@ class PixelFont:
             max_width: Optional maximum width in pixels. Text will wrap if it exceeds this width.
         """
         pyxel = self.pyxel
+
+        text_pixels = []
 
         # Split and wrap text into lines
         lines = self.wrap_text(str(text), max_width, size)
@@ -134,9 +141,12 @@ class PixelFont:
             for py in range(h):
                 for px in range(w):
                     if pixels[px, py]:
+                        text_pixels.append((x + px - padding, current_y + py - padding))
                         pyxel.pset(x + px - padding, current_y + py - padding, col)
 
             current_y += line_height
+
+        return text_pixels
 
     def get_text_height(self, text, size="medium", max_width=None):
         """
