@@ -24,14 +24,23 @@ class ViewSection(abc.ABC):
     are given by the controller"""
 
     def __init__(self, font, start_pos, bounding_coordinate):
+        """
+        We initialize view sections to be active but not drawable,
+        meaning they are taking up space on the screen, but we draw
+        a blank space where they are until told otherwise
+        """
         self.font = font
         self.start_pos = start_pos
         self.bounding_coordinate = bounding_coordinate
         self.end_pos = self.bounding_coordinate
         self.drawable = False
+        self.active = True
 
     def clear_bounds(self) -> None:
         """a function to clear the view's area before redrawing itself"""
+        if not self.active:
+            return
+
         pyxel.rect(
             self.start_pos[0],
             self.start_pos[1],
@@ -41,9 +50,16 @@ class ViewSection(abc.ABC):
         )
 
     def redraw(self) -> None:
+        if not self.active:
+            return
+        self._redraw()
+
+    def _redraw(self) -> None:
         self.draw()
 
     def draw(self) -> None:
+        if not self.active:
+            return
         self.clear_bounds()
         if not self.drawable:
             return
@@ -88,7 +104,7 @@ class LogView(ViewSection):
             self._log = new_log
             self.is_log_changed = True
 
-    def redraw(self) -> None:
+    def _redraw(self) -> None:
         self.clear_bounds()
         if not self.log and self.round_number <= 0:
             return
