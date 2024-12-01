@@ -1,9 +1,6 @@
-import threading
 from dataclasses import dataclass
 from itertools import count
 import pickle
-import os
-import time
 
 from backend.models.game_loop import GameLoop
 from backend.models.pyxel_backend import PyxelManager
@@ -73,7 +70,6 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
-            self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
