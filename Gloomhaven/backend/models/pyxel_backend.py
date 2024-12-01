@@ -245,4 +245,4 @@ class PyxelManager:
         sprite_names = [character.pyxel_sprite_name for character in characters]
         backstories = [character.backstory for character in characters]
         task = tasks.ShowCharacterPickerTask(names, sprite_names, backstories)
-        self.shared_action_queue.enqueue(task)
+        self.jsonify_and_send_task(task)
