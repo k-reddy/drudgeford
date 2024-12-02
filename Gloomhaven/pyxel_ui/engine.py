@@ -10,8 +10,7 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
-from .models.action import MoveAction
-from .models.tasks import ActionTask, InputTask, LoadCampaign
+from .models.tasks import ActionTask, ShowCharacterPickerTask, InputTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient, ClientType
@@ -36,12 +35,14 @@ class PyxelEngine:
 
         # Controller
         self.view_manager = None
+        # self.current_view_manager = None
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
+
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
         self.keyboard_manager = UserInputManager(self.view_manager, self.server_client)
@@ -71,8 +72,7 @@ class PyxelEngine:
                 and self.current_task.action_steps
             ):
                 return
-            # if we're asked for user input or a campaign, send what we get to the server
-            # elif isinstance(self.current_task, (InputTask, LoadCampaign)):
+            # if we're asked for a campaign, send what we get to the server
             elif isinstance(self.current_task, LoadCampaign):
                 self.server_client.post_user_input(task_output)
             self.current_task = None

@@ -2,7 +2,7 @@ import pyxel
 
 from typing import Optional
 
-from .view_factory import ViewFactory
+from pyxel_ui.controllers.view_factory import ViewFactory
 from pyxel_ui.constants import (
     BITS,
     FONT_PATH,
@@ -24,7 +24,17 @@ class ViewManager:
         self.canvas_height = pyxel_height
         self.view_factory = ViewFactory()
         self.views = []
+        self.map_view = None
+        self.load_carousel_log_screen(view.CharacterPickerView)
 
+    def clear_current_views(self):
+        for v in self.views:
+            self.turn_off_view_section(v)
+        self.views = []
+        self.clear_screen()
+
+    def load_game_screen(self, floor_color_map=[], wall_color_map=[]):
+        self.clear_current_views()
         initiative_bar_width = 11
         initiative_bar_view_params = ViewParams(
             font=self.font,
@@ -104,9 +114,44 @@ class ViewManager:
         self.personal_log.font_color = 2
         self.personal_log.display_round_turn = False
 
+    def load_carousel_log_screen(self, carousel_type):
+        self.clear_current_views()
+        carousel_params = ViewParams(
+            font=self.font,
+            start_pos=(0, 0),
+            bounding_coordinate=(
+                self.canvas_width,
+                BITS * 16,
+            ),
+        )
+        self.carousel_view, carousel_borders = (
+            self.view_factory.create_view_with_border(
+                carousel_type, carousel_params, [10, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.carousel_view, *carousel_borders])
+
+        personal_log_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.carousel_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, self.canvas_height],
+        )
+        self.personal_log, personal_log_borders = (
+            self.view_factory.create_view_with_border(
+                view.LogView, personal_log_params, [60, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.personal_log, *personal_log_borders])
+        self.personal_log.font_color = 2
+        self.personal_log.display_round_turn = False
+
     def update_log(self, log: list[str]):
-        # note: drawable set in update_round_turn()
         self.log_view.log = log
+        if log:
+            self.log_view.drawable = True
         self.log_view.draw()
 
     def update_round_turn(self, round_number: int, acting_character_name: str):
@@ -139,7 +184,7 @@ class ViewManager:
     def update_action_card_log(self, action_card_log: list[str]):
         # reset the card page to 0 every time we load new action cards
         self.action_card_view.current_card_page = 0
-        self.action_card_view.action_card_log = action_card_log
+        self.action_card_view.items = action_card_log
         if action_card_log:
             self.action_card_view.drawable = True
         else:
@@ -156,6 +201,7 @@ class ViewManager:
             self.map_view.drawable = True
         else:
             self.map_view.drawable = False
+
         if floor_color_map:
             self.map_view.floor_color_map = floor_color_map
         if wall_color_map:
@@ -186,15 +232,20 @@ class ViewManager:
         px_x: int,
         px_y: int,
     ) -> Optional[view.ViewSection]:
-        return next(
+        view = next(
             (
                 curr_view
                 for curr_view in self.views
                 if curr_view.start_pos[0] <= px_x < curr_view.end_pos[0]
                 and curr_view.start_pos[1] <= px_y < curr_view.end_pos[1]
+                and curr_view.active
             ),
             None,
         )
+        # print(view)
+        # if view:
+        #     print(view.active)
+        return view
 
     def draw_grid(self, px_x: int, px_y: int, px_width: int, px_height: int) -> None:
         view.draw_grid(px_x, px_y, px_width, px_height)
@@ -206,6 +257,8 @@ class ViewManager:
     def get_valid_map_coords_for_cursor_pos(
         self, px_x: int, px_y: int
     ) -> Optional[tuple[int, int]]:
+        if not self.map_view:
+            return None
         # get rid of offsets
         px_x -= self.map_view.start_pos[0]
         px_y -= self.map_view.start_pos[1]
@@ -216,24 +269,42 @@ class ViewManager:
             return (x_num, y_num)
         return None
 
-    def scroll_action_cards_right(self):
-        if (
-            self.action_card_view.current_card_page + 1
-        ) * self.action_card_view.cards_per_page < len(
-            self.action_card_view.action_card_log
-        ):
-            self.action_card_view.current_card_page += 1
-            self.action_card_view.draw()
+    def _get_active_carousel(self):
+        active_carousel = [
+            v for v in self.views if isinstance(v, view.CarouselView) and v.active
+        ]
+        if not active_carousel:
+            return None
+        elif len(active_carousel) > 1:
+            raise ValueError(
+                f"{len(active_carousel)} active carousels. Require 0 or 1."
+            )
+        else:
+            return active_carousel[0]
 
-    def scroll_action_cards_left(self):
+    def scroll_carousel_right(self):
+        active_carousel = self._get_active_carousel()
+        if not active_carousel:
+            return
+        if (
+            active_carousel.current_card_page + 1
+        ) * active_carousel.cards_per_page < len(active_carousel.items):
+            active_carousel.current_card_page += 1
+            active_carousel.draw()
+
+    def scroll_carousel_left(self):
+        active_carousel = self._get_active_carousel()
+        if not active_carousel:
+            return
         # Go to previous page if we're not at the start
-        if self.action_card_view.current_card_page > 0:
-            self.action_card_view.current_card_page -= 1
-            self.action_card_view.draw()
+        if active_carousel.current_card_page > 0:
+            active_carousel.current_card_page -= 1
+            active_carousel.draw()
 
     def update_personal_log(self, output, clear=True):
         if clear:
             self.personal_log.log = [output]
+            self.personal_log.is_log_changed = True
         else:
             self.personal_log.log += output
         self.personal_log.drawable = True
@@ -252,3 +323,42 @@ class ViewManager:
         self.update_personal_log([], clear=True)
         self.update_sprites({})
         self.update_round_turn(0, "")
+
+    def turn_on_view_section(self, view_section: view.ViewSection) -> None:
+        """
+        Toggles the provided view_section on and redraws the whole screen
+        (in case the view section doesn't perfectly overlap with the old one)
+        """
+        view_section.drawable = True
+        view_section.active = True
+        self.draw_whole_game()
+
+    def turn_off_view_section(self, view_section: view.ViewSection) -> None:
+        """
+        toggles a view_section off and redraws it (to clear the bounds)
+        we leave it in our
+
+        """
+        view_section.drawable = False
+        view_section.active = False
+        view_section.draw()
+
+    def get_map_view(self):
+        return self.map_view
+
+    def get_carousel_view(self):
+        return self.carousel_view
+
+    def update_carousel(self, items):
+        self.carousel_view.items = items
+        self.carousel_view.drawable = True
+        self.carousel_view.draw()
+
+    def clear_screen(self):
+        pyxel.rect(
+            0,
+            0,
+            self.canvas_width,
+            self.canvas_height,
+            0,
+        )

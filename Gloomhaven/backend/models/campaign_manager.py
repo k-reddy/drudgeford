@@ -1,13 +1,10 @@
-import threading
 from dataclasses import dataclass
 from itertools import count
 import pickle
-import os
-import time
 
 from backend.models.game_loop import GameLoop
 from backend.models.pyxel_backend import PyxelManager
-from backend.models.level import Level, campaign_levels
+from backend.models.level import Level, campaign_levels, GAME_PLOT
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
@@ -73,22 +70,11 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
-            self.wait_for_all_players_to_join()
+            self.pyxel_manager.load_plot_screen(GAME_PLOT)
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
-        else:
-            self.wait_for_all_players_to_join()
         self.run_levels()
-
-    def wait_for_all_players_to_join(self):
-        while True:
-            # +1 because the backend also connects
-            if len(self.server.clients) == self.num_players + 1:
-                break
-            else:
-                self.pyxel_manager.print_message("Waiting for all players to join")
-                time.sleep(3)
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
@@ -99,7 +85,7 @@ class Campaign:
         self.player_chars = self.load_player_characters()
         self.current_level = level
         if not self.all_ai_mode:
-            self.pyxel_manager.print_message(message=self.current_level.pre_level_text)
+            self.pyxel_manager.load_plot_screen(level.pre_level_text)
         self.pyxel_manager.set_level_map_colors(
             self.current_level.floor_color_map, self.current_level.wall_color_map
         )
@@ -151,16 +137,11 @@ class Campaign:
                     client.client_id,
                 )
 
-        # send the message only to the appropriate character
-        self.pyxel_manager.print_message(
-            "It's time to pick your character. Here are your options:\n", player_id
-        )
+        self.pyxel_manager.show_character_picker(self.available_chars)
         # print the backstory for every available char
-        for i, char in enumerate(self.available_chars):
-            self.pyxel_manager.print_message(
-                f"{i}: {char.__class__.__name__}", player_id
-            )
-            self.pyxel_manager.print_message(f"{char.backstory}\n", player_id)
+        # for i, char in enumerate(self.available_chars):
+        #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
+        #     self.disp.print_message(f"{char.backstory}\n", False)
 
         # let user pick a character
         player_char_num = int(

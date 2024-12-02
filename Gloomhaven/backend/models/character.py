@@ -4,8 +4,6 @@ import backend.models.character_classes as character_classes
 import backend.models.action_model as action_model
 from ..utils import utilities
 from backend.models import obstacle
-import textwrap
-from backend.utils.config import TEXT_WIDTH
 
 MAX_ROUNDS = 1000
 
@@ -204,7 +202,7 @@ class Wizard(Character):
         super().__init__(
             name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
         )
-        self.backstory = textwrap.fill(character_classes.wizard.backstory, TEXT_WIDTH)
+        self.backstory = character_classes.wizard.backstory
         self.pyxel_sprite_name = "wizard"
 
     def create_action_cards(self):
@@ -229,7 +227,7 @@ class Miner(Character):
         super().__init__(
             name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
         )
-        self.backstory = textwrap.fill(character_classes.miner.backstory, TEXT_WIDTH)
+        self.backstory = character_classes.miner.backstory
         self.pyxel_sprite_name = "miner"
 
     def create_action_cards(self):
@@ -254,9 +252,7 @@ class Necromancer(Character):
         super().__init__(
             name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
         )
-        self.backstory = textwrap.fill(
-            character_classes.necromancer.backstory, TEXT_WIDTH
-        )
+        self.backstory = character_classes.necromancer.backstory
         self.pyxel_sprite_name = "necromancer"
 
     def create_action_cards(self):
@@ -281,7 +277,7 @@ class Monk(Character):
         super().__init__(
             name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
         )
-        self.backstory = textwrap.fill(character_classes.monk.backstory, TEXT_WIDTH)
+        self.backstory = character_classes.monk.backstory
         self.pyxel_sprite_name = "monk"
 
     def create_action_cards(self):

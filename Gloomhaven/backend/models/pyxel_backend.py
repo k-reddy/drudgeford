@@ -194,8 +194,6 @@ class PyxelManager:
 
         # if there's validation, keep asking for input until you get what you need
         while user_input not in valid_inputs:
-            print(user_input)
-            print(valid_inputs)
             task = task_class("Invalid selection pressed. Try again.\n" + prompt)
             self.jsonify_and_send_task(task, client_id)
             user_input = self.server_client.get_user_input()["input"]
@@ -239,3 +237,15 @@ class PyxelManager:
     def reset_view_manager(self):
         task = tasks.ResetViewManager
         self.jsonify_and_send_task(task)
+
+    def show_character_picker(self, characters: list[character.Character]):
+        names = [character.__class__.__name__ for character in characters]
+        sprite_names = [character.pyxel_sprite_name for character in characters]
+        backstories = [character.backstory for character in characters]
+        task = tasks.ShowCharacterPickerTask(names, sprite_names, backstories)
+        self.jsonify_and_send_task(task)
+
+    def load_plot_screen(self, plot: str):
+        task = tasks.LoadPlotScreen(plot)
+        self.jsonify_and_send_task(task)
+        self.get_user_input(prompt="Hit enter to continue")

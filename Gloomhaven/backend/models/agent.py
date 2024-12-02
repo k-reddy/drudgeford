@@ -261,10 +261,7 @@ class Human(Agent):
                 prompt = orig_prompt
                 continue
             else:
-                prompt = (
-                    "Invalid square (obstacle, character, or out of movement range) - try again\n"
-                    + prompt
-                )
+                prompt = "Invalid square (obstacle, character, or out of movement range) - try again\nClick where you want to move."
 
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
