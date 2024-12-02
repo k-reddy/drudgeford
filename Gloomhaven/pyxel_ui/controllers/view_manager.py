@@ -25,7 +25,7 @@ class ViewManager:
         self.view_factory = ViewFactory()
         self.views = []
         self.map_view = None
-        self.load_character_picker_screen()
+        self.load_carousel_log_screen(view.CharacterPickerView)
 
     def clear_current_views(self):
         for v in self.views:
@@ -114,9 +114,9 @@ class ViewManager:
         self.personal_log.font_color = 2
         self.personal_log.display_round_turn = False
 
-    def load_character_picker_screen(self):
+    def load_carousel_log_screen(self, carousel_type):
         self.clear_current_views()
-        character_picker_params = ViewParams(
+        carousel_params = ViewParams(
             font=self.font,
             start_pos=(0, 0),
             bounding_coordinate=(
@@ -124,18 +124,18 @@ class ViewManager:
                 BITS * 16,
             ),
         )
-        self.character_picker_view, picker_borders = (
+        self.carousel_view, carousel_borders = (
             self.view_factory.create_view_with_border(
-                view.CharacterPickerView, character_picker_params, [10, 10, 0, 10]
+                carousel_type, carousel_params, [10, 10, 0, 10]
             )
         )
-        self.views.extend([self.character_picker_view, *picker_borders])
+        self.views.extend([self.carousel_view, *carousel_borders])
 
         personal_log_params = ViewParams(
             font=self.font,
             start_pos=[
                 0,
-                self.character_picker_view.bounding_coordinate[1],
+                self.carousel_view.bounding_coordinate[1],
             ],
             bounding_coordinate=[self.canvas_width, self.canvas_height],
         )
@@ -344,13 +344,13 @@ class ViewManager:
     def get_map_view(self):
         return self.map_view
 
-    def get_character_picker_view(self):
-        return self.character_picker_view
+    def get_carousel_view(self):
+        return self.carousel_view
 
-    def update_character_picker(self, items):
-        self.character_picker_view.items = items
-        self.character_picker_view.drawable = True
-        self.character_picker_view.draw()
+    def update_carousel(self, items):
+        self.carousel_view.items = items
+        self.carousel_view.drawable = True
+        self.carousel_view.draw()
 
     def clear_screen(self):
         pyxel.rect(

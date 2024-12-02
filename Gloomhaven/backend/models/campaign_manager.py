@@ -84,7 +84,7 @@ class Campaign:
         self.player_chars = self.load_player_characters()
         self.current_level = level
         if not self.all_ai_mode:
-            self.pyxel_manager.print_message(message=self.current_level.pre_level_text)
+            self.pyxel_manager.load_plot_screen(level.pre_level_text)
         self.pyxel_manager.set_level_map_colors(
             self.current_level.floor_color_map, self.current_level.wall_color_map
         )

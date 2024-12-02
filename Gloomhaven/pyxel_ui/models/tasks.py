@@ -10,6 +10,7 @@ from pyxel_ui.controllers.character_picker_view_manager import (
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import FRAME_DURATION_MS
+from pyxel_ui.models.view_section import ActionCardView
 
 
 @dataclass
@@ -402,7 +403,7 @@ class ShowCharacterPickerTask(Task):
     backstories: list[str]
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.update_character_picker(
+        view_manager.update_carousel(
             items=[
                 {"name": name, "sprite_name": sprite_name, "backstory": backstory}
                 for name, sprite_name, backstory in zip(
@@ -410,3 +411,13 @@ class ShowCharacterPickerTask(Task):
                 )
             ]
         )
+
+
+@dataclass
+class LoadPlotScreen(Task):
+    plot: str
+
+    def perform(self, view_manager, user_input_manager):
+        view_manager.load_carousel_log_screen(ActionCardView)
+        view_manager.carousel_view.font_color = 5
+        view_manager.update_carousel(items=[self.plot])

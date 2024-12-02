@@ -35,6 +35,7 @@ class ViewSection(abc.ABC):
         self.end_pos = self.bounding_coordinate
         self.drawable = False
         self.active = True
+        self.font_color = 7
 
     def clear_bounds(self) -> None:
         """a function to clear the view's area before redrawing itself"""
@@ -327,14 +328,14 @@ class CarouselView(ViewSection):
     def draw_page_indicator(self, y_start) -> None:
         total_pages = (len(self.items) + self.cards_per_page - 1) // self.cards_per_page
         page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
+        pyxel.text(self.start_pos[0], y_start, page_text, col=self.font_color)
 
     def draw_navigation_hints(self) -> None:
         y_start = self.end_pos[1] - 20
         if self.current_card_page > 0:
-            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
+            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=self.font_color)
         if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
-            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=7)
+            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=self.font_color)
 
     def go_to_next_page(self):
         if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
@@ -369,7 +370,7 @@ class ActionCardView(CarouselView):
         for card in self.items[start_idx:end_idx]:
             self.text_pixels.extend(
                 self.font.draw_text(
-                    x, y, card, col=7, size="medium", max_width=card_width
+                    x, y, card, col=self.font_color, size="medium", max_width=card_width
                 )
             )
             x += card_width + card_border
@@ -528,7 +529,7 @@ class CharacterPickerView(CarouselView):
                 - self.font.get_text_width(header, size="large") / 2,
                 y,
                 header,
-                col=7,
+                col=self.font_color,
                 size="large",
                 max_width=card_width,
             )
@@ -536,7 +537,7 @@ class CharacterPickerView(CarouselView):
                 x + padding,
                 y + 30,
                 card["backstory"],
-                col=7,
+                col=self.font_color,
                 size="medium",
                 max_width=card_width - padding,
             )

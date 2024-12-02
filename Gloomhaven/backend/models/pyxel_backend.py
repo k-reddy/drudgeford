@@ -246,3 +246,8 @@ class PyxelManager:
         backstories = [character.backstory for character in characters]
         task = tasks.ShowCharacterPickerTask(names, sprite_names, backstories)
         self.jsonify_and_send_task(task)
+
+    def load_plot_screen(self, plot: str):
+        task = tasks.LoadPlotScreen(plot)
+        self.jsonify_and_send_task(task)
+        self.get_user_input(prompt="Hit enter to continue")
