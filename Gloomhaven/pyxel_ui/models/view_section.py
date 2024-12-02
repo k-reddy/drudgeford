@@ -106,11 +106,11 @@ class LogView(ViewSection):
             self.is_log_changed = True
 
     def _redraw(self) -> None:
-        self.draw()
-        # self.clear_bounds()
-        # if not self.log and self.round_number <= 0:
-        #     return
-        # self.font.redraw_text(self.font_color, self.text_pixels)
+        # self.draw()
+        self.clear_bounds()
+        if not self.log and self.round_number <= 0:
+            return
+        self.font.redraw_text(self.font_color, self.text_pixels)
 
     def _draw(self) -> None:
         # if not self.is_log_changed:
