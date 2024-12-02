@@ -71,9 +71,12 @@ class Campaign:
         if not self.initialized:
             self.set_num_players()
             self.pyxel_manager.load_plot_screen(GAME_PLOT)
+            self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
+        else:
+            self.wait_for_all_players_to_join()
         self.run_levels()
 
     def make_levels(self):
@@ -233,3 +236,28 @@ class Campaign:
             id_gen_start=next(self.id_generator),
         )
         self.pyxel_manager.save_campign(campaign_state)
+
+    def wait_for_all_players_to_join(self):
+        self.pyxel_manager.add_to_personal_log("Waiting for all players to join")
+        print(self.num_players)
+        while True:
+            print(
+                len(
+                    [
+                        1
+                        for client in self.server.clients.values()
+                        if client.client_type == ClientType.FRONTEND
+                    ]
+                )
+            )
+            if (
+                len(
+                    [
+                        1
+                        for client in self.server.clients.values()
+                        if client.client_type == ClientType.FRONTEND
+                    ]
+                )
+                == self.num_players
+            ):
+                return

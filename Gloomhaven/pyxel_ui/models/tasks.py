@@ -299,7 +299,7 @@ class AddToPersonalLog(Task):
     clear: bool
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.update_keyboard(self.log, self.clear)
+        view_manager.update_personal_log(self.log, self.clear)
 
 
 @dataclass
