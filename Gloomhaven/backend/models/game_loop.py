@@ -221,9 +221,9 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     f"{acting_character.name} slipped and lost their turn!"
                 )
-                self.pyxel_manager.get_user_input(
+                self.pyxel_manager.pause_for_all_players(
+                    num_players=self.num_players,
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
-                    client_id="frontend_1",
                 )
         except DieAndEndTurn:
             pass
@@ -258,13 +258,14 @@ class GameLoop:
     def _end_turn(self) -> None:
         self.board.acting_character = None
         if not self.all_ai_mode:
-            for i in range(1, self.num_players):
-                self.pyxel_manager.print_message(
-                    "End of turn. Waiting for Player 1 to hit continue",
-                    f"frontend_{i+1}",
-                )
-            self.pyxel_manager.get_user_input(
-                prompt="End of turn. Hit enter to continue", client_id="frontend_1"
+            # for i in range(1, self.num_players):
+            #     self.pyxel_manager.print_message(
+            #         "End of turn. Waiting for Player 1 to hit continue",
+            #         f"frontend_{i+1}",
+            #     )
+            self.pyxel_manager.pause_for_all_players(
+                self.num_players,
+                prompt="End of turn. All playesr must hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 
@@ -274,13 +275,14 @@ class GameLoop:
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            for i in range(1, self.num_players):
-                self.pyxel_manager.print_message(
-                    "End of round. Waiting for Player 1 to hit continue",
-                    f"frontend_{i+1}",
-                )
-            self.pyxel_manager.get_user_input(
-                prompt="End of round. Hit enter to continue", client_id="frontend_1"
+            # for i in range(1, self.num_players):
+            #     self.pyxel_manager.print_message(
+            #         "End of round. Waiting for Player 1 to hit continue",
+            #         f"frontend_{i+1}",
+            #     )
+            self.pyxel_manager.pause_for_all_players(
+                num_players=self.num_players,
+                prompt="End of round. All players must hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 
