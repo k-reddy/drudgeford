@@ -329,7 +329,6 @@ class Board:
             closed.add(current)
 
             for direction in directions:
-                print(f"current: {current}, direction: {direction}")
                 new_row = int(current[0] + direction[0])
                 new_col = int(current[1] + direction[1])
                 new_pos = (new_row, new_col)

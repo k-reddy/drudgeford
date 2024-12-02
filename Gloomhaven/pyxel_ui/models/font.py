@@ -35,7 +35,7 @@ class PixelFont:
 
         font = self.medium_font if size == "medium" else self.large_font
         bbox = font.getbbox(text)
-        padding = max(2, 8 if size == "medium" else 12 // 4)
+        padding = max(2, 4 if size == "medium" else 12)
         return bbox[2] - bbox[0] + padding * 2
 
     def wrap_text(self, text, max_width, size="medium"):

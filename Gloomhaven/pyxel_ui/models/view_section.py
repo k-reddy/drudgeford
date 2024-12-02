@@ -24,14 +24,24 @@ class ViewSection(abc.ABC):
     are given by the controller"""
 
     def __init__(self, font, start_pos, bounding_coordinate):
+        """
+        We initialize view sections to be active but not drawable,
+        meaning they are taking up space on the screen, but we draw
+        a blank space where they are until told otherwise
+        """
         self.font = font
         self.start_pos = start_pos
         self.bounding_coordinate = bounding_coordinate
         self.end_pos = self.bounding_coordinate
         self.drawable = False
+        self.active = True
+        self.font_color = 7
 
     def clear_bounds(self) -> None:
         """a function to clear the view's area before redrawing itself"""
+        if not self.active:
+            return
+
         pyxel.rect(
             self.start_pos[0],
             self.start_pos[1],
@@ -41,10 +51,26 @@ class ViewSection(abc.ABC):
         )
 
     def redraw(self) -> None:
+        if not self.active:
+            return
+        self.clear_bounds()
+        if self.drawable:
+            self._redraw()
+
+    def _redraw(self) -> None:
         self.draw()
 
+    def draw(self) -> None:
+        if not self.active:
+            return
+        self.clear_bounds()
+        if not self.drawable:
+            return
+
+        self._draw()
+
     @abc.abstractmethod
-    def draw(self):
+    def _draw(self):
         pass
 
 
@@ -52,7 +78,7 @@ class BorderView(ViewSection):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         self.clear_bounds()
 
 
@@ -67,7 +93,6 @@ class LogView(ViewSection):
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
         self.text_pixels: list[tuple[int, int]] = None
-        self.font_color = 7
         self.display_round_turn = True
 
     @property
@@ -81,20 +106,16 @@ class LogView(ViewSection):
             self._log = new_log
             self.is_log_changed = True
 
-    def redraw(self) -> None:
-        self.clear_bounds()
+    def _redraw(self) -> None:
         if not self.log and self.round_number <= 0:
             return
         self.font.redraw_text(self.font_color, self.text_pixels)
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         if not self.is_log_changed:
             return
 
         self.text_pixels = []
-        self.clear_bounds()
-        if not self.drawable:
-            return
 
         def get_line_height(text: str) -> int:
             return (
@@ -170,10 +191,7 @@ class MapView(ViewSection):
         self.floor_color_map = floor_color_map
         self.wall_color_map = wall_color_map
 
-    def draw(self):
-        self.clear_bounds()
-        if not self.drawable:
-            return
+    def _draw(self):
         self.draw_map_background()
         self.draw_map_grid()
         self.draw_sprites()
@@ -265,36 +283,82 @@ class MapView(ViewSection):
         return (pixel_x, pixel_y)
 
 
-class ActionCardView(ViewSection):
+class CarouselView(ViewSection):
+    """
+    A view that scrolls through a carousel and has text
+    The text pixels cache the current text for redrawing
+    (which we do when we pass the cursor over the view section
+    rather than fully drawing the text over again in order to
+    speed things up)
+
+    Requires you to specify how to draw items, and draw items
+    must cache all text pixels in self.text_pixels or
+    text will disappear from the screen as you move the cursor
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # !!! we should probably set a card width and then
         # set cards per page dynamically rather than the other
         # way around
-        self.action_card_log: list[str] = []
+        self.items: list[str] = []
         self.current_card_page = 0
         self.cards_per_page = 3
         self.text_pixels: list[tuple[int, int]] = None
 
-    def redraw(self) -> None:
-        self.clear_bounds()
-        if not self.action_card_log:
+    def _redraw(self) -> None:
+        if not self.items:
             return
-        self.font.redraw_text(7, self.text_pixels)
-
-    def draw(self) -> None:
-        # print("action card draw")
-        self.text_pixels = []
-        self.clear_bounds()
-        if not self.drawable:
-            return
-
         self.draw_page_indicator(self.start_pos[1])
+        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.draw_navigation_hints()
 
-        # Draw action cards
+    def get_start_end_idx(self) -> tuple[int, int]:
         start_idx = self.current_card_page * self.cards_per_page
-        end_idx = min(start_idx + self.cards_per_page, len(self.action_card_log))
+        end_idx = min(start_idx + self.cards_per_page, len(self.items))
+        return start_idx, end_idx
+
+    def _draw(self) -> None:
+        self.text_pixels = []
+        self.draw_page_indicator(self.start_pos[1])
+        self.draw_items()
+        self.draw_navigation_hints()
+
+    @abc.abstractmethod
+    def draw_items(self):
+        pass
+
+    def draw_page_indicator(self, y_start) -> None:
+        total_pages = (len(self.items) + self.cards_per_page - 1) // self.cards_per_page
+        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
+        pyxel.text(self.start_pos[0], y_start, page_text, col=self.font_color)
+
+    def draw_navigation_hints(self) -> None:
+        y_start = self.end_pos[1] - 20
+        if self.current_card_page > 0:
+            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=self.font_color)
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            pyxel.text(self.end_pos[0] - 30, y_start, "-> Next", col=self.font_color)
+
+    def go_to_next_page(self):
+        if (self.current_card_page + 1) * self.cards_per_page < len(self.items):
+            self.current_card_page += 1
+            self.draw()
+
+    def go_to_prev_page(self):
+        if self.current_card_page > 0:
+            self.current_card_page -= 1
+            self.draw()
+
+
+class ActionCardView(CarouselView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def draw_items(self) -> None:
+        # Draw action cards
+        start_idx, end_idx = self.get_start_end_idx()
 
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
@@ -306,32 +370,13 @@ class ActionCardView(ViewSection):
             - self.cards_per_page * card_border
         ) // self.cards_per_page
         # Draw only the current page of cards
-        for card in self.action_card_log[start_idx:end_idx]:
+        for card in self.items[start_idx:end_idx]:
             self.text_pixels.extend(
                 self.font.draw_text(
-                    x, y, card, col=7, size="medium", max_width=card_width
+                    x, y, card, col=self.font_color, size="medium", max_width=card_width
                 )
             )
             x += card_width + card_border
-
-        # !!! should change this to measure the height of the cards and page indicator
-        navigation_start_y = self.start_pos[1] + BITS * 6 + card_border + 10
-        self.draw_navigation_hints(x - card_width // 2, navigation_start_y)
-
-    def draw_page_indicator(self, y_start) -> None:
-        total_pages = (
-            len(self.action_card_log) + self.cards_per_page - 1
-        ) // self.cards_per_page
-        page_text = f"Page {self.current_card_page + 1}/{total_pages}"
-        pyxel.text(self.start_pos[0], y_start, page_text, col=7)
-
-    def draw_navigation_hints(self, x_start_next, y_start) -> None:
-        if self.current_card_page > 0:
-            pyxel.text(self.start_pos[0], y_start, "<- Previous", col=7)
-        if (self.current_card_page + 1) * self.cards_per_page < len(
-            self.action_card_log
-        ):
-            pyxel.text(x_start_next, y_start, "-> Next", col=7)
 
 
 class InitiativeBarView(ViewSection):
@@ -349,7 +394,7 @@ class InitiativeBarView(ViewSection):
         self.vertical_gap = BITS  # Gap between rows
         self.sprite_manager = SpriteManager()
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         """
         Draw a bar showing health and initiative for sprites, with team indicators.
 
@@ -359,8 +404,6 @@ class InitiativeBarView(ViewSection):
             max_healths: List of max health values corresponding to sprites
             teams: List of boolean values (True for monster team, False for player team)
         """
-        self.clear_bounds()
-
         # Calculate maximum items per row based on screen width
         item_width = self.sprite_width + self.horiz_gap
         # Leave some margin on both sides
@@ -406,7 +449,7 @@ class InitiativeBarView(ViewSection):
                     x_pos + self.font_offset,
                     y_pos,
                     f"{self.healths[actual_index]}/{self.max_healths[actual_index]}",
-                    7,
+                    self.font_color,
                 )
 
                 # Draw team indicator line
@@ -431,6 +474,94 @@ class InitiativeBarView(ViewSection):
                     line_y,
                     line_color,
                 )
+
+
+class SpriteView(ViewSection):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sprite_name = "wizard"
+        self.sprite_manager = SpriteManager()
+        self.drawable = True
+        self.sprite_width = BITS
+        self.sprite_x = (
+            self.bounding_coordinate[0] - self.start_pos[0]
+        ) / 2 - self.sprite_width
+        self.sprite_y = 100
+
+    def _draw(self) -> None:
+        draw_sprite(
+            self.sprite_x,
+            self.sprite_y,
+            self.sprite_manager.get_sprite(self.sprite_name, AnimationFrame.SOUTH),
+            colkey=0,
+            scale=4,
+        )
+
+
+class CharacterPickerView(CarouselView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cards_per_page = 1
+
+    def _redraw(self):
+        """
+        same as super, but have to add drawing sprite
+        """
+        if not self.items:
+            return
+        self.draw_page_indicator(self.start_pos[1])
+        start_idx, end_idx = self.get_start_end_idx()
+        for card in self.items[start_idx:end_idx]:
+            sprite = SpriteView(self.font, [0, 10], self.end_pos)
+            sprite.sprite_name = card["sprite_name"]
+            sprite.draw()
+        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.draw_navigation_hints()
+
+    def draw_items(self):
+        # Draw cards
+        start_idx, end_idx = self.get_start_end_idx()
+
+        x = self.start_pos[0]
+        # !!! ideally put something here that measures the height of the page indicator
+        y = self.start_pos[1] + 200
+        padding = 50
+        card_border = 4
+        card_width = (
+            self.bounding_coordinate[0]
+            - self.start_pos[0]
+            - self.cards_per_page * card_border
+        ) // self.cards_per_page
+        # Draw only the current page of cards
+        for i, card in enumerate(self.items[start_idx:end_idx]):
+            sprite = SpriteView(self.font, [0, 10], self.end_pos)
+            sprite.sprite_name = card["sprite_name"]
+            sprite.draw()
+            card_num = i + start_idx
+            header = f"{card_num}: {card['name']}"
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    self.end_pos[0] / 2
+                    - self.font.get_text_width(header, size="large") / 2,
+                    y,
+                    header,
+                    col=self.font_color,
+                    size="large",
+                    max_width=card_width,
+                )
+            )
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    x + padding,
+                    y + 30,
+                    card["backstory"],
+                    col=self.font_color,
+                    size="medium",
+                    max_width=card_width - padding,
+                )
+            )
+            x += card_width + card_border
 
 
 def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:

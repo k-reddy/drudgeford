@@ -3,9 +3,14 @@ from collections import deque
 from typing import Optional
 import abc
 
+from pyxel_ui.controllers.view_manager import ViewManager
+from pyxel_ui.controllers.character_picker_view_manager import (
+    CharacterPickerViewManager,
+)
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import FRAME_DURATION_MS
+from pyxel_ui.models.view_section import ActionCardView, CharacterPickerView
 
 
 @dataclass
@@ -134,6 +139,7 @@ class BoardInitTask:
     wall_color_map: Optional[list[tuple[int, int]]] = None
 
     def perform(self, view_manager, user_input_manager):
+        view_manager.load_game_screen(self.floor_color_map, self.wall_color_map)
         view_manager.update_map(
             self.valid_map_coordinates, self.floor_color_map, self.wall_color_map
         )
@@ -384,3 +390,36 @@ class ResetViewManager(Task):
 
     def perform(self, view_manager, user_input_manager):
         view_manager.reset_self()
+
+
+@dataclass
+class ShowCharacterPickerTask(Task):
+    """
+    A task that tells pyxel to show the character picker so player can choose their character class
+    """
+
+    names: list[str]
+    sprite_names: list[str]
+    backstories: list[str]
+
+    def perform(self, view_manager, user_input_manager):
+        view_manager.load_carousel_log_screen(CharacterPickerView)
+        view_manager.update_carousel(
+            items=[
+                {"name": name, "sprite_name": sprite_name, "backstory": backstory}
+                for name, sprite_name, backstory in zip(
+                    self.names, self.sprite_names, self.backstories
+                )
+            ]
+        )
+
+
+@dataclass
+class LoadPlotScreen(Task):
+    plot: str
+
+    def perform(self, view_manager, user_input_manager):
+        view_manager.load_carousel_log_screen(ActionCardView)
+        view_manager.carousel_view.font_color = 5
+        view_manager.carousel_view.cards_per_page = 1
+        view_manager.update_carousel(items=[self.plot])
