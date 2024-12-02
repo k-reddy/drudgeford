@@ -253,14 +253,21 @@ class PyxelManager:
         task = tasks.MakeCarouselUndrawable()
         self.jsonify_and_send_task(task, client_id)
 
-    def load_plot_screen(self, plot: str, pause_until_enter: bool = True):
+    def load_plot_screen(
+        self, plot: str, pause_until_enter: bool = True, num_players=1
+    ):
+        """
+        If you want to pause until enter, you must pass num_players to pause for
+        """
         task = tasks.LoadPlotScreen(plot)
         self.jsonify_and_send_task(task)
         if pause_until_enter:
-            self.get_user_input(prompt="Hit enter to continue")
+            self.pause_for_all_players(
+                num_players=num_players, prompt="All players must enter to continue"
+            )
 
     def pause_for_all_players(
-        self, num_players: int, prompt: str = "Hit enter to continue"
+        self, num_players: int, prompt: str = "All players must hit enter to continue"
     ):
         task = tasks.InputTask(prompt)
         self.jsonify_and_send_task(task, "ALL_FRONTEND")
