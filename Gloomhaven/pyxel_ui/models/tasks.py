@@ -295,11 +295,11 @@ class AddToPersonalLog(Task):
     task that updates the personal log
     """
 
-    log: list[str]
+    string_to_add: str
     clear: bool
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.update_personal_log(self.log, self.clear)
+        view_manager.update_personal_log(self.string_to_add, self.clear)
 
 
 @dataclass
