@@ -4,9 +4,7 @@ import textwrap
 from backend.utils.config import TEXT_WIDTH
 from backend.models import obstacle
 
-GAME_PLOT = (
-    """Welcome to Drudgeford, your rather unremarkable home since childhood. Recently, however, things have changed. Strange events have been plaguing your village. Crops wither overnight, shadows move against the sun, and ancient runes appear carved into doors. All in the town swear innocence but darkness spreads. You journey to nearby villages in search of information and hear rumors of a puppet master working from the shadows. You decide to seek out this mysterious force before your village succumbs to its influence.""",
-)
+GAME_PLOT = """Welcome to Drudgeford, your rather unremarkable home since childhood. Recently, however, things have changed. Strange events have been plaguing your village. Crops wither overnight, shadows move against the sun, and ancient runes appear carved into doors. All in the town swear innocence but darkness spreads. You journey to nearby villages in search of information and hear rumors of a puppet master working from the shadows. You decide to seek out this mysterious force before your village succumbs to its influence."""
 
 
 @dataclass
