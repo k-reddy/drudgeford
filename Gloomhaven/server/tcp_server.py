@@ -31,6 +31,8 @@ class TCPServer:
         self.user_input_queue = queue.Queue()
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+        self.persistent_frontend_tasks: List[Dict] = []
+
         if self.testing_mode:
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -90,6 +92,13 @@ class TCPServer:
 
     def _handle_client(self, client_socket: socket.socket, client_id: str):
         """Handle individual client connections"""
+
+        client_data = self.clients[client_id]
+        # berore anything else, load all the persistent tasks you missed
+        if client_data.client_type == ClientType.FRONTEND:
+            with self.lock:
+                for task in self.persistent_frontend_tasks:
+                    client_data.tasks.append(task)
         while self.running:
             try:
                 data = client_socket.recv(4096).decode("utf-8")
@@ -145,7 +154,11 @@ class TCPServer:
             raise ValueError("No target client id")
 
         if target_client_id == "ALL_FRONTEND":
+            # we add all ALL_FRONTEND tasks to the persistent list
+            # so that late-coming clients can still get the important info
             with self.lock:
+                self.persistent_frontend_tasks.append(task_data)
+
                 for client_data in self.clients.values():
                     if client_data.client_type == ClientType.FRONTEND:
                         client_data.tasks.append(task_data)

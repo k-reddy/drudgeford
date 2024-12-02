@@ -70,7 +70,7 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
-            self.pyxel_manager.load_plot_screen(GAME_PLOT)
+            self.pyxel_manager.load_plot_screen(GAME_PLOT, False)
             self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
@@ -244,14 +244,19 @@ class Campaign:
     def wait_for_all_players_to_join(self):
         self.pyxel_manager.add_to_personal_log("Waiting for all players to join")
         while True:
+            clients_snapshot = list(self.server.clients.values())
+
             if (
                 len(
                     [
                         1
-                        for client in self.server.clients.values()
+                        for client in clients_snapshot
                         if client.client_type == ClientType.FRONTEND
                     ]
                 )
-                == self.num_players
+                >= self.num_players
             ):
+                self.pyxel_manager.get_user_input(
+                    "All players joined. Hit enter to continue."
+                )
                 return

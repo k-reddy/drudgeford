@@ -251,7 +251,8 @@ class PyxelManager:
         task = tasks.MakeCarouselUndrawable()
         self.jsonify_and_send_task(task, client_id)
 
-    def load_plot_screen(self, plot: str):
+    def load_plot_screen(self, plot: str, pause_until_enter: bool = True):
         task = tasks.LoadPlotScreen(plot)
         self.jsonify_and_send_task(task)
-        self.get_user_input(prompt="Hit enter to continue")
+        if pause_until_enter:
+            self.get_user_input(prompt="Hit enter to continue")
