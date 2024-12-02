@@ -112,8 +112,8 @@ class LogView(ViewSection):
         self.font.redraw_text(self.font_color, self.text_pixels)
 
     def _draw(self) -> None:
-        # if not self.is_log_changed:
-        #     return
+        if not self.is_log_changed:
+            return
 
         self.text_pixels = []
 

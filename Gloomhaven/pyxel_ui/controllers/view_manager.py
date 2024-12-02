@@ -304,7 +304,7 @@ class ViewManager:
     def update_personal_log(self, output, clear=True):
         if clear:
             self.personal_log.log = [output]
-            self.is_log_changed = True
+            self.personal_log.is_log_changed = True
         else:
             self.personal_log.log += output
         self.personal_log.drawable = True
