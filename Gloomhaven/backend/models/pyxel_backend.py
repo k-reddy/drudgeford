@@ -271,8 +271,9 @@ class PyxelManager:
             inputs_received += 1
 
             if inputs_received < num_players:
+                remaining_inputs = num_players - inputs_received
                 wait_task = tasks.AddToPersonalLog(
-                    f"Waiting for {num_players - inputs_received} more players to hit enter",
+                    f"Waiting for {remaining_inputs} more player{'s' if remaining_inputs>1 else ''} to hit enter",
                     False,
                 )
                 self.jsonify_and_send_task(wait_task)
