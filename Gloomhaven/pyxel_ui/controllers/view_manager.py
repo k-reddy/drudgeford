@@ -24,7 +24,16 @@ class ViewManager:
         self.canvas_height = pyxel_height
         self.view_factory = ViewFactory()
         self.views = []
+        self.map_view = None
+        self.load_character_picker_screen()
 
+    def clear_current_views(self):
+        for v in self.views:
+            self.turn_off_view_section(v)
+        self.views = []
+
+    def load_game_screen(self, floor_color_map=[], wall_color_map=[]):
+        self.clear_current_views()
         initiative_bar_width = 11
         initiative_bar_view_params = ViewParams(
             font=self.font,
@@ -72,25 +81,6 @@ class ViewManager:
         )
         self.views.extend([self.log_view, *log_borders])
 
-        # make a character picker view that fits right where the map and log_view go
-        character_picker_params = ViewParams(
-            font=self.font,
-            start_pos=map_view_params.start_pos,
-            bounding_coordinate=(
-                log_view_params.bounding_coordinate[0],
-                map_view_params.bounding_coordinate[1],
-            ),
-        )
-        self.character_picker_view, picker_borders = (
-            self.view_factory.create_view_with_border(
-                view.CharacterPickerView, character_picker_params, [10, 10, 0, 10]
-            )
-        )
-        self.views.extend([self.character_picker_view, *picker_borders])
-        # then turn off the map view to start since we'll start with the character picker view
-        self.turn_off_view_section(self.map_view)
-        self.turn_off_view_section(self.log_view)
-
         action_card_view_params = ViewParams(
             font=self.font,
             start_pos=[
@@ -111,6 +101,40 @@ class ViewManager:
             start_pos=[
                 0,
                 self.action_card_view.bounding_coordinate[1],
+            ],
+            bounding_coordinate=[self.canvas_width, self.canvas_height],
+        )
+        self.personal_log, personal_log_borders = (
+            self.view_factory.create_view_with_border(
+                view.LogView, personal_log_params, [60, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.personal_log, *personal_log_borders])
+        self.personal_log.font_color = 2
+        self.personal_log.display_round_turn = False
+
+    def load_character_picker_screen(self):
+        self.clear_current_views()
+        character_picker_params = ViewParams(
+            font=self.font,
+            start_pos=(0, 0),
+            bounding_coordinate=(
+                self.canvas_width,
+                BITS * 16,
+            ),
+        )
+        self.character_picker_view, picker_borders = (
+            self.view_factory.create_view_with_border(
+                view.CharacterPickerView, character_picker_params, [10, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.character_picker_view, *picker_borders])
+
+        personal_log_params = ViewParams(
+            font=self.font,
+            start_pos=[
+                0,
+                self.character_picker_view.bounding_coordinate[1],
             ],
             bounding_coordinate=[self.canvas_width, self.canvas_height],
         )
@@ -231,6 +255,8 @@ class ViewManager:
     def get_valid_map_coords_for_cursor_pos(
         self, px_x: int, px_y: int
     ) -> Optional[tuple[int, int]]:
+        if not self.map_view:
+            return None
         # get rid of offsets
         px_x -= self.map_view.start_pos[0]
         px_y -= self.map_view.start_pos[1]
@@ -241,20 +267,28 @@ class ViewManager:
             return (x_num, y_num)
         return None
 
-    def scroll_action_cards_right(self):
-        if (
-            self.action_card_view.current_card_page + 1
-        ) * self.action_card_view.cards_per_page < len(
-            self.action_card_view.action_card_log
-        ):
-            self.action_card_view.current_card_page += 1
-            self.action_card_view.draw()
+    def _get_active_carousel(self):
+        active_carousel = [
+            v for v in self.views if isinstance(v, view.CarouselView) and v.active
+        ]
+        if len(active_carousel) != 1:
+            raise ValueError(f"{len(active_carousel)} active carousels. Require 1.")
+        return active_carousel[0]
 
-    def scroll_action_cards_left(self):
+    def scroll_carousel_right(self):
+        active_carousel = self._get_active_carousel()
+        if (
+            active_carousel.current_card_page + 1
+        ) * active_carousel.cards_per_page < len(active_carousel.items):
+            active_carousel.current_card_page += 1
+            active_carousel.draw()
+
+    def scroll_carousel_left(self):
+        active_carousel = self._get_active_carousel()
         # Go to previous page if we're not at the start
-        if self.action_card_view.current_card_page > 0:
-            self.action_card_view.current_card_page -= 1
-            self.action_card_view.draw()
+        if active_carousel.current_card_page > 0:
+            active_carousel.current_card_page -= 1
+            active_carousel.draw()
 
     def update_personal_log(self, output, clear=True):
         if clear:

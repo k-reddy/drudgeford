@@ -137,11 +137,8 @@ class BoardInitTask:
     floor_color_map: Optional[list[tuple[int, int]]] = None
     wall_color_map: Optional[list[tuple[int, int]]] = None
 
-    def perform(self, view_manager: ViewManager, user_input_manager):
-        map_view = view_manager.get_map_view()
-        view_manager.turn_on_view_section(map_view)
-        character_picker_view = view_manager.get_character_picker_view()
-        view_manager.turn_off_view_section(character_picker_view)
+    def perform(self, view_manager, user_input_manager):
+        view_manager.load_game_screen(self.floor_color_map, self.wall_color_map)
         view_manager.update_map(
             self.valid_map_coordinates, self.floor_color_map, self.wall_color_map
         )

@@ -517,15 +517,17 @@ class CharacterPickerView(CarouselView):
             - self.cards_per_page * card_border
         ) // self.cards_per_page
         # Draw only the current page of cards
-        for card in self.items[start_idx:end_idx]:
+        for i, card in enumerate(self.items[start_idx:end_idx]):
             sprite = SpriteView(self.font, [0, 10], self.end_pos)
             sprite.sprite_name = card["sprite_name"]
             sprite.draw()
+            card_num = i + start_idx
+            header = f"{card_num}: {card['name']}"
             self.font.draw_text(
                 self.end_pos[0] / 2
-                - self.font.get_text_width(card["name"], size="large") / 2,
+                - self.font.get_text_width(header, size="large") / 2,
                 y,
-                card["name"],
+                header,
                 col=7,
                 size="large",
                 max_width=card_width,

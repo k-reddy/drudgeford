@@ -51,9 +51,9 @@ class UserInputManager:
 
         # Add controls for scrolling action cards
         if pyxel.btnp(pyxel.KEY_RIGHT):
-            self.view_manager.scroll_action_cards_right()
+            self.view_manager.scroll_carousel_right()
         if pyxel.btnp(pyxel.KEY_LEFT):
-            self.view_manager.scroll_action_cards_left()
+            self.view_manager.scroll_carousel_left()
 
         if self.accept_mouse_input:
             self.print_personal_log(self.input)
