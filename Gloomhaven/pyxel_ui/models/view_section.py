@@ -53,7 +53,9 @@ class ViewSection(abc.ABC):
     def redraw(self) -> None:
         if not self.active:
             return
-        self._redraw()
+        self.clear_bounds()
+        if self.drawable:
+            self._redraw()
 
     def _redraw(self) -> None:
         self.draw()
@@ -106,8 +108,6 @@ class LogView(ViewSection):
             self.is_log_changed = True
 
     def _redraw(self) -> None:
-        # self.draw()
-        self.clear_bounds()
         if not self.log and self.round_number <= 0:
             return
         self.font.redraw_text(self.font_color, self.text_pixels)

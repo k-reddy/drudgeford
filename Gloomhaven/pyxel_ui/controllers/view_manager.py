@@ -149,8 +149,9 @@ class ViewManager:
         self.personal_log.display_round_turn = False
 
     def update_log(self, log: list[str]):
-        # note: drawable set in update_round_turn()
         self.log_view.log = log
+        if log:
+            self.log_view.drawable = True
         self.log_view.draw()
 
     def update_round_turn(self, round_number: int, acting_character_name: str):
@@ -303,6 +304,7 @@ class ViewManager:
     def update_personal_log(self, output, clear=True):
         if clear:
             self.personal_log.log = [output]
+            self.is_log_changed = True
         else:
             self.personal_log.log += output
         self.personal_log.drawable = True
