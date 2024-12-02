@@ -135,12 +135,14 @@ class Campaign:
                 client.client_id != player_id
                 and client.client_type == ClientType.FRONTEND
             ):
-                self.pyxel_manager.print_message(
+                self.pyxel_manager.add_to_personal_log(
                     f"Waiting for player {player_num+1} to pick a character",
-                    client.client_id,
+                    client_id=client.client_id,
                 )
 
-        self.pyxel_manager.show_character_picker(self.available_chars)
+        self.pyxel_manager.show_character_picker(
+            self.available_chars, client_id=player_id
+        )
         # print the backstory for every available char
         # for i, char in enumerate(self.available_chars):
         #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
@@ -165,6 +167,8 @@ class Campaign:
         # set the client_id
         player_char.client_id = player_id
 
+        # hide the active carousel
+        self.pyxel_manager.make_active_carousel_undrawable(player_id)
         return player_char
 
     def set_up_player_chars(self):
@@ -239,17 +243,7 @@ class Campaign:
 
     def wait_for_all_players_to_join(self):
         self.pyxel_manager.add_to_personal_log("Waiting for all players to join")
-        print(self.num_players)
         while True:
-            print(
-                len(
-                    [
-                        1
-                        for client in self.server.clients.values()
-                        if client.client_type == ClientType.FRONTEND
-                    ]
-                )
-            )
             if (
                 len(
                     [

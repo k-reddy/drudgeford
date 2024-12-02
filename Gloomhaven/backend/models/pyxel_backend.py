@@ -147,9 +147,9 @@ class PyxelManager:
         task = tasks.LoadLogTask(log)
         self.jsonify_and_send_task(task)
 
-    def add_to_personal_log(self, log, clear=True):
+    def add_to_personal_log(self, log, clear=True, client_id="ALL_FRONTEND"):
         task = tasks.AddToPersonalLog(log, clear)
-        self.jsonify_and_send_task(task)
+        self.jsonify_and_send_task(task, client_id)
 
     def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
         action_card_log = []
@@ -238,12 +238,18 @@ class PyxelManager:
         task = tasks.ResetViewManager
         self.jsonify_and_send_task(task)
 
-    def show_character_picker(self, characters: list[character.Character]):
+    def show_character_picker(
+        self, characters: list[character.Character], client_id: str
+    ):
         names = [character.__class__.__name__ for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         backstories = [character.backstory for character in characters]
         task = tasks.ShowCharacterPickerTask(names, sprite_names, backstories)
-        self.jsonify_and_send_task(task)
+        self.jsonify_and_send_task(task, client_id)
+
+    def make_active_carousel_undrawable(self, client_id: str):
+        task = tasks.MakeCarouselUndrawable()
+        self.jsonify_and_send_task(task, client_id)
 
     def load_plot_screen(self, plot: str):
         task = tasks.LoadPlotScreen(plot)
