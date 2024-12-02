@@ -194,8 +194,6 @@ class PyxelManager:
 
         # if there's validation, keep asking for input until you get what you need
         while user_input not in valid_inputs:
-            print(user_input)
-            print(valid_inputs)
             task = task_class("Invalid selection pressed. Try again.\n" + prompt)
             self.jsonify_and_send_task(task, client_id)
             user_input = self.server_client.get_user_input()["input"]
