@@ -31,6 +31,7 @@ class ViewManager:
         for v in self.views:
             self.turn_off_view_section(v)
         self.views = []
+        self.clear_screen()
 
     def load_game_screen(self, floor_color_map=[], wall_color_map=[]):
         self.clear_current_views()
@@ -341,3 +342,12 @@ class ViewManager:
         self.character_picker_view.items = items
         self.character_picker_view.drawable = True
         self.character_picker_view.draw()
+
+    def clear_screen(self):
+        pyxel.rect(
+            0,
+            0,
+            self.canvas_width,
+            self.canvas_height,
+            0,
+        )
