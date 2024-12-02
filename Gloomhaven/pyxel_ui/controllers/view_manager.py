@@ -272,12 +272,19 @@ class ViewManager:
         active_carousel = [
             v for v in self.views if isinstance(v, view.CarouselView) and v.active
         ]
-        if len(active_carousel) != 1:
-            raise ValueError(f"{len(active_carousel)} active carousels. Require 1.")
-        return active_carousel[0]
+        if not active_carousel:
+            return None
+        elif len(active_carousel) > 1:
+            raise ValueError(
+                f"{len(active_carousel)} active carousels. Require 0 or 1."
+            )
+        else:
+            return active_carousel[0]
 
     def scroll_carousel_right(self):
         active_carousel = self._get_active_carousel()
+        if not active_carousel:
+            return
         if (
             active_carousel.current_card_page + 1
         ) * active_carousel.cards_per_page < len(active_carousel.items):
