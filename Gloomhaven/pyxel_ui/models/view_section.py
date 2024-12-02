@@ -310,8 +310,14 @@ class CarouselView(ViewSection):
     def _redraw(self) -> None:
         if not self.items:
             return
-        # self.font.redraw_text(self.font_color, self.text_pixels)
-        self.draw()
+        self.draw_page_indicator(self.start_pos[1])
+        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.draw_navigation_hints()
+
+    def get_start_end_idx(self) -> tuple[int, int]:
+        start_idx = self.current_card_page * self.cards_per_page
+        end_idx = min(start_idx + self.cards_per_page, len(self.items))
+        return start_idx, end_idx
 
     def _draw(self) -> None:
         self.text_pixels = []
@@ -352,8 +358,7 @@ class ActionCardView(CarouselView):
 
     def draw_items(self) -> None:
         # Draw action cards
-        start_idx = self.current_card_page * self.cards_per_page
-        end_idx = min(start_idx + self.cards_per_page, len(self.items))
+        start_idx, end_idx = self.get_start_end_idx()
 
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
@@ -495,15 +500,28 @@ class SpriteView(ViewSection):
 
 
 class CharacterPickerView(CarouselView):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.cards_per_page = 1
 
+    def _redraw(self):
+        """
+        same as super, but have to add drawing sprite
+        """
+        if not self.items:
+            return
+        self.draw_page_indicator(self.start_pos[1])
+        start_idx, end_idx = self.get_start_end_idx()
+        for card in self.items[start_idx:end_idx]:
+            sprite = SpriteView(self.font, [0, 10], self.end_pos)
+            sprite.sprite_name = card["sprite_name"]
+            sprite.draw()
+        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.draw_navigation_hints()
+
     def draw_items(self):
         # Draw cards
-        start_idx = self.current_card_page * self.cards_per_page
-        end_idx = min(start_idx + self.cards_per_page, len(self.items))
+        start_idx, end_idx = self.get_start_end_idx()
 
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
@@ -522,22 +540,26 @@ class CharacterPickerView(CarouselView):
             sprite.draw()
             card_num = i + start_idx
             header = f"{card_num}: {card['name']}"
-            self.font.draw_text(
-                self.end_pos[0] / 2
-                - self.font.get_text_width(header, size="large") / 2,
-                y,
-                header,
-                col=self.font_color,
-                size="large",
-                max_width=card_width,
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    self.end_pos[0] / 2
+                    - self.font.get_text_width(header, size="large") / 2,
+                    y,
+                    header,
+                    col=self.font_color,
+                    size="large",
+                    max_width=card_width,
+                )
             )
-            self.font.draw_text(
-                x + padding,
-                y + 30,
-                card["backstory"],
-                col=self.font_color,
-                size="medium",
-                max_width=card_width - padding,
+            self.text_pixels.extend(
+                self.font.draw_text(
+                    x + padding,
+                    y + 30,
+                    card["backstory"],
+                    col=self.font_color,
+                    size="medium",
+                    max_width=card_width - padding,
+                )
             )
             x += card_width + card_border
 
