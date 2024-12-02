@@ -10,9 +10,6 @@ from pyxel_ui.constants import (
     MAP_TILE_HEIGHT_PX,
     MAP_TILE_WIDTH_PX,
 )
-from pyxel_ui.controllers.character_picker_view_manager import (
-    CharacterPickerViewManager,
-)
 from .models.tasks import ActionTask, ShowCharacterPickerTask, InputTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from .utils import round_down_to_nearest_multiple
@@ -38,15 +35,13 @@ class PyxelEngine:
 
         # Controller
         self.view_manager = None
+        # self.current_view_manager = None
 
         # To measure framerate and loop duration
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         pyxel.load("../my_resource.pyxres")
-        self.character_picker_view_manager = CharacterPickerViewManager(
-            DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT
-        )
 
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
@@ -68,15 +63,8 @@ class PyxelEngine:
             self.current_task = self.tj.make_task_from_json(jsonified_task)
 
         if self.current_task:
-            # make this better
-            if isinstance(self.current_task, ShowCharacterPickerTask):
-                self.current_view_manager = self.character_picker_view_manager
-            else:
-                self.current_view_manager.clear_screen()
-                self.current_view_manager = self.view_manager
-
             task_output = self.current_task.perform(
-                self.current_view_manager, self.keyboard_manager
+                self.view_manager, self.keyboard_manager
             )
             # don't clear the task if it's an action task and has steps to do
             if (
@@ -84,8 +72,7 @@ class PyxelEngine:
                 and self.current_task.action_steps
             ):
                 return
-            # if we're asked for user input or a campaign, send what we get to the server
-            # elif isinstance(self.current_task, (InputTask, LoadCampaign)):
+            # if we're asked for a campaign, send what we get to the server
             elif isinstance(self.current_task, LoadCampaign):
                 self.server_client.post_user_input(task_output)
             self.current_task = None

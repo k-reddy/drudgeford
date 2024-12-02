@@ -2,7 +2,7 @@ import pyxel
 
 from typing import Optional
 
-from .view_factory import ViewFactory
+from pyxel_ui.controllers.view_factory import ViewFactory
 from pyxel_ui.constants import (
     BITS,
     FONT_PATH,
@@ -71,6 +71,25 @@ class ViewManager:
             view.LogView, log_view_params, [4, 0, 0, 0]
         )
         self.views.extend([self.log_view, *log_borders])
+
+        # make a character picker view that fits right where the map and log_view go
+        character_picker_params = ViewParams(
+            font=self.font,
+            start_pos=map_view_params.start_pos,
+            bounding_coordinate=(
+                log_view_params.bounding_coordinate[0],
+                map_view_params.bounding_coordinate[1],
+            ),
+        )
+        self.character_picker_view, picker_borders = (
+            self.view_factory.create_view_with_border(
+                view.CharacterPickerView, character_picker_params, [10, 10, 0, 10]
+            )
+        )
+        self.views.extend([self.character_picker_view, *picker_borders])
+        # then turn off the map view to start since we'll start with the character picker view
+        self.turn_off_view_section(self.map_view)
+        self.turn_off_view_section(self.log_view)
 
         action_card_view_params = ViewParams(
             font=self.font,
@@ -187,15 +206,20 @@ class ViewManager:
         px_x: int,
         px_y: int,
     ) -> Optional[view.ViewSection]:
-        return next(
+        view = next(
             (
                 curr_view
                 for curr_view in self.views
                 if curr_view.start_pos[0] <= px_x < curr_view.end_pos[0]
                 and curr_view.start_pos[1] <= px_y < curr_view.end_pos[1]
+                and curr_view.active
             ),
             None,
         )
+        # print(view)
+        # if view:
+        #     print(view.active)
+        return view
 
     def draw_grid(self, px_x: int, px_y: int, px_width: int, px_height: int) -> None:
         view.draw_grid(px_x, px_y, px_width, px_height)
@@ -253,3 +277,33 @@ class ViewManager:
         self.update_personal_log([], clear=True)
         self.update_sprites({})
         self.update_round_turn(0, "")
+
+    def turn_on_view_section(self, view_section: view.ViewSection) -> None:
+        """
+        Toggles the provided view_section on and redraws the whole screen
+        (in case the view section doesn't perfectly overlap with the old one)
+        """
+        view_section.drawable = True
+        view_section.active = True
+        self.draw_whole_game()
+
+    def turn_off_view_section(self, view_section: view.ViewSection) -> None:
+        """
+        toggles a view_section off and redraws it (to clear the bounds)
+        we leave it in our
+
+        """
+        view_section.drawable = False
+        view_section.active = False
+        view_section.draw()
+
+    def get_map_view(self):
+        return self.map_view
+
+    def get_character_picker_view(self):
+        return self.character_picker_view
+
+    def update_character_picker(self, items):
+        self.character_picker_view.items = items
+        self.character_picker_view.drawable = True
+        self.character_picker_view.draw()

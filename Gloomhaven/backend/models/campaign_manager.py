@@ -136,10 +136,6 @@ class Campaign:
                     client.client_id,
                 )
 
-        # send the message only to the appropriate character
-        self.pyxel_manager.print_message(
-            "It's time to pick your character. Here are your options:\n", player_id
-        )
         self.pyxel_manager.show_character_picker(self.available_chars)
         # print the backstory for every available char
         # for i, char in enumerate(self.available_chars):
