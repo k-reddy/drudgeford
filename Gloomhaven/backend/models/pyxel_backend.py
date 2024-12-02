@@ -147,8 +147,10 @@ class PyxelManager:
         task = tasks.LoadLogTask(log)
         self.jsonify_and_send_task(task)
 
-    def add_to_personal_log(self, log, clear=True, client_id="ALL_FRONTEND"):
-        task = tasks.AddToPersonalLog(log, clear)
+    def add_to_personal_log(
+        self, string_to_add: str, clear=True, client_id="ALL_FRONTEND"
+    ):
+        task = tasks.AddToPersonalLog(string_to_add, clear)
         self.jsonify_and_send_task(task, client_id)
 
     def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
@@ -256,3 +258,21 @@ class PyxelManager:
         self.jsonify_and_send_task(task)
         if pause_until_enter:
             self.get_user_input(prompt="Hit enter to continue")
+
+    def pause_for_all_players(
+        self, num_players: int, prompt: str = "Hit enter to continue"
+    ):
+        task = tasks.InputTask(prompt)
+        self.jsonify_and_send_task(task, "ALL_FRONTEND")
+        inputs_received = 0
+        # wait for input from each player
+        for _ in range(num_players):
+            x = self.server_client.get_user_input()["input"]
+            inputs_received += 1
+
+            if inputs_received < num_players:
+                wait_task = tasks.AddToPersonalLog(
+                    f"Waiting for {num_players - inputs_received} more players to hit enter",
+                    False,
+                )
+                self.jsonify_and_send_task(wait_task)

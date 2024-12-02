@@ -256,7 +256,8 @@ class Campaign:
                 )
                 >= self.num_players
             ):
-                self.pyxel_manager.get_user_input(
-                    "All players joined. Hit enter to continue."
+                self.pyxel_manager.pause_for_all_players(
+                    self.num_players,
+                    "All players joined. All players must hit enter to continue.",
                 )
                 return
