@@ -104,7 +104,7 @@ class Campaign:
 
     def run_levels(self):
         for i, _ in enumerate(self.levels):
-            output = self.run_level(self.levels.pop(i))
+            output = self.run_level(self.levels.pop(0))
 
             # if you don't win the level, end here
             if output != GameState.WIN:
