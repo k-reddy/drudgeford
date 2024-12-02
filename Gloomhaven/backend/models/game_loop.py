@@ -182,15 +182,13 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
                 )
+            # take damage from elements before starting turn
+            self.board.deal_terrain_damage_current_location(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
             )
             actions = [
-                # if you start in fire, take damage first
-                lambda: self.board.deal_terrain_damage_current_location(
-                    acting_character
-                ),
                 lambda: acting_character.perform_movement(
                     action_card.movement, action_card.jump, self.board
                 ),
@@ -199,12 +197,12 @@ class GameLoop:
                 ),
             ]
             if action_card.movement == 0:
-                actions = [actions[0]] + [actions[2]]
+                actions = [actions[1]]
             else:
                 move_first = acting_character.decide_if_move_first(action_card)
                 # if not move_first, swap the order of movement and attack
                 if not move_first:
-                    actions[1], actions[2] = actions[2], actions[1]
+                    actions.reverse()
 
             for action in actions:
                 action()
