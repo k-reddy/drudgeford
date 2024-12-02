@@ -415,6 +415,18 @@ class ShowCharacterPickerTask(Task):
 
 
 @dataclass
+class MakeCarouselUndrawable(Task):
+    # doing this b/c no data messes up the task jsonifier
+    fake_data = None
+
+    # makes the carousel undrawable, which means a black box will cover it
+    def perform(self, view_manager: ViewManager, user_input_manager):
+        active_carousel = view_manager.get_carousel_view()
+        active_carousel.drawable = False
+        active_carousel.draw()
+
+
+@dataclass
 class LoadPlotScreen(Task):
     plot: str
 
