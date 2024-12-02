@@ -93,7 +93,6 @@ class LogView(ViewSection):
         # !!! I want to set this dynamically based on the amount of space we have
         self.max_log_lines: int = MAX_LOG_LINES
         self.text_pixels: list[tuple[int, int]] = None
-        self.font_color = 7
         self.display_round_turn = True
 
     @property
@@ -309,10 +308,9 @@ class CarouselView(ViewSection):
         self.text_pixels: list[tuple[int, int]] = None
 
     def _redraw(self) -> None:
-        # self.clear_bounds()
-        # if not self.items:
-        #     return
-        # self.font.redraw_text(7, self.text_pixels)
+        if not self.items:
+            return
+        # self.font.redraw_text(self.font_color, self.text_pixels)
         self.draw()
 
     def _draw(self) -> None:
@@ -446,7 +444,7 @@ class InitiativeBarView(ViewSection):
                     x_pos + self.font_offset,
                     y_pos,
                     f"{self.healths[actual_index]}/{self.max_healths[actual_index]}",
-                    7,
+                    self.font_color,
                 )
 
                 # Draw team indicator line
