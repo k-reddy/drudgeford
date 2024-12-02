@@ -4,7 +4,7 @@ import pickle
 
 from backend.models.game_loop import GameLoop
 from backend.models.pyxel_backend import PyxelManager
-from backend.models.level import Level, campaign_levels
+from backend.models.level import Level, campaign_levels, GAME_PLOT
 import backend.models.character as character
 import backend.models.agent as agent
 from backend.utils.utilities import GameState
@@ -70,6 +70,7 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
+            self.pyxel_manager.load_plot_screen(GAME_PLOT)
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
