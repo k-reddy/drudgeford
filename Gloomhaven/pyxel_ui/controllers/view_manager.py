@@ -293,6 +293,8 @@ class ViewManager:
 
     def scroll_carousel_left(self):
         active_carousel = self._get_active_carousel()
+        if not active_carousel:
+            return
         # Go to previous page if we're not at the start
         if active_carousel.current_card_page > 0:
             active_carousel.current_card_page -= 1
