@@ -174,7 +174,9 @@ class Board:
                         isinstance(potential_char, Character)
                         and not effect_type == obstacle.Ice
                     ):
-                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
+                        self.deal_terrain_damage(
+                            potential_char, effect_row, effect_col, movement=False
+                        )
 
     def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
         starting_coord = self.find_location_of_target(attacker)
@@ -529,16 +531,24 @@ class Board:
         return max(len(path_traveled), path_length_jump)
 
     def deal_terrain_damage(
-        self,
-        affected_character: Character,
-        row: int,
-        col: int,
+        self, affected_character: Character, row: int, col: int, movement: bool = True
     ) -> None:
+        """
+        deals terrain damage to a character
+        if movement = True, this is because the character steps onto a square
+        if movement = False this is because the element was thrown onto a character or
+        they started their turn in that element
+        ice slipping should only apply when movement = True
+        """
         element = self.terrain[row][col]
         if not element:
             return
         damage = element.damage
-        element.perform(row, col, self, affected_character)
+        # if it's not ice or it's ice and they're moving, you can have the element perform
+        # this is to avoid slipping when ice is thrown at you or when you start
+        # your turn on ice
+        if not isinstance(element, obstacle.Ice) or movement:
+            element.perform(row, col, self, affected_character)
         # if they have an elemental affinity for this element, they heal instead of take damage
         if affected_character.elemental_affinity == element.__class__:
             self.pyxel_manager.log.append(
@@ -553,8 +563,12 @@ class Board:
             )
 
     def deal_terrain_damage_current_location(self, affected_character: Character):
+        """
+        deals terrain damage for the start of the turn - set movement to false
+        so you don't slip when you start on ice
+        """
         row, col = self.find_location_of_target(affected_character)
-        self.deal_terrain_damage(affected_character, row, col)
+        self.deal_terrain_damage(affected_character, row, col, movement=False)
 
     def update_character_location(
         self,
