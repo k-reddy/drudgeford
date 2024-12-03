@@ -145,6 +145,9 @@ class Ai(Agent):
                     )
                     current_target_loc = new_target_loc
                     movement -= 1
+                    # ensure that our character is still alive
+                    if char_to_move not in board.characters:
+                        return
         # pull is very easy, just move toward puller
         else:
             board.move_character_toward_location(
@@ -224,6 +227,9 @@ class Human(Agent):
         orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
+            # if the character we're moving died, don't try to find them
+            if char not in board.characters:
+                return
             current_loc = board.find_location_of_target(char)
             # only allow user to pick a square in range
             new_row, new_col = char.pyxel_manager.get_user_input(
