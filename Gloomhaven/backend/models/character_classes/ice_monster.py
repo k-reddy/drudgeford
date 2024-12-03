@@ -36,7 +36,9 @@ cards = [
         attack_name="Fortify",
         actions=[
             actions.ShieldSelf(3, 2),
-            actions.MakeObstableArea(obstacle_type=obstacle.Ice, shape=shapes.ring(2)),
+            actions.ElementAreaEffectFromSelf(
+                element_type=obstacle.Ice, shape=shapes.ring(2)
+            ),
         ],
         movement=1,
         jump=False,

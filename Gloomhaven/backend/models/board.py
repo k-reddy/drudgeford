@@ -327,9 +327,7 @@ class Board:
             """
             if not path:
                 return True
-            print(path)
             position_index = min(num_moves - 1, len(path) - 1)
-            print(position_index)
             position = path[position_index]
 
             # First check if landing position is legal
@@ -581,8 +579,6 @@ class Board:
             )
             damage = damage * -1
         if damage:
-            print(element)
-            print(element.__class__.__name__)
             self.modify_target_health(
                 affected_character, damage, element.__class__.__name__
             )
@@ -610,16 +606,13 @@ class Board:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
-        print(is_position_within_board)
         # for jumping, we can jump through any obstacles and players
         # but we have to stay on board and can't go through walls
         if jump_intermediate_move:
-            print("intermediate jump")
             return is_position_within_board and not isinstance(
                 self.locations[row][col], obstacle.Wall
             )
         else:
-            print(self.locations[row][col])
             return is_position_within_board and self.locations[row][col] is None
 
     def modify_target_health(
