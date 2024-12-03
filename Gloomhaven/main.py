@@ -18,14 +18,10 @@ def main(num_players: int = 1, all_ai_mode=False):
     server.start()
 
     while True:
+        # cache a copy to prevent changing while iterating
+        clients = server.clients.values()
         if (
-            len(
-                [
-                    1
-                    for client in server.clients.values()
-                    if client.client_type == ClientType.FRONTEND
-                ]
-            )
+            len([1 for client in clients if client.client_type == ClientType.FRONTEND])
             == 1
         ):
             print("Player 1 connected! Game running")
