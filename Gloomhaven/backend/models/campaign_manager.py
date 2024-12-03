@@ -84,7 +84,6 @@ class Campaign:
 
     def run_level(self, level: Level):
         # reset our player characters between each level
-        print(f"running level {level.monster_classes}")
         self.player_chars = self.load_player_characters()
         self.current_level = level
         if not self.all_ai_mode:
