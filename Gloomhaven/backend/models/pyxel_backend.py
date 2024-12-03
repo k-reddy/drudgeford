@@ -285,5 +285,5 @@ class PyxelManager:
                 )
                 self.jsonify_and_send_task(wait_task)
         # once we have all input, clear personal log messages
-        clear_log_task = tasks.AddToPersonalLog(" ", True)
-        self.jsonify_and_send_task(clear_log_task)
+        # clear_log_task = tasks.AddToPersonalLog(" ", True)
+        # self.jsonify_and_send_task(clear_log_task)
