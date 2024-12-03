@@ -114,8 +114,7 @@ class ViewManager:
         self.personal_log.font_color = 2
         self.personal_log.display_round_turn = False
 
-    def load_carousel_log_screen(self, carousel_type: str):
-        view_class = getattr(view, carousel_type)
+    def load_carousel_log_screen(self, carousel_type: view.CarouselView):
         self.clear_current_views()
         carousel_params = ViewParams(
             font=self.font,
@@ -127,7 +126,7 @@ class ViewManager:
         )
         self.carousel_view, carousel_borders = (
             self.view_factory.create_view_with_border(
-                view_class, carousel_params, [10, 10, 0, 10]
+                carousel_type, carousel_params, [10, 10, 0, 10]
             )
         )
         self.views.extend([self.carousel_view, *carousel_borders])
