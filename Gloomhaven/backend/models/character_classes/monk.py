@@ -53,8 +53,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Scythe Swipe",
         actions=[action_model.SingleTargetAttack(5, 1)],
-        movement=3,
-        jump=True,
+        movement=2,
+        jump=False,
     ),
     action_model.ActionCard(
         attack_name="Healing Blast",
