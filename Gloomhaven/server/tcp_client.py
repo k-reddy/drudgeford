@@ -63,12 +63,9 @@ class TCPClient:
         request = {"command": command}
         if payload is not None:
             request["payload"] = payload
-            print(payload)
         try:
             send_message(self.socket, request)
             response = receive_message(self.socket)
-            if "task" in response and "null" not in str(response):
-                print(response)
             return response
         except (json.JSONDecodeError, ConnectionError) as e:
             self.close()
