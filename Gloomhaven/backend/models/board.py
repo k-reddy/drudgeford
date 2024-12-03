@@ -277,7 +277,7 @@ class Board:
         start: tuple[int, int],
         end: tuple[int, int],
         is_jump: bool = False,
-        num_moves: int = -1,
+        num_moves: int = 100,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
@@ -320,15 +320,45 @@ class Board:
         ) -> int:
             return max(abs(pos_a[0] - pos_b[0]), abs(pos_a[1] - pos_b[1]))
 
+        def is_valid_jump_path(path: list, end: tuple) -> bool:
+            """
+            returns true if the landing position (smaller of num_moves or path length)
+            is legal or second to last move is legal if the landing position is target
+            """
+            if not path:
+                return True
+            print(path)
+            position_index = min(num_moves - 1, len(path) - 1)
+            print(position_index)
+            position = path[position_index]
+
+            # First check if landing position is legal
+            if self.is_legal_move(
+                position[0], position[1], jump_intermediate_move=False
+            ):
+                return True
+
+            # If not, check if previous position exists and is legal
+            if position_index > 0 and position == end:
+                prev_pos = path[position_index - 1]
+                if self.is_legal_move(
+                    prev_pos[0], prev_pos[1], jump_intermediate_move=False
+                ):
+                    return True
+
+            return False
+
         while priority_queue:
             _, current = heapq.heappop(priority_queue)
 
             if current == end:
-                return self.generate_path(previous_cell, end)
+                path = self.generate_path(previous_cell, end)
+                # only return the path if it's a valid path
+                if not is_jump or is_valid_jump_path(path, end):
+                    return path
 
             if current in closed:
                 continue
-            closed.add(current)
 
             for direction in directions:
                 new_row = int(current[0] + direction[0])
@@ -339,15 +369,9 @@ class Board:
                     # Calculate the potential path length to this new position
                     potential_path_length = g_scores[current] + 1
 
-                    # Determine whether to use jumping for this position check
-                    current_is_jump = is_jump
-                    if is_jump and num_moves > 0 and potential_path_length == num_moves:
-                        current_is_jump = False
-
-                    if (
-                        self.is_legal_move(new_row, new_col, current_is_jump)
-                        or new_pos == end
-                    ):
+                    # We will calculate our whole jump path assuming jumping is fine,
+                    # and we'll dump bad paths at the end
+                    if self.is_legal_move(new_row, new_col, is_jump) or new_pos == end:
                         new_g_score = potential_path_length
                         if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
                             h_score = calculate_chebyshev_distance(new_pos, end)
@@ -355,6 +379,7 @@ class Board:
                             f_score = new_g_score + h_score
                             heapq.heappush(priority_queue, (f_score, new_pos))
                             previous_cell[new_pos] = current
+            closed.add(current)
 
         return []
 
@@ -488,7 +513,7 @@ class Board:
         is_jump=False,
     ) -> int:
         if movement == 0:
-            return
+            return 0
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
@@ -503,7 +528,7 @@ class Board:
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
-            return
+            return 0
         # if we can't go all the way, get the furthest position we can go
         elif len(path_to_target) > movement:
             path_traveled = path_to_target[:movement]
@@ -512,7 +537,7 @@ class Board:
             path_traveled = path_to_target
         # if it's occupied and one square away, you don't need to move
         elif len(path_to_target) == 1:
-            return
+            return 0
         # if it's occupied and you need to move, move to one away
         else:
             path_traveled = path_to_target[:-1]
@@ -585,13 +610,16 @@ class Board:
         is_position_within_board = (
             row >= 0 and col >= 0 and row < self.size and col < self.size
         )
+        print(is_position_within_board)
         # for jumping, we can jump through any obstacles and players
         # but we have to stay on board and can't go through walls
         if jump_intermediate_move:
+            print("intermediate jump")
             return is_position_within_board and not isinstance(
                 self.locations[row][col], obstacle.Wall
             )
         else:
+            print(self.locations[row][col])
             return is_position_within_board and self.locations[row][col] is None
 
     def modify_target_health(

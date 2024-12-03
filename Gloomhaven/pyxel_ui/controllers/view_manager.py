@@ -323,6 +323,7 @@ class ViewManager:
         self.update_personal_log([], clear=True)
         self.update_sprites({})
         self.update_round_turn(0, "")
+        self.draw_whole_game()
 
     def turn_on_view_section(self, view_section: view.ViewSection) -> None:
         """

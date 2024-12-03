@@ -237,7 +237,7 @@ class PyxelManager:
         return (new_row, new_col)
 
     def reset_view_manager(self):
-        task = tasks.ResetViewManager
+        task = tasks.ResetViewManager()
         self.jsonify_and_send_task(task)
 
     def show_character_picker(
