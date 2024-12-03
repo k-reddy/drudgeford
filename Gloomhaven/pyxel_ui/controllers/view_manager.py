@@ -301,12 +301,12 @@ class ViewManager:
             active_carousel.current_card_page -= 1
             active_carousel.draw()
 
-    def update_personal_log(self, output, clear=True):
+    def update_personal_log(self, output: str, clear=True):
         if clear:
             self.personal_log.log = [output]
             self.personal_log.is_log_changed = True
         else:
-            self.personal_log.log += output
+            self.personal_log.log += [output]
         self.personal_log.drawable = True
         self.personal_log.draw()
 
@@ -323,6 +323,7 @@ class ViewManager:
         self.update_personal_log([], clear=True)
         self.update_sprites({})
         self.update_round_turn(0, "")
+        self.draw_whole_game()
 
     def turn_on_view_section(self, view_section: view.ViewSection) -> None:
         """

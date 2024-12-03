@@ -147,9 +147,11 @@ class PyxelManager:
         task = tasks.LoadLogTask(log)
         self.jsonify_and_send_task(task)
 
-    def add_to_personal_log(self, log, clear=True):
-        task = tasks.AddToPersonalLog(log, clear)
-        self.jsonify_and_send_task(task)
+    def add_to_personal_log(
+        self, string_to_add: str, clear=True, client_id="ALL_FRONTEND"
+    ):
+        task = tasks.AddToPersonalLog(string_to_add, clear)
+        self.jsonify_and_send_task(task, client_id)
 
     def load_action_cards(self, action_cards, client_id="ALL_FRONTEND"):
         action_card_log = []
@@ -235,17 +237,50 @@ class PyxelManager:
         return (new_row, new_col)
 
     def reset_view_manager(self):
-        task = tasks.ResetViewManager
+        task = tasks.ResetViewManager()
         self.jsonify_and_send_task(task)
 
-    def show_character_picker(self, characters: list[character.Character]):
+    def show_character_picker(
+        self, characters: list[character.Character], client_id: str
+    ):
         names = [character.__class__.__name__ for character in characters]
         sprite_names = [character.pyxel_sprite_name for character in characters]
         backstories = [character.backstory for character in characters]
         task = tasks.ShowCharacterPickerTask(names, sprite_names, backstories)
-        self.jsonify_and_send_task(task)
+        self.jsonify_and_send_task(task, client_id)
 
-    def load_plot_screen(self, plot: str):
+    def make_active_carousel_undrawable(self, client_id: str):
+        task = tasks.MakeCarouselUndrawable()
+        self.jsonify_and_send_task(task, client_id)
+
+    def load_plot_screen(
+        self, plot: str, pause_until_enter: bool = True, num_players=1
+    ):
+        """
+        If you want to pause until enter, you must pass num_players to pause for
+        """
         task = tasks.LoadPlotScreen(plot)
         self.jsonify_and_send_task(task)
-        self.get_user_input(prompt="Hit enter to continue")
+        if pause_until_enter:
+            self.pause_for_all_players(
+                num_players=num_players, prompt="All players must enter to continue"
+            )
+
+    def pause_for_all_players(
+        self, num_players: int, prompt: str = "All players must hit enter to continue"
+    ):
+        task = tasks.InputTask(prompt)
+        self.jsonify_and_send_task(task, "ALL_FRONTEND")
+        inputs_received = 0
+        # wait for input from each player
+        for _ in range(num_players):
+            x = self.server_client.get_user_input()["input"]
+            inputs_received += 1
+
+            if inputs_received < num_players:
+                remaining_inputs = num_players - inputs_received
+                wait_task = tasks.AddToPersonalLog(
+                    f"Waiting for {remaining_inputs} more player{'s' if remaining_inputs>1 else ''} to hit enter",
+                    False,
+                )
+                self.jsonify_and_send_task(wait_task)

@@ -182,15 +182,13 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
                 )
+            # take damage from elements before starting turn
+            self.board.deal_terrain_damage_current_location(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
             )
             actions = [
-                # if you start in fire, take damage first
-                lambda: self.board.deal_terrain_damage_current_location(
-                    acting_character
-                ),
                 lambda: acting_character.perform_movement(
                     action_card.movement, action_card.jump, self.board
                 ),
@@ -199,12 +197,12 @@ class GameLoop:
                 ),
             ]
             if action_card.movement == 0:
-                actions = [actions[0]] + [actions[2]]
+                actions = [actions[1]]
             else:
                 move_first = acting_character.decide_if_move_first(action_card)
                 # if not move_first, swap the order of movement and attack
                 if not move_first:
-                    actions[1], actions[2] = actions[2], actions[1]
+                    actions.reverse()
 
             for action in actions:
                 action()
@@ -221,9 +219,9 @@ class GameLoop:
                 self.pyxel_manager.log.append(
                     f"{acting_character.name} slipped and lost their turn!"
                 )
-                self.pyxel_manager.get_user_input(
+                self.pyxel_manager.pause_for_all_players(
+                    num_players=self.num_players,
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
-                    client_id="frontend_1",
                 )
         except DieAndEndTurn:
             pass
@@ -239,7 +237,9 @@ class GameLoop:
             self.game_state = GameState.GAME_OVER
 
     def _end_game(self) -> GameState:
+        print("resetting view manager")
         self.pyxel_manager.reset_view_manager()
+        print("done")
         message = ""
         if self.game_state == GameState.GAME_OVER:
             message = self._lose_game_dead()
@@ -252,19 +252,20 @@ class GameLoop:
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.pyxel_manager.print_message(message)
+            self.pyxel_manager.add_to_personal_log(message)
         return self.game_state
 
     def _end_turn(self) -> None:
         self.board.acting_character = None
         if not self.all_ai_mode:
-            for i in range(1, self.num_players):
-                self.pyxel_manager.print_message(
-                    "End of turn. Waiting for Player 1 to hit continue",
-                    f"frontend_{i+1}",
-                )
-            self.pyxel_manager.get_user_input(
-                prompt="End of turn. Hit enter to continue", client_id="frontend_1"
+            # for i in range(1, self.num_players):
+            #     self.pyxel_manager.print_message(
+            #         "End of turn. Waiting for Player 1 to hit continue",
+            #         f"frontend_{i+1}",
+            #     )
+            self.pyxel_manager.pause_for_all_players(
+                self.num_players,
+                prompt="End of turn. All players must hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 
@@ -274,13 +275,14 @@ class GameLoop:
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            for i in range(1, self.num_players):
-                self.pyxel_manager.print_message(
-                    "End of round. Waiting for Player 1 to hit continue",
-                    f"frontend_{i+1}",
-                )
-            self.pyxel_manager.get_user_input(
-                prompt="End of round. Hit enter to continue", client_id="frontend_1"
+            # for i in range(1, self.num_players):
+            #     self.pyxel_manager.print_message(
+            #         "End of round. Waiting for Player 1 to hit continue",
+            #         f"frontend_{i+1}",
+            #     )
+            self.pyxel_manager.pause_for_all_players(
+                num_players=self.num_players,
+                prompt="End of round. All players must hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 
