@@ -27,14 +27,16 @@ class TCPClient:
 
     def _send_request(self, command, payload=None):
         request = {"command": command}
-        if payload is not None:
+        # print(request)
+        if payload is not None and len(payload) > 0:
             request["payload"] = payload
-
+            # print("a" + str(payload) + "a")
         try:
             self.socket.send(json.dumps(request).encode("utf-8"))
-            data = self.socket.recv(4096).decode("utf-8")
+            data = self.socket.recv(409600).decode("utf-8")
             if not data:  # Connection closed
                 raise ConnectionError("Connection closed by server")
+            # print(data)
             return json.loads(data)
         except (json.JSONDecodeError, ConnectionError) as e:
             self.close()
