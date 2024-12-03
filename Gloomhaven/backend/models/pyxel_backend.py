@@ -254,7 +254,7 @@ class PyxelManager:
         self.jsonify_and_send_task(task, client_id)
 
     def load_plot_screen(
-        self, plot: str, pause_until_enter: bool = True, num_players=1
+        self, plot: str, pause_until_enter: bool = False, num_players=1
     ):
         """
         If you want to pause until enter, you must pass num_players to pause for
@@ -263,7 +263,7 @@ class PyxelManager:
         self.jsonify_and_send_task(task)
         if pause_until_enter:
             self.pause_for_all_players(
-                num_players=num_players, prompt="All players must enter to continue"
+                num_players=num_players, prompt="All players must hit enter to continue"
             )
 
     def pause_for_all_players(
@@ -285,5 +285,5 @@ class PyxelManager:
                 )
                 self.jsonify_and_send_task(wait_task)
         # once we have all input, clear personal log messages
-        # clear_log_task = tasks.AddToPersonalLog(" ", True)
-        # self.jsonify_and_send_task(clear_log_task)
+        clear_log_task = tasks.AddToPersonalLog(" ", True)
+        self.jsonify_and_send_task(clear_log_task)
