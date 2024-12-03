@@ -26,11 +26,14 @@ class TaskJsonifier:
 
         print(task_data, class_name)
 
-        pickled_data = pickle.dumps(task_data)
-        encoded_data = base64.b64encode(pickled_data).decode("utf-8")
+        # pickled_data = pickle.dumps(task_data)
+        # encoded_data = base64.b64encode(pickled_data).decode("utf-8")
+        task_dict = {"class_name": class_name, "data": task_data}
 
-        task_dict = {"class_name": class_name, "data": encoded_data}
-
+        # task_dict = {"class_name": class_name, "data": encoded_data}
+        if class_name == "AddToPersonalLog":
+            print(task_dict)
+            print(json.dumps(task_dict, ensure_ascii=False))
         return json.dumps(task_dict, ensure_ascii=False)
 
     @staticmethod
@@ -57,10 +60,11 @@ class TaskJsonifier:
         task_class = getattr(tasks, task_dict["class_name"])
 
         # Decode and unpickle the instance data
-        decoded_data = base64.b64decode(task_dict["data"])
-        instance_data = pickle.loads(decoded_data)
+        # decoded_data = base64.b64decode(task_dict["data"])
+        # instance_data = pickle.loads(decoded_data)
 
         # Create a new instance with the unpickled data
-        task_instance = task_class(**instance_data)
+        # task_instance = task_class(**instance_data)
+        task_instance = task_class(**task_dict["data"])
 
         return task_instance
