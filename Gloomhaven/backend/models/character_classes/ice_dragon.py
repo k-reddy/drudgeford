@@ -63,4 +63,4 @@ cards = [
     ),
 ]
 
-health = 6
+health = 10
