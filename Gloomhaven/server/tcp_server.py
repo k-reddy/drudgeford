@@ -106,10 +106,7 @@ class TCPServer:
                 command = request.get("command")
                 payload = request.get("payload", {})
                 response = self._process_command(command, payload, client_id)
-                if response and "task" in response and response["task"] is not None:
-                    print(response)
-                    print(json.dumps(response).encode("utf-8"))
-                client_socket.sendall(json.dumps(response).encode("utf-8"))
+                client_socket.send(json.dumps(response).encode("utf-8"))
             except socket.timeout:
                 continue
 
@@ -152,7 +149,6 @@ class TCPServer:
         target_client_id = payload.get("target_client_id")
         task_data = payload.get("task")
         if not target_client_id:
-            # print(payload)
             raise ValueError("No target client id")
 
         if target_client_id == "ALL_FRONTEND":
