@@ -3,14 +3,49 @@ import json
 from enum import Enum
 
 
+def send_message(sock: socket.socket, data: dict):
+    """Send a message with length prefix"""
+    message = json.dumps(data).encode("utf-8")
+    message_length = len(message)
+    # Send length as 4-byte integer
+    sock.send(message_length.to_bytes(4, byteorder="big"))
+    # Send actual message
+    sock.send(message)
+
+
+def receive_message(sock: socket.socket) -> dict:
+    """Receive a complete message using length prefix"""
+    # Get message length (4 bytes)
+    length_bytes = recv_all(sock, 4)
+    if not length_bytes:
+        raise ConnectionError("Connection closed")
+    message_length = int.from_bytes(length_bytes, byteorder="big")
+
+    # Get actual message
+    message = recv_all(sock, message_length)
+    if not message:
+        raise ConnectionError("Connection closed")
+    return json.loads(message.decode("utf-8"))
+
+
+def recv_all(sock: socket.socket, n: int) -> bytes:
+    """Receive exactly n bytes"""
+    data = bytearray()
+    while len(data) < n:
+        packet = sock.recv(n - len(data))
+        if not packet:
+            return None
+        data.extend(packet)
+    return bytes(data)
+
+
 class ClientType(Enum):
     BACKEND = "backend"
     FRONTEND = "frontend"
 
 
 class TCPClient:
-    def __init__(self, client_type: ClientType, host="13.59.128.25", port=8080):
-        # def __init__(self, client_type: ClientType, host="localhost", port=8080):
+    def __init__(self, client_type: ClientType, host="localhost", port=8080):
         self.client_type = client_type
         self.client_id = None
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,21 +55,21 @@ class TCPClient:
     def _identify(self):
         """Identify client type to server and receive client ID"""
         identification = {"client_type": self.client_type.value}
-        self.socket.send(json.dumps(identification).encode("utf-8"))
-        data = self.socket.recv(4096).decode("utf-8")
-        response = json.loads(data)
+        send_message(self.socket, identification)
+        response = receive_message(self.socket)
         self.client_id = response["client_id"]
 
     def _send_request(self, command, payload=None):
         request = {"command": command}
-        if payload is not None and len(payload) > 0:
+        if payload is not None:
             request["payload"] = payload
+            print(payload)
         try:
-            self.socket.send(json.dumps(request).encode("utf-8"))
-            data = self.socket.recv(409600).decode("utf-8")
-            if not data:  # Connection closed
-                raise ConnectionError("Connection closed by server")
-            return json.loads(data)
+            send_message(self.socket, request)
+            response = receive_message(self.socket)
+            if "task" in response and "null" not in str(response):
+                print(response)
+            return response
         except (json.JSONDecodeError, ConnectionError) as e:
             self.close()
             raise ConnectionError(f"Connection error: {str(e)}")

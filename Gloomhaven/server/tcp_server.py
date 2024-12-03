@@ -7,6 +7,42 @@ from typing import List, Dict
 from enum import Enum
 
 
+def send_message(sock: socket.socket, data: dict):
+    """Send a message with length prefix"""
+    message = json.dumps(data).encode("utf-8")
+    message_length = len(message)
+    # Send length as 4-byte integer
+    sock.send(message_length.to_bytes(4, byteorder="big"))
+    # Send actual message
+    sock.send(message)
+
+
+def receive_message(sock: socket.socket) -> dict:
+    """Receive a complete message using length prefix"""
+    # Get message length (4 bytes)
+    length_bytes = recv_all(sock, 4)
+    if not length_bytes:
+        raise ConnectionError("Connection closed")
+    message_length = int.from_bytes(length_bytes, byteorder="big")
+
+    # Get actual message
+    message = recv_all(sock, message_length)
+    if not message:
+        raise ConnectionError("Connection closed")
+    return json.loads(message.decode("utf-8"))
+
+
+def recv_all(sock: socket.socket, n: int) -> bytes:
+    """Receive exactly n bytes"""
+    data = bytearray()
+    while len(data) < n:
+        packet = sock.recv(n - len(data))
+        if not packet:
+            return None
+        data.extend(packet)
+    return bytes(data)
+
+
 class ClientType(Enum):
     BACKEND = "backend"
     FRONTEND = "frontend"
@@ -64,15 +100,12 @@ class TCPServer:
             client_socket.settimeout(0.5)
 
             # Wait for client to identify itself
-            data = client_socket.recv(4096).decode("utf-8")
-            if not data:
-                continue
-            client_info = json.loads(data)
+            client_info = receive_message(client_socket)
             client_type = ClientType(client_info.get("client_type"))
 
             # Generate client ID and send it back
             client_id = self._generate_client_id(client_type)
-            client_socket.send(json.dumps({"client_id": client_id}).encode("utf-8"))
+            send_message(client_socket, {"client_id": client_id})
 
             # Create and start client thread
             client_thread = threading.Thread(
@@ -92,21 +125,19 @@ class TCPServer:
 
     def _handle_client(self, client_socket: socket.socket, client_id: str):
         """Handle individual client connections"""
-
         client_data = self.clients[client_id]
-        # berore anything else, load all the persistent tasks you missed
+        # before anything else, load all the persistent tasks you missed
         if client_data.client_type == ClientType.FRONTEND:
             with self.lock:
                 for task in self.persistent_frontend_tasks:
                     client_data.tasks.append(task)
         while self.running:
             try:
-                data = client_socket.recv(4096).decode("utf-8")
-                request = json.loads(data)
+                request = receive_message(client_socket)
                 command = request.get("command")
                 payload = request.get("payload", {})
                 response = self._process_command(command, payload, client_id)
-                client_socket.sendall(json.dumps(response).encode("utf-8"))
+                send_message(client_socket, response)
             except socket.timeout:
                 continue
 
@@ -122,7 +153,7 @@ class TCPServer:
             return {"task": task}
 
         elif command == "post_task":
-            self._process_post_task(payload)
+            return self._process_post_task(payload)
 
         elif command == "get_user_input":
             if client_data.client_type != ClientType.BACKEND:
