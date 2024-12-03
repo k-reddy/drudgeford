@@ -2,6 +2,7 @@ import json
 import pickle
 import base64
 from typing import Any
+from dataclasses import fields
 from pyxel_ui.models import tasks
 
 
@@ -20,8 +21,10 @@ class TaskJsonifier:
         """
         class_name = task.__class__.__name__
 
-        # Convert __dict__ to a regular dictionary if it's empty or contains special objects
-        task_data = {} if not task.__dict__ else dict(task.__dict__)
+        # only get the actual data fields
+        task_data = {field.name: getattr(task, field.name) for field in fields(task)}
+
+        print(task_data, class_name)
 
         pickled_data = pickle.dumps(task_data)
         encoded_data = base64.b64encode(pickled_data).decode("utf-8")

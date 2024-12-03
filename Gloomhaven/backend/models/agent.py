@@ -251,6 +251,8 @@ class Human(Agent):
             )
 
             legal_move = board.is_legal_move(new_row, new_col)
+            print(legal_move, additional_movement_check_result, path_len, movement)
+            print(board.locations[new_row][new_col])
             # don't let them pick out of range squares
             if legal_move and additional_movement_check_result and path_len <= movement:
                 # do this instead of update location because it deals with terrain

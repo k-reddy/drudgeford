@@ -237,7 +237,9 @@ class GameLoop:
             self.game_state = GameState.GAME_OVER
 
     def _end_game(self) -> GameState:
+        print("resetting view manager")
         self.pyxel_manager.reset_view_manager()
+        print("done")
         message = ""
         if self.game_state == GameState.GAME_OVER:
             message = self._lose_game_dead()
@@ -250,7 +252,7 @@ class GameLoop:
                 f"trying to end game when status is {self.game_state.name}"
             )
         if not self.all_ai_mode:
-            self.pyxel_manager.print_message(message)
+            self.pyxel_manager.add_to_personal_log(message)
         return self.game_state
 
     def _end_turn(self) -> None:
