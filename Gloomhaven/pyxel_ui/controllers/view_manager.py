@@ -25,7 +25,7 @@ class ViewManager:
         self.view_factory = ViewFactory()
         self.views = []
         self.map_view = None
-        self.load_carousel_log_screen(view.CharacterPickerView)
+        self.load_carousel_log_screen("CharacterPickerView")
 
     def clear_current_views(self):
         for v in self.views:
@@ -114,7 +114,8 @@ class ViewManager:
         self.personal_log.font_color = 2
         self.personal_log.display_round_turn = False
 
-    def load_carousel_log_screen(self, carousel_type: view.CarouselView):
+    def load_carousel_log_screen(self, carousel_type: str):
+        view_class = getattr(view, carousel_type)
         self.clear_current_views()
         carousel_params = ViewParams(
             font=self.font,
@@ -126,7 +127,7 @@ class ViewManager:
         )
         self.carousel_view, carousel_borders = (
             self.view_factory.create_view_with_border(
-                carousel_type, carousel_params, [10, 10, 0, 10]
+                view_class, carousel_params, [10, 10, 0, 10]
             )
         )
         self.views.extend([self.carousel_view, *carousel_borders])
