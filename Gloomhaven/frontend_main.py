@@ -31,8 +31,10 @@ def provide_help_if_desired(all_ai_mode=False):
 
 
 def main(dev_mode=False):
+    host = "13.59.128.25"
     if dev_mode:
         port = "8000"
+        host = "localhost"
     else:
         port = input("Please enter the port number")
         valid_ports = ["5000", "5001", "5002", "5003", "5004", "8000"]
@@ -41,7 +43,7 @@ def main(dev_mode=False):
         # if players want game help, display instructions
         provide_help_if_desired()
     port = int(port)
-    pyxel_view = PyxelEngine(port)
+    pyxel_view = PyxelEngine(port, host=host)
     pyxel_view.start()
 
 
