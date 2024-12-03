@@ -70,10 +70,13 @@ class Campaign:
         # if we load a campaign, we don't want to reset everything
         if not self.initialized:
             self.set_num_players()
-            self.pyxel_manager.load_plot_screen(GAME_PLOT)
+            self.pyxel_manager.load_plot_screen(GAME_PLOT, False)
+            self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
             self.initialized = True
+        else:
+            self.wait_for_all_players_to_join()
         self.run_levels()
 
     def make_levels(self):
@@ -81,7 +84,6 @@ class Campaign:
 
     def run_level(self, level: Level):
         # reset our player characters between each level
-        print(f"running level {level.monster_classes}")
         self.player_chars = self.load_player_characters()
         self.current_level = level
         if not self.all_ai_mode:
@@ -101,13 +103,22 @@ class Campaign:
 
     def run_levels(self):
         for i, _ in enumerate(self.levels):
-            output = self.run_level(self.levels.pop(i))
+            output = self.run_level(self.levels.pop(0))
 
-            # if you don't win the level, end here
-            if output != GameState.WIN:
+            # if you don't win the level or if all levels are done, end here
+            if output != GameState.WIN or not self.levels:
+                self.pyxel_manager.pause_for_all_players(
+                    num_players=self.num_players,
+                    prompt="Game over, press esc to exit",
+                )
+                # !!! should clean up gracefully here
                 return
-
-            # otherwise, offer to save and continue to next level
+            # otherwise, let them see end game message then
+            # offer to save and continue to next level
+            self.pyxel_manager.pause_for_all_players(
+                num_players=self.num_players,
+                prompt="All players must press enter to continue",
+            )
             self.save_campaign()
 
     def set_num_players(self):
@@ -132,12 +143,14 @@ class Campaign:
                 client.client_id != player_id
                 and client.client_type == ClientType.FRONTEND
             ):
-                self.pyxel_manager.print_message(
+                self.pyxel_manager.add_to_personal_log(
                     f"Waiting for player {player_num+1} to pick a character",
-                    client.client_id,
+                    client_id=client.client_id,
                 )
 
-        self.pyxel_manager.show_character_picker(self.available_chars)
+        self.pyxel_manager.show_character_picker(
+            self.available_chars, client_id=player_id
+        )
         # print the backstory for every available char
         # for i, char in enumerate(self.available_chars):
         #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
@@ -162,6 +175,8 @@ class Campaign:
         # set the client_id
         player_char.client_id = player_id
 
+        # hide the active carousel
+        self.pyxel_manager.make_active_carousel_undrawable(player_id)
         return player_char
 
     def set_up_player_chars(self):
@@ -233,3 +248,24 @@ class Campaign:
             id_gen_start=next(self.id_generator),
         )
         self.pyxel_manager.save_campign(campaign_state)
+
+    def wait_for_all_players_to_join(self):
+        self.pyxel_manager.add_to_personal_log("Waiting for all players to join")
+        while True:
+            clients_snapshot = list(self.server.clients.values())
+
+            if (
+                len(
+                    [
+                        1
+                        for client in clients_snapshot
+                        if client.client_type == ClientType.FRONTEND
+                    ]
+                )
+                >= self.num_players
+            ):
+                self.pyxel_manager.pause_for_all_players(
+                    self.num_players,
+                    "All players joined. All players must hit enter to continue.",
+                )
+                return

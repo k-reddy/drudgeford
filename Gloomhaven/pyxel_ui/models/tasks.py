@@ -295,11 +295,11 @@ class AddToPersonalLog(Task):
     task that updates the personal log
     """
 
-    log: list[str]
+    string_to_add: str
     clear: bool
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.update_keyboard(self.log, self.clear)
+        view_manager.update_personal_log(self.string_to_add, self.clear)
 
 
 @dataclass
@@ -385,9 +385,6 @@ class LoadCampaign(Task):
 
 @dataclass
 class ResetViewManager(Task):
-    # doing this b/c no data messes up the task jsonifier
-    fake_data = None
-
     def perform(self, view_manager, user_input_manager):
         view_manager.reset_self()
 
@@ -412,6 +409,15 @@ class ShowCharacterPickerTask(Task):
                 )
             ]
         )
+
+
+@dataclass
+class MakeCarouselUndrawable(Task):
+    # makes the carousel undrawable, which means a black box will cover it
+    def perform(self, view_manager: ViewManager, user_input_manager):
+        active_carousel = view_manager.get_carousel_view()
+        active_carousel.drawable = False
+        active_carousel.draw()
 
 
 @dataclass

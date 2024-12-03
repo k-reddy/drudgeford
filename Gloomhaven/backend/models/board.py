@@ -174,7 +174,9 @@ class Board:
                         isinstance(potential_char, Character)
                         and not effect_type == obstacle.Ice
                     ):
-                        self.deal_terrain_damage(potential_char, effect_row, effect_col)
+                        self.deal_terrain_damage(
+                            potential_char, effect_row, effect_col, movement=False
+                        )
 
     def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
         starting_coord = self.find_location_of_target(attacker)
@@ -275,7 +277,7 @@ class Board:
         start: tuple[int, int],
         end: tuple[int, int],
         is_jump: bool = False,
-        num_moves: int = -1,
+        num_moves: int = 100,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
@@ -318,15 +320,43 @@ class Board:
         ) -> int:
             return max(abs(pos_a[0] - pos_b[0]), abs(pos_a[1] - pos_b[1]))
 
+        def is_valid_jump_path(path: list, end: tuple) -> bool:
+            """
+            returns true if the landing position (smaller of num_moves or path length)
+            is legal or second to last move is legal if the landing position is target
+            """
+            if not path:
+                return True
+            position_index = min(num_moves - 1, len(path) - 1)
+            position = path[position_index]
+
+            # First check if landing position is legal
+            if self.is_legal_move(
+                position[0], position[1], jump_intermediate_move=False
+            ):
+                return True
+
+            # If not, check if previous position exists and is legal
+            if position_index > 0 and position == end:
+                prev_pos = path[position_index - 1]
+                if self.is_legal_move(
+                    prev_pos[0], prev_pos[1], jump_intermediate_move=False
+                ):
+                    return True
+
+            return False
+
         while priority_queue:
             _, current = heapq.heappop(priority_queue)
 
             if current == end:
-                return self.generate_path(previous_cell, end)
+                path = self.generate_path(previous_cell, end)
+                # only return the path if it's a valid path
+                if not is_jump or is_valid_jump_path(path, end):
+                    return path
 
             if current in closed:
                 continue
-            closed.add(current)
 
             for direction in directions:
                 new_row = int(current[0] + direction[0])
@@ -337,15 +367,9 @@ class Board:
                     # Calculate the potential path length to this new position
                     potential_path_length = g_scores[current] + 1
 
-                    # Determine whether to use jumping for this position check
-                    current_is_jump = is_jump
-                    if is_jump and num_moves > 0 and potential_path_length == num_moves:
-                        current_is_jump = False
-
-                    if (
-                        self.is_legal_move(new_row, new_col, current_is_jump)
-                        or new_pos == end
-                    ):
+                    # We will calculate our whole jump path assuming jumping is fine,
+                    # and we'll dump bad paths at the end
+                    if self.is_legal_move(new_row, new_col, is_jump) or new_pos == end:
                         new_g_score = potential_path_length
                         if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
                             h_score = calculate_chebyshev_distance(new_pos, end)
@@ -353,6 +377,7 @@ class Board:
                             f_score = new_g_score + h_score
                             heapq.heappush(priority_queue, (f_score, new_pos))
                             previous_cell[new_pos] = current
+            closed.add(current)
 
         return []
 
@@ -486,7 +511,7 @@ class Board:
         is_jump=False,
     ) -> int:
         if movement == 0:
-            return
+            return 0
 
         acting_character_loc = self.find_location_of_target(acting_character)
         # get path
@@ -501,7 +526,7 @@ class Board:
 
         # if there's not a way to get to target, don't move
         if not path_to_target:
-            return
+            return 0
         # if we can't go all the way, get the furthest position we can go
         elif len(path_to_target) > movement:
             path_traveled = path_to_target[:movement]
@@ -510,7 +535,7 @@ class Board:
             path_traveled = path_to_target
         # if it's occupied and one square away, you don't need to move
         elif len(path_to_target) == 1:
-            return
+            return 0
         # if it's occupied and you need to move, move to one away
         else:
             path_traveled = path_to_target[:-1]
@@ -529,17 +554,24 @@ class Board:
         return max(len(path_traveled), path_length_jump)
 
     def deal_terrain_damage(
-        self,
-        affected_character: Character,
-        row: int,
-        col: int,
+        self, affected_character: Character, row: int, col: int, movement: bool = True
     ) -> None:
+        """
+        deals terrain damage to a character
+        if movement = True, this is because the character steps onto a square
+        if movement = False this is because the element was thrown onto a character or
+        they started their turn in that element
+        ice slipping should only apply when movement = True
+        """
         element = self.terrain[row][col]
         if not element:
             return
         damage = element.damage
-        element.perform(row, col, self, affected_character)
-        element = self.terrain[row][col]
+        # if it's not ice or it's ice and they're moving, you can have the element perform
+        # this is to avoid slipping when ice is thrown at you or when you start
+        # your turn on ice
+        if not isinstance(element, obstacle.Ice) or movement:
+            element.perform(row, col, self, affected_character)
         # if they have an elemental affinity for this element, they heal instead of take damage
         if affected_character.elemental_affinity == element.__class__:
             self.pyxel_manager.log.append(
@@ -552,8 +584,12 @@ class Board:
             )
 
     def deal_terrain_damage_current_location(self, affected_character: Character):
+        """
+        deals terrain damage for the start of the turn - set movement to false
+        so you don't slip when you start on ice
+        """
         row, col = self.find_location_of_target(affected_character)
-        self.deal_terrain_damage(affected_character, row, col)
+        self.deal_terrain_damage(affected_character, row, col, movement=False)
 
     def update_character_location(
         self,
