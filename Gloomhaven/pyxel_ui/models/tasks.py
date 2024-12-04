@@ -442,3 +442,9 @@ class HighlightMapTiles(Task):
             view_manager.draw_grid(
                 x, y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, self.color
             )
+
+
+@dataclass
+class RedrawMap(Task):
+    def perform(self, view_manager, user_input_manager):
+        view_manager.map_view.draw()
