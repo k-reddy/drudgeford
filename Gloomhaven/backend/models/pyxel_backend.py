@@ -304,5 +304,7 @@ class PyxelManager:
         task = tasks.HighlightMapTiles(color, normalized_tiles)
         self.jsonify_and_send_task(task, client_id)
 
-    def pick_attack_orientation(self, shape: list[tuple[int, int]], client_id: str):
-        pass
+    def pick_attack_orientation(
+        self, attack_coords: list[tuple[int, int]], client_id: str
+    ):
+        return attack_coords
