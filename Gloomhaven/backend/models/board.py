@@ -178,15 +178,9 @@ class Board:
                             potential_char, effect_row, effect_col, movement=False
                         )
 
-    def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
-        starting_coord = self.find_location_of_target(attacker)
-        # don't attack yourself
-        shape.discard((0, 0))
-        # get the actual map coordinates from the shape (which is a set of offsets)
-        attack_coords = [
-            (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
-            for coordinate in shape
-        ]
+    def attack_area(
+        self, attacker: Character, attack_coords: list[tuple[int, int]], strength: int
+    ) -> None:
         self.pyxel_manager.highlight_map_tiles(attack_coords, "ALL_FRONTEND")
         for attack_row, attack_col in attack_coords:
             # check if row and col are in bounds
