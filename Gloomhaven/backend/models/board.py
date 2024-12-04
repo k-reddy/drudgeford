@@ -188,8 +188,11 @@ class Board:
                 if 0 <= attack_col < len(self.locations[attack_row]):
                     potential_char = self.locations[attack_row][attack_col]
                     # if there's a character there, deal damage to them
-                    # note: this allows friendly fire, which I think is fun
-                    if isinstance(potential_char, Character):
+                    # removing friendly fire, which hasn't been so fun
+                    if (
+                        isinstance(potential_char, Character)
+                        and potential_char.team_monster != attacker.team_monster
+                    ):
                         self.attack_target(attacker, strength, potential_char)
 
     def set_obstacles_in_area(
