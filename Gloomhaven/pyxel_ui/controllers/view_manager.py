@@ -249,7 +249,12 @@ class ViewManager:
         return view
 
     def draw_grid(
-        self, px_x: int, px_y: int, px_width: int, px_height: int, color: int = 3
+        self,
+        px_x: int,
+        px_y: int,
+        px_width: int,
+        px_height: int,
+        color: int = 3,
     ) -> None:
         view.draw_grid(px_x, px_y, px_width, px_height, color)
 
