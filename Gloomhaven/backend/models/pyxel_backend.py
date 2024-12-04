@@ -61,6 +61,7 @@ class PyxelManager:
                             "priority": OTHER_PRIORITY,
                         }
                     )
+        print(valid_map_coordinates)
         tasks_to_send = []
         tasks_to_send.append(
             tasks.BoardInitTask(
