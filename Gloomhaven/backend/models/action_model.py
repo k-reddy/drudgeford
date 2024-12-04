@@ -29,7 +29,13 @@ class AreaAttack(ActionStep):
     strength: int
 
     def perform(self, board, attacker, round_num):
-        board.attack_area(attacker, self.shape, self.strength)
+        # first create the attack coordinates from the shape (offsets)
+        starting_coord = board.find_location_of_target(attacker)
+        self.shape.discard((0, 0))  # don't attack yourself
+        attack_coords = attacker.pick_attack_orientation(
+            board, self.shape, starting_coord
+        )
+        board.attack_area(attacker, attack_coords, self.strength)
 
     def __str__(self):
         return f"Area Attack, Strength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"

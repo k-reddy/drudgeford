@@ -86,105 +86,39 @@ def print_shape(shape):
     return print_str
 
 
-# def rotate_90_degrees(shape):
-#     """Rotates a shape 90 degrees clockwise around the origin.
-
-#     Args:
-#         shape (set): Set of (x,y) coordinates representing the shape
-
-#     Returns:
-#         set: New set of coordinates representing the rotated shape
-#     """
-#     rotated = set()
-#     for x, y in shape:
-#         # For 90-degree clockwise rotation: (x,y) -> (y,-x)
-#         rotated.add((y, -x))
-#     return rotated
-
-
-def rotate_to_direction(shape, target_x, target_y):
-    """
-    Rotates a shape to point towards a specific adjacent square.
-    The rotation is calculated based on the angle to the target square.
-
-    Args:
-        shape (set): Set of (x,y) coordinates representing the shape
-        target_x (int): x coordinate of target direction (-1, 0, or 1)
-        target_y (int): y coordinate of target direction (-1, 0, or 1)
-
-    Returns:
-        set: New set of coordinates representing the rotated shape
-    """
-    if target_x == 0 and target_y == 0:
-        return shape
-
-    # Direction dictionary mapping (target_x, target_y) to rotation transformation function
-    DIRECTION_TRANSFORMS = {
-        (0, 1): lambda x, y: (x, y),  # North
-        (0, -1): lambda x, y: (-x, -y),  # South
-        (1, 0): lambda x, y: (y, -x),  # East
-        (-1, 0): lambda x, y: (-y, x),  # West
-        (1, 1): lambda x, y: (x + y, y - x),  # Northeast
-        (1, -1): lambda x, y: (x - y, x + y),  # Southeast
-        (-1, 1): lambda x, y: (-x + y, x + y),  # Northwest
-        (-1, -1): lambda x, y: (-x - y, -y + x),  # Southwest
-    }
-
-    # Get the appropriate transformation function
-    transform = DIRECTION_TRANSFORMS.get((target_x, target_y))
-    if transform is None:
-        raise ValueError(f"Invalid direction: ({target_x}, {target_y})")
-
-    # Apply the transformation to each point
-    return {transform(x, y) for x, y in shape}
-
-
 def get_all_directional_rotations(shape):
-    """
-    Gets all 8 directional rotations of a shape.
+    transforms = [
+        lambda x, y: (x, y),
+        lambda x, y: (y, -x),
+        lambda x, y: (-x, -y),
+        lambda x, y: (-y, x),
+        lambda x, y: (x - y, -y),
+        lambda x, y: (x - y, y),
+        lambda x, y: (x, y - x),
+        lambda x, y: (-x, y - x),
+    ]
+    all_shapes = {}
+    for i, transform in enumerate(transforms):
+        all_shapes[i] = [transform(x, y) for x, y in shape]
 
-    Args:
-        shape (set): Set of (x,y) coordinates representing the shape
-
-    Returns:
-        dict: Dictionary mapping direction names to rotated shapes
-    """
-    directions = {
-        "N": (0, 1),
-        "NE": (1, 1),
-        "E": (1, 0),
-        "SE": (1, -1),
-        "S": (0, -1),
-        "SW": (-1, -1),
-        "W": (-1, 0),
-        "NW": (-1, 1),
-    }
-
-    return {
-        direction: rotate_to_direction(shape, x, y)
-        for direction, (x, y) in directions.items()
-    }
+    return all_shapes
 
 
 def print_all_directions(shape):
     """Prints the shape rotated in all 8 directions."""
     rotations = get_all_directional_rotations(shape)
 
-    print("Original shape:")
-    print(print_shape(shape))
-    print()
-
     for direction, rotated_shape in rotations.items():
         print(f"Direction {direction}:")
         print(print_shape(rotated_shape))
-        print()
+        print(rotated_shape)
 
 
 # Example usage with a simple line
 def demo_directional_rotations():
     # Create a vertical line
-    # vertical_line = line((0, 1), 3)
-    vertical_line = cone(2)
+    # vertical_line = line((1, 1), 3)
+    vertical_line = arc(3)
 
     print_all_directions(vertical_line)
 

@@ -4,6 +4,7 @@ from typing import Optional
 from backend.models.action_model import ActionCard
 from typing import Callable
 from backend.models.pyxel_backend import PyxelManager
+from backend.utils import attack_shapes as shapes
 
 DIRECTION_MAP = {
     "w": [-1, 0],
@@ -64,6 +65,17 @@ class Agent(abc.ABC):
         movement_check,
         client_id: Optional[str] = None,
         is_push=False,
+    ):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def pick_attack_orientation(
+        board,
+        shape: set,
+        starting_coord: tuple[int, int],
+        client_id: str,
+        attacker_team_monster: bool,
     ):
         pass
 
@@ -153,6 +165,31 @@ class Ai(Agent):
             board.move_character_toward_location(
                 char_to_move, mover_loc, movement, is_jump
             )
+
+    @staticmethod
+    def pick_attack_orientation(
+        board,
+        shape: set,
+        starting_coord: tuple[int, int],
+        client_id: str,
+        attacker_team_monster: bool,
+    ):
+        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        # iterate until you hit someone
+        for shape in shape_list:
+            attack_coords = [
+                (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
+                for coordinate in shape
+            ]
+            # if you hit a character, take this shape, otherwise keep trying other shapes
+            for character in board.characters:
+                if (
+                    character.team_monster == attacker_team_monster
+                    and board.find_location_of_target(character) in attack_coords
+                ):
+                    return attack_coords
+
+        return attack_coords
 
 
 class Human(Agent):
@@ -257,8 +294,6 @@ class Human(Agent):
             )
 
             legal_move = board.is_legal_move(new_row, new_col)
-            print(legal_move, additional_movement_check_result, path_len, movement)
-            print(board.locations[new_row][new_col])
             # don't let them pick out of range squares
             if legal_move and additional_movement_check_result and path_len <= movement:
                 # do this instead of update location because it deals with terrain
@@ -294,4 +329,16 @@ class Human(Agent):
             board,
             client_id,
             movement_check,
+        )
+
+    @staticmethod
+    def pick_attack_orientation(
+        board,
+        shape: set,
+        starting_coord: tuple[int, int],
+        client_id: str,
+        attacker_team_monster: bool,
+    ):
+        return board.pyxel_manager.pick_attack_orientation(
+            shape, starting_coord, client_id
         )

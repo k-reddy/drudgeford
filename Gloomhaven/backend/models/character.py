@@ -97,6 +97,13 @@ class Character(abc.ABC):
         random.shuffle(attack_modifier_deck)
         return attack_modifier_deck
 
+    def pick_attack_orientation(
+        self, board, shape: set, starting_coord: tuple[int, int]
+    ) -> list[tuple[int, int]]:
+        return self.agent.pick_attack_orientation(
+            board, shape, starting_coord, self.client_id, self.team_monster
+        )
+
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]
         strength_weights = [3, 5, 4, 2, 1]
