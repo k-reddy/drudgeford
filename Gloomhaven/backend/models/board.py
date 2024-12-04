@@ -1,7 +1,8 @@
 from backend.models.character import Character
+from collections import deque
 import heapq
-import random
 from itertools import count
+import random
 from typing import Type
 
 import backend.models.agent as agent
@@ -10,7 +11,7 @@ from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
 from backend.utils import attack_shapes as shapes
-from backend.utils.utilities import DieAndEndTurn
+from backend.utils.utilities import DieAndEndTurn, directions
 
 
 MAX_ROUNDS = 1000
@@ -272,6 +273,64 @@ class Board:
             row, col = self.pick_unoccupied_location()
             self.locations[row][col] = x
 
+    def find_all_reachable_paths(
+        self,
+        start: tuple[int, int],
+        num_moves: int,
+    ) -> tuple[list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]]:
+        """
+        Finds all positions reachable within the movement range and the shortest path to each position.
+
+        Args:
+            start: Starting position as (row, col)
+            num_moves: Maximum number of moves allowed
+
+        Returns:
+            A tuple containing:
+            - list[tuple[int, int]]: All reachable positions, excluding the start position.
+              Use this for highlighting possible destinations.
+            - dict[tuple[int, int], list[tuple[int, int]]]: Maps each reachable position
+              to its shortest valid path from the start position. Each path is a list of
+              coordinates excluding the start position. Use this for showing movement
+              preview when hovering over a destination.
+
+        """
+        reachable_positions = set()
+        queue = deque([(start, 0)])
+        visited = {start}
+
+        # BFS to find all reachable positions
+        while queue:
+            current_pos, distance = queue.popleft()
+
+            # prevents us from considering starting point
+            if distance > 0:
+                reachable_positions.add(current_pos)
+
+            if distance < num_moves:
+                valid_surrounding_positions = [
+                    (new_row, new_col)
+                    for d_row, d_col in directions
+                    if (
+                        new_row := current_pos[0] + d_row,
+                        new_col := current_pos[1] + d_col,
+                    )
+                    not in visited
+                    and self.is_legal_move(new_row, new_col)
+                ]
+                visited.update(valid_surrounding_positions)
+                queue.extend((pos, distance + 1) for pos in valid_surrounding_positions)
+
+        # Iterate over reachable positions and find shortest valid routes
+        reachable_paths = {}
+        for end_pos in reachable_positions:
+            if path := self.get_shortest_valid_path(
+                start=start, end=end_pos, num_moves=num_moves
+            ):
+                reachable_paths[end_pos] = path
+
+        return list(reachable_positions), reachable_paths
+
     def get_shortest_valid_path(
         self,
         start: tuple[int, int],
@@ -297,16 +356,7 @@ class Board:
         starting cell.
         Returns empty list if it is impossible to reach the end.
         """
-        directions = [
-            (1, 0),  # Down
-            (0, 1),  # Right
-            (-1, 0),  # Up
-            (0, -1),  # Left
-            (-1, 1),  # NE
-            (1, 1),  # SE
-            (1, -1),  # SW
-            (-1, -1),  # NW
-        ]
+
         closed: set[tuple[int, int]] = set()
 
         previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
@@ -358,25 +408,21 @@ class Board:
             if current in closed:
                 continue
 
-            for direction in directions:
-                new_row = int(current[0] + direction[0])
-                new_col = int(current[1] + direction[1])
-                new_pos = (new_row, new_col)
+            valid_neighbors = [
+                (new_pos, new_g)
+                for d_row, d_col in directions
+                if (new_pos := (current[0] + d_row, current[1] + d_col)) not in closed
+                and (self.is_legal_move(*new_pos, is_jump) or new_pos == end)
+                and (new_g := g_scores[current] + 1)
+                < g_scores.get(new_pos, float("inf"))
+            ]
 
-                if new_pos not in closed:
-                    # Calculate the potential path length to this new position
-                    potential_path_length = g_scores[current] + 1
+            for new_pos, new_g_score in valid_neighbors:
+                g_scores[new_pos] = new_g_score
+                h_score = calculate_chebyshev_distance(new_pos, end)
+                heapq.heappush(priority_queue, (new_g_score + h_score, new_pos))
+                previous_cell[new_pos] = current
 
-                    # We will calculate our whole jump path assuming jumping is fine,
-                    # and we'll dump bad paths at the end
-                    if self.is_legal_move(new_row, new_col, is_jump) or new_pos == end:
-                        new_g_score = potential_path_length
-                        if new_pos not in g_scores or new_g_score < g_scores[new_pos]:
-                            h_score = calculate_chebyshev_distance(new_pos, end)
-                            g_scores[new_pos] = new_g_score
-                            f_score = new_g_score + h_score
-                            heapq.heappush(priority_queue, (f_score, new_pos))
-                            previous_cell[new_pos] = current
             closed.add(current)
 
         return []
