@@ -1,6 +1,3 @@
-import numpy as np
-
-
 def circle(radius: int):
     directions = set()
     for i in range(radius + 1):
@@ -121,7 +118,7 @@ def print_all_directions(shape):
 def demo_directional_rotations():
     # Create a vertical line
     # vertical_line = line((1, 1), 3)
-    vertical_line = cone(3)
+    vertical_line = arc(3)
 
     print_all_directions(vertical_line)
 
