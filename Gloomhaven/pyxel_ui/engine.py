@@ -24,8 +24,8 @@ from .controllers.user_input_manager import UserInputManager
 
 
 class PyxelEngine:
-    def __init__(self, port):
-        self.server_client = TCPClient(ClientType.FRONTEND, port=port)
+    def __init__(self, port, host):
+        self.server_client = TCPClient(ClientType.FRONTEND, port=port, host=host)
         self.tj = TaskJsonifier()
         self.current_task = None
 
