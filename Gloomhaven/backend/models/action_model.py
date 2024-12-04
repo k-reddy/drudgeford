@@ -37,7 +37,7 @@ class AreaAttack(ActionStep):
             for coordinate in self.shape
         ]
         rotated_attack_coords = board.pyxel_manager.pick_attack_orientation(
-            attacker, attack_coords, attacker.client_id
+            attack_coords, attacker.client_id
         )
         board.attack_area(attacker, rotated_attack_coords, self.strength)
 
