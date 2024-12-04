@@ -182,9 +182,13 @@ class Board:
         starting_coord = self.find_location_of_target(attacker)
         # don't attack yourself
         shape.discard((0, 0))
-        for coordinate in shape:
-            attack_row = starting_coord[0] + coordinate[0]
-            attack_col = starting_coord[1] + coordinate[1]
+        # get the actual map coordinates from the shape (which is a set of offsets)
+        attack_coords = [
+            (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
+            for coordinate in shape
+        ]
+        self.pyxel_manager.highlight_map_tiles(attack_coords, "ALL_FRONTEND")
+        for attack_row, attack_col in attack_coords:
             # check if row and col are in bounds
             if 0 <= attack_row < len(self.locations):
                 if 0 <= attack_col < len(self.locations[attack_row]):
