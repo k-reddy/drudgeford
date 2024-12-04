@@ -179,20 +179,21 @@ class Board:
                             potential_char, effect_row, effect_col, movement=False
                         )
 
-    def attack_area(self, attacker: Character, shape: set, strength: int) -> None:
-        starting_coord = self.find_location_of_target(attacker)
-        # don't attack yourself
-        shape.discard((0, 0))
-        for coordinate in shape:
-            attack_row = starting_coord[0] + coordinate[0]
-            attack_col = starting_coord[1] + coordinate[1]
+    def attack_area(
+        self, attacker: Character, attack_coords: list[tuple[int, int]], strength: int
+    ) -> None:
+        self.pyxel_manager.highlight_map_tiles(attack_coords, "ALL_FRONTEND")
+        for attack_row, attack_col in attack_coords:
             # check if row and col are in bounds
             if 0 <= attack_row < len(self.locations):
                 if 0 <= attack_col < len(self.locations[attack_row]):
                     potential_char = self.locations[attack_row][attack_col]
                     # if there's a character there, deal damage to them
-                    # note: this allows friendly fire, which I think is fun
-                    if isinstance(potential_char, Character):
+                    # removing friendly fire, which hasn't been so fun
+                    if (
+                        isinstance(potential_char, Character)
+                        and potential_char.team_monster != attacker.team_monster
+                    ):
                         self.attack_target(attacker, strength, potential_char)
 
     def set_obstacles_in_area(

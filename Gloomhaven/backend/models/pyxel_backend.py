@@ -1,9 +1,11 @@
 import backend.models.character as character
+from itertools import cycle
 from pyxel_ui.models import tasks
 import backend.models.obstacle as obstacle
 from ..utils.listwithupdate import ListWithUpdate
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
+from backend.utils import attack_shapes as shapes
 
 CHAR_PRIORITY = 20
 OTHER_PRIORITY = 10
@@ -122,6 +124,10 @@ class PyxelManager:
         self.board_width = max_x - min_x + 1
 
     def normalize_coordinate(self, coordinate: tuple[int, int]):
+        """
+        takes coordinates in the col, row format that pyxel uses
+        this is the reverse of what the backend uses
+        """
         return (coordinate[0] - self.x_offset, coordinate[1] - self.y_offset)
 
     def generate_valid_map_coordinates(self, locations):
@@ -288,3 +294,44 @@ class PyxelManager:
         # once we have all input, clear personal log messages
         clear_log_task = tasks.AddToPersonalLog(" ", True)
         self.jsonify_and_send_task(clear_log_task)
+
+    def highlight_map_tiles(
+        self, tiles: list[tuple[int, int]], client_id: str, color: int = 8
+    ):
+        # first flip from backend to frontend coordinate order
+        pyxel_format_tiles = [(col, row) for (row, col) in tiles]
+        # then normalize the tiles by removing the col and row offsets
+        normalized_tiles = [
+            self.normalize_coordinate(coordinate) for coordinate in pyxel_format_tiles
+        ]
+        task = tasks.HighlightMapTiles(color, normalized_tiles)
+        self.jsonify_and_send_task(task, client_id)
+
+    def pick_attack_orientation(
+        self, shape: set, starting_coord: tuple[int, int], client_id: str
+    ):
+        # get all the shapes as something we can iterate through cyclically
+        shape_iterator = cycle(
+            list(shapes.get_all_directional_rotations(shape).values())
+        )
+        current_shape = next(shape_iterator)
+
+        # keep iterating through the shapes and displaying them
+        # until the user picks one
+        while True:
+            attack_coords = [
+                (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
+                for coordinate in current_shape
+            ]
+            # display potential attack in yellow
+            self.highlight_map_tiles(attack_coords, client_id, color=10)
+            user_input = self.get_user_input(
+                "Hit enter to rotate or (f) and enter to accept the shape",
+                ["", "f"],
+                client_id,
+            )
+            # clear the map
+            self.jsonify_and_send_task(tasks.RedrawMap(), client_id)
+            if user_input == "f":
+                return attack_coords
+            current_shape = next(shape_iterator)
