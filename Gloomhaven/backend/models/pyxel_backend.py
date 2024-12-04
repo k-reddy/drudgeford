@@ -297,12 +297,9 @@ class PyxelManager:
         color = 3
         # first flip from backend to frontend coordinate order
         pyxel_format_tiles = [(col, row) for (row, col) in tiles]
-        print(tiles)
-        print(pyxel_format_tiles)
         # then normalize the tiles by removing the col and row offsets
         normalized_tiles = [
             self.normalize_coordinate(coordinate) for coordinate in pyxel_format_tiles
         ]
-        print(normalized_tiles)
         task = tasks.HighlightMapTiles(color, normalized_tiles)
         self.jsonify_and_send_task(task, client_id)
