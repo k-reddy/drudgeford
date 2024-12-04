@@ -396,7 +396,7 @@ class ShowCharacterPickerTask(Task):
     backstories: list[str]
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.load_carousel_log_screen('CharacterPickerView')
+        view_manager.load_carousel_log_screen("CharacterPickerView")
         view_manager.update_carousel(
             items=[
                 {"name": name, "sprite_name": sprite_name, "backstory": backstory}
@@ -421,7 +421,7 @@ class LoadPlotScreen(Task):
     plot: str
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.load_carousel_log_screen('ActionCardView')
+        view_manager.load_carousel_log_screen("ActionCardView")
         view_manager.carousel_view.font_color = 5
         view_manager.carousel_view.cards_per_page = 1
         view_manager.update_carousel(items=[self.plot])
