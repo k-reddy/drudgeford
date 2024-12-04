@@ -32,14 +32,10 @@ class AreaAttack(ActionStep):
         # first create the attack coordinates from the shape (offsets)
         starting_coord = board.find_location_of_target(attacker)
         self.shape.discard((0, 0))  # don't attack yourself
-        attack_coords = [
-            (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
-            for coordinate in self.shape
-        ]
-        rotated_attack_coords = board.pyxel_manager.pick_attack_orientation(
-            attack_coords, attacker.client_id
+        attack_coords = attacker.pick_attack_orientation(
+            board, self.shape, starting_coord
         )
-        board.attack_area(attacker, rotated_attack_coords, self.strength)
+        board.attack_area(attacker, attack_coords, self.strength)
 
     def __str__(self):
         return f"Area Attack, Strength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"
