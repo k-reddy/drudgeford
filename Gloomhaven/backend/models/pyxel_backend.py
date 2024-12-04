@@ -122,6 +122,10 @@ class PyxelManager:
         self.board_width = max_x - min_x + 1
 
     def normalize_coordinate(self, coordinate: tuple[int, int]):
+        """
+        takes coordinates in the col, row format that pyxel uses
+        this is the reverse of what the backend uses
+        """
         return (coordinate[0] - self.x_offset, coordinate[1] - self.y_offset)
 
     def generate_valid_map_coordinates(self, locations):
@@ -288,3 +292,17 @@ class PyxelManager:
         # once we have all input, clear personal log messages
         clear_log_task = tasks.AddToPersonalLog(" ", True)
         self.jsonify_and_send_task(clear_log_task)
+
+    def highlight_map_tiles(self, tiles: list[tuple[int, int]], client_id: str):
+        color = 3
+        # first flip from backend to frontend coordinate order
+        pyxel_format_tiles = [(col, row) for (row, col) in tiles]
+        print(tiles)
+        print(pyxel_format_tiles)
+        # then normalize the tiles by removing the col and row offsets
+        normalized_tiles = [
+            self.normalize_coordinate(coordinate) for coordinate in pyxel_format_tiles
+        ]
+        print(normalized_tiles)
+        task = tasks.HighlightMapTiles(color, normalized_tiles)
+        self.jsonify_and_send_task(task, client_id)
