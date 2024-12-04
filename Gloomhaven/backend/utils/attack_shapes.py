@@ -150,7 +150,6 @@ def get_all_directional_rotations(shape):
         dict: Dictionary mapping direction names to rotated shapes
     """
     directions = {
-        "O": (0, 0),
         "N": (0, 1),
         "NE": (1, 1),
         "E": (1, 0),

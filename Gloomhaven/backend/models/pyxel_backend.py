@@ -330,6 +330,8 @@ class PyxelManager:
                 ["", "f"],
                 client_id,
             )
+            # clear the map
+            self.jsonify_and_send_task(tasks.RedrawMap(), client_id)
             if user_input == "f":
                 return attack_coords
             current_shape = next(shape_iterator)
