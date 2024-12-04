@@ -2,15 +2,11 @@ from dataclasses import dataclass
 from collections import deque
 from typing import Optional
 import abc
-
-from pyxel_ui.controllers.view_manager import ViewManager
-from pyxel_ui.controllers.character_picker_view_manager import (
-    CharacterPickerViewManager,
-)
 from pyxel_ui.models.entity import Entity
 from pyxel_ui.enums import AnimationFrame
 from pyxel_ui.constants import FRAME_DURATION_MS
-from pyxel_ui.models.view_section import ActionCardView, CharacterPickerView
+
+# from pyxel_ui.models.view_section import ActionCardView, CharacterPickerView
 
 
 @dataclass
@@ -400,7 +396,7 @@ class ShowCharacterPickerTask(Task):
     backstories: list[str]
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.load_carousel_log_screen(CharacterPickerView)
+        view_manager.load_carousel_log_screen('CharacterPickerView')
         view_manager.update_carousel(
             items=[
                 {"name": name, "sprite_name": sprite_name, "backstory": backstory}
@@ -414,7 +410,7 @@ class ShowCharacterPickerTask(Task):
 @dataclass
 class MakeCarouselUndrawable(Task):
     # makes the carousel undrawable, which means a black box will cover it
-    def perform(self, view_manager: ViewManager, user_input_manager):
+    def perform(self, view_manager, user_input_manager):
         active_carousel = view_manager.get_carousel_view()
         active_carousel.drawable = False
         active_carousel.draw()
@@ -425,7 +421,7 @@ class LoadPlotScreen(Task):
     plot: str
 
     def perform(self, view_manager, user_input_manager):
-        view_manager.load_carousel_log_screen(ActionCardView)
+        view_manager.load_carousel_log_screen('ActionCardView')
         view_manager.carousel_view.font_color = 5
         view_manager.carousel_view.cards_per_page = 1
         view_manager.update_carousel(items=[self.plot])
