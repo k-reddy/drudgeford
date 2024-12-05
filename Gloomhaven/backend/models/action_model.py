@@ -70,12 +70,13 @@ class ElementAreaEffectWithTarget(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        target = select_in_range_target(board, attacker, self.att_range)
+        target_row, target_col = attacker.select_board_square_target(
+            board, self.att_range
+        )
 
-        if target is not None:
-            row, col = board.find_location_of_target(target)
+        if target_row is not None:
             board.add_effect_to_terrain_for_attack(
-                self.element_type, row, col, self.shape
+                self.element_type, target_row, target_col, self.shape
             )
         else:
             board.pyxel_manager.log.append("No target in range")

@@ -53,6 +53,11 @@ class Character(abc.ABC):
         )
         return action_card_to_perform
 
+    def select_board_square_target(self, board, att_range):
+        return self.agent.select_board_square_target(
+            board, self.client_id, att_range, self
+        )
+
     def decide_if_move_first(self, action_card):
         return self.agent.decide_if_move_first(self.pyxel_manager, self.client_id)
 
