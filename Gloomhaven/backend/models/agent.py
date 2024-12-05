@@ -181,10 +181,10 @@ class Ai(Agent):
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape
             ]
-            # if you hit a character, take this shape, otherwise keep trying other shapes
+            # if you hit an enemy, take this shape, otherwise keep trying other shapes
             for character in board.characters:
                 if (
-                    character.team_monster == attacker_team_monster
+                    character.team_monster != attacker_team_monster
                     and board.find_location_of_target(character) in attack_coords
                 ):
                     return attack_coords

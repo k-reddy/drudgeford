@@ -46,6 +46,7 @@ class PyxelEngine:
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
         self.keyboard_manager = UserInputManager(self.view_manager, self.server_client)
+        self.loop_num = 1
 
     # def generate_hover_grid(self, width_px: int =32, height_px:int =32) -> list
 
@@ -57,12 +58,22 @@ class PyxelEngine:
     def update(self):
         self.start_time = time.time()
         self.keyboard_manager.update()
-
-        if not self.current_task:
+        ui_time = time.time() - self.start_time
+        get_task_time = -1
+        unjsonify_time = -1
+        perform_time = -1
+        start_time = time.time()
+        if not self.current_task and self.loop_num % 5 == 0:
             jsonified_task = self.server_client.get_task()
+            get_task_time = time.time() - start_time
+            start_time = time.time()
+
             self.current_task = self.tj.make_task_from_json(jsonified_task)
+            unjsonify_time = time.time() - start_time
+            self.loop_num = 0
 
         if self.current_task:
+            start_time = time.time()
             task_output = self.current_task.perform(
                 self.view_manager, self.keyboard_manager
             )
@@ -76,6 +87,14 @@ class PyxelEngine:
             elif isinstance(self.current_task, LoadCampaign):
                 self.server_client.post_user_input(task_output)
             self.current_task = None
+            perform_time = time.time() - start_time
+        self.loop_num += 1
+        # print("------")
+        # print(f"ui time: {ui_time}")
+        # print(f"perform time: {perform_time}")
+        # print(f"get_task_time : {get_task_time}")
+        # print(f"unjsonify time: {unjsonify_time}")
+        # print("------")
 
     def draw(self):
         """everything in the tasks draws itself,
