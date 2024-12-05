@@ -277,6 +277,7 @@ class Board:
         self,
         start: tuple[int, int],
         num_moves: int,
+        exclude_walls_only: bool = False,
     ) -> tuple[list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]]:
         """
         Finds all positions reachable within the movement range and the shortest path to each position.
@@ -284,6 +285,8 @@ class Board:
         Args:
             start: Starting position as (row, col)
             num_moves: Maximum number of moves allowed
+            exclude_walls_only: Only considers walls as an invalid position - useful when using this
+                to find potential attack square targets for area attacks
 
         Returns:
             A tuple containing:
@@ -316,7 +319,14 @@ class Board:
                         new_col := current_pos[1] + d_col,
                     )
                     not in visited
-                    and self.is_legal_move(new_row, new_col)
+                    and (
+                        # either you're only excluding walls and it's not a wall, or it's a legal move
+                        exclude_walls_only
+                        and not isinstance(
+                            self.locations[new_row][new_col], obstacle.Wall
+                        )
+                        or self.is_legal_move(new_row, new_col)
+                    )
                 ]
                 visited.update(valid_surrounding_positions)
                 queue.extend((pos, distance + 1) for pos in valid_surrounding_positions)
