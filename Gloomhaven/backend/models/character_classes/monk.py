@@ -45,7 +45,7 @@ cards = [
         actions=[
             action_model.BlessAndChargeAlly(2, 3),
             action_model.CurseSelf(),
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.line(5), damage=3, att_range=2
             ),
         ],
@@ -54,7 +54,7 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Scythe Swipe",
-        actions=[action_model.AreaAttack(shapes.arc(3), 4)],
+        actions=[action_model.AreaAttackFromSelf(shapes.arc(3), 4)],
         movement=2,
         jump=False,
     ),

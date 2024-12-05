@@ -7,9 +7,8 @@ cards = [
     actions.ActionCard(
         attack_name="Frost Breath",
         actions=[
-            actions.AreaAttack(shape=shapes.cone(3), strength=2),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.cone(3), element_type=obstacle.Ice
+            actions.AreaAttackFromSelf(
+                shape=shapes.cone(3), element_type=obstacle.Ice, strength=3
             ),
         ],
         movement=2,
@@ -27,7 +26,7 @@ cards = [
     actions.ActionCard(
         attack_name="Ice Wall",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 element_type=obstacle.Ice, shape=shapes.bar(1, 3)
             ),
             actions.ShieldSelf(2, 2),
@@ -38,7 +37,7 @@ cards = [
     actions.ActionCard(
         attack_name="Wing Buffet",
         actions=[
-            actions.AreaAttack(shape=shapes.circle(1), strength=2),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=2),
             actions.PushAllEnemies(1, 1),
         ],
         movement=4,
@@ -48,8 +47,8 @@ cards = [
         attack_name="Freezing Roar",
         actions=[
             actions.WeakenAllEnemies(2, 3),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Ice
+            actions.AreaAttackFromSelf(
+                shape=shapes.ring(2), element_type=obstacle.Ice, strength=2
             ),
         ],
         movement=2,

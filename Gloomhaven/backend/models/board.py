@@ -150,16 +150,12 @@ class Board:
     def add_effect_to_terrain_for_attack(
         self,
         effect_type: Type[obstacle.TerrainObject],
-        row: int,
-        col: int,
-        shape: set,
+        attack_coords: list[tuple[int, int]],
     ) -> None:
         """
         if you want this to also do damage, you must pass damage and an attacker
         """
-        for coordinate in shape:
-            effect_row = row + coordinate[0]
-            effect_col = col + coordinate[1]
+        for effect_row, effect_col in attack_coords:
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):

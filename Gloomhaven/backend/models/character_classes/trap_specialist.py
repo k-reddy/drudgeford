@@ -7,9 +7,7 @@ trap_specialist_cards = [
         attack_name="Ice and Steel",
         actions=[
             actions.SingleTargetAttack(3, 3),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.line(3), element_type=obstacle.Ice
-            ),
+            actions.AreaAttackFromSelf(shape=shapes.line(3), element_type=obstacle.Ice),
         ],
         movement=2,
         jump=True,
@@ -17,9 +15,7 @@ trap_specialist_cards = [
     actions.ActionCard(
         attack_name="Trap Network",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.arc(5), element_type=obstacle.Trap
-            ),
+            actions.AreaAttackFromSelf(shape=shapes.arc(5), element_type=obstacle.Trap),
             actions.PushAllEnemies(2, 2),
         ],
         movement=2,
@@ -28,12 +24,9 @@ trap_specialist_cards = [
     actions.ActionCard(
         attack_name="Frozen Path",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.line(3), element_type=obstacle.Ice
-            ),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.line(3), element_type=obstacle.Ice
-            ),
+            actions.AreaAttackFromSelf(
+                shape=shapes.line(3), element_type=obstacle.Ice, strength=3
+            )
         ],
         movement=3,
         jump=True,
@@ -41,9 +34,8 @@ trap_specialist_cards = [
     actions.ActionCard(
         attack_name="Shadow Strike",
         actions=[
-            actions.SingleTargetAttack(4, 2),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=3
             ),
         ],
         movement=2,
@@ -52,7 +44,7 @@ trap_specialist_cards = [
     actions.ActionCard(
         attack_name="Deadly Surprise",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Trap
             ),
             actions.Pull(3, 2),
@@ -63,8 +55,8 @@ trap_specialist_cards = [
     actions.ActionCard(
         attack_name="Ice Prison",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Ice
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Ice, strength=2
             ),
             actions.WeakenAllEnemies(1, 2),
         ],

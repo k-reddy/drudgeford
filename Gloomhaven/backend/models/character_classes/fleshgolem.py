@@ -17,7 +17,7 @@ cards = [
     actions.ActionCard(
         attack_name="Thunderous Charge",
         actions=[
-            actions.AreaAttack(shape=shapes.line(3), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.line(3), strength=3),
             actions.Push(2, 3),
         ],
         movement=4,
@@ -39,7 +39,7 @@ cards = [
         attack_name="Stone Flesh",
         actions=[
             actions.ShieldSelf(2, 2),
-            actions.AreaAttack(shape=shapes.bar(1, 2), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.bar(1, 2), strength=3),
         ],
         movement=3,
         jump=False,

@@ -6,7 +6,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Fireball",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.circle(1),
                 element_type=obstacle.Fire,
                 att_range=4,
@@ -19,10 +19,10 @@ cards = [
     action_model.ActionCard(
         attack_name="Fire and Ice",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Fire
             ),
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Ice
             ),
         ],
@@ -44,10 +44,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Masochistic Explosion",
         actions=[
-            action_model.ElementAreaEffectFromSelf(
-                element_type=obstacle.Fire, shape=shapes.circle(2)
+            action_model.AreaAttackFromSelf(
+                element_type=obstacle.Fire, shape=shapes.circle(2), strength=5
             ),
-            action_model.AreaAttack(shape=shapes.circle(2), strength=5),
             action_model.ModifySelfHealth(-3),
         ],
         movement=3,
@@ -56,7 +55,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Lightning Charge",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.line(3), damage=4, att_range=2
             ),
             action_model.ModifySelfHealth(3),
@@ -76,7 +75,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Phase Strike",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.bar(1, 2), damage=4, att_range=3
             )
         ],

@@ -7,8 +7,8 @@ cards = [
         attack_name="Healing Spores",
         actions=[
             actions.HealAllAllies(3, 3),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Spores
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(1), element_type=obstacle.Spores, strength=1
             ),
         ],
         movement=2,
@@ -32,10 +32,9 @@ cards = [
     actions.ActionCard(
         attack_name="Spore Cloud",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Spores
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(1), element_type=obstacle.Spores, strength=2
             ),
-            actions.AreaAttack(shapes.circle(1), strength=2),
             actions.WeakenAllEnemies(2, 2),
         ],
         movement=2,
@@ -51,7 +50,7 @@ cards = [
         attack_name="Protective Bloom",
         actions=[
             actions.HealAllAllies(3, 5),
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 shape=shapes.ring(2), element_type=obstacle.PoisonShroom
             ),
         ],

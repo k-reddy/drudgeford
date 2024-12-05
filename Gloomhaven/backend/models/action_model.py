@@ -24,9 +24,10 @@ class ActionStep(abc.ABC):
 
 
 @dataclass
-class AreaAttack(ActionStep):
+class AreaAttackFromSelf(ActionStep):
     shape: set
-    strength: int
+    strength: Optional[int] = None
+    element_type: Optional[Type[obstacle.TerrainObject]] = None
 
     def perform(self, board, attacker, round_num):
         # first create the attack coordinates from the shape (offsets)
@@ -35,13 +36,27 @@ class AreaAttack(ActionStep):
         attack_coords = attacker.pick_rotated_attack_coordinates(
             board, self.shape, starting_coord
         )
-        board.attack_area(attacker, attack_coords, self.strength)
+        if self.strength:
+            board.attack_area(attacker, attack_coords, self.strength)
+        if self.element_type:
+            board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
-        return f"Area Attack, Strength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"
+        attack_type = f"{self.element_type.__name__} " if self.element_type else ""
+        damage_str = f" for {self.strength} Damage" if self.strength else ""
+        return (
+            f"{attack_type}Attack{damage_str}, Shape:\n{shapes.print_shape(self.shape)}"
+        )
 
     def perform_string(self, attacker):
-        return f"{attacker.name} is performing an area attack"
+        perform_str = f"{attacker.name} "
+        if self.element_type:
+            perform_str += f"throws {self.element_type.__name__}"
+            if self.strength:
+                perform_str += " and "
+        if self.strength:
+            perform_str += f"does {self.strength} damage"
+        return perform_str
 
 
 @dataclass
@@ -64,7 +79,7 @@ class SingleTargetAttack(ActionStep):
 
 
 @dataclass
-class ElementAreaEffectWithTarget(ActionStep):
+class AreaAttackWithTarget(ActionStep):
     shape: set
     att_range: int
     damage: Optional[int] = None
@@ -90,12 +105,7 @@ class ElementAreaEffectWithTarget(ActionStep):
 
         # if we're given an element, add elements to board
         if self.element_type:
-            board.add_effect_to_terrain_for_attack(
-                self.element_type,
-                target_row,
-                target_col,
-                self.shape,
-            )
+            board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
@@ -111,24 +121,6 @@ class ElementAreaEffectWithTarget(ActionStep):
         if self.damage:
             perform_str += f"does {self.damage} damage"
         return perform_str
-
-
-@dataclass
-class ElementAreaEffectFromSelf(ActionStep):
-    shape: set
-    element_type: Type[obstacle.TerrainObject]
-
-    def perform(self, board, attacker, round_num):
-        target = attacker
-
-        row, col = board.find_location_of_target(target)
-        board.add_effect_to_terrain_for_attack(self.element_type, row, col, self.shape)
-
-    def __str__(self):
-        return f"{self.element_type.__name__} Attack, Fires from Self @\nShape:\n{shapes.print_shape(self.shape)}"
-
-    def perform_string(self, attacker):
-        return f"{attacker.name} throws {self.element_type.__name__}"
 
 
 @dataclass
