@@ -50,6 +50,7 @@ cards = [
                 element_type=obstacle.Fire, shape=shapes.circle(2)
             ),
             action_model.AreaAttack(shape=shapes.circle(2), strength=5),
+            action_model.ModifySelfHealth(-3),
         ],
         movement=3,
         jump=True,
@@ -57,7 +58,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Lightning Charge",
         actions=[
-            action_model.AreaAttack(shape=shapes.line((1, 0), 3), strength=4),
+            action_model.AreaAttack(shape=shapes.line(3), strength=4),
             action_model.ModifySelfHealth(3),
         ],
         movement=1,
@@ -74,7 +75,7 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="B-Line",
-        actions=[action_model.AreaAttack(shape=shapes.line((0, 1), 3), strength=4)],
+        actions=[action_model.AreaAttack(shape=shapes.line(3), strength=4)],
         movement=2,
         jump=True,
     ),

@@ -45,14 +45,14 @@ cards = [
         actions=[
             action_model.BlessAndChargeAlly(2, 3),
             action_model.CurseSelf(),
-            action_model.AreaAttack(shapes.line((0, 1), 5), 4),
+            action_model.AreaAttack(shapes.line(5), 4),
         ],
         movement=2,
         jump=False,
     ),
     action_model.ActionCard(
         attack_name="Scythe Swipe",
-        actions=[action_model.SingleTargetAttack(5, 1)],
+        actions=[action_model.AreaAttack(shapes.arc(3), 4)],
         movement=2,
         jump=False,
     ),

@@ -48,7 +48,7 @@ cards = [
         actions=[
             actions.ChargeNextAttack(3),
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Shadow
+                shape=shapes.bar(1, 2), element_type=obstacle.Shadow
             ),
         ],
         movement=1,

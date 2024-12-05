@@ -5,61 +5,43 @@ from backend.models import obstacle
 cards = [
     actions.ActionCard(
         attack_name="Shield Wall",
-        actions=[
-            actions.ShieldSelf(3, 2),
-            actions.ShieldAllAllies(1, 2, 2)
-        ],
+        actions=[actions.ShieldSelf(3, 2), actions.ShieldAllAllies(1, 2, 2)],
         movement=2,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Combat Stance",
-        actions=[
-            actions.ChargeNextAttack(3),
-            actions.ShieldSelf(2, 2)
-        ],
+        actions=[actions.ChargeNextAttack(3), actions.ShieldSelf(2, 2)],
         movement=2,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Shield Bash",
-        actions=[
-            actions.SingleTargetAttack(3, 1),
-            actions.Push(2, 1)
-        ],
+        actions=[actions.SingleTargetAttack(3, 1), actions.Push(2, 1)],
         movement=3,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Sword Dance",
         actions=[
-            actions.AreaAttack(
-                shape=shapes.circle(1),
-                strength=2
-            ),
-            actions.ChargeNextAttack(2)
+            actions.AreaAttack(shape=shapes.arc(3), strength=2),
+            actions.ChargeNextAttack(2),
         ],
         movement=3,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Undying Warrior",
-        actions=[
-            actions.ModifySelfHealth(-1),
-            actions.ShieldSelf(4, 2)
-        ],
+        actions=[actions.ModifySelfHealth(-1), actions.ShieldSelf(4, 2)],
         movement=2,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Battle Line",
-        actions=[
-            actions.SingleTargetAttack(4,2),
-            actions.ShieldAllAllies(2, 1, 2)
-        ],
+        actions=[actions.SingleTargetAttack(4, 2), actions.ShieldAllAllies(2, 1, 2)],
         movement=2,
-        jump=False
-    )
+        jump=False,
+    ),
 ]
 
 health = 4
