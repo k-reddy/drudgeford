@@ -57,12 +57,21 @@ class PyxelEngine:
     def update(self):
         self.start_time = time.time()
         self.keyboard_manager.update()
-
+        ui_time = time.time() - self.start_time
+        get_task_time = -1
+        unjsonify_time = -1
+        perform_time = -1
+        start_time = time.time()
         if not self.current_task:
             jsonified_task = self.server_client.get_task()
+            get_task_time = time.time() - start_time
+            start_time = time.time()
+
             self.current_task = self.tj.make_task_from_json(jsonified_task)
+            unjsonify_time = time.time() - start_time
 
         if self.current_task:
+            start_time = time.time()
             task_output = self.current_task.perform(
                 self.view_manager, self.keyboard_manager
             )
@@ -76,6 +85,13 @@ class PyxelEngine:
             elif isinstance(self.current_task, LoadCampaign):
                 self.server_client.post_user_input(task_output)
             self.current_task = None
+            perform_time = time.time() - start_time
+        print("------")
+        print(f"ui time: {ui_time}")
+        print(f"perform time: {perform_time}")
+        print(f"get_task_time : {get_task_time}")
+        print(f"unjsonify time: {unjsonify_time}")
+        print("------")
 
     def draw(self):
         """everything in the tasks draws itself,
