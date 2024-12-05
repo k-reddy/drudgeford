@@ -68,6 +68,13 @@ def ring(radius):
     return shape
 
 
+def is_circle_or_arc(shape):
+    max_coord = max(max(abs(x), abs(y)) for x, y in shape)
+    circle_points = circle(max_coord)
+    arc_points = arc(max_coord)
+    return shape == circle_points or shape == arc_points
+
+
 def print_shape(shape):
     print_str = ""
     ymin = min([y for y, _ in shape])
@@ -126,6 +133,3 @@ def demo_directional_rotations():
     vertical_line = ring(3)
 
     print_all_directions(vertical_line)
-
-
-demo_directional_rotations()

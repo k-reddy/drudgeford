@@ -70,7 +70,7 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def pick_attack_orientation(
+    def pick_rotated_attack_coordinates(
         board,
         shape: set,
         starting_coord: tuple[int, int],
@@ -167,7 +167,7 @@ class Ai(Agent):
             )
 
     @staticmethod
-    def pick_attack_orientation(
+    def pick_rotated_attack_coordinates(
         board,
         shape: set,
         starting_coord: tuple[int, int],
@@ -332,13 +332,13 @@ class Human(Agent):
         )
 
     @staticmethod
-    def pick_attack_orientation(
+    def pick_rotated_attack_coordinates(
         board,
         shape: set,
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
     ):
-        return board.pyxel_manager.pick_attack_orientation(
+        return board.pyxel_manager.pick_rotated_attack_coordinates(
             shape, starting_coord, client_id
         )
