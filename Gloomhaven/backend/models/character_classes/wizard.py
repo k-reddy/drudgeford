@@ -10,8 +10,8 @@ cards = [
                 shape=shapes.circle(1),
                 element_type=obstacle.Fire,
                 att_range=4,
-            ),
-            action_model.SingleTargetAttack(3, 4),
+                damage=3,
+            )
         ],
         movement=2,
         jump=True,

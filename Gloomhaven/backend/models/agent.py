@@ -375,7 +375,9 @@ class Human(Agent):
         )
         target_row, target_col = (-1, -1)
         while (target_row, target_col) not in reachable_squares:
-            board.pyxel_manager.highlight_map_tiles(reachable_squares, client_id)
+            board.pyxel_manager.highlight_map_tiles(
+                reachable_squares, client_id, color=10
+            )
             target_row, target_col = board.pyxel_manager.get_user_input(
                 prompt="Select a valid board square to attack",
                 is_mouse=True,

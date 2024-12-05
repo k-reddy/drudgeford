@@ -154,6 +154,9 @@ class Board:
         col: int,
         shape: set,
     ) -> None:
+        """
+        if you want this to also do damage, you must pass damage and an attacker
+        """
         for coordinate in shape:
             effect_row = row + coordinate[0]
             effect_col = col + coordinate[1]
@@ -320,8 +323,10 @@ class Board:
                     )
                     not in visited
                     and (
-                        # either you're only excluding walls and it's not a wall, or it's a legal move
+                        # either you're only excluding walls and it's in bounds and not a wall, or it's a legal move
                         exclude_walls_only
+                        and new_row < self.size
+                        and new_col < self.size
                         and not isinstance(
                             self.locations[new_row][new_col], obstacle.Wall
                         )
@@ -540,7 +545,7 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
-        died_by = f" stepped on {damage_str} and" if damage_str else ""
+        died_by = f" stepped on{damage_str} and" if damage_str else ""
         self.pyxel_manager.log.append(f"{target.name}{died_by} has been killed.")
         # if it's your turn, end it immediately
         if target == self.acting_character:
