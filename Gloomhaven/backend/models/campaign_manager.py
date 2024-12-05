@@ -105,13 +105,13 @@ class Campaign:
 
     def run_levels(self):
         for i, _ in enumerate(self.levels):
-            output = self.run_level(self.levels.pop(0))
+            output, message = self.run_level(self.levels.pop(0))
 
             # if you don't win the level or if all levels are done, end here
             if output != GameState.WIN or not self.levels:
                 self.pyxel_manager.pause_for_all_players(
                     num_players=self.num_players,
-                    prompt="Game over, press esc to exit",
+                    prompt=message + "\nPress esc to enter",
                 )
                 # !!! should clean up gracefully here
                 return
@@ -119,7 +119,7 @@ class Campaign:
             # offer to save and continue to next level
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
-                prompt="All players must press enter to continue",
+                prompt=message + "\nAll players must press enter to continue",
             )
             self.save_campaign()
 

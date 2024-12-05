@@ -251,9 +251,7 @@ class GameLoop:
             raise ValueError(
                 f"trying to end game when status is {self.game_state.name}"
             )
-        if not self.all_ai_mode:
-            self.pyxel_manager.add_to_personal_log(message)
-        return self.game_state
+        return self.game_state, message
 
     def _end_turn(self) -> None:
         self.board.acting_character = None
@@ -325,7 +323,7 @@ class GameLoop:
         return message
 
     def _win_game(self) -> str:
-        message = """You defeated the monster!! Victory!
+        message = """You defeated the monsters!! Victory!
     \\o/   Victory!
      |
     / \\
