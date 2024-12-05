@@ -24,7 +24,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Life Drain",
         actions=[
-            action_model.AreaAttack(shapes.circle(radius=3), 2),
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.circle(radius=3), damage=3, att_range=2
+            ),
             action_model.ModifySelfHealth(4),
         ],
         movement=2,

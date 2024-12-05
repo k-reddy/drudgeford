@@ -56,7 +56,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Lightning Charge",
         actions=[
-            action_model.AreaAttack(shape=shapes.line(3), strength=4),
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.line(3), damage=4, att_range=2
+            ),
             action_model.ModifySelfHealth(3),
         ],
         movement=1,
