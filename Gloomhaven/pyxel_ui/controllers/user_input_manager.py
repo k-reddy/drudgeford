@@ -7,18 +7,25 @@ from pyxel_ui.utils import round_down_to_nearest_multiple
 class UserInputManager:
     def __init__(self, view_manager, server_client):
         self.view_manager = view_manager
+
         self.accept_keyboard_input = False
         self.accept_mouse_input = False
-        self.input = ""
-        self.prompt = ""
-        self.server_client = server_client
-        self.mouse_tile_pos = None
-        self.last_mouse_pos = (-1, -1)
-        self.draw_shape_with_cursor = False
         self.cursor_shape_offsets = []
         self.default_grid_color = 3
+        self.draw_shape_with_cursor = False
         self.grid_color = self.default_grid_color
+        self.input = ""
+        self.last_mouse_pos = (-1, -1)
+        self.mouse_tile_pos = None
+        self.prompt = ""
+        self.server_client = server_client
         self.valid_starting_squares = []
+
+        self.reachable_positions: list[tuple[int, int]] = []
+        # The coordinates represented in these attributes have been converted from
+        # map tile to pixel with view border offsets applied.
+        self.reachable_positions_px: list[tuple[int, int]] = []
+        self.reachable_paths_px: dict[tuple[int, int], list[tuple[int, int]]] = {}
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_ESCAPE):
@@ -71,7 +78,15 @@ class UserInputManager:
             self.view_manager.scroll_carousel_left()
 
         if self.accept_mouse_input:
-            self.print_personal_log(self.input)
+            for pos_x, pos_y in self.reachable_positions_px:
+                self.view_manager.draw_grid(
+                    pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
+                )
+            if self.mouse_tile_pos and self.mouse_tile_pos in self.reachable_positions:
+                for path_x, path_y in self.reachable_paths_px[self.mouse_tile_pos]:
+                    self.view_manager.draw_grid(
+                        path_x, path_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=7
+                    )
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
                 # BUG: location seems to be relative to character starting position so
@@ -123,6 +138,8 @@ class UserInputManager:
     def return_input_to_server(self):
         self.server_client.post_user_input(self.input)
 
+    # nit: this method doesn't actually get mouse input, maybe
+    # rename to something like enable_mouse_input?
     def get_mouse_input(self, prompt):
         self.input = ""
         self.accept_mouse_input = True
@@ -138,3 +155,25 @@ class UserInputManager:
             self.view_manager.draw_grid(
                 x, y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color
             )
+
+    def set_reachable_values(
+        self,
+        reachable_positions: list[tuple[int, int]],
+        reachable_paths: dict[tuple[int, int], list[tuple[int, int]]],
+    ) -> None:
+        # We are flipping x and y after unpacking. This needs to be resolved upstream.
+        self.reachable_positions = [
+            (pos_y, pos_x) for pos_x, pos_y in reachable_positions
+        ]
+        self.reachable_positions_px = [
+            self.view_manager.get_pixel_pos_for_map_tile(pos_y, pos_x)
+            for pos_x, pos_y in reachable_positions
+        ]
+
+        self.reachable_paths_px = {
+            (end_pos_y, end_pos_x): [
+                self.view_manager.get_pixel_pos_for_map_tile(p_y, p_x)
+                for p_x, p_y in paths
+            ]
+            for (end_pos_x, end_pos_y), paths in reachable_paths.items()
+        }
