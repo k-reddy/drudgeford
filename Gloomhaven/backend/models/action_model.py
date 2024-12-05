@@ -32,7 +32,7 @@ class AreaAttack(ActionStep):
         # first create the attack coordinates from the shape (offsets)
         starting_coord = board.find_location_of_target(attacker)
         self.shape.discard((0, 0))  # don't attack yourself
-        attack_coords = attacker.pick_attack_orientation(
+        attack_coords = attacker.pick_rotated_attack_coordinates(
             board, self.shape, starting_coord
         )
         board.attack_area(attacker, attack_coords, self.strength)

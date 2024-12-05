@@ -4,6 +4,7 @@ import backend.models.character_classes as character_classes
 import backend.models.action_model as action_model
 from ..utils import utilities
 from backend.models import obstacle
+from backend.utils import attack_shapes as shapes
 
 MAX_ROUNDS = 1000
 
@@ -97,10 +98,20 @@ class Character(abc.ABC):
         random.shuffle(attack_modifier_deck)
         return attack_modifier_deck
 
-    def pick_attack_orientation(
+    def pick_rotated_attack_coordinates(
         self, board, shape: set, starting_coord: tuple[int, int]
     ) -> list[tuple[int, int]]:
-        return self.agent.pick_attack_orientation(
+        """
+        gets an attack shape rotation and attack coordinates (not offsets)
+        from agent
+        """
+        # we do not rotate cirlces or arcs
+        if shapes.is_circle_or_arc(shape):
+            return [
+                (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
+                for coordinate in shape
+            ]
+        return self.agent.pick_rotated_attack_coordinates(
             board, shape, starting_coord, self.client_id, self.team_monster
         )
 
