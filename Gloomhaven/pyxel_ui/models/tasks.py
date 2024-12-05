@@ -433,18 +433,16 @@ class HighlightMapTiles(Task):
     tiles: list[tuple[int, int]]
 
     def perform(self, view_manager, user_input_manager):
-        from pyxel_ui.constants import MAP_TILE_HEIGHT_PX, MAP_TILE_WIDTH_PX
-
-        for tile in self.tiles:
-            if tile not in view_manager.map_view.valid_map_coordinates:
-                continue
-            x, y = view_manager.map_view.convert_grid_to_pixel_pos(tile[0], tile[1])
-            view_manager.draw_grid(
-                x, y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, self.color
-            )
+        user_input_manager.draw_grid_shape(self.tiles, self.color)
 
 
 @dataclass
 class RedrawMap(Task):
     def perform(self, view_manager, user_input_manager):
         view_manager.map_view.draw()
+
+
+@dataclass
+class AdjustCursorGridShape(Task):
+    def perform(self, view_manager, user_input_manager):
+        pass
