@@ -57,7 +57,7 @@ cards = [
         attack_name="Heat Wave",
         actions=[
             actions.WeakenAllEnemies(2, 2),
-            actions.AreaAttack(shapes.circle(2), 2),
+            actions.AreaAttack(shapes.cone(2), 2),
         ],
         movement=3,
         jump=True,

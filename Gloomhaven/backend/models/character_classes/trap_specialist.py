@@ -18,7 +18,7 @@ trap_specialist_cards = [
         attack_name="Trap Network",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Trap
+                shape=shapes.arc(5), element_type=obstacle.Trap
             ),
             actions.PushAllEnemies(2, 2),
         ],
