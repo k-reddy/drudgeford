@@ -1,0 +1,12 @@
+# using pyinstaller - downside is it's slow to start up
+pyinstaller --clean frontend_main.spec
+
+# or run the nuitka python file
+# cd into the frontend_main.dist
+# make the file executable
+chmod +x frontend_main.bin  
+# then run the binary 
+ ./frontend_main.bin
+
+
+# game speed seems similar, but nuitka loads *way* faster

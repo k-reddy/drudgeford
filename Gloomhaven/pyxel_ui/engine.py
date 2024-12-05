@@ -7,12 +7,9 @@ from pyxel_ui.constants import (
     WINDOW_LENGTH,
     DEFAULT_PYXEL_WIDTH,
     DEFAULT_PYXEL_HEIGHT,
-    MAP_TILE_HEIGHT_PX,
-    MAP_TILE_WIDTH_PX,
 )
-from .models.tasks import ActionTask, ShowCharacterPickerTask, InputTask, LoadCampaign
+from .models.tasks import ActionTask, LoadCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
-from .utils import round_down_to_nearest_multiple
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
 from .controllers.user_input_manager import UserInputManager
