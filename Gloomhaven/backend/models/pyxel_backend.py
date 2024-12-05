@@ -342,11 +342,21 @@ class PyxelManager:
                 return attack_coords
             current_shape = next(shape_iterator)
 
-    def draw_cursor_grid_shape(self, shape: list[tuple[int, int]], client_id: str):
+    def draw_cursor_grid_shape(
+        self,
+        shape: list[tuple[int, int]],
+        client_id: str,
+        valid_starting_squares: list[tuple[int, int]],
+    ):
         # flip to frontend tuple format
         tile_shape_offsets = [(col, row) for row, col in shape]
+        valid_pyxel_starting_squares = [
+            self.normalize_coordinate((col, row)) for row, col in valid_starting_squares
+        ]
         task = tasks.DrawCursorGridShape(
-            tile_shape_offsets=tile_shape_offsets, grid_color=10
+            tile_shape_offsets=tile_shape_offsets,
+            grid_color=10,
+            valid_starting_squares=valid_pyxel_starting_squares,
         )
         self.jsonify_and_send_task(task, client_id)
 

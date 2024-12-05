@@ -18,6 +18,7 @@ class UserInputManager:
         self.cursor_shape_offsets = []
         self.default_grid_color = 3
         self.grid_color = self.default_grid_color
+        self.valid_starting_squares = []
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_ESCAPE):
@@ -49,7 +50,10 @@ class UserInputManager:
                 )
                 self.mouse_tile_pos = tile_pos
                 # and add the rest of the shape if needed
-                if self.draw_shape_with_cursor:
+                if (
+                    self.draw_shape_with_cursor
+                    and tile_pos in self.valid_starting_squares
+                ):
                     shape_tiles = [
                         (tile_pos[0] + offset[0], tile_pos[1] + offset[1])
                         for offset in self.cursor_shape_offsets
