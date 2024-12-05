@@ -21,10 +21,9 @@ cards = [
     actions.ActionCard(
         attack_name="Haunting Mist",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.arc(4), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.arc(4), element_type=obstacle.Shadow, strength=3
             ),
-            actions.AreaAttack(shape=shapes.arc(4), strength=3),
             actions.WeakenAllEnemies(1, 2),
         ],
         movement=3,
@@ -40,10 +39,9 @@ cards = [
         attack_name="Ethereal Dance",
         actions=[
             actions.Teleport(3),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=3
             ),
-            actions.AreaAttack(shape=shapes.circle(2), strength=3),
         ],
         movement=2,
         jump=True,
@@ -52,7 +50,7 @@ cards = [
         attack_name="Terror",
         actions=[
             actions.CurseAllEnemies(2),
-            actions.AreaAttack(shapes.circle(2), 1),
+            actions.AreaAttackFromSelf(shapes.circle(2), 1),
             actions.PushAllEnemies(2, 2),
         ],
         movement=2,

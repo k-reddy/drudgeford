@@ -6,9 +6,8 @@ cards = [
     actions.ActionCard(
         attack_name="Ice Slam",
         actions=[
-            actions.SingleTargetAttack(4, 1),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Ice
+            actions.AreaAttackFromSelf(
+                shape=shapes.ring(1), element_type=obstacle.Ice, strength=3
             ),
         ],
         movement=2,
@@ -26,7 +25,7 @@ cards = [
     actions.ActionCard(
         attack_name="Avalanche Charge",
         actions=[
-            actions.AreaAttack(shape=shapes.line(3), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.line(3), strength=3),
             actions.PushAllEnemies(1, 1),
         ],
         movement=4,
@@ -36,8 +35,8 @@ cards = [
         attack_name="Fortify",
         actions=[
             actions.ShieldSelf(3, 2),
-            actions.ElementAreaEffectFromSelf(
-                element_type=obstacle.Ice, shape=shapes.ring(2)
+            actions.AreaAttackFromSelf(
+                element_type=obstacle.Ice, shape=shapes.ring(2), strength=2
             ),
         ],
         movement=1,

@@ -24,7 +24,7 @@ cards = [
     actions.ActionCard(
         attack_name="Sword Dance",
         actions=[
-            actions.AreaAttack(shape=shapes.arc(3), strength=2),
+            actions.AreaAttackFromSelf(shape=shapes.arc(3), strength=2),
             actions.ChargeNextAttack(2),
         ],
         movement=3,

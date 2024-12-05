@@ -6,7 +6,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Fear Mongerer",
         actions=[
-            action_model.AreaAttack(shapes.circle(2), 2),
+            action_model.AreaAttackFromSelf(shapes.circle(2), 2),
             action_model.PushAllEnemies(3, 2),
         ],
         movement=0,
@@ -24,7 +24,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Life Drain",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.circle(radius=1), damage=4, att_range=2
             ),
             action_model.ModifySelfHealth(4),
@@ -51,7 +51,7 @@ cards = [
         attack_name="Death's Embrace",
         actions=[
             action_model.CurseAllEnemies(3),
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.ring(1), damage=4, element_type=Shadow, att_range=2
             ),
             action_model.PushAllEnemies(1, 3),
@@ -69,13 +69,13 @@ cards = [
         # switch this to shadow that shows up around you
         attack_name="Shadow Tendril",
         actions=[
-            action_model.ElementAreaEffectFromSelf(
+            action_model.AreaAttackFromSelf(
                 shape=shapes.circle(
                     2,
                 ),
                 element_type=Shadow,
             ),
-            action_model.AreaAttack(shapes.arc(4), 2),
+            action_model.AreaAttackFromSelf(shapes.arc(4), 2),
         ],
         movement=3,
         jump=False,

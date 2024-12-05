@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Cold Tears",
         actions=[
-            actions.ElementAreaEffectWithTarget(
+            actions.AreaAttackWithTarget(
                 shape=shapes.ring(1), element_type=obstacle.Ice, att_range=3, damage=3
             ),
             actions.CurseAllEnemies(3),
@@ -35,7 +35,7 @@ cards = [
     actions.ActionCard(
         attack_name="Blood Rain",
         actions=[
-            actions.AreaAttack(shape=shapes.circle(2), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=3),
             actions.WeakenAllEnemies(1, 2),
         ],
         movement=2,

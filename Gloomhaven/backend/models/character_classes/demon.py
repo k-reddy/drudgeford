@@ -12,8 +12,8 @@ cards = [
     actions.ActionCard(
         attack_name="Void Circle",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=2
             ),
             actions.WeakenAllEnemies(2, 2),
         ],
@@ -30,7 +30,7 @@ cards = [
         attack_name="Shadow Aegis",
         actions=[
             actions.ShieldAllAllies(3, 2, 3),
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 shape=shapes.ring(2), element_type=obstacle.Shadow
             ),
         ],
@@ -47,8 +47,8 @@ cards = [
         attack_name="Dark Blessing",
         actions=[
             actions.ChargeNextAttack(3),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.bar(1, 2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.bar(1, 2), element_type=obstacle.Shadow, strength=1
             ),
         ],
         movement=1,

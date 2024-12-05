@@ -112,6 +112,7 @@ class Character(abc.ABC):
         """
         # we do not rotate cirlces or rings
         if shapes.is_circle_or_ring(shape):
+            print("it's a circle!")
             return [
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape

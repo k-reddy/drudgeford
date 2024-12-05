@@ -15,8 +15,8 @@ cards = [
     actions.ActionCard(
         attack_name="Fire Trail",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.line(4), element_type=obstacle.Fire
+            actions.AreaAttackFromSelf(
+                shape=shapes.line(4), element_type=obstacle.Fire, strength=1
             ),
             actions.WeakenAllEnemies(1, 2),
         ],
@@ -26,7 +26,7 @@ cards = [
     actions.ActionCard(
         attack_name="Spark Storm",
         actions=[
-            actions.AreaAttack(shape=shapes.circle(1), strength=2),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=2),
         ],
         movement=3,
         jump=True,
@@ -34,10 +34,9 @@ cards = [
     actions.ActionCard(
         attack_name="Burning Dash",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.cone(2), element_type=obstacle.Fire
+            actions.AreaAttackFromSelf(
+                shape=shapes.cone(2), element_type=obstacle.Fire, strength=2
             ),
-            actions.AreaAttack(shape=shapes.cone(2), strength=2),
         ],
         movement=5,  # Increased base movement to represent the "dash"
         jump=True,
@@ -46,8 +45,8 @@ cards = [
         attack_name="Ember Shield",
         actions=[
             actions.ShieldAllAllies(1, 2, 2),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Fire
+            actions.AreaAttackFromSelf(
+                shape=shapes.ring(2), element_type=obstacle.Fire, strength=1
             ),
         ],
         movement=3,
@@ -57,7 +56,7 @@ cards = [
         attack_name="Heat Wave",
         actions=[
             actions.WeakenAllEnemies(2, 2),
-            actions.AreaAttack(shapes.cone(2), 2),
+            actions.AreaAttackFromSelf(shapes.cone(2), 2),
         ],
         movement=3,
         jump=True,
