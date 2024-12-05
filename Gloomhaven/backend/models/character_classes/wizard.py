@@ -6,12 +6,12 @@ cards = [
     action_model.ActionCard(
         attack_name="Fireball",
         actions=[
-            action_model.ElementAreaEffectWithTarget(
+            action_model.AreaAttackWithTarget(
                 shape=shapes.circle(1),
                 element_type=obstacle.Fire,
                 att_range=4,
-            ),
-            action_model.SingleTargetAttack(3, 4),
+                damage=3,
+            )
         ],
         movement=2,
         jump=True,
@@ -19,13 +19,11 @@ cards = [
     action_model.ActionCard(
         attack_name="Fire and Ice",
         actions=[
-            action_model.AreaAttack(shape=shapes.cone(3), strength=2),
-            action_model.ElementAreaEffectFromSelf(
-                shape=shapes.cone(3), element_type=obstacle.Fire
+            action_model.AreaAttackWithTarget(
+                shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Fire
             ),
-            action_model.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
-                element_type=obstacle.Ice,
+            action_model.AreaAttackWithTarget(
+                shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Ice
             ),
         ],
         movement=3,
@@ -46,10 +44,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Masochistic Explosion",
         actions=[
-            action_model.ElementAreaEffectFromSelf(
-                element_type=obstacle.Fire, shape=shapes.circle(2)
+            action_model.AreaAttackFromSelf(
+                element_type=obstacle.Fire, shape=shapes.circle(2), strength=5
             ),
-            action_model.AreaAttack(shape=shapes.circle(2), strength=5),
             action_model.ModifySelfHealth(-3),
         ],
         movement=3,
@@ -58,7 +55,9 @@ cards = [
     action_model.ActionCard(
         attack_name="Lightning Charge",
         actions=[
-            action_model.AreaAttack(shape=shapes.line(3), strength=4),
+            action_model.AreaAttackWithTarget(
+                shape=shapes.line(3), damage=4, att_range=2
+            ),
             action_model.ModifySelfHealth(3),
         ],
         movement=1,
@@ -74,8 +73,12 @@ cards = [
         jump=False,
     ),
     action_model.ActionCard(
-        attack_name="B-Line",
-        actions=[action_model.AreaAttack(shape=shapes.line(3), strength=4)],
+        attack_name="Phase Strike",
+        actions=[
+            action_model.AreaAttackWithTarget(
+                shape=shapes.bar(1, 2), damage=4, att_range=3
+            )
+        ],
         movement=2,
         jump=True,
     ),

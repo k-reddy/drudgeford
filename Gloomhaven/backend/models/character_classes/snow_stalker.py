@@ -7,7 +7,7 @@ cards = [
         attack_name="Protective Snares",
         actions=[
             actions.ShieldAllAllies(2, 2, 3),
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 element_type=obstacle.Trap, shape=shapes.bar(1, 1)
             ),
         ],
@@ -17,7 +17,7 @@ cards = [
     actions.ActionCard(
         attack_name="Warming Fire",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Fire
             ),
             actions.HealAllAllies(2, 2),
@@ -28,7 +28,7 @@ cards = [
     actions.ActionCard(
         attack_name="Trap Network",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 element_type=obstacle.Trap, shape=shapes.ring(2)
             ),
             actions.Pull(2, 3),
@@ -51,7 +51,9 @@ cards = [
     actions.ActionCard(
         attack_name="Shadow Attack",
         actions=[
-            actions.ElementAreaEffectFromSelf(shapes.circle(2), obstacle.Shadow),
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=1
+            ),
             actions.Pull(2, 3),
             actions.SingleTargetAttack(3, 1),
         ],

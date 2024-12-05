@@ -6,8 +6,8 @@ cards = [
     actions.ActionCard(
         attack_name="Shadow Veil",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=1
             ),
             actions.WeakenAllEnemies(2, 2),
         ],
@@ -29,10 +29,9 @@ cards = [
     actions.ActionCard(
         attack_name="Fairy Ring",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Spores
-            ),
-            actions.SingleTargetAttack(4, 2),
+            actions.AreaAttackFromSelf(
+                shape=shapes.ring(2), element_type=obstacle.Spores, strength=3
+            )
         ],
         movement=3,
         jump=True,
@@ -41,8 +40,8 @@ cards = [
         attack_name="Shadow Dance",
         actions=[
             actions.Teleport(4),
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(1), element_type=obstacle.Shadow, strength=2
             ),
         ],
         movement=2,
