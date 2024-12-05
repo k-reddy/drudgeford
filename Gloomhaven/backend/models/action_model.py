@@ -72,7 +72,7 @@ class ElementAreaEffectWithTarget(ActionStep):
 
     def perform(self, board, attacker, round_num):
         target_row, target_col = attacker.select_board_square_target(
-            board, self.att_range
+            board, self.att_range, self.shape
         )
         # if we don't get a target, return
         if target_row is None:

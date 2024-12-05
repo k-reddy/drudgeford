@@ -53,9 +53,9 @@ class Character(abc.ABC):
         )
         return action_card_to_perform
 
-    def select_board_square_target(self, board, att_range):
+    def select_board_square_target(self, board, att_range, shape):
         return self.agent.select_board_square_target(
-            board, self.client_id, att_range, self
+            board, self.client_id, att_range, self, shape
         )
 
     def decide_if_move_first(self, action_card):

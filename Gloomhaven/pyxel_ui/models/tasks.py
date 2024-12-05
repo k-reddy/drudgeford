@@ -443,6 +443,19 @@ class RedrawMap(Task):
 
 
 @dataclass
-class AdjustCursorGridShape(Task):
+class DrawCursorGridShape(Task):
+    tile_shape_offsets: list[tuple[int, int]]
+    grid_color: int
+
     def perform(self, view_manager, user_input_manager):
-        pass
+        user_input_manager.draw_shape_with_cursor = True
+        user_input_manager.cursor_shape_offsets = self.tile_shape_offsets
+        user_input_manager.grid_color = self.grid_color
+
+
+@dataclass
+class TurnOffCursorGridShape(Task):
+    def perform(self, view_manager, user_input_manager):
+        user_input_manager.draw_shape_with_cursor = False
+        user_input_manager.cursor_shape_offsets = []
+        user_input_manager.grid_color = user_input_manager.default_grid_color
