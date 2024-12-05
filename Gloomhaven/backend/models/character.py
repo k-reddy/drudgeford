@@ -105,8 +105,8 @@ class Character(abc.ABC):
         gets an attack shape rotation and attack coordinates (not offsets)
         from agent
         """
-        # we do not rotate cirlces or arcs
-        if shapes.is_circle_or_arc(shape):
+        # we do not rotate cirlces or rings
+        if shapes.is_circle_or_ring(shape):
             return [
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape
