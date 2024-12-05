@@ -49,8 +49,7 @@ class Board:
         self.set_character_starting_locations()
 
         self.potential_shapes = [
-            shapes.line((1, 0), random.randint(2, 3)),
-            shapes.line((0, 1), random.randint(2, 3)),
+            shapes.line(random.randint(2, 3)),
             shapes.arc(random.randint(2, 3)),
             shapes.cone(random.randint(1, 2)),
             shapes.ring(random.randint(2, 3)),

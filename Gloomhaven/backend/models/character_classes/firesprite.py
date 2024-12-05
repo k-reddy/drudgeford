@@ -16,7 +16,7 @@ cards = [
         attack_name="Fire Trail",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.line((1, 0), 4), element_type=obstacle.Fire
+                shape=shapes.line(4), element_type=obstacle.Fire
             ),
             actions.WeakenAllEnemies(1, 2),
         ],

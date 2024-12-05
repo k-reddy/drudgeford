@@ -9,7 +9,7 @@ def circle(radius: int):
     return directions
 
 
-def line(direction: tuple, length: int):
+def line(length: int):
     direction = (1, 0)
     directions = set()
     for i in range(1, length + 1):
@@ -130,6 +130,6 @@ def print_all_directions(shape):
 def demo_directional_rotations():
     # Create a vertical line
     # vertical_line = line((1, 0), 3)
-    vertical_line = ring(3)
+    vertical_line = cone(2)
 
     print_all_directions(vertical_line)
