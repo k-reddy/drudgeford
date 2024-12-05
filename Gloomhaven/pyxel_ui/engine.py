@@ -43,6 +43,7 @@ class PyxelEngine:
 
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
+        # maybe change this to input_manager?
         self.keyboard_manager = UserInputManager(self.view_manager, self.server_client)
         self.loop_num = 1
 
