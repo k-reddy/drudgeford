@@ -5,7 +5,7 @@ from backend.models import obstacle
 cards = [
     actions.ActionCard(
         attack_name="Mutation Surge",
-        actions=[actions.AreaAttack(shape=shapes.arc(3), strength=4)],
+        actions=[actions.AreaAttackFromSelf(shape=shapes.arc(3), strength=4)],
         movement=3,
         jump=False,
     ),
@@ -22,7 +22,7 @@ cards = [
     actions.ActionCard(
         attack_name="Writhing Mass",
         actions=[
-            actions.AreaAttack(shape=shapes.arc(3), strength=2),
+            actions.AreaAttackFromSelf(shape=shapes.arc(3), strength=2),
             actions.CurseAllEnemies(2),
         ],
         movement=3,
@@ -37,7 +37,7 @@ cards = [
     actions.ActionCard(
         attack_name="Flesh Eruption",
         actions=[
-            actions.AreaAttack(shape=shapes.cone(3), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.cone(3), strength=3),
             actions.WeakenAllEnemies(1, 2),
         ],
         movement=2,
@@ -47,7 +47,7 @@ cards = [
         attack_name="Consume Self",
         actions=[
             actions.ModifySelfHealth(-3),
-            actions.AreaAttack(shape=shapes.circle(1), strength=5),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=5),
         ],
         movement=1,
         jump=False,

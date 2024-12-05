@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Finishing Blow",
         actions=[
-            actions.AreaAttack(shape=shapes.arc(3), strength=1),
+            actions.AreaAttackFromSelf(shape=shapes.arc(3), strength=1),
         ],
         movement=3,
         jump=False,
@@ -30,7 +30,7 @@ cards = [
         attack_name="Engulf",
         actions=[
             actions.Pull(2, 2),
-            actions.AreaAttack(shape=shapes.circle(1), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
         ],
         movement=2,
         jump=False,
@@ -38,7 +38,7 @@ cards = [
     actions.ActionCard(
         attack_name="Blood Rain",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 shape=shapes.ring(2), element_type=obstacle.Fire
             ),
             actions.WeakenAllEnemies(2, 2),

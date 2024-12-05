@@ -117,11 +117,11 @@ class LogView(ViewSection):
 
         self.text_pixels = []
 
-        def get_line_height(text: str) -> int:
+        def get_line_height(text: str, size: str = "medium") -> int:
             return (
                 self.font.get_text_height(
                     text,
-                    size="medium",
+                    size=size,
                     max_width=self.bounding_coordinate[0] - self.start_pos[0],
                 )
                 + 4
@@ -138,7 +138,7 @@ class LogView(ViewSection):
                     max_width=self.bounding_coordinate[0] - self.start_pos[0],
                 )
             )
-            return y_pos + get_line_height(text)
+            return y_pos + get_line_height(text, size)
 
         current_y = self.start_pos[1]
         available_height = self.bounding_coordinate[1] - self.start_pos[1]
@@ -146,7 +146,7 @@ class LogView(ViewSection):
         # Try to draw header
         if self.display_round_turn:
             header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
-            header_height = get_line_height(header)
+            header_height = get_line_height(header, "large")
 
             if header_height <= available_height:
                 current_y = draw_line(header, current_y, "large")

@@ -150,13 +150,12 @@ class Board:
     def add_effect_to_terrain_for_attack(
         self,
         effect_type: Type[obstacle.TerrainObject],
-        row: int,
-        col: int,
-        shape: set,
+        attack_coords: list[tuple[int, int]],
     ) -> None:
-        for coordinate in shape:
-            effect_row = row + coordinate[0]
-            effect_col = col + coordinate[1]
+        """
+        if you want this to also do damage, you must pass damage and an attacker
+        """
+        for effect_row, effect_col in attack_coords:
             # check if row and col are in bounds
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
@@ -277,6 +276,7 @@ class Board:
         self,
         start: tuple[int, int],
         num_moves: int,
+        exclude_walls_only: bool = False,
     ) -> tuple[list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]]:
         """
         Finds all positions reachable within the movement range and the shortest path to each position.
@@ -284,6 +284,8 @@ class Board:
         Args:
             start: Starting position as (row, col)
             num_moves: Maximum number of moves allowed
+            exclude_walls_only: Only considers walls as an invalid position - useful when using this
+                to find potential attack square targets for area attacks
 
         Returns:
             A tuple containing:
@@ -316,7 +318,16 @@ class Board:
                         new_col := current_pos[1] + d_col,
                     )
                     not in visited
-                    and self.is_legal_move(new_row, new_col)
+                    and (
+                        # either you're only excluding walls and it's in bounds and not a wall, or it's a legal move
+                        exclude_walls_only
+                        and new_row < self.size
+                        and new_col < self.size
+                        and not isinstance(
+                            self.locations[new_row][new_col], obstacle.Wall
+                        )
+                        or self.is_legal_move(new_row, new_col)
+                    )
                 ]
                 visited.update(valid_surrounding_positions)
                 queue.extend((pos, distance + 1) for pos in valid_surrounding_positions)
@@ -530,7 +541,7 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
-        died_by = f" stepped on {damage_str} and" if damage_str else ""
+        died_by = f" stepped on{damage_str} and" if damage_str else ""
         self.pyxel_manager.log.append(f"{target.name}{died_by} has been killed.")
         # if it's your turn, end it immediately
         if target == self.acting_character:

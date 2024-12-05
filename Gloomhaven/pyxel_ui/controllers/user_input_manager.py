@@ -14,6 +14,11 @@ class UserInputManager:
         self.server_client = server_client
         self.mouse_tile_pos = None
         self.last_mouse_pos = (-1, -1)
+        self.draw_shape_with_cursor = False
+        self.cursor_shape_offsets = []
+        self.default_grid_color = 3
+        self.grid_color = self.default_grid_color
+        self.valid_starting_squares = []
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_ESCAPE):
@@ -44,6 +49,16 @@ class UserInputManager:
                     grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
                 )
                 self.mouse_tile_pos = tile_pos
+                # and add the rest of the shape if needed
+                if (
+                    self.draw_shape_with_cursor
+                    and tile_pos in self.valid_starting_squares
+                ):
+                    shape_tiles = [
+                        (tile_pos[0] + offset[0], tile_pos[1] + offset[1])
+                        for offset in self.cursor_shape_offsets
+                    ]
+                    self.draw_grid_shape(shape_tiles, color=self.grid_color)
             else:
                 self.mouse_tile_pos = None
 
@@ -112,3 +127,14 @@ class UserInputManager:
         self.input = ""
         self.accept_mouse_input = True
         self.prompt = prompt
+
+    def draw_grid_shape(self, tiles, color):
+        for tile in tiles:
+            if tile not in self.view_manager.map_view.valid_map_coordinates:
+                continue
+            x, y = self.view_manager.map_view.convert_grid_to_pixel_pos(
+                tile[0], tile[1]
+            )
+            self.view_manager.draw_grid(
+                x, y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color
+            )

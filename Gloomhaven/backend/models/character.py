@@ -53,6 +53,11 @@ class Character(abc.ABC):
         )
         return action_card_to_perform
 
+    def select_board_square_target(self, board, att_range, shape):
+        return self.agent.select_board_square_target(
+            board, self.client_id, att_range, self, shape
+        )
+
     def decide_if_move_first(self, action_card):
         return self.agent.decide_if_move_first(self.pyxel_manager, self.client_id)
 
@@ -107,6 +112,7 @@ class Character(abc.ABC):
         """
         # we do not rotate cirlces or rings
         if shapes.is_circle_or_ring(shape):
+            print("it's a circle!")
             return [
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape

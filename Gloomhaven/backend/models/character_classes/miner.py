@@ -15,7 +15,7 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Pickaxe Swipe",
-        actions=[action_model.AreaAttack(shape=shapes.arc(4), strength=3)],
+        actions=[action_model.AreaAttackFromSelf(shape=shapes.arc(2), strength=4)],
         movement=3,
         jump=False,
     ),
@@ -41,7 +41,7 @@ cards = [
         attack_name="Crystal Ward",
         actions=[
             action_model.ModifySelfHealth(strength=4),
-            action_model.AreaAttack(shapes.ring(2), 2),
+            action_model.AreaAttackFromSelf(shapes.ring(2), 2),
         ],
         movement=2,
         jump=False,
@@ -59,7 +59,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Desperate Mining",
         actions=[
-            action_model.AreaAttack(shape=shapes.bar(1, 2), strength=3),
+            action_model.AreaAttackFromSelf(shape=shapes.bar(1, 2), strength=3),
             action_model.BlessSelf(),
             action_model.ChargeNextAttack(strength=4),
             action_model.ModifySelfHealth(-3),

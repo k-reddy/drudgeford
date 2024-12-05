@@ -13,8 +13,8 @@ cards = [
     actions.ActionCard(
         attack_name="Reality Warp",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.cone(3), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.cone(3), element_type=obstacle.Shadow, strength=3
             ),
             actions.Teleport(3),
             actions.Teleport(3),
@@ -26,7 +26,7 @@ cards = [
     actions.ActionCard(
         attack_name="Nightmare Web",
         actions=[
-            actions.ElementAreaEffectFromSelf(
+            actions.AreaAttackFromSelf(
                 element_type=obstacle.Trap, shape=shapes.ring(2)
             ),
             actions.Pull(2, 3),
@@ -39,8 +39,8 @@ cards = [
     actions.ActionCard(
         attack_name="Dance of Darkness",
         actions=[
-            actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
+            actions.AreaAttackFromSelf(
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=2
             ),
             actions.WeakenAllEnemies(2, 2),
             actions.HealAllAllies(3, 3),

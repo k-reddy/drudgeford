@@ -7,23 +7,20 @@ cards = [
         attack_name="Critical Meltdown",
         actions=[
             actions.ModifySelfHealth(-5),
-            actions.AreaAttack(
-                shape=shapes.circle(2),
-                strength=6
-            )
+            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=6),
         ],
         movement=3,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Chain Reaction",
         actions=[
             actions.ModifySelfHealth(-2),
-            actions.SingleTargetAttack(3,2),
-            actions.SingleTargetAttack(3,2),
+            actions.SingleTargetAttack(3, 2),
+            actions.SingleTargetAttack(3, 2),
         ],
         movement=4,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Power Surge",
@@ -31,38 +28,30 @@ cards = [
             actions.ChargeNextAttack(4),
         ],
         movement=0,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Containment Breach",
         actions=[
             actions.Pull(3, 3),
             actions.ModifySelfHealth(-4),
-            actions.AreaAttack(
-                shape=shapes.circle(1),
-                strength=5
-            )
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=5),
         ],
         movement=2,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Destabilize",
-        actions=[
-            actions.ShieldSelf(4, 1),
-            actions.WeakenAllEnemies(3, 2)
-        ],
+        actions=[actions.ShieldSelf(4, 1), actions.WeakenAllEnemies(3, 2)],
         movement=2,
-        jump=False
+        jump=False,
     ),
     actions.ActionCard(
         attack_name="Execute Command",
-        actions=[
-            actions.SingleTargetAttack(3, 2)
-        ],
+        actions=[actions.SingleTargetAttack(3, 2)],
         movement=2,
-        jump=False
-    )
+        jump=False,
+    ),
 ]
 
 health = 4

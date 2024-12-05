@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import abc
 import random
 from functools import partial
-from typing import Type
+from typing import Type, Optional
 
 from . import obstacle
 from ..utils import utilities as utils
@@ -24,9 +24,10 @@ class ActionStep(abc.ABC):
 
 
 @dataclass
-class AreaAttack(ActionStep):
+class AreaAttackFromSelf(ActionStep):
     shape: set
-    strength: int
+    strength: Optional[int] = None
+    element_type: Optional[Type[obstacle.TerrainObject]] = None
 
     def perform(self, board, attacker, round_num):
         # first create the attack coordinates from the shape (offsets)
@@ -35,13 +36,27 @@ class AreaAttack(ActionStep):
         attack_coords = attacker.pick_rotated_attack_coordinates(
             board, self.shape, starting_coord
         )
-        board.attack_area(attacker, attack_coords, self.strength)
+        if self.strength:
+            board.attack_area(attacker, attack_coords, self.strength)
+        if self.element_type:
+            board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
-        return f"Area Attack, Strength {self.strength}, Shape:\n{shapes.print_shape(self.shape)}"
+        attack_type = f"{self.element_type.__name__} " if self.element_type else ""
+        damage_str = f" for {self.strength} Damage" if self.strength else ""
+        return (
+            f"{attack_type}Attack{damage_str}, Shape:\n{shapes.print_shape(self.shape)}"
+        )
 
     def perform_string(self, attacker):
-        return f"{attacker.name} is performing an area attack"
+        perform_str = f"{attacker.name} "
+        if self.element_type:
+            perform_str += f"throws {self.element_type.__name__}"
+            if self.strength:
+                perform_str += " and "
+        if self.strength:
+            perform_str += f"does {self.strength} damage"
+        return perform_str
 
 
 @dataclass
@@ -64,45 +79,48 @@ class SingleTargetAttack(ActionStep):
 
 
 @dataclass
-class ElementAreaEffectWithTarget(ActionStep):
+class AreaAttackWithTarget(ActionStep):
     shape: set
-    element_type: Type[obstacle.TerrainObject]
     att_range: int
+    damage: Optional[int] = None
+    element_type: Optional[Type[obstacle.TerrainObject]] = None
 
     def perform(self, board, attacker, round_num):
-        target = select_in_range_target(board, attacker, self.att_range)
-
-        if target is not None:
-            row, col = board.find_location_of_target(target)
-            board.add_effect_to_terrain_for_attack(
-                self.element_type, row, col, self.shape
-            )
-        else:
+        self.shape.add((0, 0))
+        target_row, target_col = attacker.select_board_square_target(
+            board, self.att_range, self.shape
+        )
+        # if we don't get a target, return
+        if target_row is None:
             board.pyxel_manager.log.append("No target in range")
+            return
+
+        # if we're given damage, perform a damage attack
+        if self.damage:
+            attack_coords = [
+                (target_row + coordinate[0], target_col + coordinate[1])
+                for coordinate in self.shape
+            ]
+            board.attack_area(attacker, attack_coords, self.damage)
+
+        # if we're given an element, add elements to board
+        if self.element_type:
+            board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
-        return f"{self.element_type.__name__} Attack, Targets Opponent @\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+        attack_type = f"{self.element_type.__name__} " if self.element_type else ""
+        damage_str = f" for {self.damage} Damage" if self.damage else ""
+        return f"{attack_type}Attack{damage_str}, Targets Opponent @\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} throws {self.element_type.__name__}"
-
-
-@dataclass
-class ElementAreaEffectFromSelf(ActionStep):
-    shape: set
-    element_type: Type[obstacle.TerrainObject]
-
-    def perform(self, board, attacker, round_num):
-        target = attacker
-
-        row, col = board.find_location_of_target(target)
-        board.add_effect_to_terrain_for_attack(self.element_type, row, col, self.shape)
-
-    def __str__(self):
-        return f"{self.element_type.__name__} Attack, Fires from Self @\nShape:\n{shapes.print_shape(self.shape)}"
-
-    def perform_string(self, attacker):
-        return f"{attacker.name} throws {self.element_type.__name__}"
+        perform_str = f"{attacker.name} "
+        if self.element_type:
+            perform_str += f"throws {self.element_type.__name__}"
+            if self.damage:
+                perform_str += " and "
+        if self.damage:
+            perform_str += f"does {self.damage} damage"
+        return perform_str
 
 
 @dataclass
@@ -459,8 +477,6 @@ class PushAllEnemies(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from .agent import Human
-
         enemies = board.find_in_range_opponents_or_allies(
             attacker, self.att_range, opponents=True
         )
@@ -468,16 +484,15 @@ class PushAllEnemies(ActionStep):
             board.pyxel_manager.log.append("No one in range to push")
             return
 
-        is_legal_push_check = partial(
-            check_if_legal_push, board.find_location_of_target(attacker), board
-        )
+        attacker_loc = board.find_location_of_target(attacker)
+        is_legal_push_check = partial(check_if_legal_push, attacker_loc, board)
 
         for enemy in enemies:
             board.pyxel_manager.log.append(f"Pushing {enemy.name}")
 
             attacker.agent.move_other_character(
                 enemy,
-                board.find_location_of_target(attacker),
+                attacker_loc,
                 self.squares,
                 False,
                 board,
