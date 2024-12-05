@@ -68,11 +68,11 @@ def ring(radius):
     return shape
 
 
-def is_circle_or_arc(shape):
+def is_circle_or_ring(shape):
     max_coord = max(max(abs(x), abs(y)) for x, y in shape)
     circle_points = circle(max_coord)
-    arc_points = arc(max_coord)
-    return shape == circle_points or shape == arc_points
+    ring_points = ring(max_coord)
+    return shape == circle_points or shape == ring_points
 
 
 def print_shape(shape):
