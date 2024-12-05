@@ -341,3 +341,14 @@ class PyxelManager:
             if user_input == "f":
                 return attack_coords
             current_shape = next(shape_iterator)
+
+    def draw_cursor_grid_shape(self, shape: list[tuple[int, int]], client_id: str):
+        # flip to frontend tuple format
+        tile_shape_offsets = [(col, row) for row, col in shape]
+        task = tasks.DrawCursorGridShape(
+            tile_shape_offsets=tile_shape_offsets, grid_color=10
+        )
+        self.jsonify_and_send_task(task, client_id)
+
+    def turn_off_cursor_grid_shape(self, client_id: str):
+        self.jsonify_and_send_task(tasks.TurnOffCursorGridShape(), client_id)

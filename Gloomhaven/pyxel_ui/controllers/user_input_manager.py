@@ -14,6 +14,10 @@ class UserInputManager:
         self.server_client = server_client
         self.mouse_tile_pos = None
         self.last_mouse_pos = (-1, -1)
+        self.draw_shape_with_cursor = False
+        self.cursor_shape_offsets = []
+        self.default_grid_color = 3
+        self.grid_color = self.default_grid_color
 
     def update(self):
         if pyxel.btnp(pyxel.KEY_ESCAPE):
@@ -44,6 +48,13 @@ class UserInputManager:
                     grid_left_px, grid_top_px, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX
                 )
                 self.mouse_tile_pos = tile_pos
+                # and add the rest of the shape if needed
+                if self.draw_shape_with_cursor:
+                    shape_tiles = [
+                        (tile_pos[0] + offset[0], tile_pos[1] + offset[1])
+                        for offset in self.cursor_shape_offsets
+                    ]
+                    self.draw_grid_shape(shape_tiles, color=self.grid_color)
             else:
                 self.mouse_tile_pos = None
 

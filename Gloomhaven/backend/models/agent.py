@@ -82,7 +82,7 @@ class Agent(abc.ABC):
     @staticmethod
     @abc.abstractmethod
     def select_board_square_target(
-        board, client_id, att_range, attacker
+        board, client_id, att_range, attacker, shape
     ) -> tuple[int, int]:
         pass
 
@@ -200,7 +200,7 @@ class Ai(Agent):
 
     @staticmethod
     def select_board_square_target(
-        board, client_id, att_range, attacker
+        board, client_id, att_range, attacker, shape
     ) -> tuple[int, int]:
         """
         ai will only throw elements at enemeies, so they find an enemy to target
@@ -367,7 +367,7 @@ class Human(Agent):
 
     @staticmethod
     def select_board_square_target(
-        board, client_id, att_range, attacker
+        board, client_id, att_range, attacker, shape
     ) -> tuple[int, int]:
         attacker_loc = board.find_location_of_target(attacker)
         reachable_squares, _ = board.find_all_reachable_paths(
@@ -375,12 +375,11 @@ class Human(Agent):
         )
         target_row, target_col = (-1, -1)
         while (target_row, target_col) not in reachable_squares:
-            board.pyxel_manager.highlight_map_tiles(
-                reachable_squares, client_id, color=10
-            )
+            board.pyxel_manager.draw_cursor_grid_shape(shape, attacker.client_id)
             target_row, target_col = board.pyxel_manager.get_user_input(
                 prompt="Select a valid board square to attack",
                 is_mouse=True,
                 client_id=client_id,
             )
+        board.pyxel_manager.turn_off_cursor_grid_shape(attacker.client_id)
         return target_row, target_col
