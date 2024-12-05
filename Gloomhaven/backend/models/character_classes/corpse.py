@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Putrid Burst",
         actions=[
-            actions.AreaAttack(shape=shapes.circle(2), strength=1),
+            actions.AreaAttack(shape=shapes.cone(2), strength=1),
             actions.WeakenAllEnemies(2, 2),
         ],
         movement=2,

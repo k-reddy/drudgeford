@@ -50,6 +50,7 @@ cards = [
                 element_type=obstacle.Fire, shape=shapes.circle(2)
             ),
             action_model.AreaAttack(shape=shapes.circle(2), strength=5),
+            action_model.ModifySelfHealth(-3),
         ],
         movement=3,
         jump=True,

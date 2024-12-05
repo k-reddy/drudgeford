@@ -39,7 +39,7 @@ cards = [
         attack_name="Stone Flesh",
         actions=[
             actions.ShieldSelf(2, 2),
-            actions.AreaAttack(shape=shapes.circle(1), strength=3),
+            actions.AreaAttack(shape=shapes.bar(1, 2), strength=3),
         ],
         movement=3,
         jump=False,
