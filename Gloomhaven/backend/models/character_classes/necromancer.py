@@ -25,7 +25,7 @@ cards = [
         attack_name="Life Drain",
         actions=[
             action_model.ElementAreaEffectWithTarget(
-                shape=shapes.circle(radius=3), damage=3, att_range=2
+                shape=shapes.circle(radius=1), damage=4, att_range=2
             ),
             action_model.ModifySelfHealth(4),
         ],
@@ -51,7 +51,9 @@ cards = [
         attack_name="Death's Embrace",
         actions=[
             action_model.CurseAllEnemies(3),
-            action_model.AreaAttack(shapes.ring(1), 4),
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.ring(1), damage=4, element_type=Shadow, att_range=2
+            ),
             action_model.PushAllEnemies(1, 3),
         ],
         movement=0,

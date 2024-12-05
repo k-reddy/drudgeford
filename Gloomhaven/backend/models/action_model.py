@@ -71,6 +71,7 @@ class ElementAreaEffectWithTarget(ActionStep):
     element_type: Optional[Type[obstacle.TerrainObject]] = None
 
     def perform(self, board, attacker, round_num):
+        self.shape.add((0, 0))
         target_row, target_col = attacker.select_board_square_target(
             board, self.att_range, self.shape
         )
@@ -78,6 +79,14 @@ class ElementAreaEffectWithTarget(ActionStep):
         if target_row is None:
             board.pyxel_manager.log.append("No target in range")
             return
+
+        # if we're given damage, perform a damage attack
+        if self.damage:
+            attack_coords = [
+                (target_row + coordinate[0], target_col + coordinate[1])
+                for coordinate in self.shape
+            ]
+            board.attack_area(attacker, attack_coords, self.damage)
 
         # if we're given an element, add elements to board
         if self.element_type:
@@ -88,21 +97,20 @@ class ElementAreaEffectWithTarget(ActionStep):
                 self.shape,
             )
 
-        # if we're given damage, perform a damage attack
-        if self.damage:
-            attack_coords = [
-                (target_row + coordinate[0], target_col + coordinate[1])
-                for coordinate in self.shape
-            ]
-            board.attack_area(attacker, attack_coords, self.damage)
-
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
         damage_str = f" for {self.damage} Damage" if self.damage else ""
         return f"{attack_type}Attack{damage_str}, Targets Opponent @\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} throws {self.element_type.__name__}"
+        perform_str = f"{attacker.name} "
+        if self.element_type:
+            perform_str += f"throws {self.element_type.__name__}"
+            if self.damage:
+                perform_str += " and "
+        if self.damage:
+            perform_str += f"does {self.damage} damage"
+        return perform_str
 
 
 @dataclass
