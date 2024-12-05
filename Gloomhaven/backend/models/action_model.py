@@ -477,8 +477,6 @@ class PushAllEnemies(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        from .agent import Human
-
         enemies = board.find_in_range_opponents_or_allies(
             attacker, self.att_range, opponents=True
         )
@@ -486,16 +484,15 @@ class PushAllEnemies(ActionStep):
             board.pyxel_manager.log.append("No one in range to push")
             return
 
-        is_legal_push_check = partial(
-            check_if_legal_push, board.find_location_of_target(attacker), board
-        )
+        attacker_loc = board.find_location_of_target(attacker)
+        is_legal_push_check = partial(check_if_legal_push, attacker_loc, board)
 
         for enemy in enemies:
             board.pyxel_manager.log.append(f"Pushing {enemy.name}")
 
             attacker.agent.move_other_character(
                 enemy,
-                board.find_location_of_target(attacker),
+                attacker_loc,
                 self.squares,
                 False,
                 board,
