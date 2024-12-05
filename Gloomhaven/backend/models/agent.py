@@ -373,6 +373,7 @@ class Human(Agent):
         reachable_squares, _ = board.find_all_reachable_paths(
             start=attacker_loc, num_moves=att_range, exclude_walls_only=True
         )
+        reachable_squares.append(attacker_loc)
         target_row, target_col = (-1, -1)
         board.pyxel_manager.draw_cursor_grid_shape(
             shape, attacker.client_id, reachable_squares
