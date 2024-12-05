@@ -112,3 +112,14 @@ class UserInputManager:
         self.input = ""
         self.accept_mouse_input = True
         self.prompt = prompt
+
+    def draw_grid_shape(self, tiles, color):
+        for tile in tiles:
+            if tile not in self.view_manager.map_view.valid_map_coordinates:
+                continue
+            x, y = self.view_manager.map_view.convert_grid_to_pixel_pos(
+                tile[0], tile[1]
+            )
+            self.view_manager.draw_grid(
+                x, y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color
+            )
