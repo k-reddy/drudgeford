@@ -446,11 +446,13 @@ class RedrawMap(Task):
 class DrawCursorGridShape(Task):
     tile_shape_offsets: list[tuple[int, int]]
     grid_color: int
+    valid_starting_squares: list[tuple[int, int]]
 
     def perform(self, view_manager, user_input_manager):
         user_input_manager.draw_shape_with_cursor = True
         user_input_manager.cursor_shape_offsets = self.tile_shape_offsets
         user_input_manager.grid_color = self.grid_color
+        user_input_manager.valid_starting_squares = self.valid_starting_squares
 
 
 @dataclass
@@ -459,3 +461,4 @@ class TurnOffCursorGridShape(Task):
         user_input_manager.draw_shape_with_cursor = False
         user_input_manager.cursor_shape_offsets = []
         user_input_manager.grid_color = user_input_manager.default_grid_color
+        user_input_manager.valid_starting_squares = []

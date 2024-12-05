@@ -19,13 +19,11 @@ cards = [
     action_model.ActionCard(
         attack_name="Fire and Ice",
         actions=[
-            action_model.AreaAttack(shape=shapes.cone(3), strength=2),
-            action_model.ElementAreaEffectFromSelf(
-                shape=shapes.cone(3), element_type=obstacle.Fire
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Fire
             ),
-            action_model.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
-                element_type=obstacle.Ice,
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.cone(2), att_range=2, damage=2, element_type=obstacle.Ice
             ),
         ],
         movement=3,
@@ -74,8 +72,12 @@ cards = [
         jump=False,
     ),
     action_model.ActionCard(
-        attack_name="B-Line",
-        actions=[action_model.AreaAttack(shape=shapes.line(3), strength=4)],
+        attack_name="Phase Strike",
+        actions=[
+            action_model.ElementAreaEffectWithTarget(
+                shape=shapes.bar(1, 2), damage=4, att_range=3
+            )
+        ],
         movement=2,
         jump=True,
     ),

@@ -374,8 +374,10 @@ class Human(Agent):
             start=attacker_loc, num_moves=att_range, exclude_walls_only=True
         )
         target_row, target_col = (-1, -1)
+        board.pyxel_manager.draw_cursor_grid_shape(
+            shape, attacker.client_id, reachable_squares
+        )
         while (target_row, target_col) not in reachable_squares:
-            board.pyxel_manager.draw_cursor_grid_shape(shape, attacker.client_id)
             target_row, target_col = board.pyxel_manager.get_user_input(
                 prompt="Select a valid board square to attack",
                 is_mouse=True,
