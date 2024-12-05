@@ -54,9 +54,9 @@ cards = [
     actions.ActionCard(
         attack_name="Flame Wall",
         actions=[
-            actions.AreaAttack(shape=shapes.line((1, 0), 3), strength=3),
+            actions.AreaAttack(shape=shapes.line(3), strength=3),
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.line((1, 0), 3), element_type=obstacle.Fire
+                shape=shapes.line(3), element_type=obstacle.Fire
             ),
         ],
         movement=1,

@@ -24,6 +24,9 @@ class PyxelManager:
         entities = []
         # get all the coordinates on the map
         valid_map_coordinates = self.generate_valid_map_coordinates(locations)
+        self.backend_valid_map_coords = set(
+            [(col, row) for row, col in valid_map_coordinates]
+        )
         # there are sometimes full rows and columns of nothing - set offsets and remove those rows/cols
         self.set_x_y_offset(valid_map_coordinates)
         valid_map_coordinates = [
@@ -63,7 +66,6 @@ class PyxelManager:
                             "priority": OTHER_PRIORITY,
                         }
                     )
-        print(valid_map_coordinates)
         tasks_to_send = []
         tasks_to_send.append(
             tasks.BoardInitTask(
@@ -307,13 +309,12 @@ class PyxelManager:
         task = tasks.HighlightMapTiles(color, normalized_tiles)
         self.jsonify_and_send_task(task, client_id)
 
-    def pick_attack_orientation(
+    def pick_rotated_attack_coordinates(
         self, shape: set, starting_coord: tuple[int, int], client_id: str
     ):
         # get all the shapes as something we can iterate through cyclically
-        shape_iterator = cycle(
-            list(shapes.get_all_directional_rotations(shape).values())
-        )
+        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        shape_iterator = cycle(shape_list)
         current_shape = next(shape_iterator)
 
         # keep iterating through the shapes and displaying them
@@ -323,6 +324,11 @@ class PyxelManager:
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in current_shape
             ]
+
+            # if nothing in this shape will show up on the map, move to the next shape
+            if len(set(attack_coords).intersection(self.backend_valid_map_coords)) == 0:
+                current_shape = next(shape_iterator)
+                continue
             # display potential attack in yellow
             self.highlight_map_tiles(attack_coords, client_id, color=10)
             user_input = self.get_user_input(

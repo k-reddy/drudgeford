@@ -10,54 +10,43 @@ cards = [
             actions.Teleport(2),
         ],
         movement=3,
-        jump=True
+        jump=True,
     ),
     actions.ActionCard(
         attack_name="Spectral Chains",
-        actions=[
-            actions.Pull(3, 4),
-            actions.CurseAllEnemies(2)
-        ],
+        actions=[actions.Pull(3, 4), actions.CurseAllEnemies(2)],
         movement=2,
-        jump=True
+        jump=True,
     ),
     actions.ActionCard(
         attack_name="Haunting Mist",
         actions=[
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
-                element_type=obstacle.Shadow
+                shape=shapes.arc(4), element_type=obstacle.Shadow
             ),
-            actions.AreaAttack(
-                shape=shapes.circle(2),
-                strength=3
-            ),
-            actions.WeakenAllEnemies(1, 2)
+            actions.AreaAttack(shape=shapes.arc(4), strength=3),
+            actions.WeakenAllEnemies(1, 2),
         ],
         movement=3,
-        jump=True
+        jump=True,
     ),
     actions.ActionCard(
         attack_name="Possession",
-        actions=[
-            actions.Pull(2, 3),
-            actions.BlessAllAllies(3)
-        ],
+        actions=[actions.Pull(2, 3), actions.BlessAllAllies(3)],
         movement=2,
-        jump=True
+        jump=True,
     ),
     actions.ActionCard(
         attack_name="Ethereal Dance",
         actions=[
             actions.Teleport(3),
             actions.ElementAreaEffectFromSelf(
-                shape=shapes.circle(2),
-                element_type=obstacle.Shadow
+                shape=shapes.circle(2), element_type=obstacle.Shadow
             ),
-            actions.AreaAttack(shape=shapes.circle(2),strength=3)
+            actions.AreaAttack(shape=shapes.circle(2), strength=3),
         ],
         movement=2,
-        jump=True
+        jump=True,
     ),
     actions.ActionCard(
         attack_name="Terror",
@@ -67,8 +56,8 @@ cards = [
             actions.PushAllEnemies(2, 2),
         ],
         movement=2,
-        jump=True
-    )
+        jump=True,
+    ),
 ]
 
 health = 3

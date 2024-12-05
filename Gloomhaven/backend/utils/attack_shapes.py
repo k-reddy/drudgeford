@@ -9,7 +9,8 @@ def circle(radius: int):
     return directions
 
 
-def line(direction: tuple, length: int):
+def line(length: int):
+    direction = (1, 0)
     directions = set()
     for i in range(1, length + 1):
         coord_to_add = [dir_coord * i for dir_coord in direction]
@@ -41,9 +42,9 @@ def cone(length: int):
     directions = set()
     for y in range(length + 1):
         for x in range(y):
-            directions.add((x, y))
-            directions.add((-x, y))
-            directions.add((0, y))
+            directions.add((y, -x))
+            directions.add((y, x))
+            directions.add((y, 0))
     return directions
 
 
@@ -65,6 +66,13 @@ def ring(radius):
             if abs(x) + abs(y) == radius:
                 shape.add((x, y))
     return shape
+
+
+def is_circle_or_ring(shape):
+    max_coord = max(max(abs(x), abs(y)) for x, y in shape)
+    circle_points = circle(max_coord)
+    ring_points = ring(max_coord)
+    return shape == circle_points or shape == ring_points
 
 
 def print_shape(shape):
@@ -89,13 +97,17 @@ def print_shape(shape):
 def get_all_directional_rotations(shape):
     transforms = [
         lambda x, y: (x, y),
+        lambda x, y: (x, y - 1),
+        lambda x, y: (y + 1, -x),
         lambda x, y: (y, -x),
+        lambda x, y: (y - 1, -x),
+        lambda x, y: (-x, -y - 1),
         lambda x, y: (-x, -y),
+        lambda x, y: (-x, -y + 1),
+        lambda x, y: (-y - 1, x),
         lambda x, y: (-y, x),
-        lambda x, y: (x - y, -y),
-        lambda x, y: (x - y, y),
-        lambda x, y: (x, y - x),
-        lambda x, y: (-x, y - x),
+        lambda x, y: (-y + 1, x),
+        lambda x, y: (x, y + 1),
     ]
     all_shapes = {}
     for i, transform in enumerate(transforms):
@@ -117,10 +129,7 @@ def print_all_directions(shape):
 # Example usage with a simple line
 def demo_directional_rotations():
     # Create a vertical line
-    # vertical_line = line((1, 1), 3)
-    vertical_line = arc(3)
+    # vertical_line = line((1, 0), 3)
+    vertical_line = cone(2)
 
     print_all_directions(vertical_line)
-
-
-# demo_directional_rotations()

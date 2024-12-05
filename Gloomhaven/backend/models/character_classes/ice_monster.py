@@ -26,7 +26,7 @@ cards = [
     actions.ActionCard(
         attack_name="Avalanche Charge",
         actions=[
-            actions.AreaAttack(shape=shapes.line((1, 0), 3), strength=3),
+            actions.AreaAttack(shape=shapes.line(3), strength=3),
             actions.PushAllEnemies(1, 1),
         ],
         movement=4,
