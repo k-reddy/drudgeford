@@ -120,5 +120,23 @@ class Shadow(TerrainObject):
         self.pyxel_sprite_name = "shadow"
 
 
+class Web(TerrainObject):
+    def __init__(self, round_num, obj_id):
+        super().__init__(round_num, obj_id)
+        self.emoji = "🧊"
+        self.pyxel_sprite_name = "web"
+
+    def perform(self, row, col, board, affected_character):
+        if random.random() < 0.25:
+            if board.acting_character == affected_character:
+                raise EntrappedAndLoseTurn("Trapped!")
+            else:
+                affected_character.lose_turn = True
+
+
 class SlipAndLoseTurn(Exception):
+    pass
+
+
+class EntrappedAndLoseTurn(Exception):
     pass

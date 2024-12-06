@@ -27,9 +27,7 @@ cards = [
     actions.ActionCard(
         attack_name="Nightmare Web",
         actions=[
-            actions.AreaAttackFromSelf(
-                element_type=obstacle.Trap, shape=shapes.ring(2)
-            ),
+            actions.AreaAttackFromSelf(element_type=obstacle.Web, shape=shapes.ring(2)),
             actions.Pull(2, 3),
             actions.PushAllEnemies(2, 3),
             actions.CurseAllEnemies(3),
