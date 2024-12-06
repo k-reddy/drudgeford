@@ -6,7 +6,9 @@ cards = [
     actions.ActionCard(
         attack_name="Putrid Burst",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.cone(2), strength=1),
+            actions.AreaAttackFromSelf(
+                shape=shapes.cone(2), strength=1, element_type=obstacle.InfectedOoze
+            ),
             actions.WeakenAllEnemies(2, 2),
         ],
         movement=2,
@@ -16,7 +18,7 @@ cards = [
         attack_name="Infectious Trail",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.line(3), element_type=obstacle.Spores, strength=2
+                shape=shapes.line(3), element_type=obstacle.InfectedOoze, strength=2
             ),
             actions.WeakenAllEnemies(1, 2),
         ],
