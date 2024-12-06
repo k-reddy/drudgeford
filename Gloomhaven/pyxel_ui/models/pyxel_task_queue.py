@@ -1,10 +1,6 @@
 from collections import deque
 from typing import Optional
-
-from .tasks import Task, BoardInitTask
-
-# all tasks are children of Task except BoardInitTask
-task_type = Task | BoardInitTask
+from .tasks import Task
 
 
 class PyxelTaskQueue:
@@ -19,13 +15,13 @@ class PyxelTaskQueue:
     def __init__(self):
         self.queue = deque()
 
-    def enqueue(self, action: task_type) -> None:
+    def enqueue(self, action: Task) -> None:
         self.queue.append(action)
 
     def is_empty(self) -> bool:
         return not len(self.queue)
 
-    def dequeue(self) -> task_type:
+    def dequeue(self) -> Task:
         if not self.is_empty():
             return self.queue.popleft()
         raise IndexError("Cannot pop from empty queue")
@@ -33,7 +29,7 @@ class PyxelTaskQueue:
     def clear(self) -> None:
         self.queue.clear()
 
-    def peek(self) -> Optional[task_type]:
+    def peek(self) -> Optional[Task]:
         if self.is_empty():
             return None
         return self.queue[0]
