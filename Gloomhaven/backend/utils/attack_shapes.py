@@ -69,12 +69,13 @@ def ring(radius):
 
 
 def is_circle_or_ring(shape):
-    # sometimes we remove (0,0), so add just in case
-    shape.add((0, 0))
+    circle_shape = set(shape)
+    # sometimes we remove (0,0), so add just in case for circle
+    circle_shape.add((0, 0))
     max_coord = max(max(abs(x), abs(y)) for x, y in shape)
-    circle_points = circle(max_coord)
     ring_points = ring(max_coord)
-    return shape == circle_points or shape == ring_points
+    circle_points = circle(max_coord)
+    return circle_shape == circle_points or shape == ring_points
 
 
 def is_circle(shape):

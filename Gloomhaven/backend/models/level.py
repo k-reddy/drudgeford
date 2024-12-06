@@ -47,18 +47,18 @@ campaign_levels = [
     #     pre_level_text="""As the last demon falls, the infernal heat suddenly crystallizes into deadly cold. Your victory over the demons is cut short by a sinister laugh echoing through your mind and the realization that your journey is not taking you homeward. You crash onto a vast tundra, where howling winds whip endless sheets of snow and ice in every direction. Through the blinding white, you glimpse an ancient dragon's massive form circling overhead, its scales gleaming like shards of frozen starlight. You know instantly that this battle will be harder than all that came before.""",
     #     starting_elements=[obstacle.Ice, obstacle.Trap],
     # ),
-    Level(
-        floor_color_map=[],
-        wall_color_map=[],
-        monster_classes=[
-            character.Ghost,
-            character.WailingSpirit,
-            character.Corpse,
-            character.Skeleton,
-        ],
-        pre_level_text="""Your last enemy crashes to the frozen earth with a thunderous impact that splinters the ice beneath. But as the snow settles, the ground continues to crack and decay, the pristine white turning to rotting soil. The crisp winter air grows thick with the stench of decay, and through the mist rising from freshly disturbed graves, you see hands prying their way out of the earth. Horrors beyond your darkest nightmares emerge from the shadows - translucent spirits wailing in eternal agony, ethereal wraiths drifting between tombstones, and things for which you have no name. The sheer number and intensity of these abominations makes one thing clear: whatever force has been testing you is now desperate to ensure you don't survive this nightmare.""",
-        starting_elements=[obstacle.Shadow, obstacle.Trap, obstacle.Shadow],
-    ),
+    # Level(
+    #     floor_color_map=[],
+    #     wall_color_map=[],
+    #     monster_classes=[
+    #         character.Ghost,
+    #         character.WailingSpirit,
+    #         character.Corpse,
+    #         character.Skeleton,
+    #     ],
+    #     pre_level_text="""Your last enemy crashes to the frozen earth with a thunderous impact that splinters the ice beneath. But as the snow settles, the ground continues to crack and decay, the pristine white turning to rotting soil. The crisp winter air grows thick with the stench of decay, and through the mist rising from freshly disturbed graves, you see hands prying their way out of the earth. Horrors beyond your darkest nightmares emerge from the shadows - translucent spirits wailing in eternal agony, ethereal wraiths drifting between tombstones, and things for which you have no name. The sheer number and intensity of these abominations makes one thing clear: whatever force has been testing you is now desperate to ensure you don't survive this nightmare.""",
+    #     starting_elements=[obstacle.Shadow, obstacle.Trap, obstacle.Shadow],
+    # ),
     Level(
         floor_color_map=[(1, 8), (5, 14)],
         wall_color_map=[(1, 2), (13, 8)],
@@ -77,7 +77,7 @@ campaign_levels = [
         wall_color_map=[],
         monster_classes=[character.Puppet, character.Puppet, character.Orchestrator],
         pre_level_text="""As the flesh-chamber convulses one final time, reality tears itself apart and then snaps back into focus. You find yourself standing in Drudgeford once again - but not as you remember it. The village square stretches before you, warped by unnatural shadows, and at its center stands the one you've been pursuing: the Orchestrator. Their hood falls back revealing a face that's both ancient and impossibly young, twisted by the dark forces they command. "You've survived every nightmare I could conjure," they snarl, dark energy crackling between their fingers. "But here, where it all began, I'll show you my true power." The fate of your home hangs in the balance as you ready yourself for the final battle, knowing that either your village will see another dawn - or be lost forever to the Orchestrator's darkness.""",
-        starting_elements=[obstacle.Shadow] * 5,
+        starting_elements=[obstacle.Shadow] * 3,
     ),
 ]
 
