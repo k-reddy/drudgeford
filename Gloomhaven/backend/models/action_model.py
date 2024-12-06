@@ -167,7 +167,7 @@ class WeakenEnemy(ActionStep):
         if not target:
             return
         target.attack_modifier_deck.append(modifier)
-        board.pyxel_manager.log.append(f"Weakend {target.name} by {self.strength}")
+        board.pyxel_manager.log.append(f"Weakened {target.name} by {self.strength}")
 
     def __str__(self):
         return f"Cause one enemy to draw {self.strength} as next attack modifier, Range {self.att_range}"
