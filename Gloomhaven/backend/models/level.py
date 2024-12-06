@@ -40,9 +40,9 @@ campaign_levels = [
     #     floor_color_map=[(1, 6), (5, 7)],
     #     wall_color_map=[(13, 12)],
     #     monster_classes=[
-    #         character.IceDragon,
     #         character.SnowStalker,
     #         character.IceMonster,
+    #         character.IceDragon,
     #     ],
     #     pre_level_text="""As the last demon falls, the infernal heat suddenly crystallizes into deadly cold. Your victory over the demons is cut short by a sinister laugh echoing through your mind and the realization that your journey is not taking you homeward. You crash onto a vast tundra, where howling winds whip endless sheets of snow and ice in every direction. Through the blinding white, you glimpse an ancient dragon's massive form circling overhead, its scales gleaming like shards of frozen starlight. You know instantly that this battle will be harder than all that came before.""",
     #     starting_elements=[obstacle.Ice, obstacle.Trap],
