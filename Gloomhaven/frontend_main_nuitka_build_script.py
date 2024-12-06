@@ -26,6 +26,7 @@ def create_build_script():
         "pyxel_ui.views.sprite",
         "server.tcp_client",
         "server.task_jsonifier",
+        "server.server_utils",
     ]
 
     # Base Nuitka command
