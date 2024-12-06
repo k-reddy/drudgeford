@@ -373,7 +373,12 @@ class ActionCardView(CarouselView):
         for card in self.items[start_idx:end_idx]:
             self.text_pixels.extend(
                 self.font.draw_text(
-                    x, y, card, col=self.font_color, size="medium", max_width=card_width
+                    x,
+                    y,
+                    card,
+                    col=self.font_color,
+                    size="medium",
+                    max_width=card_width,
                 )
             )
             x += card_width + card_border

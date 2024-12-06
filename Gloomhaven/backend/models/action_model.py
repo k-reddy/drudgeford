@@ -43,10 +43,8 @@ class AreaAttackFromSelf(ActionStep):
 
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
-        damage_str = f" for {self.strength} Damage" if self.strength else ""
-        return (
-            f"{attack_type}Attack{damage_str}, Shape:\n{shapes.print_shape(self.shape)}"
-        )
+        damage_str = f" {self.strength}" if self.strength else ""
+        return f"{attack_type}Attack{damage_str}:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         perform_str = f"{attacker.name} "
@@ -70,7 +68,7 @@ class SingleTargetAttack(ActionStep):
             board.pyxel_manager.log.append("No targets in range for attack")
 
     def __str__(self):
-        return f"Single Target Attack, Strength {self.strength}, Range {self.att_range}"
+        return f"Attack {self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -107,8 +105,8 @@ class AreaAttackWithTarget(ActionStep):
 
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
-        damage_str = f" for {self.damage} Damage" if self.damage else ""
-        return f"{attack_type}Attack{damage_str}, Targets Opponent @\nRange {self.att_range} and Shape:\n{shapes.print_shape(self.shape)}"
+        damage_str = f" {self.damage}" if self.damage else ""
+        return f"{attack_type}Attack{damage_str} <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         perform_str = f"{attacker.name} "
@@ -130,7 +128,7 @@ class Teleport(ActionStep):
             board.teleport_character(target)
 
     def __str__(self):
-        return f"Teleport Another Character, Range {self.att_range}"
+        return f"Teleport Enemy <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -145,7 +143,7 @@ class ChargeNextAttack(ActionStep):
         attacker.attack_modifier_deck.append(modifier)
 
     def __str__(self):
-        return f"Charge next attack {self.strength}"
+        return f"+{self.strength} next attack"
 
     def perform_string(self, attacker):
         return f"{attacker.name} charges next attack +{self.strength}"
@@ -166,7 +164,7 @@ class WeakenEnemy(ActionStep):
         board.pyxel_manager.log.append(f"Weakened {target.name} by {self.strength}")
 
     def __str__(self):
-        return f"Cause one enemy to draw {self.strength} as next attack modifier, Range {self.att_range}"
+        return f"Weaken enemy by {self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -187,7 +185,7 @@ class WeakenAllEnemies(ActionStep):
             board.pyxel_manager.log.append(f"{enemy.name}")
 
     def __str__(self):
-        return f"Weaken all enemies by {self.strength}, Range {self.att_range}"
+        return f"-{self.strength} next attack all enemies <{self.att_range}>"
 
     def perform_string(self, attacker):
         return f"{attacker.name} weakens these enemies by {self.strength}:"
@@ -202,7 +200,7 @@ class ShieldSelf(ActionStep):
         attacker.shield = (self.strength, round_num + self.duration)
 
     def __str__(self):
-        return f"Shield {self.strength} self, {self.duration} turn{'s' if self.duration>1 else ''}"
+        return f"Shield {self.strength}, {self.duration} turn{'s' if self.duration>1 else ''}"
 
     def perform_string(self, attacker):
         return f"{attacker.name} shields {self.strength} self, {self.duration} turn{'s' if self.duration>1 else ''}"
@@ -223,7 +221,7 @@ class ShieldAllAllies(ActionStep):
             board.pyxel_manager.log.append(f"{ally.name}")
 
     def __str__(self):
-        return f"Shield {self.strength} all allies, Range {self.att_range}, {self.duration} turns"
+        return f"Shield {self.strength} all allies <{self.att_range}>, {self.duration} turns"
 
     def perform_string(self, attacker):
         return f"Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ''} these allies:"
@@ -238,7 +236,7 @@ class ModifySelfHealth(ActionStep):
 
     def __str__(self):
         if self.strength > 0:
-            return f"Heal self for {self.strength}"
+            return f"Heal {self.strength}"
         else:
             return f"Take {self.strength} damage"
 
@@ -256,7 +254,7 @@ class HealAlly(ActionStep):
         board.modify_target_health(target, -self.strength)
 
     def __str__(self):
-        return f"Heal ally {self.strength}, Range {self.att_range}"
+        return f"Heal ally {self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -275,7 +273,7 @@ class HealAllAllies(ActionStep):
             board.modify_target_health(ally, -self.strength)
 
     def __str__(self):
-        return f"Heal all allies for {self.strength}, Range {self.att_range}"
+        return f"Heal all allies {self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return f"{attacker.name} heals allies"
@@ -289,7 +287,7 @@ class BlessSelf(ActionStep):
         attacker.attack_modifier_deck.insert(rand_index, modifier)
 
     def __str__(self):
-        return "Bless self, one 2x modifier card"
+        return "Bless self"
 
     def perform_string(self, attacker):
         return f"{attacker.name} blesses self"
@@ -312,7 +310,7 @@ class BlessAndChargeAlly(ActionStep):
         )
 
     def __str__(self):
-        return f"Bless one ally, Range {self.att_range}, and charge their next attack +{self.strength}"
+        return f"Bless ally <{self.att_range}>\n+{self.strength} next attack"
 
     def perform_string(self, attacker):
         return ""
@@ -333,7 +331,7 @@ class BlessAllAllies(ActionStep):
             board.pyxel_manager.log.append(f"Blessed {ally.name}")
 
     def __str__(self):
-        return f"Bless all allies, Range {self.att_range}, One 2x modifier card each"
+        return f"Bless all allies <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -353,7 +351,7 @@ class Curse(ActionStep):
         board.pyxel_manager.log.append(f"Cursed {target.name}")
 
     def __str__(self):
-        return f"Curse an enemy, Range {self.att_range}\nOne null modifier card"
+        return f"Curse enemy <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -367,7 +365,7 @@ class CurseSelf(ActionStep):
         attacker.attack_modifier_deck.insert(rand_index, modifier)
 
     def __str__(self):
-        return "Curse self, One null modifier card"
+        return "Curse self"
 
     def perform_string(self, attacker):
         return f"{attacker.name} curses self"
@@ -388,7 +386,7 @@ class CurseAllEnemies(ActionStep):
             board.pyxel_manager.log.append(f"Cursed {enemy.name}")
 
     def __str__(self):
-        return f"Curse all enemies, Range {self.att_range}"
+        return f"Curse all enemies <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -424,7 +422,7 @@ class Pull(ActionStep):
         board.pyxel_manager.log.append("Pull completed")
 
     def __str__(self):
-        return f"Pull {self.squares}, any enemy, range {self.att_range}"
+        return f"Pull {self.squares} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -461,7 +459,7 @@ class Push(ActionStep):
         board.pyxel_manager.log.append("Push completed")
 
     def __str__(self):
-        return f"Push {self.squares}, Any enemy, Range {self.att_range}"
+        return f"Push {self.squares} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -497,7 +495,7 @@ class PushAllEnemies(ActionStep):
             )
 
     def __str__(self):
-        return f"Push {self.squares} all enemies, Range {self.att_range}"
+        return f"Push {self.squares} all enemies <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -512,7 +510,7 @@ class SummonSkeleton(ActionStep):
         board.add_new_ai_char(attacker.team_monster, Skeleton)
 
     def __str__(self):
-        return "Summon a skeleton to fight alongside you."
+        return "Summon a skeleton"
 
     def perform_string(self, attacker):
         return f"{attacker.name} summons a skeleton"
@@ -526,7 +524,7 @@ class SummonPuppet(ActionStep):
         board.add_new_ai_char(attacker.team_monster, Puppet)
 
     def __str__(self):
-        return "Summon a puppet to fight alongside you."
+        return "Summon a puppet"
 
     def perform_string(self, attacker):
         return f"{attacker.name} summons a puppet"
@@ -545,7 +543,7 @@ class MakeObstableArea(ActionStep):
         board.set_obstacles_in_area(starting_coordinate, self.shape, self.obstacle_type)
 
     def __str__(self):
-        return f"Set {self.obstacle_type.__name__}, Shape:\n{shapes.print_shape(self.shape)}"
+        return f"Set {self.obstacle_type.__name__}:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         return f"{attacker.name} creates {self.obstacle_type.__name__}"
@@ -574,7 +572,7 @@ class MoveAlly(ActionStep):
         board.pyxel_manager.log.append(f"Moved {target.name}")
 
     def __str__(self):
-        return f"Move {self.squares}, one ally, Range {self.att_range}"
+        return f"Move {self.squares} one ally <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -603,9 +601,10 @@ class ActionCard:
         return setattr(self, key, value)
 
     def __str__(self):
-        print_str = f"{self.attack_name}\nMovement {self.movement}"
-        if self.jump:
-            print_str += ", Jump"
+        print_str = f"{self.attack_name}\n"
+        if self.movement != 0:
+            print_str += "\nJump" if self.jump else "\nMove"
+            print_str += f" {self.movement}\n"
         for action in self.actions:
             print_str += f"\n{action}"
         return print_str
