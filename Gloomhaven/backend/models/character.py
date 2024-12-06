@@ -78,15 +78,32 @@ class Character(abc.ABC):
         )
 
     def short_rest(self) -> None:
+        # kill a random card that's not already been killed and that's used (not available)
+        killed_card = random.choice(
+            [
+                card
+                for card in self.action_cards
+                if card not in self.killed_action_cards
+                and card not in self.available_action_cards
+            ]
+        )
         # reset our available cards
         self.available_action_cards = [
             card for card in self.action_cards if card not in self.killed_action_cards
         ]
-        # kill a random card, update the user, remove it from play, and keep track for next round
-        killed_card = random.choice(self.available_action_cards)
-        self.log.append(f"{self.name} short rested and lost {killed_card}")
+        # update the user, remove it from play, and keep track for next round
+        # only update people with a frontend
+        if self.client_id:
+            self.pyxel_manager.get_user_input(
+                prompt=f"You short rested and lost {killed_card}\nHit enter to continue",
+                client_id=self.client_id,
+            )
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
+        # load new available cards
+        self.pyxel_manager.load_action_cards(
+            self.available_action_cards, self.client_id
+        )
 
     def make_attack_modifier_deck(self) -> list:
         attack_modifier_deck = [
@@ -104,22 +121,28 @@ class Character(abc.ABC):
         return attack_modifier_deck
 
     def pick_rotated_attack_coordinates(
-        self, board, shape: set, starting_coord: tuple[int, int]
+        self, board, shape: set, starting_coord: tuple[int, int], from_self: bool = True
     ) -> list[tuple[int, int]]:
         """
         gets an attack shape rotation and attack coordinates (not offsets)
         from agent
+        if from_self=false, we're using this for an area attack with target,
+        so we only show cardinal directions
         """
         # we do not rotate cirlces or rings
         if shapes.is_circle_or_ring(shape):
-            print("it's a circle!")
             return [
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape
             ]
+        else:
+            shape.discard((0, 0))
         return self.agent.pick_rotated_attack_coordinates(
-            board, shape, starting_coord, self.client_id, self.team_monster
+            board, shape, starting_coord, self.client_id, self.team_monster, from_self
         )
+
+    def decide_if_short_rest(self):
+        return self.agent.decide_if_short_rest(self.pyxel_manager, self.client_id)
 
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]

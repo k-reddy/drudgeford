@@ -7,7 +7,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Heavy Hammer",
         actions=[
-            action_model.SingleTargetAttack(strength=4, att_range=1),
+            action_model.SingleTargetAttack(strength=5, att_range=1, knock_down=True),
             action_model.ChargeNextAttack(strength=2),
         ],
         movement=0,
@@ -15,14 +15,14 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Pickaxe Swipe",
-        actions=[action_model.AreaAttackFromSelf(shape=shapes.arc(2), strength=4)],
+        actions=[action_model.AreaAttackFromSelf(shape=shapes.arc(3), strength=4)],
         movement=3,
         jump=False,
     ),
     action_model.ActionCard(
         attack_name="Mason's Shield",
         actions=[
-            action_model.ShieldSelf(strength=1, duration=2),
+            action_model.ShieldSelf(strength=2, duration=2),
             action_model.SingleTargetAttack(strength=4, att_range=1),
         ],
         movement=2,
@@ -71,14 +71,14 @@ cards = [
         attack_name="Tax Assessment",
         actions=[
             action_model.Pull(squares=2, att_range=3),
-            action_model.SingleTargetAttack(strength=3, att_range=1),
+            action_model.SingleTargetAttack(strength=3, att_range=1, knock_down=True),
             action_model.WeakenEnemy(strength=-2, att_range=1),
         ],
         movement=2,
         jump=False,
     ),
     action_model.ActionCard(
-        attack_name="Stone Defense Rescue",
+        attack_name="Stone Defense",
         actions=[
             action_model.MakeObstableArea(obstacle_type=Rock, shape=shapes.bar(1, 1)),
             action_model.ShieldAllAllies(strength=2, duration=1, att_range=2),

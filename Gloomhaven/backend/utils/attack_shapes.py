@@ -69,12 +69,21 @@ def ring(radius):
 
 
 def is_circle_or_ring(shape):
+    circle_shape = set(shape)
+    # sometimes we remove (0,0), so add just in case for circle
+    circle_shape.add((0, 0))
+    max_coord = max(max(abs(x), abs(y)) for x, y in shape)
+    ring_points = ring(max_coord)
+    circle_points = circle(max_coord)
+    return circle_shape == circle_points or shape == ring_points
+
+
+def is_circle(shape):
     # sometimes we remove (0,0), so add just in case
     shape.add((0, 0))
     max_coord = max(max(abs(x), abs(y)) for x, y in shape)
     circle_points = circle(max_coord)
-    ring_points = ring(max_coord)
-    return shape == circle_points or shape == ring_points
+    return shape == circle_points
 
 
 def print_shape(shape):
@@ -114,7 +123,19 @@ def get_all_directional_rotations(shape):
     all_shapes = {}
     for i, transform in enumerate(transforms):
         all_shapes[i] = [transform(x, y) for x, y in shape]
+    return all_shapes
 
+
+def get_cardinal_rotations(shape):
+    transforms = [
+        lambda x, y: (x, y),
+        lambda x, y: (y, -x),
+        lambda x, y: (-x, -y),
+        lambda x, y: (-y, x),
+    ]
+    all_shapes = {}
+    for i, transform in enumerate(transforms):
+        all_shapes[i] = [transform(x, y) for x, y in shape]
     return all_shapes
 
 

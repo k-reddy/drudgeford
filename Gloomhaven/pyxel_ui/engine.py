@@ -76,8 +76,6 @@ class PyxelEngine:
             start_time = time.time()
             current_task_json = self.task_queue.popleft()
             self.current_task = self.tj.make_task_from_json(current_task_json)
-            if self.current_task:
-                print(self.current_task.__class__.__name__)
             unjsonify_time = time.time() - start_time
 
         if self.current_task:

@@ -47,9 +47,9 @@ class Campaign:
 
         # see if the user wants to load an existing campaign
         # and do so if desired
-        campaign_pickle_to_load = self.pyxel_manager.get_campaign_to_load()
-        if campaign_pickle_to_load:
-            self.load_campaign(campaign_pickle_to_load)
+        # campaign_pickle_to_load = self.pyxel_manager.get_campaign_to_load()
+        # if campaign_pickle_to_load:
+        #     self.load_campaign(campaign_pickle_to_load)
 
     def load_campaign(self, campaign_pickle_to_load):
         # get the data needed to recreate the campaign
@@ -121,7 +121,7 @@ class Campaign:
                 num_players=self.num_players,
                 prompt=message + "\nAll players must press enter to continue",
             )
-            self.save_campaign()
+            # self.save_campaign()
 
     def set_num_players(self):
         if not self.all_ai_mode:

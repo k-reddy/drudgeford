@@ -4,7 +4,7 @@ from backend.utils import attack_shapes as shapes
 cards = [
     actions.ActionCard(
         attack_name="Crushing Slam",
-        actions=[actions.SingleTargetAttack(4, 1), actions.Push(2, 1)],
+        actions=[actions.SingleTargetAttack(4, 1, knock_down=True), actions.Push(2, 1)],
         movement=2,
         jump=False,
     ),
