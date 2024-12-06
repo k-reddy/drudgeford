@@ -36,10 +36,10 @@ cards = [
         jump=False,
     ),
     actions.ActionCard(
-        attack_name="Blood Rain",
+        attack_name="Necrotic Storm",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Fire
+                shape=shapes.ring(2), element_type=obstacle.RottingFlesh
             ),
             actions.WeakenAllEnemies(2, 2),
         ],
