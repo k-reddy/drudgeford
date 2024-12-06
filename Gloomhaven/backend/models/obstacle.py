@@ -39,7 +39,7 @@ class RottingFlesh(TerrainObject):
     @property
     def damage(self):
         # 50% chance of doing 3 damage
-        random.choice([0, 3])
+        return random.choice([0, 3])
 
     # don't ever reset damage
     @damage.setter
