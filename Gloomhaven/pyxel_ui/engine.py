@@ -25,6 +25,7 @@ class PyxelEngine:
         self.server_client = TCPClient(ClientType.FRONTEND, port=port, host=host)
         self.tj = TaskJsonifier()
         self.current_task = None
+        self.task_queue = deque()
 
         # self.last_mouse_pos = (-1, -1)
 
@@ -59,15 +60,25 @@ class PyxelEngine:
         get_task_time = -1
         unjsonify_time = -1
         perform_time = -1
-        start_time = time.time()
-        if not self.current_task and self.loop_num % 5 == 0:
-            jsonified_task = self.server_client.get_task()
-            get_task_time = time.time() - start_time
+        # once in a while, grab all the tasks and queue them up
+        if self.loop_num % 20 == 0:
             start_time = time.time()
-
-            self.current_task = self.tj.make_task_from_json(jsonified_task)
-            unjsonify_time = time.time() - start_time
+            # jsonified_task = self.server_client.get_task()
+            all_tasks = self.server_client.get_all_tasks()
+            if all_tasks:
+                for task in all_tasks:
+                    self.task_queue.append(task)
             self.loop_num = 0
+            get_task_time = time.time() - start_time
+
+        # every loop, try to grab a task from the queue
+        if not self.current_task and self.task_queue:
+            start_time = time.time()
+            current_task_json = self.task_queue.popleft()
+            self.current_task = self.tj.make_task_from_json(current_task_json)
+            if self.current_task:
+                print(self.current_task.__class__.__name__)
+            unjsonify_time = time.time() - start_time
 
         if self.current_task:
             start_time = time.time()

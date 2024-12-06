@@ -1,6 +1,6 @@
 import socket
 import json
-from server.server_utils import ClientType, recv_all, receive_message, send_message
+from server.server_utils import ClientType, receive_message, send_message
 
 
 class TCPClient:
@@ -8,6 +8,8 @@ class TCPClient:
         self.client_type = client_type
         self.client_id = None
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # disable nagle's algo
+        self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         self.socket.connect((host, port))
         self._identify()
 
@@ -34,6 +36,13 @@ class TCPClient:
         """Get tasks assigned to this client"""
         response = self._send_request("get_task")
         return response.get("task")
+
+    def get_all_tasks(self):
+        """Get all tasks assigned to this client
+        returns a list of tasks
+        """
+        response = self._send_request("get_all_tasks")
+        return response.get("tasks")
 
     def post_task(self, task_data, target_client_id):
         """Post a task for a specific client"""

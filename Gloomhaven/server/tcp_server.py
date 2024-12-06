@@ -5,8 +5,8 @@ import queue
 import json
 import time
 import traceback
-from typing import List, Dict, Optional
-from server.server_utils import ClientType, recv_all, receive_message, send_message
+from typing import List, Dict
+from server.server_utils import ClientType, receive_message, send_message
 
 
 @dataclass
@@ -38,6 +38,8 @@ class TCPServer:
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            # disable nagle's algo
+            self.server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(5)
             self.server_socket.settimeout(
@@ -285,6 +287,12 @@ class TCPServer:
                     if client_data.tasks:
                         task = client_data.tasks.pop(0)
                 return {"task": task}
+
+            if command == "get_all_tasks":
+                with self.lock:
+                    tasks = client_data.tasks.copy()  # Create a copy of all tasks
+                    client_data.tasks.clear()  # Clear the original task list
+                return {"tasks": tasks}
 
             elif command == "post_task":
                 return self._process_post_task(payload)
