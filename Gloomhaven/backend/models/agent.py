@@ -101,7 +101,7 @@ class Ai(Agent):
         client_id: Optional[str] = None,
     ) -> ActionCard:
         action_card_num = random.randrange(len(available_action_cards))
-        return available_action_cards.pop(action_card_num)
+        return available_action_cards[action_card_num]
 
     @staticmethod
     def decide_if_move_first(

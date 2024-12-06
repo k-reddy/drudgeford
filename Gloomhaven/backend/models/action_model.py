@@ -66,7 +66,7 @@ class SingleTargetAttack(ActionStep):
         if target is not None:
             if self.knock_down and random.random() < 0.5:
                 target.lose_turn = True
-                board.pyxel_manager.log.append(f"{target} was knocked down")
+                board.pyxel_manager.log.append(f"{target.name} was knocked down")
             elif self.knock_down:
                 board.pyxel_manager.log.append("Knock down failed")
             board.attack_target(attacker, self.strength, target)
