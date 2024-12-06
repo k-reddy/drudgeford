@@ -30,6 +30,23 @@ class Fire(TerrainObject):
         self.damage = 1
 
 
+class RottingFlesh(TerrainObject):
+    def __init__(self, round_num, obj_id):
+        super().__init__(round_num, obj_id)
+        self.emoji = "🔥"
+        self.pyxel_sprite_name = "rotting_flesh"
+
+    @property
+    def damage(self):
+        # 50% chance of doing 3 damage
+        return random.choice([0, 3])
+
+    # don't ever reset damage
+    @damage.setter
+    def damage(self, value):
+        pass
+
+
 class Ice(TerrainObject):
     def __init__(self, round_num, obj_id):
         super().__init__(round_num, obj_id)
@@ -80,6 +97,14 @@ class Spores(TerrainObject):
         self.damage = 1
 
 
+class InfectedOoze(TerrainObject):
+    def __init__(self, round_num, obj_id):
+        super().__init__(round_num, obj_id)
+        self.emoji = "🍄"
+        self.pyxel_sprite_name = "spores"
+        self.damage = 1
+
+
 class Wall(TerrainObject):
     def __init__(self, round_num, obj_id):
         super().__init__(round_num, obj_id)
@@ -95,5 +120,23 @@ class Shadow(TerrainObject):
         self.pyxel_sprite_name = "shadow"
 
 
+class Web(TerrainObject):
+    def __init__(self, round_num, obj_id):
+        super().__init__(round_num, obj_id)
+        self.emoji = "🧊"
+        self.pyxel_sprite_name = "web"
+
+    def perform(self, row, col, board, affected_character):
+        if random.random() < 0.25:
+            if board.acting_character == affected_character:
+                raise EntrappedAndLoseTurn("Trapped!")
+            else:
+                affected_character.lose_turn = True
+
+
 class SlipAndLoseTurn(Exception):
+    pass
+
+
+class EntrappedAndLoseTurn(Exception):
     pass

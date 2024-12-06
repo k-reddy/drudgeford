@@ -541,8 +541,8 @@ class Board:
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id)
-        died_by = f" stepped on{damage_str} and" if damage_str else ""
-        self.pyxel_manager.log.append(f"{target.name}{died_by} has been killed.")
+        died_by = f" by{damage_str}" if damage_str else ""
+        self.pyxel_manager.log.append(f"{target.name} has been killed{died_by}.")
         # if it's your turn, end it immediately
         if target == self.acting_character:
             raise DieAndEndTurn()
@@ -639,6 +639,11 @@ class Board:
             self.modify_target_health(
                 affected_character, damage, element.__class__.__name__
             )
+        # if it's rotting flesh and doesn't do damage:
+        elif isinstance(element, obstacle.RottingFlesh):
+            self.pyxel_manager.log.append(
+                f"{affected_character.name} avoided infection from RottingFlesh"
+            )
 
     def deal_terrain_damage_current_location(self, affected_character: Character):
         """
@@ -689,6 +694,9 @@ class Board:
         # if this is a heal (damage is -), don't allow them to heal beyond max health
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
+            self.pyxel_manager.log.append(
+                f"{target.name} takes {damage}{damage_str} damage"
+            )
             self.kill_target(target, damage_str)
         elif damage > 0:
             self.pyxel_manager.log.append(

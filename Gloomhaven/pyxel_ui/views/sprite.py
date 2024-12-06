@@ -74,7 +74,7 @@ class SpriteManager:
             "fiend": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=128, v=0, w=32, h=32),
             },
-             "firesprite": {
+            "firesprite": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=96, v=32, w=32, h=32),
             },
             "ice": {
@@ -125,7 +125,12 @@ class SpriteManager:
             "orchestrator": {
                 AnimationFrame.SOUTH: Sprite(img_bank=1, u=192, v=0, w=32, h=32),
             },
-            
+            "rotting_flesh": {
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=96, v=32, w=32, h=32),
+            },
+            "web": {
+                AnimationFrame.SOUTH: Sprite(img_bank=2, u=96, v=64, w=32, h=32),
+            },
         }
 
     def get_sprite(self, name, frame):

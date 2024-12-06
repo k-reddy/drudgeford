@@ -38,6 +38,9 @@ cards = [
         attack_name="Flesh Eruption",
         actions=[
             actions.AreaAttackFromSelf(shape=shapes.cone(3), strength=3),
+            actions.AreaAttackFromSelf(
+                shape=shapes.ring(1), element_type=obstacle.RottingFlesh
+            ),
             actions.WeakenAllEnemies(1, 2),
         ],
         movement=2,

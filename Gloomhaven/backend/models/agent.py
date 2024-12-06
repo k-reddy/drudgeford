@@ -70,12 +70,18 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def pick_rotated_attack_coordinates(
         board,
         shape: set,
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
         pass
 
@@ -95,7 +101,7 @@ class Ai(Agent):
         client_id: Optional[str] = None,
     ) -> ActionCard:
         action_card_num = random.randrange(len(available_action_cards))
-        return available_action_cards.pop(action_card_num)
+        return available_action_cards[action_card_num]
 
     @staticmethod
     def decide_if_move_first(
@@ -128,6 +134,10 @@ class Ai(Agent):
         return nearest_opponent
 
     @staticmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        return False
+
+    @staticmethod
     def perform_movement(
         char, movement, is_jump, board, client_id: Optional[str] = None
     ):
@@ -150,9 +160,12 @@ class Ai(Agent):
         if is_push:
             current_target_loc = board.find_location_of_target(char_to_move)
             directions = [v for v in DIRECTION_MAP.values() if v is not None]
-            while movement > 0:
+            directions_to_explore = directions.copy()
+            while movement > 0 and directions_to_explore:
                 # grab a random direction
-                direction = directions[random.randint(0, len(directions) - 1)]
+                direction = directions_to_explore.pop(
+                    random.randint(0, len(directions) - 1)
+                )
                 # simulate moving that way and see if it passes the movement check
                 new_target_loc = tuple(
                     a + b for a, b in zip(current_target_loc, direction)
@@ -167,6 +180,8 @@ class Ai(Agent):
                     # ensure that our character is still alive
                     if char_to_move not in board.characters:
                         return
+                    # reset our potential directions
+                    directions_to_explore = directions
         # pull is very easy, just move toward puller
         else:
             board.move_character_toward_location(
@@ -180,8 +195,12 @@ class Ai(Agent):
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
-        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        if from_self:
+            shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        else:
+            shape_list = list(shapes.get_cardinal_rotations(shape).values())
         # iterate until you hit someone
         for shape in shape_list:
             attack_coords = [
@@ -231,7 +250,6 @@ class Human(Agent):
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
         # load the new action cards now that you've popped from the list
         pyxel_manager.load_action_cards(available_action_cards, client_id)
-
         return action_card_to_perform
 
     @staticmethod
@@ -246,6 +264,16 @@ class Human(Agent):
         return key_press == "1"
 
     @staticmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        key_press = pyxel_manager.get_user_input(
+            prompt="Type (s) then enter to short rest or just enter to continue.",
+            valid_inputs=["s", ""],
+            client_id=client_id,
+        )
+        print(key_press)
+        return key_press == "s"
+
+    @staticmethod
     def select_attack_target(
         pyxel_manager,
         in_range_opponents: list,
@@ -253,8 +281,6 @@ class Human(Agent):
         char,
         client_id: Optional[str] = None,
     ):
-        if len(in_range_opponents) == 1:
-            return in_range_opponents[0]
         # show in range opponents and collect info
         valid_inputs = []
         prompt = (
@@ -281,9 +307,9 @@ class Human(Agent):
         additional_movement_check: Optional[
             Callable[[tuple[int, int], tuple[int, int]], bool]
         ] = None,
+        orig_prompt: str = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n",
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
             # if the character we're moving died, don't try to find them
@@ -344,6 +370,7 @@ class Human(Agent):
         client_id: Optional[str] = None,
         is_push=False,
     ):
+        push_pull_str = "push" if is_push else "pull"
         Human.perform_movement(
             char_to_move,
             movement,
@@ -351,6 +378,7 @@ class Human(Agent):
             board,
             client_id,
             movement_check,
+            f"Click where you want to {push_pull_str} other character. Click on that character to end movement. \n\n  - You can move step by step to control enemy's path \n  - You can also click an endpoint if you don't want to control the path\n",
         )
 
     @staticmethod
@@ -360,9 +388,10 @@ class Human(Agent):
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
         return board.pyxel_manager.pick_rotated_attack_coordinates(
-            shape, starting_coord, client_id
+            shape, starting_coord, client_id, from_self
         )
 
     @staticmethod

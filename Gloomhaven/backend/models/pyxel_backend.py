@@ -310,10 +310,17 @@ class PyxelManager:
         self.jsonify_and_send_task(task, client_id)
 
     def pick_rotated_attack_coordinates(
-        self, shape: set, starting_coord: tuple[int, int], client_id: str
+        self,
+        shape: set,
+        starting_coord: tuple[int, int],
+        client_id: str,
+        from_self: bool,
     ):
         # get all the shapes as something we can iterate through cyclically
-        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        if from_self:
+            shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        else:
+            shape_list = list(shapes.get_cardinal_rotations(shape).values())
         shape_iterator = cycle(shape_list)
         current_shape = next(shape_iterator)
 
@@ -324,7 +331,6 @@ class PyxelManager:
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in current_shape
             ]
-
             # if nothing in this shape will show up on the map, move to the next shape
             if len(set(attack_coords).intersection(self.backend_valid_map_coords)) == 0:
                 current_shape = next(shape_iterator)
