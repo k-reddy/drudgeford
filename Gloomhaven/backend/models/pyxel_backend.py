@@ -327,16 +327,10 @@ class PyxelManager:
         # keep iterating through the shapes and displaying them
         # until the user picks one
         while True:
-            print(
-                f"shape in backend.pick_rotated_attack_coords while loop start: {shape}"
-            )
             attack_coords = [
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in current_shape
             ]
-            print(
-                f"attack coords in backend.pick_rotated_attack_coords while loop mid: {shape}"
-            )
             # if nothing in this shape will show up on the map, move to the next shape
             if len(set(attack_coords).intersection(self.backend_valid_map_coords)) == 0:
                 current_shape = next(shape_iterator)
