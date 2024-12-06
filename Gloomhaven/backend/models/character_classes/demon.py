@@ -5,7 +5,11 @@ from backend.models import obstacle
 cards = [
     actions.ActionCard(
         attack_name="Dark Ritual",
-        actions=[actions.CurseAllEnemies(2), actions.BlessAllAllies(2)],
+        actions=[
+            actions.CurseAllEnemies(2),
+            actions.BlessAllAllies(2),
+            actions.SingleTargetAttack(3, 2),
+        ],
         movement=2,
         jump=False,
     ),
@@ -29,9 +33,9 @@ cards = [
     actions.ActionCard(
         attack_name="Shadow Aegis",
         actions=[
-            actions.ShieldAllAllies(3, 2, 3),
+            actions.ShieldAllAllies(3, 1, 3),
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Shadow
+                shape=shapes.ring(2), element_type=obstacle.Shadow, strength=3
             ),
         ],
         movement=1,

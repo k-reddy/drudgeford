@@ -27,7 +27,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Defensive Wings",
-        actions=[actions.ShieldSelf(3, 2), actions.Push(2, 2)],
+        actions=[actions.ShieldSelf(3, 1), actions.Push(2, 2)],
         movement=4,
         jump=True,
     ),
