@@ -5,70 +5,8 @@ import queue
 import json
 import time
 import traceback
-from typing import List, Dict, Optional
-from enum import Enum
-
-
-def send_message(sock: socket.socket, data: dict):
-    message = json.dumps(data).encode("utf-8")
-    # Combine length and message into single packet
-    length_bytes = len(message).to_bytes(4, byteorder="big")
-    sock.send(length_bytes + message)
-
-
-def receive_message(sock: socket.socket) -> dict:
-    try:
-        # First 4 bytes are length
-        initial_data = sock.recv(4)
-        if not initial_data or len(initial_data) < 4:
-            raise ConnectionError("Connection closed")
-
-        message_length = int.from_bytes(initial_data, byteorder="big")
-        remaining_data = b""
-
-        # If there's more data in the buffer from the first recv, use it
-        if len(initial_data) > 4:
-            remaining_data = initial_data[4:]
-            message_length -= len(remaining_data)
-
-        # Get any remaining message data
-        if message_length > 0:
-            message_data = recv_all(sock, message_length)
-            if not message_data:
-                raise ConnectionError("Connection closed")
-            remaining_data += message_data
-
-        return json.loads(remaining_data.decode("utf-8"))
-    except Exception as e:
-        raise ConnectionError(f"Error receiving message: {str(e)}")
-
-
-def recv_all(sock: socket.socket, n: int) -> bytes:
-    # Try to get all data at once first
-    data = sock.recv(n)
-    if not data:
-        return None
-
-    if len(data) == n:  # Got everything in one call
-        return data
-
-    # If we didn't get everything, then fall back to accumulating
-    buffer = bytearray(data)
-    remaining = n - len(data)
-
-    while remaining > 0:
-        chunk = sock.recv(remaining)  # Ask for exactly what we still need
-        if not chunk:
-            return None
-        buffer.extend(chunk)
-        remaining -= len(chunk)
-
-    return bytes(buffer)
-
-
-class ClientType(Enum):
-    BACKEND = "backend"
-    FRONTEND = "frontend"
+from typing import List, Dict
+from server.server_utils import ClientType, receive_message, send_message
 
 
 @dataclass
@@ -100,6 +38,8 @@ class TCPServer:
         try:
             self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            # disable nagle's algo
+            self.server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
             self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(5)
             self.server_socket.settimeout(
@@ -347,6 +287,12 @@ class TCPServer:
                     if client_data.tasks:
                         task = client_data.tasks.pop(0)
                 return {"task": task}
+
+            if command == "get_all_tasks":
+                with self.lock:
+                    tasks = client_data.tasks.copy()  # Create a copy of all tasks
+                    client_data.tasks.clear()  # Clear the original task list
+                return {"tasks": tasks}
 
             elif command == "post_task":
                 return self._process_post_task(payload)
