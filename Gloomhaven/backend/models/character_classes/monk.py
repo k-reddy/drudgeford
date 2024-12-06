@@ -46,7 +46,7 @@ cards = [
             action_model.BlessAndChargeAlly(2, 3),
             action_model.CurseSelf(),
             action_model.AreaAttackWithTarget(
-                shape=shapes.line(5), damage=3, att_range=2
+                shape=shapes.line(3), damage=3, att_range=2
             ),
         ],
         movement=2,
