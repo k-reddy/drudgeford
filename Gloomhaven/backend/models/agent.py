@@ -245,9 +245,6 @@ class Human(Agent):
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
         # load the new action cards now that you've popped from the list
         pyxel_manager.load_action_cards(available_action_cards, client_id)
-        # print your action card
-        pyxel_manager.log.append(action_card_to_perform)
-
         return action_card_to_perform
 
     @staticmethod
