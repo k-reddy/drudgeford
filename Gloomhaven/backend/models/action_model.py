@@ -82,21 +82,29 @@ class AreaAttackWithTarget(ActionStep):
     element_type: Optional[Type[obstacle.TerrainObject]] = None
 
     def perform(self, board, attacker, round_num):
+        attacker_loc = board.find_location_of_target(attacker)
         self.shape.add((0, 0))
+        rotated_offset_shape = attacker.pick_rotated_attack_coordinates(
+            board, self.shape, attacker_loc
+        )
+        # remove attacker_loc
+        rotated_shape = [
+            (row - attacker_loc[0], col - attacker_loc[1])
+            for (row, col) in rotated_offset_shape
+        ]
         target_row, target_col = attacker.select_board_square_target(
-            board, self.att_range, self.shape
+            board, self.att_range, rotated_shape
         )
         # if we don't get a target, return
         if target_row is None:
             board.pyxel_manager.log.append("No target in range")
             return
 
+        attack_coords = [
+            (row + target_row, col + target_col) for (row, col) in rotated_shape
+        ]
         # if we're given damage, perform a damage attack
         if self.damage:
-            attack_coords = [
-                (target_row + coordinate[0], target_col + coordinate[1])
-                for coordinate in self.shape
-            ]
             board.attack_area(attacker, attack_coords, self.damage)
 
         # if we're given an element, add elements to board
