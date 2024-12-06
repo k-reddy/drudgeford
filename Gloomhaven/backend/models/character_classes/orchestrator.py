@@ -6,7 +6,11 @@ from backend.models import obstacle
 cards = [
     actions.ActionCard(
         attack_name="Pull Strings",
-        actions=[actions.SummonPuppet(), actions.WeakenAllEnemies(1, 2)],
+        actions=[
+            actions.SummonPuppet(),
+            actions.SummonPuppet(),
+            actions.WeakenAllEnemies(1, 2),
+        ],
         movement=0,
         jump=False,
     ),
@@ -16,8 +20,8 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.cone(3), element_type=obstacle.Shadow, strength=3
             ),
-            actions.Teleport(3),
-            actions.Teleport(4),
+            actions.Teleport(5),
+            actions.Teleport(5),
             actions.Teleport(5),
             actions.SingleTargetAttack(4, 6, True),
         ],
@@ -27,7 +31,9 @@ cards = [
     actions.ActionCard(
         attack_name="Nightmare Web",
         actions=[
-            actions.AreaAttackFromSelf(element_type=obstacle.Web, shape=shapes.ring(2)),
+            actions.AreaAttackFromSelf(
+                element_type=obstacle.Web, shape=shapes.ring(2), strength=4
+            ),
             actions.Pull(2, 3),
             actions.PushAllEnemies(2, 3),
             actions.CurseAllEnemies(3),

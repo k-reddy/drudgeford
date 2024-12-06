@@ -15,9 +15,9 @@ cards = [
     actions.ActionCard(
         attack_name="Chain Reaction",
         actions=[
+            actions.SingleTargetAttack(3, 2),
+            actions.SingleTargetAttack(3, 2),
             actions.ModifySelfHealth(-2),
-            actions.SingleTargetAttack(3, 2),
-            actions.SingleTargetAttack(3, 2),
         ],
         movement=4,
         jump=False,
@@ -34,8 +34,8 @@ cards = [
         attack_name="Containment Breach",
         actions=[
             actions.Pull(3, 3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=6),
             actions.ModifySelfHealth(-4),
-            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=5),
         ],
         movement=2,
         jump=False,
