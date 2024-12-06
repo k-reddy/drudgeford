@@ -78,12 +78,17 @@ class Character(abc.ABC):
         )
 
     def short_rest(self) -> None:
+        # kill a random used card that's not already been killed
+        killed_card = random.choice(
+            set(self.action_cards)
+            - set(self.available_action_cards)
+            - set(self.killed_action_cards)
+        )
         # reset our available cards
         self.available_action_cards = [
             card for card in self.action_cards if card not in self.killed_action_cards
         ]
-        # kill a random card, update the user, remove it from play, and keep track for next round
-        killed_card = random.choice(self.available_action_cards)
+        # update the user, remove it from play, and keep track for next round
         # only update people with a frontend
         if self.client_id:
             self.pyxel_manager.get_user_input(
@@ -92,6 +97,7 @@ class Character(abc.ABC):
             )
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
+        # load new available cards
         self.pyxel_manager.load_action_cards(
             self.available_action_cards, self.client_id
         )
