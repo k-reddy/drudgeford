@@ -74,21 +74,14 @@ class GameLoop:
         self.board.update_terrain()
         self.board.update_character_statuses()
 
-        # randomize who starts the turn
-        # character_dict = {
-        #     character.id: character for character in self.board.characters
-        # }
-        # character_ids = [character.id for character in self.board.characters]
-        # random.shuffle(character_ids)
-        # round_character_list = [character_dict[cid] for cid in character_ids]
-
         # if we don't shuffle the actual list, we will create ordering issues
         # b/c when we kill a character, we send a copy of characters over to
         # pyxel, same when we update healths
         random.shuffle(self.board.characters)
-        round_character_list = copy.copy((self.board.characters))
-        self.pyxel_manager.load_characters(round_character_list)
+        round_character_list = list(self.board.characters)
+        self.pyxel_manager.load_characters(self.board.characters)
         for acting_character in round_character_list:
+            print([char.name for char in round_character_list])
             # since we use a copy, we need to make sure the character is still alive
             if acting_character not in self.board.characters:
                 return
@@ -114,9 +107,6 @@ class GameLoop:
                 self.run_turn_move_only(acting_character, round_num)
             else:
                 self.run_turn(acting_character, round_num)
-            # !!! ideally the following lines would go in end_turn(), which is called at the end of run turn but then I don't know how to quit the for loop
-            # !!! also the issue here is that if you kill all the monsters, you still move if you decide to
-            # move after acting, which is not ideal
             self.check_and_update_game_state()
             if self.game_state != GameState.RUNNING:
                 return
@@ -167,8 +157,6 @@ class GameLoop:
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
-        # shouldn't be the case, but somehow we got to here without refreshing cards, so adding this as a safety check
-        self.refresh_character_cards(acting_character)
         if acting_character.lose_turn:
             acting_character.lose_turn = False
             self.pyxel_manager.log.append(
@@ -257,11 +245,6 @@ class GameLoop:
     def _end_turn(self) -> None:
         self.board.acting_character = None
         if not self.all_ai_mode:
-            # for i in range(1, self.num_players):
-            #     self.pyxel_manager.print_message(
-            #         "End of turn. Waiting for Player 1 to hit continue",
-            #         f"frontend_{i+1}",
-            #     )
             self.pyxel_manager.pause_for_all_players(
                 self.num_players,
                 prompt="End of turn. All players must hit enter to continue",
