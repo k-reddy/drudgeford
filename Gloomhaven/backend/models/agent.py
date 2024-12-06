@@ -70,6 +70,11 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def pick_rotated_attack_coordinates(
         board,
         shape: set,
@@ -126,6 +131,10 @@ class Ai(Agent):
                 nearest_opponent = opponent
                 shortest_dist = opponent_dist
         return nearest_opponent
+
+    @staticmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        return False
 
     @staticmethod
     def perform_movement(
@@ -244,6 +253,15 @@ class Human(Agent):
             client_id=client_id,
         )
         return key_press == "1"
+
+    @staticmethod
+    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+        key_press = pyxel_manager.get_user_input(
+            prompt="Type (s) then enter to short rest or just enter to continue.",
+            valid_inputs=["s", ""],
+            client_id=client_id,
+        )
+        return key_press == "s"
 
     @staticmethod
     def select_attack_target(
