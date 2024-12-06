@@ -77,6 +77,14 @@ def is_circle_or_ring(shape):
     return shape == circle_points or shape == ring_points
 
 
+def is_circle(shape):
+    # sometimes we remove (0,0), so add just in case
+    shape.add((0, 0))
+    max_coord = max(max(abs(x), abs(y)) for x, y in shape)
+    circle_points = circle(max_coord)
+    return shape == circle_points
+
+
 def print_shape(shape):
     print_str = ""
     ymin = min([y for y, _ in shape])
@@ -111,10 +119,10 @@ def get_all_directional_rotations(shape):
         lambda x, y: (-y + 1, x),
         lambda x, y: (x, y + 1),
     ]
+    print(f"shape in shapes.get_all_directional_values: {shape}")
     all_shapes = {}
     for i, transform in enumerate(transforms):
         all_shapes[i] = [transform(x, y) for x, y in shape]
-
     return all_shapes
 
 
