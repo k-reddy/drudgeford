@@ -121,7 +121,7 @@ class Character(abc.ABC):
         )
 
     def decide_if_short_rest(self):
-        self.agent.decide_if_short_rest(self.pyxel_manager, self.client_id)
+        return self.agent.decide_if_short_rest(self.pyxel_manager, self.client_id)
 
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]
