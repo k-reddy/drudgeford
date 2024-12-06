@@ -78,11 +78,14 @@ class Character(abc.ABC):
         )
 
     def short_rest(self) -> None:
-        # kill a random used card that's not already been killed
+        # kill a random card that's not already been killed and that's used (not available)
         killed_card = random.choice(
-            set(self.action_cards)
-            - set(self.available_action_cards)
-            - set(self.killed_action_cards)
+            [
+                card
+                for card in self.action_cards
+                if card not in self.killed_action_cards
+                and card not in self.available_action_cards
+            ]
         )
         # reset our available cards
         self.available_action_cards = [
