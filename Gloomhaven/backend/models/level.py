@@ -68,7 +68,7 @@ campaign_levels = [
             character.BloodOoze,
         ],
         pre_level_text="""Your victory over the undead hordes is cut short as the mist-shrouded graveyard begins to pulse with an unnatural rhythm. Through the fog, you finally glimpse the hooded figure again - but this time they're stumbling backward, their confident posture replaced with panic. "No... impossible... you weren't supposed to make it this far!" they shriek before dissolving into shadow. The ground beneath you softens sickeningly, transforming from packed earth into something warm and organic. You find yourself in a grotesque chamber of living tissue, where half-formed creatures writhe in pools of viscous crimson, and monstrous flesh-golems lumber through pulsing tunnels of raw meat and sinew. The wet, rhythmic sounds of this place make your skin crawl as you realize you're trapped inside something impossibly vast and alive - but you're close now, so close to ending this nightmare.""",
-        starting_elements=[],
+        starting_elements=[obstacle.RottingFlesh, obstacle.RottingFlesh],
     ),
     Level(
         floor_color_map=[
