@@ -271,8 +271,6 @@ class Human(Agent):
         char,
         client_id: Optional[str] = None,
     ):
-        if len(in_range_opponents) == 1:
-            return in_range_opponents[0]
         # show in range opponents and collect info
         valid_inputs = []
         prompt = (
