@@ -120,6 +120,9 @@ class Character(abc.ABC):
             board, shape, starting_coord, self.client_id, self.team_monster
         )
 
+    def decide_if_short_rest(self):
+        self.agent.decide_if_short_rest(self.pyxel_manager, self.client_id)
+
     def create_action_cards(self):
         strengths = [1, 2, 3, 4, 5]
         strength_weights = [3, 5, 4, 2, 1]
