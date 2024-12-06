@@ -688,8 +688,12 @@ class Board:
         damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
         target.health = min(target.health - damage, target.max_health)
-
-        if damage > 0:
+        if target.health <= 0:
+            self.pyxel_manager.log.append(
+                f"{target.name} takes {damage}{damage_str} damage"
+            )
+            self.kill_target(target, damage_str)
+        elif damage > 0:
             self.pyxel_manager.log.append(
                 f"{target.name} takes {damage}{damage_str} damage and has {target.health} health"
             )
@@ -697,8 +701,6 @@ class Board:
             self.pyxel_manager.log.append(
                 f"{target.name} heals for {-1*damage} and has {target.health} health"
             )
-        if target.health <= 0:
-            self.kill_target(target, damage_str)
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
 
