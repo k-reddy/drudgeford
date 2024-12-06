@@ -642,7 +642,7 @@ class Board:
         # if it's rotting flesh and doesn't do damage:
         elif isinstance(element, obstacle.RottingFlesh):
             self.pyxel_manager.log.append(
-                f"{affected_character} avoided infection from RottingFlesh"
+                f"{affected_character.name} avoided infection from RottingFlesh"
             )
 
     def deal_terrain_damage_current_location(self, affected_character: Character):

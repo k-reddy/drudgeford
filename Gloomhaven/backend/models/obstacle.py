@@ -41,6 +41,11 @@ class RottingFlesh(TerrainObject):
         # 50% chance of doing 3 damage
         random.choice([0, 3])
 
+    # don't ever reset damage
+    @damage.setter
+    def damage(self, value):
+        pass
+
 
 class Ice(TerrainObject):
     def __init__(self, round_num, obj_id):
