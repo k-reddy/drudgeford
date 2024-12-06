@@ -7,7 +7,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Heavy Hammer",
         actions=[
-            action_model.SingleTargetAttack(strength=4, att_range=1),
+            action_model.SingleTargetAttack(strength=5, att_range=1),
             action_model.ChargeNextAttack(strength=2),
         ],
         movement=0,
@@ -22,7 +22,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Mason's Shield",
         actions=[
-            action_model.ShieldSelf(strength=1, duration=2),
+            action_model.ShieldSelf(strength=2, duration=2),
             action_model.SingleTargetAttack(strength=4, att_range=1),
         ],
         movement=2,
