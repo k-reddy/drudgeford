@@ -281,9 +281,9 @@ class Human(Agent):
         additional_movement_check: Optional[
             Callable[[tuple[int, int], tuple[int, int]], bool]
         ] = None,
+        orig_prompt: str = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n",
     ):
         remaining_movement = movement
-        orig_prompt = "Click where you want to move. Click on your character to end movement. \n\n  - You can move step by step to control your path \n  - You can also click an endpoint, but it won't avoid traps\n  - If you have jump, pick the endpoint to jump over characters/traps\n"
         prompt = orig_prompt
         while remaining_movement > 0:
             # if the character we're moving died, don't try to find them
@@ -344,6 +344,7 @@ class Human(Agent):
         client_id: Optional[str] = None,
         is_push=False,
     ):
+        push_pull_str = "push" if is_push else "pull"
         Human.perform_movement(
             char_to_move,
             movement,
@@ -351,6 +352,7 @@ class Human(Agent):
             board,
             client_id,
             movement_check,
+            f"Click where you want to {push_pull_str} other character. Click on that character to end movement. \n\n  - You can move step by step to control enemy's path \n  - You can also click an endpoint if you don't want to control the path\n",
         )
 
     @staticmethod
