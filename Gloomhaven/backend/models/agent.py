@@ -265,6 +265,7 @@ class Human(Agent):
             valid_inputs=["s", ""],
             client_id=client_id,
         )
+        print(key_press)
         return key_press == "s"
 
     @staticmethod
@@ -383,6 +384,7 @@ class Human(Agent):
         client_id: str,
         attacker_team_monster: bool,
     ):
+        print(f"shape in agent.pick_rotated...: {shape}")
         return board.pyxel_manager.pick_rotated_attack_coordinates(
             shape, starting_coord, client_id
         )

@@ -84,9 +84,17 @@ class Character(abc.ABC):
         ]
         # kill a random card, update the user, remove it from play, and keep track for next round
         killed_card = random.choice(self.available_action_cards)
-        self.log.append(f"{self.name} short rested and lost {killed_card}")
+        # only update people with a frontend
+        if self.client_id:
+            self.pyxel_manager.get_user_input(
+                prompt=f"You short rested and lost {killed_card}\nHit enter to continue",
+                client_id=self.client_id,
+            )
         self.available_action_cards.remove(killed_card)
         self.killed_action_cards.append(killed_card)
+        self.pyxel_manager.load_action_cards(
+            self.available_action_cards, self.client_id
+        )
 
     def make_attack_modifier_deck(self) -> list:
         attack_modifier_deck = [
@@ -116,6 +124,9 @@ class Character(abc.ABC):
                 (starting_coord[0] + coordinate[0], starting_coord[1] + coordinate[1])
                 for coordinate in shape
             ]
+        else:
+            shape.discard((0, 0))
+        print(f"shape in char.pick_rotated...: {shape}")
         return self.agent.pick_rotated_attack_coordinates(
             board, shape, starting_coord, self.client_id, self.team_monster
         )
