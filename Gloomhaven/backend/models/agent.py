@@ -81,6 +81,7 @@ class Agent(abc.ABC):
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
         pass
 
@@ -194,8 +195,12 @@ class Ai(Agent):
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
-        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        if from_self:
+            shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        else:
+            shape_list = list(shapes.get_cardinal_rotations(shape).values())
         # iterate until you hit someone
         for shape in shape_list:
             attack_coords = [
@@ -383,10 +388,10 @@ class Human(Agent):
         starting_coord: tuple[int, int],
         client_id: str,
         attacker_team_monster: bool,
+        from_self: bool,
     ):
-        print(f"shape in agent.pick_rotated...: {shape}")
         return board.pyxel_manager.pick_rotated_attack_coordinates(
-            shape, starting_coord, client_id
+            shape, starting_coord, client_id, from_self
         )
 
     @staticmethod

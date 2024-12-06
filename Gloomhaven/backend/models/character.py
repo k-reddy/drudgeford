@@ -112,11 +112,13 @@ class Character(abc.ABC):
         return attack_modifier_deck
 
     def pick_rotated_attack_coordinates(
-        self, board, shape: set, starting_coord: tuple[int, int]
+        self, board, shape: set, starting_coord: tuple[int, int], from_self: bool = True
     ) -> list[tuple[int, int]]:
         """
         gets an attack shape rotation and attack coordinates (not offsets)
         from agent
+        if from_self=false, we're using this for an area attack with target,
+        so we only show cardinal directions
         """
         # we do not rotate cirlces or rings
         if shapes.is_circle_or_ring(shape):
@@ -126,9 +128,8 @@ class Character(abc.ABC):
             ]
         else:
             shape.discard((0, 0))
-        print(f"shape in char.pick_rotated...: {shape}")
         return self.agent.pick_rotated_attack_coordinates(
-            board, shape, starting_coord, self.client_id, self.team_monster
+            board, shape, starting_coord, self.client_id, self.team_monster, from_self
         )
 
     def decide_if_short_rest(self):
