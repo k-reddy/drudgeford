@@ -250,7 +250,7 @@ class ModifySelfHealth(ActionStep):
         if self.strength > 0:
             return f"Heal {self.strength}"
         else:
-            return f"Take {self.strength} damage"
+            return f"Take {-self.strength} damage"
 
     def perform_string(self, attacker):
         return ""
