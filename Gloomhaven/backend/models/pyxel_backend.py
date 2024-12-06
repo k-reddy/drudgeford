@@ -310,11 +310,17 @@ class PyxelManager:
         self.jsonify_and_send_task(task, client_id)
 
     def pick_rotated_attack_coordinates(
-        self, shape: set, starting_coord: tuple[int, int], client_id: str
+        self,
+        shape: set,
+        starting_coord: tuple[int, int],
+        client_id: str,
+        from_self: bool,
     ):
-        print(f"shape in backend.pick_rotated_attack_coords start: {shape}")
         # get all the shapes as something we can iterate through cyclically
-        shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        if from_self:
+            shape_list = list(shapes.get_all_directional_rotations(shape).values())
+        else:
+            shape_list = list(shapes.get_cardinal_rotations(shape).values())
         shape_iterator = cycle(shape_list)
         current_shape = next(shape_iterator)
 

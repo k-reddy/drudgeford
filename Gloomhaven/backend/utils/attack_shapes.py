@@ -119,7 +119,19 @@ def get_all_directional_rotations(shape):
         lambda x, y: (-y + 1, x),
         lambda x, y: (x, y + 1),
     ]
-    print(f"shape in shapes.get_all_directional_values: {shape}")
+    all_shapes = {}
+    for i, transform in enumerate(transforms):
+        all_shapes[i] = [transform(x, y) for x, y in shape]
+    return all_shapes
+
+
+def get_cardinal_rotations(shape):
+    transforms = [
+        lambda x, y: (x, y),
+        lambda x, y: (y, -x),
+        lambda x, y: (-x, -y),
+        lambda x, y: (-y, x),
+    ]
     all_shapes = {}
     for i, transform in enumerate(transforms):
         all_shapes[i] = [transform(x, y) for x, y in shape]
