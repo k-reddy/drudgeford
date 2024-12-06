@@ -54,8 +54,6 @@ class AreaAttackFromSelf(ActionStep):
             perform_str += f"throws {self.element_type.__name__}"
             if self.strength:
                 perform_str += " and "
-        if self.strength:
-            perform_str += f"does {self.strength} damage"
         return perform_str
 
 
@@ -118,8 +116,6 @@ class AreaAttackWithTarget(ActionStep):
             perform_str += f"throws {self.element_type.__name__}"
             if self.damage:
                 perform_str += " and "
-        if self.damage:
-            perform_str += f"does {self.damage} damage"
         return perform_str
 
 
