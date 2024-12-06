@@ -159,9 +159,12 @@ class Ai(Agent):
         if is_push:
             current_target_loc = board.find_location_of_target(char_to_move)
             directions = [v for v in DIRECTION_MAP.values() if v is not None]
-            while movement > 0:
+            directions_to_explore = directions.copy()
+            while movement > 0 and directions_to_explore:
                 # grab a random direction
-                direction = directions[random.randint(0, len(directions) - 1)]
+                direction = directions_to_explore.pop(
+                    random.randint(0, len(directions) - 1)
+                )
                 # simulate moving that way and see if it passes the movement check
                 new_target_loc = tuple(
                     a + b for a, b in zip(current_target_loc, direction)
@@ -176,6 +179,8 @@ class Ai(Agent):
                     # ensure that our character is still alive
                     if char_to_move not in board.characters:
                         return
+                    # reset our potential directions
+                    directions_to_explore = directions
         # pull is very easy, just move toward puller
         else:
             board.move_character_toward_location(
