@@ -15,7 +15,7 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Pickaxe Swipe",
-        actions=[action_model.AreaAttackFromSelf(shape=shapes.arc(2), strength=4)],
+        actions=[action_model.AreaAttackFromSelf(shape=shapes.arc(3), strength=4)],
         movement=3,
         jump=False,
     ),
