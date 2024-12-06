@@ -17,7 +17,7 @@ cards = [
     actions.ActionCard(
         attack_name="Biting Gale",
         actions=[
-            actions.SingleTargetAttack(4, 1),
+            actions.SingleTargetAttack(4, 1, knock_down=True),
             actions.PushAllEnemies(2, 3),
         ],
         movement=3,
@@ -56,7 +56,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Territorial Strike",
-        actions=[actions.SingleTargetAttack(4, 2), actions.Push(2, 2)],
+        actions=[actions.SingleTargetAttack(4, 2, knock_down=True), actions.Push(2, 2)],
         movement=3,
         jump=True,
     ),

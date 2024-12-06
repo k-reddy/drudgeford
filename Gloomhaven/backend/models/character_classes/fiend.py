@@ -11,7 +11,7 @@ cards = [
     # ),
     actions.ActionCard(
         attack_name="Brutal Slam",
-        actions=[actions.SingleTargetAttack(5, 1), actions.Push(3, 1)],
+        actions=[actions.SingleTargetAttack(5, 1, knock_down=True), actions.Push(3, 1)],
         movement=2,
         jump=True,
     ),
