@@ -59,16 +59,24 @@ class AreaAttackFromSelf(ActionStep):
 class SingleTargetAttack(ActionStep):
     strength: int
     att_range: int
+    knock_down: bool = False
 
     def perform(self, board, attacker, round_num):
         target = select_in_range_target(board, attacker, self.att_range)
         if target is not None:
+            if self.knock_down and random.random() < 0.5:
+                target.lose_turn = True
+                board.pyxel_manager.log.append(f"{target} was knocked down")
+            elif self.knock_down:
+                board.pyxel_manager.log.append("Knock down failed")
             board.attack_target(attacker, self.strength, target)
         else:
             board.pyxel_manager.log.append("No targets in range for attack")
 
     def __str__(self):
-        return f"Attack {self.strength} <{self.att_range}>"
+        print_str = f"Attack {self.strength} <{self.att_range}>"
+        print_str += "\nKnock down (50%)" if self.knock_down else ""
+        return print_str
 
     def perform_string(self, attacker):
         return ""
