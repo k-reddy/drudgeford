@@ -5,7 +5,7 @@ from backend.utils.config import DEBUG
 from backend.models.display import Display
 import backend.models.agent
 from backend.models.board import Board
-from backend.models.obstacle import SlipAndLoseTurn
+from backend.models.obstacle import SlipAndLoseTurn, EntrappedAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
 from backend.utils.utilities import GameState, DieAndEndTurn
@@ -150,6 +150,11 @@ class GameLoop:
                 self.pyxel_manager.get_user_input(
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
                 )
+        except EntrappedAndLoseTurn:
+            if not self.all_ai_mode:
+                self.pyxel_manager.get_user_input(
+                    prompt=f"{acting_character.name} trapped in web! Hit enter to continue",
+                )
         except DieAndEndTurn:
             pass
 
@@ -211,6 +216,15 @@ class GameLoop:
                 self.pyxel_manager.pause_for_all_players(
                     num_players=self.num_players,
                     prompt=f"{acting_character.name} slipped! Hit enter to continue",
+                )
+        except EntrappedAndLoseTurn:
+            if not self.all_ai_mode:
+                self.pyxel_manager.log.append(
+                    f"{acting_character.name} trapped in web and lost their turn!"
+                )
+                self.pyxel_manager.pause_for_all_players(
+                    num_players=self.num_players,
+                    prompt=f"{acting_character.name} trapped in web! Hit enter to continue",
                 )
         except DieAndEndTurn:
             pass
