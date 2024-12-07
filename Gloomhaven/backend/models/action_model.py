@@ -95,7 +95,6 @@ class AreaAttackWithTarget(ActionStep):
             self.shape.add((0, 0))
         else:
             self.shape.discard((0, 0))
-        print(f"shape in action_model.area_attack_with_target: {self.shape}")
         rotated_offset_shape = attacker.pick_rotated_attack_coordinates(
             board, self.shape, attacker_loc, from_self=False
         )
