@@ -370,7 +370,13 @@ class Human(Agent):
         client_id: Optional[str] = None,
         is_push=False,
     ):
-        push_pull_str = "push" if is_push else "pull"
+        if is_push:
+            push_pull_str = "push"
+        elif movement_check:
+            push_pull_str = "pull"
+        # if there's no movement check, it's moving an ally
+        else:
+            push_pull_str = "move"
         Human.perform_movement(
             char_to_move,
             movement,
