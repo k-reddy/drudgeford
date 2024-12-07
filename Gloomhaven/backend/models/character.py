@@ -694,6 +694,7 @@ class BloodOoze(Character):
             name, pyxel_manager, emoji, agent, char_id, is_monster, log, player_id
         )
         self.pyxel_sprite_name = "bloodooze"
+        self.elemental_affinity = obstacle.RottingFlesh
 
     def create_action_cards(self):
         return character_classes.bloodooze.cards
