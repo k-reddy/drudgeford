@@ -265,16 +265,12 @@ class GameLoop:
             self.pyxel_manager.log.clear()
 
     def _end_round(self) -> None:
-        for char in self.board.characters:
-            self.refresh_character_cards(char)
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            # for i in range(1, self.num_players):
-            #     self.pyxel_manager.print_message(
-            #         "End of round. Waiting for Player 1 to hit continue",
-            #         f"frontend_{i+1}",
-            #     )
+        for char in self.board.characters:
+            self.refresh_character_cards(char)
+        if not self.all_ai_mode:
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
                 prompt="End of round. All players must hit enter to continue",
