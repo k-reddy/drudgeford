@@ -161,13 +161,6 @@ class GameLoop:
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
-        if acting_character.lose_turn:
-            acting_character.lose_turn = False
-            self.pyxel_manager.log.append(
-                f"{acting_character.name} was knocked down and lost their turn."
-            )
-            self._end_turn()
-            return
         try:
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
@@ -175,6 +168,14 @@ class GameLoop:
                 )
             # take damage from elements before starting turn
             self.board.deal_terrain_damage_current_location(acting_character)
+            # if they lost their turn, skip it
+            if acting_character.lose_turn:
+                acting_character.lose_turn = False
+                self.pyxel_manager.log.append(
+                    f"{acting_character.name} was knocked down and lost their turn."
+                )
+                self._end_turn()
+                return
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
