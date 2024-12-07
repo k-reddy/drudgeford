@@ -81,7 +81,6 @@ class GameLoop:
         round_character_list = list(self.board.characters)
         self.pyxel_manager.load_characters(self.board.characters)
         for acting_character in round_character_list:
-            print([char.name for char in round_character_list])
             # since we use a copy, we need to make sure the character is still alive
             if acting_character not in self.board.characters:
                 return
