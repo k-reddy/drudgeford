@@ -733,11 +733,10 @@ class Board:
                 if self.round_num - el.round_placed > el.duration:
                     self.clear_terrain_square(i, j)
 
-    def update_character_statuses(self):
-        for char in self.characters:
-            if char.shield[1] <= self.round_num:
-                # reset to shield 0 indefinitely
-                character.shield = (0, MAX_ROUNDS)
+    def update_character_statuses(self, char: Character):
+        if char.shield[1] <= self.round_num:
+            # reset to shield 0 indefinitely
+            character.shield = (0, MAX_ROUNDS)
 
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)

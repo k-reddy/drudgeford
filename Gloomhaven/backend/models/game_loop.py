@@ -72,8 +72,6 @@ class GameLoop:
     def run_round(self, round_num: int, is_test: bool = False) -> None:
         # clear the elements from the board that have "expired"
         self.board.update_terrain()
-        self.board.update_character_statuses()
-
         # if we don't shuffle the actual list, we will create ordering issues
         # b/c when we kill a character, we send a copy of characters over to
         # pyxel, same when we update healths
@@ -162,6 +160,8 @@ class GameLoop:
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
         try:
+            # reset any statuses that should expire on their turn
+            self.board.update_character_statuses(acting_character)
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
