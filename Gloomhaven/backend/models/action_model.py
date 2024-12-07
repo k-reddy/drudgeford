@@ -510,6 +510,7 @@ class PushAllEnemies(ActionStep):
                 board,
                 is_legal_push_check,
                 attacker.client_id,
+                is_push=True,
             )
 
     def __str__(self):
