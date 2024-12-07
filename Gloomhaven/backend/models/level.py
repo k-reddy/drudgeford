@@ -83,5 +83,3 @@ campaign_levels = [
         ],
     ),
 ]
-
-# The Orchestrator raises a trembling hand, their eyes wide with disbelief. "But I was supposed to-" they begin, but their words dissolve into mist along with their form, scattering like smoke on the wind. The unnatural darkness plaguing Drudgeford lifts like a veil, and warm sunlight touches the village for the first time in what feels like ages. As color returns to the withered crops and the mysterious runes fade from the doors, you hear the sounds of your neighbors emerging from their homes - their eyes clear, their movements their own again. You've seen horrors that will haunt your dreams for years to come, but looking at the restored peace in your village, you know it was worth the cost. Still, as night falls and shadows stretch across your floor, you can't help but wonder if somewhere, in some dark corner of reality, another Orchestrator is beginning their work.
