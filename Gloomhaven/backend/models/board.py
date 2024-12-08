@@ -61,37 +61,6 @@ class Board:
         # pyxel_manager.load_characters(self.characters)
         self.acting_character = None
 
-    # @property
-    # def locations(self):
-    #     return self.__locations
-
-    # @locations.setter
-    # def locations(self, locations):
-    #     self.__locations = locations
-    #     self.disp.locations = locations
-    #     self.disp.reload_display()
-
-    # @property
-    # def terrain(self):
-    #     return self.__terrain
-
-    # @terrain.setter
-    # def terrain(self, terrain):
-    #     self.__terrain = terrain
-    #     self.disp.terrain = terrain
-    #     self.disp.reload_display()
-
-    # @property
-    # def characters(self):
-    #     return self.__characters
-
-    # @characters.setter
-    # def characters(self, characters):
-    #     self.__characters = characters
-    #     self.disp.characters = characters
-    #     # self.pyxel_manager.load_characters(characters)
-    #     self.disp.reload_display()
-
     # initializes a game map which is a list of ListWithUpdate
     # game maps are used to represent locations and terrain
     def _initialize_map(self, width: int = 5, height=5) -> list:
