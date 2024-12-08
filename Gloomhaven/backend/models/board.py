@@ -133,10 +133,20 @@ class Board:
                     if isinstance(potential_char, obstacle.Wall):
                         continue
                     terrain_obj = effect_type(self.round_num, next(self.id_generator))
-                    # if there's something there already, clear it
-                    self.clear_terrain_square(effect_row, effect_col)
-                    self.terrain[effect_row][effect_col] = terrain_obj
-                    self.pyxel_manager.add_entity(terrain_obj, effect_row, effect_col)
+                    # if there's something there already, and it's the same element
+                    # adopt its frontend id and update its backend info
+                    # this prevents weird frontend effects from clearing and reapplying
+                    # the same element
+                    if type(self.terrain[effect_row][effect_col]) is type(terrain_obj):
+                        terrain_obj.id = self.terrain[effect_row][effect_col].id
+                        self.terrain[effect_row][effect_col] = terrain_obj
+                    # otherwise, clear it and push new element to front end
+                    else:
+                        self.clear_terrain_square(effect_row, effect_col)
+                        self.terrain[effect_row][effect_col] = terrain_obj
+                        self.pyxel_manager.add_entity(
+                            terrain_obj, effect_row, effect_col
+                        )
                     # if there's a character there, deal damage to them unless it's ice
                     if (
                         isinstance(potential_char, Character)
