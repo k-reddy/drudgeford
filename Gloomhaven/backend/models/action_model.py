@@ -73,7 +73,8 @@ class SingleTargetAttack(ActionStep):
             board.pyxel_manager.log.append("No targets in range for attack")
 
     def __str__(self):
-        print_str = f"Attack {self.strength} <{self.att_range}>"
+        range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
+        print_str = f"Attack {self.strength}{range_str}"
         print_str += "\nKnock down (50%)" if self.knock_down else ""
         return print_str
 
@@ -122,9 +123,10 @@ class AreaAttackWithTarget(ActionStep):
             board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
+        range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
         damage_str = f" {self.damage}" if self.damage else ""
-        return f"{attack_type}Attack{damage_str} <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
+        return f"{attack_type}Attack{damage_str}{self.att_range}:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         perform_str = f"{attacker.name} "
@@ -604,7 +606,6 @@ class ActionCard:
     movement: int
     jump: bool
 
-    # actions = [single_target_attack, area_of_attack, status_effect]
     def perform_attack(self, attacker, board, round_num: int):
         for action in self.actions:
             action_log_line = action.perform_string(attacker)
