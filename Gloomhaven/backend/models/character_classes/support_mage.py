@@ -10,7 +10,7 @@ magic_user_cards = [
     ),
     actions.ActionCard(
         attack_name="Blessing of Power",
-        actions=[actions.BlessAndChargeAlly(3, 2), actions.HealAlly(3, 3)],
+        actions=[actions.BlessAndFortifyAlly(3, 2), actions.HealAlly(3, 3)],
         movement=1,
         jump=False,
     ),

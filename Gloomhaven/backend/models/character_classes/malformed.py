@@ -30,7 +30,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Twisted Growth",
-        actions=[actions.ChargeNextAttack(3), actions.ModifySelfHealth(-1)],
+        actions=[actions.Fortify(3), actions.ModifySelfHealth(-1)],
         movement=4,
         jump=False,
     ),

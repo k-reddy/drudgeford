@@ -25,7 +25,7 @@ cards = [
         actions=[
             actions.ShieldAllAllies(2, 1, 3),
             actions.ModifySelfHealth(2),
-            actions.ChargeNextAttack(2),
+            actions.Fortify(2),
         ],
         movement=0,
         jump=False,
