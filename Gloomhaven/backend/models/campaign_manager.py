@@ -104,23 +104,32 @@ class Campaign:
         return game.start()
 
     def run_levels(self):
-        for i, _ in enumerate(self.levels):
+        for _ in self.levels:
             output, message = self.run_level(self.levels.pop(0))
-
-            # if you don't win the level or if all levels are done, end here
-            if output != GameState.WIN or not self.levels:
+            # if you don't win the level, end here
+            if output != GameState.WIN:
                 self.pyxel_manager.pause_for_all_players(
                     num_players=self.num_players,
-                    prompt=message + "\nPress esc to enter",
+                    prompt=message + "\nPress esc to exit",
                 )
-                # !!! should clean up gracefully here
                 return
-            # otherwise, let them see end game message then
-            # offer to save and continue to next level
+            # otherwise, let them see the victory message and choose to progress
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
                 prompt=message + "\nAll players must press enter to continue",
             )
+            # reset the view manager
+            print("resetting view manager")
+            self.pyxel_manager.reset_view_manager()
+            print("done")
+            # if we're done, show the game ending plot and exit when everyone proceeds
+            if not self.levels:
+                game_end_text = """The Orchestrator raises a trembling hand, their eyes wide with disbelief. 'But I was supposed to-' they begin, but their words dissolve into mist along with their form, scattering like smoke on the wind. The unnatural darkness plaguing Drudgeford lifts like a veil, and warm sunlight touches the village for the first time in what feels like ages. As color returns to the withered crops and the mysterious runes fade from the doors, you hear the sounds of your neighbors emerging from their homes - their eyes clear, their movements their own again. You've seen horrors that will haunt your dreams for years to come, but looking at the restored peace in your village, you know it was worth the cost. Still, as night falls and shadows stretch across your floor, you can't help but wonder if somewhere, in some dark corner of reality, another Orchestrator is beginning their work."""
+                self.pyxel_manager.load_plot_screen(
+                    game_end_text, True, self.num_players
+                )
+                return
+            # if they're not done yet, offer to save campaign
             # self.save_campaign()
 
     def set_num_players(self):

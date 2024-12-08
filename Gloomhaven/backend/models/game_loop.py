@@ -72,8 +72,6 @@ class GameLoop:
     def run_round(self, round_num: int, is_test: bool = False) -> None:
         # clear the elements from the board that have "expired"
         self.board.update_terrain()
-        self.board.update_character_statuses()
-
         # if we don't shuffle the actual list, we will create ordering issues
         # b/c when we kill a character, we send a copy of characters over to
         # pyxel, same when we update healths
@@ -81,7 +79,6 @@ class GameLoop:
         round_character_list = list(self.board.characters)
         self.pyxel_manager.load_characters(self.board.characters)
         for acting_character in round_character_list:
-            print([char.name for char in round_character_list])
             # since we use a copy, we need to make sure the character is still alive
             if acting_character not in self.board.characters:
                 return
@@ -162,20 +159,25 @@ class GameLoop:
 
     def run_turn(self, acting_character: character.Character, round_num: int) -> None:
         self.board.acting_character = acting_character
-        if acting_character.lose_turn:
-            acting_character.lose_turn = False
-            self.pyxel_manager.log.append(
-                f"{acting_character.name} was knocked down and lost their turn."
-            )
-            self._end_turn()
-            return
         try:
+            # reset any statuses that should expire on their turn
+            self.board.update_character_statuses(acting_character)
             if acting_character.shield[0] > 0:
                 self.pyxel_manager.log.append(
                     (f"{acting_character.name} has shield {acting_character.shield[0]}")
                 )
             # take damage from elements before starting turn
             self.board.deal_terrain_damage_current_location(acting_character)
+            # if they lost their turn, skip it
+            if acting_character.lose_turn:
+                acting_character.lose_turn = False
+                self.pyxel_manager.log.append(
+                    f"{acting_character.name} was knocked down and lost their turn."
+                )
+                self._end_turn()
+                return
+            # before they pick a card, show them the shields of all their enemies:
+            self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
@@ -231,6 +233,18 @@ class GameLoop:
 
         self._end_turn()
 
+    def display_enemy_shield_info(self, acting_character: character.Character) -> None:
+        """
+        prints shield info to the log if any enemies have shields
+        """
+        shield_info = [
+            f"{char.name}: {char.shield[0]}"
+            for char in self.board.characters
+            if char.team_monster != acting_character.team_monster and char.shield[0] > 0
+        ]
+        if shield_info:
+            self.pyxel_manager.log.append(f"Enemy Shields: {', '.join(shield_info)}")
+
     def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins
         if all(not x.team_monster for x in self.board.characters):
@@ -240,9 +254,9 @@ class GameLoop:
             self.game_state = GameState.GAME_OVER
 
     def _end_game(self) -> GameState:
-        print("resetting view manager")
-        self.pyxel_manager.reset_view_manager()
-        print("done")
+        # print("resetting view manager")
+        # self.pyxel_manager.reset_view_manager()
+        # print("done")
         message = ""
         if self.game_state == GameState.GAME_OVER:
             message = self._lose_game_dead()
@@ -266,16 +280,12 @@ class GameLoop:
             self.pyxel_manager.log.clear()
 
     def _end_round(self) -> None:
-        for char in self.board.characters:
-            self.refresh_character_cards(char)
         if not self.all_ai_mode:
             # 0 because that's the default round number
             self.pyxel_manager.load_round_turn_info(0, None)
-            # for i in range(1, self.num_players):
-            #     self.pyxel_manager.print_message(
-            #         "End of round. Waiting for Player 1 to hit continue",
-            #         f"frontend_{i+1}",
-            #     )
+        for char in self.board.characters:
+            self.refresh_character_cards(char)
+        if not self.all_ai_mode:
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
                 prompt="End of round. All players must hit enter to continue",

@@ -352,7 +352,7 @@ class Human(Agent):
                 prompt = orig_prompt
                 continue
             else:
-                prompt = "Invalid square (obstacle, character, or out of movement range) - try again\nClick where you want to move."
+                prompt = "Invalid square (obstacle, character, or out of movement range) - try again"
 
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
@@ -370,7 +370,13 @@ class Human(Agent):
         client_id: Optional[str] = None,
         is_push=False,
     ):
-        push_pull_str = "push" if is_push else "pull"
+        if is_push:
+            push_pull_str = "push"
+        elif movement_check:
+            push_pull_str = "pull"
+        # if there's no movement check, it's moving an ally
+        else:
+            push_pull_str = "move"
         Human.perform_movement(
             char_to_move,
             movement,
