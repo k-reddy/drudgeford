@@ -431,7 +431,15 @@ class Board:
             for new_pos, new_g_score in valid_neighbors:
                 g_scores[new_pos] = new_g_score
                 h_score = calculate_chebyshev_distance(new_pos, end)
-                heapq.heappush(priority_queue, (new_g_score + h_score, new_pos))
+                # punish moves that go diagonally but don't have to by adding a small penalty
+                is_diagonal = (
+                    abs(new_pos[0] - current[0]) + abs(new_pos[1] - current[1]) == 2
+                )  # True for diagonal moves
+                tiebreaker = 0.001 if is_diagonal else 0
+                heapq.heappush(
+                    priority_queue, (new_g_score + h_score + tiebreaker, new_pos)
+                )
+                # heapq.heappush(priority_queue, (new_g_score + h_score, new_pos))
                 previous_cell[new_pos] = current
 
             closed.add(current)
@@ -733,11 +741,10 @@ class Board:
                 if self.round_num - el.round_placed > el.duration:
                     self.clear_terrain_square(i, j)
 
-    def update_character_statuses(self):
-        for char in self.characters:
-            if char.shield[1] <= self.round_num:
-                # reset to shield 0 indefinitely
-                character.shield = (0, MAX_ROUNDS)
+    def update_character_statuses(self, char: Character):
+        if char.shield[1] <= self.round_num:
+            # reset to shield 0 indefinitely
+            character.shield = (0, MAX_ROUNDS)
 
     def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
         target.attack_modifier_deck.append(modifier_card)

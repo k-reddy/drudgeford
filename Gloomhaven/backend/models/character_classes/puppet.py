@@ -6,8 +6,8 @@ cards = [
     actions.ActionCard(
         attack_name="Critical Meltdown",
         actions=[
-            actions.ModifySelfHealth(-5),
             actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=6),
+            actions.ModifySelfHealth(-5),
         ],
         movement=3,
         jump=False,
@@ -54,4 +54,4 @@ cards = [
     ),
 ]
 
-health = 4
+health = 3

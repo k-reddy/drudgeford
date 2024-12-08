@@ -32,7 +32,6 @@ class AreaAttackFromSelf(ActionStep):
     def perform(self, board, attacker, round_num):
         # first create the attack coordinates from the shape (offsets)
         starting_coord = board.find_location_of_target(attacker)
-        self.shape.discard((0, 0))  # don't attack yourself
         attack_coords = attacker.pick_rotated_attack_coordinates(
             board, self.shape, starting_coord
         )
@@ -95,7 +94,6 @@ class AreaAttackWithTarget(ActionStep):
             self.shape.add((0, 0))
         else:
             self.shape.discard((0, 0))
-        print(f"shape in action_model.area_attack_with_target: {self.shape}")
         rotated_offset_shape = attacker.pick_rotated_attack_coordinates(
             board, self.shape, attacker_loc, from_self=False
         )
@@ -512,6 +510,7 @@ class PushAllEnemies(ActionStep):
                 board,
                 is_legal_push_check,
                 attacker.client_id,
+                is_push=True,
             )
 
     def __str__(self):
