@@ -20,7 +20,7 @@ campaign_levels = [
     Level(
         floor_color_map=[(1, 3), (5, 11)],
         wall_color_map=[(1, 4), (13, 15)],
-        monster_classes=[character.Fairy],
+        monster_classes=[character.Treeman],
         # monster_classes=[character.Treeman, character.MushroomMan, character.Fairy],
         pre_level_text="""A hunter you talked to at the tavern mentioned seeing the same mysterious rune that's been appearing on village doors carved into the bark of an ancient tree in a forest nearby. When the village healer mentioned that the mushrooms from that part of the forest had suddenly lost their curative effects, you decide to investigate the area. The rune on the tree points to a trail of withered vegetation. You follow it deep into the forest - only to find yourself surrounded by forest creatures whose vacant eyes and jerky movements suggest they're under some dark influence. Before you can retreat, they lunge at you in perfect, unsettling union.""",
         starting_elements=[obstacle.Spores, obstacle.PoisonShroom],

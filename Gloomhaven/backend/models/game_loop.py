@@ -176,6 +176,8 @@ class GameLoop:
                 )
                 self._end_turn()
                 return
+            # before they pick a card, show them the shields of all their enemies:
+            self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
                 f"{acting_character.name} chose {action_card.attack_name}\n"
@@ -230,6 +232,18 @@ class GameLoop:
             pass
 
         self._end_turn()
+
+    def display_enemy_shield_info(self, acting_character: character.Character) -> None:
+        """
+        prints shield info to the log if any enemies have shields
+        """
+        shield_info = [
+            f"{char.name}: {char.shield[0]}"
+            for char in self.board.characters
+            if char.team_monster != acting_character.team_monster and char.shield[0] > 0
+        ]
+        if shield_info:
+            self.pyxel_manager.log.append(f"Enemy Shields: {', '.join(shield_info)}")
 
     def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins
