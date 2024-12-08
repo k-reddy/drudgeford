@@ -44,7 +44,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Arctic Fury",
-        actions=[actions.ChargeNextAttack(3), actions.SingleTargetAttack(3, 1)],
+        actions=[actions.Fortify(3), actions.SingleTargetAttack(3, 1)],
         movement=2,
         jump=False,
     ),

@@ -26,7 +26,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Soul Link",
-        actions=[actions.BlessAndChargeAlly(2, 3), actions.BlessAndChargeAlly(2, 3)],
+        actions=[actions.BlessAndFortifyAlly(2, 3), actions.BlessAndFortifyAlly(2, 3)],
         movement=1,
         jump=False,
     ),
@@ -50,7 +50,7 @@ cards = [
     actions.ActionCard(
         attack_name="Dark Blessing",
         actions=[
-            actions.ChargeNextAttack(3),
+            actions.Fortify(3),
             actions.AreaAttackFromSelf(
                 shape=shapes.bar(1, 2), element_type=obstacle.Shadow, strength=1
             ),

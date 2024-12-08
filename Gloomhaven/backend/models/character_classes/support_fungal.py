@@ -25,7 +25,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Rejuvenating Fungus",
-        actions=[actions.HealAlly(4, 1), actions.BlessAndChargeAlly(2, 1)],
+        actions=[actions.HealAlly(4, 1), actions.BlessAndFortifyAlly(2, 1)],
         movement=2,
         jump=False,
     ),
