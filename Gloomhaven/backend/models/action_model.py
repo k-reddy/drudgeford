@@ -123,10 +123,9 @@ class AreaAttackWithTarget(ActionStep):
             board.add_effect_to_terrain_for_attack(self.element_type, attack_coords)
 
     def __str__(self):
-        range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
         damage_str = f" {self.damage}" if self.damage else ""
-        return f"{attack_type}Attack{damage_str}{self.att_range}:\n{shapes.print_shape(self.shape)}"
+        return f"{attack_type}Attack{damage_str} <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         perform_str = f"{attacker.name} "
