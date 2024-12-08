@@ -75,7 +75,7 @@ cards = [
                 ),
                 element_type=Shadow,
             ),
-            action_model.AreaAttackFromSelf(shapes.arc(4), 2),
+            action_model.AreaAttackFromSelf(shapes.arc(4), 2, element_type=Shadow),
         ],
         movement=3,
         jump=False,
