@@ -10,7 +10,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Rage of Pain",
-        actions=[actions.SingleTargetAttack(2, 1), actions.ChargeNextAttack(4)],
+        actions=[actions.SingleTargetAttack(2, 1), actions.Fortify(4)],
         movement=3,
         jump=False,
     ),
@@ -25,7 +25,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Absorb Impact",
-        actions=[actions.ShieldSelf(4, 2), actions.ChargeNextAttack(2)],
+        actions=[actions.ShieldSelf(4, 2), actions.Fortify(2)],
         movement=1,
         jump=False,
     ),

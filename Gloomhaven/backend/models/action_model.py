@@ -153,7 +153,7 @@ class Teleport(ActionStep):
 
 
 @dataclass
-class ChargeNextAttack(ActionStep):
+class Fortify(ActionStep):
     strength: int
 
     def perform(self, board, attacker, round_num):
@@ -161,10 +161,10 @@ class ChargeNextAttack(ActionStep):
         attacker.attack_modifier_deck.append(modifier)
 
     def __str__(self):
-        return f"+{self.strength} next attack"
+        return f"Foritfy self by {self.strength}"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} charges next attack +{self.strength}"
+        return f"{attacker.name} fortifies self by {self.strength}"
 
 
 @dataclass
@@ -173,16 +173,16 @@ class WeakenEnemy(ActionStep):
     att_range: int
 
     def perform(self, board, attacker, round_num):
-        modifier = utils.make_additive_modifier(self.strength)
+        modifier = utils.make_additive_modifier(-self.strength)
         target = select_in_range_target(board, attacker, self.att_range, opponent=True)
         # if no one is in range, return
         if not target:
             return
         target.attack_modifier_deck.append(modifier)
-        board.pyxel_manager.log.append(f"Weakened {target.name} by {self.strength}")
+        board.pyxel_manager.log.append(f"Weakened {target.name} by -{self.strength}")
 
     def __str__(self):
-        return f"Weaken enemy by {self.strength} <{self.att_range}>"
+        return f"Weaken enemy by -{self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -203,10 +203,10 @@ class WeakenAllEnemies(ActionStep):
             board.pyxel_manager.log.append(f"{enemy.name}")
 
     def __str__(self):
-        return f"-{self.strength} next attack all enemies <{self.att_range}>"
+        return f"Weaken all enemies by -{self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} weakens these enemies by {self.strength}:"
+        return f"{attacker.name} weakens all enemies by -{self.strength}:"
 
 
 @dataclass
@@ -312,7 +312,7 @@ class BlessSelf(ActionStep):
 
 
 @dataclass
-class BlessAndChargeAlly(ActionStep):
+class BlessAndFortifyAlly(ActionStep):
     att_range: int
     strength: int
 
@@ -320,15 +320,15 @@ class BlessAndChargeAlly(ActionStep):
         target = select_in_range_target(board, attacker, self.att_range, opponent=False)
         rand_index = random.randint(0, len(target.attack_modifier_deck))
         bless = utils.make_multiply_modifier(2, "2x Bless")
-        charge = utils.make_additive_modifier(self.strength)
+        modifier = utils.make_additive_modifier(self.strength)
         target.attack_modifier_deck.insert(rand_index, bless)
-        target.attack_modifier_deck.append(charge)
+        target.attack_modifier_deck.append(modifier)
         board.pyxel_manager.log.append(
-            f"{attacker.name} blesses and charges {target.name}"
+            f"{attacker.name} blesses and fortifies {target.name} by {self.strength}"
         )
 
     def __str__(self):
-        return f"Bless ally <{self.att_range}>\n+{self.strength} next attack"
+        return f"Bless ally <{self.att_range}>\n+Forifity ally by {self.strength}"
 
     def perform_string(self, attacker):
         return ""

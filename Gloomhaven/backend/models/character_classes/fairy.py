@@ -16,7 +16,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Nature's Blessing",
-        actions=[actions.ChargeNextAttack(2), actions.SingleTargetAttack(2, 3)],
+        actions=[actions.Fortify(2), actions.SingleTargetAttack(2, 3)],
         movement=3,
         jump=True,
     ),
@@ -49,7 +49,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Mystic Circle",
-        actions=[actions.BlessAndChargeAlly(2, 2), actions.HealAlly(3, 2)],
+        actions=[actions.BlessAndFortifyAlly(2, 2), actions.HealAlly(3, 2)],
         movement=3,
         jump=True,
     ),

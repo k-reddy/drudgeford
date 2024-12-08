@@ -8,7 +8,7 @@ cards = [
         attack_name="Heavy Hammer",
         actions=[
             action_model.SingleTargetAttack(strength=5, att_range=1, knock_down=True),
-            action_model.ChargeNextAttack(strength=2),
+            action_model.Fortify(strength=2),
         ],
         movement=0,
         jump=False,
@@ -61,7 +61,7 @@ cards = [
         actions=[
             action_model.AreaAttackFromSelf(shape=shapes.bar(1, 2), strength=3),
             action_model.BlessSelf(),
-            action_model.ChargeNextAttack(strength=4),
+            action_model.Fortify(strength=4),
             action_model.ModifySelfHealth(-3),
         ],
         movement=0,
