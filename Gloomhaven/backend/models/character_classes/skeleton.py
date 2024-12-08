@@ -11,7 +11,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Combat Stance",
-        actions=[actions.ChargeNextAttack(3), actions.ShieldSelf(2, 2)],
+        actions=[actions.Fortify(3), actions.ShieldSelf(2, 2)],
         movement=2,
         jump=False,
     ),
@@ -25,7 +25,7 @@ cards = [
         attack_name="Sword Dance",
         actions=[
             actions.AreaAttackFromSelf(shape=shapes.arc(3), strength=2),
-            actions.ChargeNextAttack(2),
+            actions.Fortify(2),
         ],
         movement=3,
         jump=False,

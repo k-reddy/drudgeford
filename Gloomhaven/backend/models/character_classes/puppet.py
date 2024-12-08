@@ -25,7 +25,7 @@ cards = [
     actions.ActionCard(
         attack_name="Power Surge",
         actions=[
-            actions.ChargeNextAttack(4),
+            actions.Fortify(4),
         ],
         movement=0,
         jump=False,

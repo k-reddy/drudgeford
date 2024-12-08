@@ -22,7 +22,7 @@ healer_support_cards = [
     ),
     actions.ActionCard(
         attack_name="Rejuvenating Touch",
-        actions=[actions.HealAlly(5, 1), actions.BlessAndChargeAlly(2, 1)],
+        actions=[actions.HealAlly(5, 1), actions.BlessAndFortifyAlly(2, 1)],
         movement=3,
         jump=True,
     ),

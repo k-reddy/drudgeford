@@ -38,7 +38,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Good Hunting",
-        actions=[actions.SingleTargetAttack(4, 1), actions.BlessAndChargeAlly(3, 2)],
+        actions=[actions.SingleTargetAttack(4, 1), actions.BlessAndFortifyAlly(3, 2)],
         movement=2,
         jump=False,
     ),

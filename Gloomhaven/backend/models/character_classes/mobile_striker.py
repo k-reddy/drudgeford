@@ -34,7 +34,7 @@ cards = [
         attack_name="Whirlwind Assault",
         actions=[
             actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
-            actions.ChargeNextAttack(2),
+            actions.Fortify(2),
         ],
         movement=3,
         jump=True,

@@ -6,7 +6,7 @@ cards = [
         attack_name="Bitter Harvest",
         actions=[
             action_model.SingleTargetAttack(3, 1),
-            action_model.ChargeNextAttack(2),
+            action_model.Fortify(2),
         ],
         movement=2,
         jump=True,
@@ -14,7 +14,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Sacred Cultivation",
         actions=[
-            action_model.BlessAndChargeAlly(att_range=2, strength=2),
+            action_model.BlessAndFortifyAlly(att_range=2, strength=2),
             action_model.SingleTargetAttack(3, 1),
         ],
         movement=3,
@@ -35,7 +35,7 @@ cards = [
         actions=[
             action_model.SingleTargetAttack(2, 1),
             action_model.Curse(1),
-            action_model.ChargeNextAttack(2),
+            action_model.Fortify(2),
         ],
         movement=2,
         jump=False,
@@ -43,7 +43,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Seeds of Wrath",
         actions=[
-            action_model.BlessAndChargeAlly(2, 3),
+            action_model.BlessAndFortifyAlly(2, 3),
             action_model.CurseSelf(),
             action_model.AreaAttackWithTarget(
                 shape=shapes.line(3), damage=3, att_range=2
