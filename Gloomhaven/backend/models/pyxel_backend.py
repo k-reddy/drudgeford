@@ -196,6 +196,18 @@ class PyxelManager:
         reachable_positions=None,
         reachable_paths=None,
     ):
+        # Flip coordinates to front end land
+        if reachable_positions:
+            reachable_positions = [
+                self.normalize_coordinate((y, x)) for x, y in reachable_positions
+            ]
+        if reachable_paths:
+            reachable_paths = {
+                self.normalize_coordinate((k_y, k_x)): [
+                    self.normalize_coordinate((y, x)) for x, y in v
+                ]
+                for (k_x, k_y), v in reachable_paths.items()
+            }
         # tell client to get user input
         task_class = tasks.MouseInputTask if is_mouse else tasks.InputTask
         task = task_class(
