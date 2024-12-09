@@ -80,6 +80,11 @@ class Campaign:
         self.run_levels()
 
     def update_starting_level(self):
+        """
+        allows user to start not on level 1 if they want
+        doing this still requires them to set up all their characters
+        loading a campaign saves character info
+        """
         acceptable_input = [str(i + 1) for i, _ in enumerate(self.levels)] + [""]
         user_input = self.pyxel_manager.get_user_input(
             f"Press enter to start on level 1 or type the number of the level you want to start on (1-{len(self.levels)})",
