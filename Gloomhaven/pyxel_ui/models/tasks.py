@@ -391,11 +391,12 @@ class LoadCampaign(Task):
         file_dict = {}
         for i, filename in enumerate(filenames):
             file_path = SAVE_FILE_DIR + filename
+            # validate that the file size is reasonable
             file_size = os.path.getsize(file_path)
             if file_size > 1_000_000:  # 1MB in bytes
                 print(f"Save file {filename} is too large ({file_size} bytes)")
                 continue
-            with open(SAVE_FILE_DIR + filename, "rb") as f:
+            with open(file_path, "rb") as f:
                 campaign_state = json.load(f)
                 file_dict[f"{i}: {filename}"] = campaign_state.__dict__
         return file_dict
