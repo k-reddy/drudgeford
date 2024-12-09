@@ -244,15 +244,22 @@ li {
     grid-template-columns: 1fr;
     gap: 1rem;
     margin: 1rem 0;
-    width: 80%; /* Creates buffer on both sides */
-    max-width: 800px; /* Prevents boxes from getting too wide on large screens */
+    width: 80%;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
 
 @media (min-width: 768px) {
     .grid-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Center the last item if it's alone */
+    .grid-container > *:last-child:nth-child(odd) {
+        grid-column: 1 / span 2;
+        max-width: calc(50% - 1rem); /* Match width of other items */
+        margin: 0 auto; /* Center it */
     }
 }
 
@@ -260,6 +267,8 @@ li {
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 1rem;
+    max-width: 100%; /* Prevent items from extending beyond their grid cell */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .grid-item h3 {
