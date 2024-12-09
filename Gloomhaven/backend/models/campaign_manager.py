@@ -47,22 +47,20 @@ class Campaign:
 
         # see if the user wants to load an existing campaign
         # and do so if desired
-        # campaign_pickle_to_load = self.pyxel_manager.get_campaign_to_load()
-        # if campaign_pickle_to_load:
-        #     self.load_campaign(campaign_pickle_to_load)
+        campaign_data = self.pyxel_manager.get_campaign_to_load()
+        if campaign_data:
+            self.load_campaign(campaign_data)
 
-    def load_campaign(self, campaign_pickle_to_load):
-        # get the data needed to recreate the campaign
-        campaign_state = pickle.loads(campaign_pickle_to_load)
+    def load_campaign(self, campaign_data):
         # recreate it
-        self.id_generator = count(start=campaign_state.id_gen_start)
+        self.id_generator = count(start=campaign_data["id_gen_start"])
         self.make_levels()
-        self.levels = self.levels[-campaign_state.remaining_levels :]
-        self.all_ai_mode = campaign_state.all_ai_mode
-        self.num_players = campaign_state.num_players
-        self.player_names = campaign_state.player_names
-        self.player_classes = campaign_state.player_classes
-        self.player_ids = campaign_state.player_ids
+        self.levels = self.levels[-campaign_data["remaining_levels"] :]
+        self.all_ai_mode = campaign_data["all_ai_mode"]
+        self.num_players = campaign_data["num_players"]
+        self.player_names = campaign_data["player_names"]
+        self.player_classes = campaign_data["player_classes"]
+        self.player_ids = campaign_data["player_ids"]
         # remember that we already have a set up campaign
         self.initialized = True
 
@@ -141,7 +139,7 @@ class Campaign:
                 )
                 return
             # if they're not done yet, offer to save campaign
-            # self.save_campaign()
+            self.save_campaign()
 
     def set_num_players(self):
         if not self.all_ai_mode:
@@ -262,7 +260,7 @@ class Campaign:
         # Create a simple dict with just the essential data
         campaign_state = CampaignState(
             remaining_levels=len(self.levels),
-            player_classes=[type(char).__name__ for char in self.player_chars],
+            player_classes=[str(type(char).__name__) for char in self.player_chars],
             player_names=[char.name for char in self.player_chars],
             player_ids=[char.client_id for char in self.player_chars],
             num_players=self.num_players,

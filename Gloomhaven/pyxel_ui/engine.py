@@ -92,6 +92,7 @@ class PyxelEngine:
                 return
             # if we're asked for a campaign, send what we get to the server
             elif isinstance(self.current_task, LoadCampaign):
+                print(task_output)
                 self.server_client.post_user_input(task_output)
             self.current_task = None
             perform_time = time.time() - start_time
