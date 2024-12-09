@@ -74,10 +74,21 @@ class Campaign:
             self.wait_for_all_players_to_join()
             self.set_up_player_chars()
             self.make_levels()
+            self.update_starting_level()
             self.initialized = True
         else:
             self.wait_for_all_players_to_join()
         self.run_levels()
+
+    def update_starting_level(self):
+        acceptable_input = [str(i + 1) for i, _ in enumerate(self.levels)] + [""]
+        user_input = self.pyxel_manager.get_user_input(
+            f"Press enter to start on level 1 or type the number of the level you want to start on (1-{len(self.levels)})",
+            acceptable_input,
+        )
+        if user_input != "":
+            level_start = int(user_input)
+            self.levels = self.levels[level_start - 1 :]
 
     def make_levels(self):
         self.levels = campaign_levels.copy()
