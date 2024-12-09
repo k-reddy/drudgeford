@@ -1,10 +1,19 @@
-from flask import Flask, send_file, render_template_string, jsonify, send_from_directory
+from flask import (
+    Flask,
+    send_file,
+    render_template_string,
+    jsonify,
+    send_from_directory,
+    request,
+)
 import os
+import time
 import subprocess
 import uuid
 import threading
 from typing import Dict
 from dataclasses import dataclass
+from collections import defaultdict
 import socket
 
 
@@ -432,9 +441,37 @@ def download():
     return send_file(exe_path, as_attachment=True, download_name="gloomhaven.bin")
 
 
+# create limits of number of games hosted per IP
+# resets every time we reset this script, which is fine b/c we just
+# are wary of spam bots
+ip_attempts = defaultdict(list)  # IP -> list of timestamps
+
+
+def has_started_too_many_games(ip) -> bool:
+    current_time = time.time()
+    # Clean up old attempts (older than 24 hours)
+    ip_attempts[ip] = [
+        t for t in ip_attempts[ip] if current_time - t < 86400
+    ]  # 24 hours in seconds
+
+    # Check daily limit
+    if len(ip_attempts[ip]) >= 20:
+        return True
+    else:
+        return False
+
+
 @app.route("/host-game")
 def host_game():
     try:
+        # first check if this ip has tried to start too many games
+        if has_started_too_many_games(request.remote_addr):
+            return jsonify(
+                {
+                    "success": False,
+                    "error": "Daily game creation limit reached (20 games per day)",
+                }
+            )
         port = get_available_port()
         if port is None:
             return jsonify(
