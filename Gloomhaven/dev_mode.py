@@ -1,6 +1,7 @@
 import signal
 import subprocess
 import time
+import traceback
 from frontend_main import main as frontend_main
 
 
@@ -20,7 +21,10 @@ def main():
     try:
         print("Starting client...")
         frontend_main(dev_mode=True)
-    except:
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        print("Full traceback:")
+        traceback.print_exc()
         server_process.terminate()
 
     server_process.wait()
