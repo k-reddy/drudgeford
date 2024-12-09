@@ -269,6 +269,7 @@ li {
     padding: 1rem;
     max-width: 100%; /* Prevent items from extending beyond their grid cell */
     box-sizing: border-box; /* Include padding in width calculation */
+    text-align: center;
 }
 
 .grid-item h3 {
@@ -285,4 +286,5 @@ li {
 
 .special-grid-item h3 {
     color: #FF8FA7;
+    text-align: center;
 }
