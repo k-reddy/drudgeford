@@ -350,10 +350,6 @@ class SaveCampaign(Task):
     campaign_state: any
 
     def perform(self, view_manager, user_input_manager):
-        if self.should_save():
-            self.save_campaign()
-
-    def save_campaign(self):
         import os
         from backend.utils.config import SAVE_FILE_DIR
         import pickle
@@ -362,7 +358,7 @@ class SaveCampaign(Task):
         os.makedirs(SAVE_FILE_DIR, exist_ok=True)
         with open(SAVE_FILE_DIR + filename, "wb") as f:
             pickle.dump(self.campaign_state, f)
-        input(f"Successfully saved {filename}. Hit enter to continue. ")
+        return filename
 
     def get_unused_filename(self):
         from backend.utils.utilities import get_campaign_filenames
@@ -378,17 +374,11 @@ class SaveCampaign(Task):
                 break
         return filename
 
-    def should_save(self):
-        user_input = input("Would you like to save your progress? Type (y)es or (n)o. ")
-        should_save = True if user_input == "y" else False
-        return should_save
-
 
 @dataclass
 class LoadCampaign(Task):
     """
-    displays potential campaigns to load, loads the one of your choice
-    and sends data back to server
+    loads all campaign data and sends it to the backend
     """
 
     def perform(self, view_manager, user_input_manager):
@@ -396,30 +386,13 @@ class LoadCampaign(Task):
         from backend.utils.utilities import get_campaign_filenames
         from backend.utils.config import SAVE_FILE_DIR
 
-        user_input = input(
-            "Type (y)es to load a campaign or hit enter to start a new campaign"
-        )
-        if user_input != "y":
-            return None
-
         filenames = get_campaign_filenames()
-        if not filenames:
-            print("No saved files found")
-            return None
-
-        print("These are the files you may load:")
-        eligible_filenums = []
+        file_dict = {}
         for i, filename in enumerate(filenames):
-            print(f"{i}: {filename}")
-            eligible_filenums.append(str(i))
-        filenum = input("Type the number of the file you want to load")
-        while filenum not in eligible_filenums:
-            filenum = input("Type the number of the file you want to load")
-        filename = filenames[int(filenum)]
-        with open(SAVE_FILE_DIR + filename, "rb") as f:
-            campaign_state = pickle.load(f)
-            print(campaign_state.__dict__)
-        return campaign_state.__dict__
+            with open(SAVE_FILE_DIR + filename, "rb") as f:
+                campaign_state = pickle.load(f)
+                file_dict[f"{i}: {filename}"] = campaign_state.__dict__
+        return file_dict
 
 
 @dataclass
