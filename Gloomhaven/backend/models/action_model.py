@@ -329,7 +329,7 @@ class BlessAndFortifyAlly(ActionStep):
         )
 
     def __str__(self):
-        return f"Bless ally <{self.att_range}>\n+Forifity ally by {self.strength}"
+        return f"Bless ally <{self.att_range}>\nForifity ally by {self.strength}"
 
     def perform_string(self, attacker):
         return ""
