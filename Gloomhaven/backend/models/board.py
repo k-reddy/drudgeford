@@ -321,21 +321,6 @@ class Board:
             ):
                 reachable_paths[end_pos] = path
 
-        # Flip then normalize all positions
-        reachable_positions = [
-            pos
-            for x, y in reachable_positions
-            for pos in [self.pyxel_manager.normalize_coordinate((y, x))]
-        ]
-        reachable_paths = {
-            self.pyxel_manager.normalize_coordinate((k_y, k_x)): [
-                pos
-                for x, y in v
-                for pos in [self.pyxel_manager.normalize_coordinate((y, x))]
-            ]
-            for (k_x, k_y), v in reachable_paths.items()
-        }
-
         return reachable_positions, reachable_paths
 
     def get_shortest_valid_path(
