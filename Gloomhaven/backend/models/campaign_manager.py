@@ -50,6 +50,7 @@ class Campaign:
         campaign_data = self.pyxel_manager.get_campaign_to_load()
         if campaign_data:
             self.load_campaign(campaign_data)
+            self.pyxel_manager.get_user_input("Successfully loaded campaign.")
 
     def load_campaign(self, campaign_data):
         # recreate it
