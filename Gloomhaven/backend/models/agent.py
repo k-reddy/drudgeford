@@ -164,7 +164,7 @@ class Ai(Agent):
             while movement > 0 and directions_to_explore:
                 # grab a random direction
                 direction = directions_to_explore.pop(
-                    random.randint(0, len(directions) - 1)
+                    random.randint(0, len(directions_to_explore) - 1)
                 )
                 # simulate moving that way and see if it passes the movement check
                 new_target_loc = tuple(
@@ -320,7 +320,7 @@ class Human(Agent):
 
             # send reachable positions and the shortest valid paths to get to them.
             reachable_positions, reachable_paths = board.find_all_reachable_paths(
-                current_loc, remaining_movement
+                current_loc, remaining_movement, False, additional_movement_check
             )
 
             new_row, new_col = char.pyxel_manager.get_user_input(

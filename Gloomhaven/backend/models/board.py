@@ -3,7 +3,7 @@ from collections import deque
 import heapq
 from itertools import count
 import random
-from typing import Type
+from typing import Type, Optional, Callable
 
 import backend.models.agent as agent
 import backend.models.character as character
@@ -256,6 +256,9 @@ class Board:
         start: tuple[int, int],
         num_moves: int,
         exclude_walls_only: bool = False,
+        additional_movement_check: Optional[
+            Callable[[tuple[int, int], tuple[int, int]], bool]
+        ] = None,
     ) -> tuple[list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]]:
         """
         Finds all positions reachable within the movement range and the shortest path to each position.
@@ -300,14 +303,25 @@ class Board:
                     )
                     not in visited
                     and (
-                        # either you're only excluding walls and it's in bounds and not a wall, or it's a legal move
-                        exclude_walls_only
-                        and new_row < self.size
-                        and new_col < self.size
-                        and not isinstance(
-                            self.locations[new_row][new_col], obstacle.Wall
+                        # only excluding walls and it's in bounds and not a wall
+                        (
+                            exclude_walls_only
+                            and new_row < self.size
+                            and new_col < self.size
+                            and not isinstance(
+                                self.locations[new_row][new_col], obstacle.Wall
+                            )
                         )
-                        or self.is_legal_move(new_row, new_col)
+                        # there's no movement check and it's a legal move
+                        or (
+                            self.is_legal_move(new_row, new_col)
+                            and additional_movement_check is None
+                        )
+                        # movement check exists, you pass the movement check, and it's a legal move
+                        or (
+                            self.is_legal_move(new_row, new_col)
+                            and additional_movement_check(start, (new_row, new_col))
+                        )
                     )
                 ]
                 visited.update(valid_surrounding_positions)
