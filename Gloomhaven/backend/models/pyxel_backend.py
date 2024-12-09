@@ -198,13 +198,11 @@ class PyxelManager:
     ):
         # Flip then normalize all positions
         reachable_positions = [
-            pos
-            for x, y in reachable_positions
-            for pos in [self.normalize_coordinate((y, x))]
+            self.normalize_coordinate((y, x)) for x, y in reachable_positions
         ]
         reachable_paths = {
             self.normalize_coordinate((k_y, k_x)): [
-                pos for x, y in v for pos in [self.normalize_coordinate((y, x))]
+                self.normalize_coordinate((y, x)) for x, y in v
             ]
             for (k_x, k_y), v in reachable_paths.items()
         }
