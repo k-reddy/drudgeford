@@ -17,6 +17,7 @@ class UserInputManager:
         self.input = ""
         self.last_mouse_pos = (-1, -1)
         self.mouse_tile_pos = None
+        self.mouse_px_pos = None
         self.prompt = ""
         self.server_client = server_client
         self.valid_starting_squares = []
@@ -47,6 +48,8 @@ class UserInputManager:
             grid_top_px = round_down_to_nearest_multiple(
                 curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.view_border
             )
+            self.mouse_px_pos = (grid_left_px, grid_top_px)
+
             # draw the grid only if it's on mapview
             # store valid current map tile pos
             if tile_pos := self.view_manager.get_valid_map_coords_for_cursor_pos(
@@ -83,14 +86,14 @@ class UserInputManager:
                     pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
                 )
             if self.mouse_tile_pos and self.mouse_tile_pos in self.reachable_positions:
-                for path_x, path_y in self.reachable_paths_px[self.mouse_tile_pos]:
+                for path_x, path_y in self.reachable_paths_px.get(
+                    self.mouse_tile_pos, [self.mouse_px_pos]
+                ):
                     self.view_manager.draw_grid(
                         path_x, path_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=7
                     )
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
-                # BUG: location seems to be relative to character starting position so
-                # the target location will always be off by some amount, e.g. always 2 over.
                 self.view_manager.reset_personal_log()
                 self.accept_mouse_input = False
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
