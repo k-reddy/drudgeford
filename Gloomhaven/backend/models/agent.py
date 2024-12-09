@@ -326,7 +326,7 @@ class Human(Agent):
             else:
                 # send reachable positions and the shortest valid paths to get to them.
                 reachable_positions, reachable_paths = board.find_all_reachable_paths(
-                    current_loc, remaining_movement
+                    current_loc, remaining_movement, False, additional_movement_check
                 )
 
             # only allow user to pick a square in range
