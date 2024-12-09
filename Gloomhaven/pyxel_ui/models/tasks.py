@@ -417,8 +417,9 @@ class LoadCampaign(Task):
             filenum = input("Type the number of the file you want to load")
         filename = filenames[int(filenum)]
         with open(SAVE_FILE_DIR + filename, "rb") as f:
-            campaign_state_pickle = f.read()
-        return campaign_state_pickle
+            campaign_state = pickle.load(f)
+            print(campaign_state.__dict__)
+        return campaign_state.__dict__
 
 
 @dataclass
