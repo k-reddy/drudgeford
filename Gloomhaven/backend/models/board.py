@@ -293,14 +293,6 @@ class Board:
             and (jump_x, jump_y) != start
         ]
 
-        # Flip and normalize, look to turn this into a function if we
-        # do this one more time.
-        jumpable_positions = [
-            pos
-            for x, y in jumpable_positions
-            for pos in [self.pyxel_manager.normalize_coordinate((y, x))]
-        ]
-
         return jumpable_positions, {}
 
     def find_all_reachable_paths(
