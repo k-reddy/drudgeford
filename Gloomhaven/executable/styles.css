@@ -277,13 +277,11 @@ li {
     font-weight: bold;
     margin-bottom: 0.5rem;
     font-size: 0.9em;
-    text-align: center;
 }
 
 .grid-item p {
     font-size: 0.85em;
     line-height: 1.4;
-    text-align: center;
 }
 
 .special-grid-item h3 {
