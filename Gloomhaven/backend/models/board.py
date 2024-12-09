@@ -364,7 +364,9 @@ class Board:
                         # movement check exists, you pass the movement check, and it's a legal move
                         or (
                             self.is_legal_move(new_row, new_col)
-                            and additional_movement_check(start, (new_row, new_col))
+                            and additional_movement_check(
+                                current_pos, (new_row, new_col)
+                            )
                         )
                     )
                 ]
