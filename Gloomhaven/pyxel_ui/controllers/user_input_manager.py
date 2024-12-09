@@ -161,19 +161,17 @@ class UserInputManager:
         reachable_positions: list[tuple[int, int]],
         reachable_paths: dict[tuple[int, int], list[tuple[int, int]]],
     ) -> None:
-        # We are flipping x and y after unpacking. This needs to be resolved upstream.
-        self.reachable_positions = [
-            (pos_y, pos_x) for pos_x, pos_y in reachable_positions
-        ]
+        self.reachable_positions = reachable_positions
+
+        # Convert map tile coords to pixel coords
         self.reachable_positions_px = [
-            self.view_manager.get_pixel_pos_for_map_tile(pos_y, pos_x)
+            self.view_manager.get_pixel_pos_for_map_tile(pos_x, pos_y)
             for pos_x, pos_y in reachable_positions
         ]
-
         self.reachable_paths_px = {
-            (end_pos_y, end_pos_x): [
-                self.view_manager.get_pixel_pos_for_map_tile(p_y, p_x)
-                for p_x, p_y in paths
+            end_pos: [
+                self.view_manager.get_pixel_pos_for_map_tile(pos_x, pos_y)
+                for pos_x, pos_y in paths
             ]
-            for (end_pos_x, end_pos_y), paths in reachable_paths.items()
+            for end_pos, paths in reachable_paths.items()
         }
