@@ -263,7 +263,8 @@ class Board:
     ) -> PositionPathResult:
         """
         Finds all valid jumpable positions within `num_moves` where diagonal movements
-        cost as much as cardinal movements.
+        cost as much as cardinal movements. We never push/pull with jump, so there's no
+        additional movement check here
 
         Args:
             start: Starting position as (row, col)

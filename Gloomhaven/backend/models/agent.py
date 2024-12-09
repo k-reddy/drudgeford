@@ -320,6 +320,7 @@ class Human(Agent):
             if is_jump:
                 # reachable position is a radius of remaining_movement around current_loc
                 # reachable_paths is an empty dict
+                # note that we never jump for a push/pull, so there's no additional movement check here
                 reachable_positions, reachable_paths = (
                     board.find_all_jumpable_positions(current_loc, remaining_movement)
                 )
