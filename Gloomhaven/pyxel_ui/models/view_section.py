@@ -274,6 +274,7 @@ class MapView(ViewSection):
                         self.sprite_manager.get_sprite(
                             entity.name, entity.animation_frame
                         ),
+                        scale=entity.scale,
                     )
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
