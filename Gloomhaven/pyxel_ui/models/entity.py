@@ -24,9 +24,9 @@ class Entity:
     # 0 upward, with higher priority number displaying on top
     priority: int
     alive: bool = True
+    scale: int = 1
 
-
-    def update_position(self, x: int, y: int):
+    def update_position(self, x: int, y: int) -> None:
         """
         Updates the entity's position on the canvas.
 
@@ -36,3 +36,6 @@ class Entity:
         """
         self.x = x
         self.y = y
+
+    def update_scale(self, scale: int) -> None:
+        self.scale = scale
