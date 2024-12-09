@@ -196,7 +196,7 @@ class PyxelManager:
         reachable_positions=None,
         reachable_paths=None,
     ):
-        # Flip then normalize all positions
+        # Flip coordinates to front end land
         reachable_positions = [
             self.normalize_coordinate((y, x)) for x, y in reachable_positions
         ]
