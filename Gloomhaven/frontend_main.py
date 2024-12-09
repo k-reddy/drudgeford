@@ -5,6 +5,7 @@ from backend.utils.config import TEXT_WIDTH
 
 def main(dev_mode=False):
     host = "13.59.128.25"
+
     if dev_mode:
         port = "8000"
         host = "localhost"

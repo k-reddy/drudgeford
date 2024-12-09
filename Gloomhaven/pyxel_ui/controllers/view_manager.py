@@ -14,10 +14,8 @@ from pyxel_ui.models import view_section as view
 
 
 class ViewManager:
-    def __init__(
-        self, pyxel_width, pyxel_height, floor_color_map=[], wall_color_map=[]
-    ):
-        self.view_border = 10
+    def __init__(self, pyxel_width: int, pyxel_height: int):
+        self.view_border: int = 10
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.canvas_width = pyxel_width
@@ -255,8 +253,9 @@ class ViewManager:
         px_width: int,
         px_height: int,
         color: int = 3,
+        **kwargs,
     ) -> None:
-        view.draw_grid(px_x, px_y, px_width, px_height, color)
+        view.draw_grid(px_x, px_y, px_width, px_height, color=color, **kwargs)
 
     def draw_whole_game(self):
         for v in self.views:
@@ -276,6 +275,24 @@ class ViewManager:
         if (x_num, y_num) in self.map_view.valid_map_coordinates:
             return (x_num, y_num)
         return None
+
+    def get_pixel_pos_for_map_tile(
+        self,
+        tile_x: int,
+        tile_y: int,
+        offset_x: int = 0,
+        offset_y: int = 0,
+    ) -> tuple[int, int]:
+        """Converts the tile numbers into pixel coordinates representing the top-left corner
+        in the tile.
+        """
+        px_x = tile_x * self.map_view.tile_width_px
+        px_y = tile_y * self.map_view.tile_height_px
+
+        px_x += self.map_view.start_pos[0] + offset_x
+        px_y += self.map_view.start_pos[1] + offset_y
+
+        return (px_x, px_y)
 
     def _get_active_carousel(self):
         active_carousel = [

@@ -210,6 +210,8 @@ class InputTask(Task):
     """
 
     prompt: str
+    reachable_positions: Optional[list[tuple[int, int]]] = None
+    reachable_paths: Optional[dict[tuple[int, int], list[tuple[int, int]]]] = None
 
     def perform(self, view_manager, user_input_manager):
         user_input_manager.get_keyboard_input(self.prompt)
@@ -234,9 +236,15 @@ class MouseInputTask(Task):
     """
 
     prompt: str
+    reachable_positions: Optional[list[tuple[int, int]]] = None
+    reachable_paths: Optional[dict[tuple[int, int], list[tuple[int, int]]]] = None
 
     def perform(self, view_manager, user_input_manager):
         user_input_manager.get_mouse_input(self.prompt)
+        if self.reachable_positions and self.reachable_paths:
+            user_input_manager.set_reachable_values(
+                self.reachable_positions, self.reachable_paths
+            )
 
 
 # @dataclass
