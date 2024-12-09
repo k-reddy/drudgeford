@@ -241,8 +241,8 @@ class MouseInputTask(Task):
 
     def perform(self, view_manager, user_input_manager):
         user_input_manager.get_mouse_input(self.prompt)
-        # only checking for reachable_positions since paths can be empty for jumps
-        if self.reachable_positions:
+        # reachable_paths is an empty dict for jumps
+        if self.reachable_positions and self.reachable_paths is not None:
             user_input_manager.set_reachable_values(
                 self.reachable_positions, self.reachable_paths
             )
