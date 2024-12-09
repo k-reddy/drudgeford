@@ -352,12 +352,12 @@ class SaveCampaign(Task):
     def perform(self, view_manager, user_input_manager):
         import os
         from backend.utils.config import SAVE_FILE_DIR
-        import pickle
+        import json
 
         filename = self.get_unused_filename()
         os.makedirs(SAVE_FILE_DIR, exist_ok=True)
         with open(SAVE_FILE_DIR + filename, "wb") as f:
-            pickle.dump(self.campaign_state, f)
+            json.dump(self.campaign_state, f)
         return filename
 
     def get_unused_filename(self):
@@ -365,11 +365,11 @@ class SaveCampaign(Task):
 
         file_names = get_campaign_filenames()
         i = 0
-        filename = f"campaign_{i}.pickle"
+        filename = f"campaign_{i}.json"
         while True:
             if filename in file_names:
                 i += 1
-                filename = f"campaign_{i}.pickle"
+                filename = f"campaign_{i}.json"
             else:
                 break
         return filename
@@ -382,7 +382,7 @@ class LoadCampaign(Task):
     """
 
     def perform(self, view_manager, user_input_manager):
-        import pickle
+        import json
         from backend.utils.utilities import get_campaign_filenames
         from backend.utils.config import SAVE_FILE_DIR
 
@@ -390,7 +390,7 @@ class LoadCampaign(Task):
         file_dict = {}
         for i, filename in enumerate(filenames):
             with open(SAVE_FILE_DIR + filename, "rb") as f:
-                campaign_state = pickle.load(f)
+                campaign_state = json.load(f)
                 file_dict[f"{i}: {filename}"] = campaign_state.__dict__
         return file_dict
 
