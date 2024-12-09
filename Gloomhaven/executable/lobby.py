@@ -248,17 +248,19 @@ TUTORIAL_HTML = """
             {
                 image: "/static/help_images/short_rest.png",
                 image_size: 150,
-                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span>.<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
+                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span> at the end of a round.<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
             },
             {
                 image: "/static/help_images/card_highlighted.png",
                 image_size: 200,
-                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board), <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"
+                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board), <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"+
+                "On some cards, you will see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you. If no range is specified, the ability can only be done to squares adjacent to you.<br><br>"
+
             },
             {
                 image: "/static/help_images/modifier_deck.png",
                 image_size: 50,
-                text: "When you attack, you will draw a random modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack for 3 but draw a -2 modifier, your attack does only 1 damage :(<br><br>"
+                text: "When you attack, you will draw a random modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack for 3 but draw a -2 modifier, your attack does only 1 damage <span style='color: #00BFFF'>:(</span><br><br>"
             },
             {
                 alignment: "left",
@@ -303,9 +305,6 @@ TUTORIAL_HTML = """
                         </div>
                     </div>
                 </div>`
-            },
-            {
-                text: "On some abilities, you will also see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you.<br><br>If it's not specified, the ability can only be done to squares adjacent to you.<br><br>"
             },
             {
                 image: "/static/help_images/range_attack.png",
