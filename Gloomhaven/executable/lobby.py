@@ -81,7 +81,7 @@ MAIN_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gloomhaven Game</title>
+    <title>Drudgeford Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
     <script>
@@ -130,6 +130,10 @@ MAIN_HTML = """
             
             <a href="/download" class="download-button">
                 DOWNLOAD GAME
+            </a>
+
+            <a href="/tutorial" class="tutorial-button">
+                LEARN TO PLAY
             </a>
         </div>
         
@@ -213,6 +217,207 @@ JOIN_HTML = """
 </html>
 """
 
+TUTORIAL_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play - Gloomhaven</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        let currentSlide = 0;
+        const slides = [
+            {
+                image: "/static/help_images/log.png",
+                text: "WELCOME TO DRUDGEFORD!<br><br>Drudgeford is a turn-based, dungeon-crawling, cooperative strategy game.<br><br>When you enter the game, you'll see a screen like this. The <span style='color: #FF1493'>log</span> will tell you what each character does on their turn.<br><br>"
+            },
+            {
+                image: "/static/help_images/initiative_bar.png",
+                text: "The <span style='color: #FF1493'>initiative bar</span> will show you how much health each character has"+
+                        ", the turn order for the round, and who's on what team.<br><br>Turn order is randomly set each round.<br><br><br>"
+            },
+            {
+                image: "/static/help_images/action_cards.png",
+                text: "During your turn, you will choose an <span style='color: #FF1493'>action card</span>.<br><br>Your available <span style='color: #FF1493'>action cards</span>"+
+                        " are displayed below the map/log area. You can use the left and right arrows to scroll through them.<br><br>"
+            },
+            {
+                image: "/static/help_images/short_rest.png",
+                image_size: 150,
+                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span>."+
+                "<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your"+
+                " other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
+            },
+            {
+                image: "/static/help_images/card_highlighted.png",
+                image_size: 200,
+                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board)"+
+                        ", <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"
+            },
+            {
+                image: "/static/help_images/modifier_deck.png",
+                image_size: 50,
+                text: "When you attack, you will draw a random"+
+                        " modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack"+
+                        " for 3 but draw a -2 modifier, your attack does only 1 damage :(<br><br>"
+            },
+            {
+                alignment: "left",
+                text: `<div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #00BFFF">attack modifier deck</span>:
+                    
+                    <ul style="list-style-type: none; padding-left: 20px; margin: 10px 0;">
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #00BFFF">Fortify</span> by 2: puts a +2 card on top of your attack modifier deck
+                        </li>
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #00BFFF">Weaken</span> by 2: puts a -2 card on top of your attack modifier deck
+                        </li>
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #00BFFF">Bless</span>: puts a 2x card in a random spot in your attack modifier deck - this doubles your attack
+                        </li>
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #00BFFF">Curse</span>: puts a null card in a random spot attack modifier deck - you miss your attack
+                        </li>
+                    </ul>
+                    
+                    <p style="margin: 16px 0 8px 0;"><br><br>Other <span style="color: #FF8FA7">special abilities</span> include:</p>
+                    
+                    <ul style="list-style-type: none; padding-left: 20px;">
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #FF8FA7">Shield</span>: decreases damage you take from attacks, expires on your turn
+                        </li>
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #FF8FA7">Area attacks</span>: let you hit an area rather than a specific target
+                        </li>
+                        <li style="margin: 8px 0;">
+                        - <span style="color: #FF8FA7">Knock down</span> (50%): gives you a 50% chance of knocking down an enemy, which skips their next turn
+                        </li>
+                    </ul>
+                    </div>`
+            },
+            {
+                text: "On some abilities, you will also see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you.<br><br>"+
+                    "If it's not specified, the ability can only be done to squares adjacent to you.<br><br>"
+            },
+            {
+                image: "/static/help_images/range_attack.png",
+                image_size: 200,
+                text: "Some of your attacks are <span style='color: #00BFFF'>area effect attacks</span>. "+
+                        "These hit a full area rather than a single character.<br><br>"+
+                        "You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will "+
+                        " then be able to pick a square to attack.<br><br>"
+            },
+            {
+                alignment: "left",
+                text: `<div>
+                    <p style="margin-bottom: 16px;">
+                    There are also some <span style="color: #BC8F82">element effects</span>. If you start in or move through an element that does damage, you'll lose health.<br><br>Some characters have <span style="color: #BC8F82">element affinities</span>, which means they will heal from that element instead.<br><br>
+                    </div>`
+            },
+            {
+                image: "/static/help_images/elements.png",
+                image_size: 75,
+                alignment: "left",
+                text: `<div>
+                    <p style="margin-bottom: 16px;">
+                    Here are some common <span style="color: #BC8F82">elements</span>. The rest you can figure out by experimenting!
+                    </p>
+                    <ul style="list-style-type: none; padding-left: 20px; margin: 16px 0;">
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Fire</span>: Does 1 damage
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Ice</span>: Gives you a 25% chance of slipping when you pass through it
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Rotting Flesh</span>: Has a 50% chance of infecting you and doing 3 damage
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Shadow</span>: Gives any attack that moves through it a 10% chance of missing per square. 
+                        If your attack passes through 3 shadow squares, it has a 30% chance of missing.
+                    </li>
+                    </ul>
+                    </div>`
+            }
+        ];
+
+        function updateSlide() {
+            const imageElement = document.getElementById('tutorialImage');
+            const textElement = document.getElementById('tutorialText');
+            
+            // Handle image visibility and size
+            if (slides[currentSlide].image) {
+                imageElement.src = slides[currentSlide].image;
+                imageElement.style.display = 'block';
+                
+                // Set custom image size if specified, otherwise reset to CSS defaults
+                if (slides[currentSlide].image_size) {
+                    imageElement.style.width = 'auto';  // Reset width to auto
+                    imageElement.style.height = slides[currentSlide].image_size + 'px';
+                } else {
+                    // Reset to CSS defaults (500px width from your current CSS)
+                    imageElement.style.width = '500px';
+                    imageElement.style.height = 'auto';
+                }
+            } else {
+                imageElement.style.display = 'none';
+            }
+            
+            // Handle text content and alignment
+            textElement.style.textAlign = slides[currentSlide].alignment === 'left' ? 'left' : 'center';
+            textElement.innerHTML = slides[currentSlide].text;
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('prevButton').disabled = currentSlide === 0;
+            document.getElementById('nextButton').disabled = currentSlide === slides.length - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        window.onload = updateSlide;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>HOW TO PLAY</h1>
+        
+        <div class="tutorial-content">
+            <div class="tutorial-controls">
+                <button onclick="prevSlide()" class="nav-button" id="prevButton">←</button>
+                <span id="slideCounter" class="slide-counter"></span>
+                <button onclick="nextSlide()" class="nav-button" id="nextButton">→</button>
+            </div>
+            <div class="carousel-container">
+                <p id="tutorialText" class="tutorial-text"></p>
+                <img id="tutorialImage" alt="Tutorial" class="tutorial-image" style="width: 500px; height: auto;">
+            </div>
+
+        </div>
+        
+        <div class="back-button-container">
+            <a href="/" class="host-button back-button">
+                BACK TO LOBBY
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+"""
+
 
 @app.route("/")
 def home():
@@ -261,6 +466,11 @@ def join_game(game_id):
         return render_template_string(ENDED_HTML), 400
 
     return render_template_string(JOIN_HTML.format(port=game.port))
+
+
+@app.route("/tutorial")
+def tutorial():
+    return render_template_string(TUTORIAL_HTML)
 
 
 if __name__ == "__main__":
