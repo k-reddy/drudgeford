@@ -1,3 +1,8 @@
+"""
+This is what creates the tasks that are sent to the front-end which results
+in updates to the different view sections.
+"""
+
 import backend.models.character as character
 from itertools import cycle
 from pyxel_ui.models import tasks
@@ -84,12 +89,13 @@ class PyxelManager:
         self.log = ListWithUpdate([], self.load_log)
         self.load_log(self.log)
 
-    def move_character(self, char, old_location, new_location):
+    def move_character(self, char, old_location, new_location, is_jump=False):
         task = tasks.ActionTask(
             char.id,
             self.normalize_coordinate((old_location[1], old_location[0])),
             self.normalize_coordinate((new_location[1], new_location[0])),
             self.move_duration,
+            is_jump=is_jump,
         )
         self.jsonify_and_send_task(task)
 
