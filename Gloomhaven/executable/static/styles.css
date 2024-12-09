@@ -238,3 +238,42 @@ li {
     box-shadow: 4px 4px 0px #000;
     transition: all 0.1s ease;
 }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+    width: 80%; /* Creates buffer on both sides */
+    max-width: 800px; /* Prevents boxes from getting too wide on large screens */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 768px) {
+    .grid-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.grid-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.grid-item h3 {
+    color: #00BFFF;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 0.9em;
+}
+
+.grid-item p {
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.special-grid-item h3 {
+    color: #FF8FA7;
+}

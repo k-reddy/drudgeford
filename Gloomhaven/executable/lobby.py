@@ -235,86 +235,86 @@ TUTORIAL_HTML = """
             },
             {
                 image: "/static/help_images/initiative_bar.png",
-                text: "The <span style='color: #FF1493'>initiative bar</span> will show you how much health each character has"+
-                        ", the turn order for the round, and who's on what team.<br><br>Turn order is randomly set each round.<br><br><br>"
+                text: "The <span style='color: #FF1493'>initiative bar</span> will show you how much health each character has, the turn order for the round, and who's on what team.<br><br>Turn order is randomly set each round.<br><br><br>"
             },
             {
                 image: "/static/help_images/action_cards.png",
-                text: "During your turn, you will choose an <span style='color: #FF1493'>action card</span>.<br><br>Your available <span style='color: #FF1493'>action cards</span>"+
-                        " are displayed below the map/log area. You can use the left and right arrows to scroll through them.<br><br>"
+                text: "During your turn, you will choose an <span style='color: #FF1493'>action card</span>.<br><br>Your available <span style='color: #FF1493'>action cards</span> are displayed below the map/log area. You can use the left and right arrows to scroll through them.<br><br>"
             },
             {
                 image: "/static/help_images/short_rest.png",
                 image_size: 150,
-                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span>."+
-                "<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your"+
-                " other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
+                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span>.<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
             },
             {
                 image: "/static/help_images/card_highlighted.png",
                 image_size: 200,
-                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board)"+
-                        ", <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"
+                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board), <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"
             },
             {
                 image: "/static/help_images/modifier_deck.png",
                 image_size: 50,
-                text: "When you attack, you will draw a random"+
-                        " modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack"+
-                        " for 3 but draw a -2 modifier, your attack does only 1 damage :(<br><br>"
+                text: "When you attack, you will draw a random modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack for 3 but draw a -2 modifier, your attack does only 1 damage :(<br><br>"
             },
             {
                 alignment: "left",
-                text: `<div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #00BFFF">attack modifier deck</span>:
-                    
-                    <ul style="list-style-type: none; padding-left: 20px; margin: 10px 0;">
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #00BFFF">Fortify</span> by 2: puts a +2 card on top of your attack modifier deck
-                        </li>
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #00BFFF">Weaken</span> by 2: puts a -2 card on top of your attack modifier deck
-                        </li>
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #00BFFF">Bless</span>: puts a 2x card in a random spot in your attack modifier deck - this doubles your attack
-                        </li>
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #00BFFF">Curse</span>: puts a null card in a random spot attack modifier deck - you miss your attack
-                        </li>
-                    </ul>
-                    
-                    <p style="margin: 16px 0 8px 0;"><br><br>Other <span style="color: #FF8FA7">special abilities</span> include:</p>
-                    
-                    <ul style="list-style-type: none; padding-left: 20px;">
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #FF8FA7">Shield</span>: decreases damage you take from attacks, expires on your turn
-                        </li>
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #FF8FA7">Area attacks</span>: let you hit an area rather than a specific target
-                        </li>
-                        <li style="margin: 8px 0;">
-                        - <span style="color: #FF8FA7">Knock down</span> (50%): gives you a 50% chance of knocking down an enemy, which skips their next turn
-                        </li>
-                    </ul>
-                    </div>`
+                text: `<div>
+                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #00BFFF">attack modifier deck</span>:</div>
+                    <div class="grid-container">
+                        <div class="grid-item">
+                            <h3>Fortify by 2</h3>
+                            <p>Puts a +2 card on top of your attack modifier deck</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Weaken by 2</h3>
+                            <p>Puts a -2 card on top of your attack modifier deck</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Bless</h3>
+                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Curse</h3>
+                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack</p>
+                        </div>
+                    </div>
+                </div>`
             },
             {
-                text: "On some abilities, you will also see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you.<br><br>"+
-                    "If it's not specified, the ability can only be done to squares adjacent to you.<br><br>"
+                alignment: "left",
+                text: `<div>
+                    <p style="margin: 16px 0 8px 0;"><br>Other <span style="color: #FF8FA7">special abilities</span> include:</p>
+                    <div class="grid-container">
+                        <div class="grid-item special-grid-item">
+                            <h3>Shield</h3>
+                            <p>Decreases damage you take from attacks, expires on your turn</p>
+                        </div>
+                        <div class="grid-item special-grid-item">
+                            <h3>Area Attacks</h3>
+                            <p>Let you hit an area rather than a specific target</p>
+                        </div>
+                        <div class="grid-item special-grid-item">
+                            <h3>Knock Down (50%)</h3>
+                            <p>Gives you a 50% chance of knocking down an enemy, which skips their next turn</p>
+                        </div>
+                    </div>
+                </div>`
+            },
+            {
+                text: "On some abilities, you will also see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you.<br><br>If it's not specified, the ability can only be done to squares adjacent to you.<br><br>"
             },
             {
                 image: "/static/help_images/range_attack.png",
                 image_size: 200,
-                text: "Some of your attacks are <span style='color: #00BFFF'>area effect attacks</span>. "+
-                        "These hit a full area rather than a single character.<br><br>"+
-                        "You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will "+
-                        " then be able to pick a square to attack.<br><br>"
+                text: "Some of your attacks are <span style='color: #00BFFF'>area effect attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
             },
             {
                 alignment: "left",
                 text: `<div>
                     <p style="margin-bottom: 16px;">
                     There are also some <span style="color: #BC8F82">element effects</span>. If you start in or move through an element that does damage, you'll lose health.<br><br>Some characters have <span style="color: #BC8F82">element affinities</span>, which means they will heal from that element instead.<br><br>
-                    </div>`
+                    </p>
+                </div>`
             },
             {
                 image: "/static/help_images/elements.png",
@@ -335,11 +335,10 @@ TUTORIAL_HTML = """
                         - <span style="color: #BC8F82">Rotting Flesh</span>: Has a 50% chance of infecting you and doing 3 damage
                     </li>
                     <li style="margin-bottom: 12px;">
-                        - <span style="color: #BC8F82">Shadow</span>: Gives any attack that moves through it a 10% chance of missing per square. 
-                        If your attack passes through 3 shadow squares, it has a 30% chance of missing.
+                        - <span style="color: #BC8F82">Shadow</span>: Gives any attack that moves through it a 10% chance of missing per square. If your attack passes through 3 shadow squares, it has a 30% chance of missing.
                     </li>
                     </ul>
-                    </div>`
+                </div>`
             }
         ];
 
@@ -347,17 +346,14 @@ TUTORIAL_HTML = """
             const imageElement = document.getElementById('tutorialImage');
             const textElement = document.getElementById('tutorialText');
             
-            // Handle image visibility and size
             if (slides[currentSlide].image) {
                 imageElement.src = slides[currentSlide].image;
                 imageElement.style.display = 'block';
                 
-                // Set custom image size if specified, otherwise reset to CSS defaults
                 if (slides[currentSlide].image_size) {
-                    imageElement.style.width = 'auto';  // Reset width to auto
+                    imageElement.style.width = 'auto';
                     imageElement.style.height = slides[currentSlide].image_size + 'px';
                 } else {
-                    // Reset to CSS defaults (500px width from your current CSS)
                     imageElement.style.width = '500px';
                     imageElement.style.height = 'auto';
                 }
@@ -365,7 +361,6 @@ TUTORIAL_HTML = """
                 imageElement.style.display = 'none';
             }
             
-            // Handle text content and alignment
             textElement.style.textAlign = slides[currentSlide].alignment === 'left' ? 'left' : 'center';
             textElement.innerHTML = slides[currentSlide].text;
             
@@ -405,7 +400,6 @@ TUTORIAL_HTML = """
                 <p id="tutorialText" class="tutorial-text"></p>
                 <img id="tutorialImage" alt="Tutorial" class="tutorial-image" style="width: 500px; height: auto;">
             </div>
-
         </div>
         
         <div class="back-button-container">
