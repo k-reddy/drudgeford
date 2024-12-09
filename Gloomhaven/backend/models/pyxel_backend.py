@@ -188,11 +188,21 @@ class PyxelManager:
         self.server_client.post_task(json_task, client_id)
 
     def get_user_input(
-        self, prompt, valid_inputs=None, client_id="ALL_FRONTEND", is_mouse=False
+        self,
+        prompt,
+        valid_inputs=None,
+        client_id="ALL_FRONTEND",
+        is_mouse=False,
+        reachable_positions=None,
+        reachable_paths=None,
     ):
         # tell client to get user input
         task_class = tasks.MouseInputTask if is_mouse else tasks.InputTask
-        task = task_class(prompt)
+        task = task_class(
+            prompt=prompt,
+            reachable_positions=reachable_positions,
+            reachable_paths=reachable_paths,
+        )
 
         self.jsonify_and_send_task(task, client_id)
         # get input back

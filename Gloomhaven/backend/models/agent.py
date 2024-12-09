@@ -317,10 +317,18 @@ class Human(Agent):
                 return
             current_loc = board.find_location_of_target(char)
             # only allow user to pick a square in range
+
+            # send reachable positions and the shortest valid paths to get to them.
+            reachable_positions, reachable_paths = board.find_all_reachable_paths(
+                current_loc, remaining_movement
+            )
+
             new_row, new_col = char.pyxel_manager.get_user_input(
                 prompt=prompt + f"\nMovement remaining: {remaining_movement}",
                 is_mouse=True,
                 client_id=client_id,
+                reachable_positions=reachable_positions,
+                reachable_paths=reachable_paths,
             )
             # we ask them to click on their character if they want to finish their movement
             if current_loc == (new_row, new_col):
