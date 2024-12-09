@@ -161,25 +161,35 @@ class ActionTask(Task):
     to_grid_pos: tuple
     duration_ms: int = 1000
     action_steps: Optional[deque[tuple[int, int]]] = None
+    is_jump: bool = False
 
     def perform(self, view_manager, user_input_manager):
         # if you don't have action steps, create them
         if not self.action_steps:
-            self.action_steps = self.get_px_move_steps_between_tiles(view_manager)
+            self.action_steps = self.get_px_move_steps_between_tiles(
+                view_manager, self.is_jump
+            )
 
-        px_pos_x, px_pos_y = self.action_steps.popleft()
+        px_pos_x, px_pos_y, scale = self.action_steps.popleft()
         # !!! yuck! fix this later
         view_manager.map_view.entities[self.entity_id].update_position(
             px_pos_x, px_pos_y
         )
+        view_manager.map_view.entities[self.entity_id].update_scale(scale)
         view_manager.map_view.draw()
 
-    def get_px_move_steps_between_tiles(self, view_manager) -> deque[tuple[int, int]]:
+    def get_px_move_steps_between_tiles(
+        self,
+        view_manager,
+        is_jump,
+    ) -> deque[tuple[int, int, int]]:
         """
         Calculates the pixel-based steps for movement between two tiles.
 
         Movement is broken into discrete steps, where the number of steps determines
         the speed of the animation. The steps are stored as tuples of (x, y) pixel coordinates.
+
+        The third value in the tuple represents the size of the sprite. Default is 1.
         """
         assert (
             self.duration_ms > FRAME_DURATION_MS
@@ -198,9 +208,32 @@ class ActionTask(Task):
             (
                 int(start_px_x + i / step_count * (diff_px_x)),
                 int(start_px_y + i / step_count * (diff_px_y)),
+                (
+                    parabolic_scaling(i, step_count)
+                    if is_jump
+                    else parabolic_scaling(i, step_count, peak_scale=1.2)
+                ),
             )
             for i in range(step_count + 1)
         )
+
+
+def parabolic_scaling(
+    i: int, step_count: int, base_scale: int = 1, peak_scale: int = 2
+):
+    """Adjusts the scale parabolically over step_count frames.
+
+    Args:
+        i: Current step
+        step_count: Total steps
+        base_scale: Starting scale
+        peak_scale: Max scale.
+    """
+    return (
+        -4 * (peak_scale - base_scale) / step_count**2 * i**2
+        + 4 * (peak_scale - base_scale) / step_count * i
+        + base_scale
+    )
 
 
 @dataclass

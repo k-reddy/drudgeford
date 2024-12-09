@@ -649,7 +649,9 @@ class Board:
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
             # move character one step
-            self.update_character_location(acting_character, acting_character_loc, loc)
+            self.update_character_location(
+                acting_character, acting_character_loc, loc, is_jump
+            )
             acting_character_loc = loc
             # humans move step by step, so they should not take damage on a jump - we'll have them take damage
             # at the end of their movement later
@@ -705,11 +707,12 @@ class Board:
         actor: Character,
         old_location: tuple[int, int],
         new_location: tuple[int, int],
+        is_jump: bool = False,
     ) -> None:
         # Add action queue logic here.
         self.update_locations(old_location[0], old_location[1], None)
         self.update_locations(new_location[0], new_location[1], actor)
-        self.pyxel_manager.move_character(actor, old_location, new_location)
+        self.pyxel_manager.move_character(actor, old_location, new_location, is_jump)
 
     def is_legal_move(self, row: int, col: int, jump_intermediate_move=False) -> bool:
         is_position_within_board = (
