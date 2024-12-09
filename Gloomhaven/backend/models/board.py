@@ -650,6 +650,9 @@ class Board:
             path_length_jump = len(path_traveled)
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
+            # if they die during the movement, move on
+            if acting_character not in self.characters:
+                return
             # move character one step
             self.update_character_location(
                 acting_character, acting_character_loc, loc, is_jump
@@ -804,6 +807,9 @@ class Board:
             )
             destinations.append(destination)
         for destination in destinations:
+            # if the character died during the movement, move on
+            if target not in self.characters:
+                return
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
