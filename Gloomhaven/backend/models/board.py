@@ -290,6 +290,7 @@ class Board:
             for d_x in bounds
             for d_y in bounds
             if self.is_legal_move(jump_x := start_x + d_x, jump_y := start_y + d_y)
+            and (jump_x, jump_y) != start
         ]
 
         # Flip and normalize, look to turn this into a function if we
