@@ -316,13 +316,20 @@ class Human(Agent):
             if char not in board.characters:
                 return
             current_loc = board.find_location_of_target(char)
+
+            if is_jump:
+                # reachable position is a radius of remaining_movement around current_loc
+                # reachable_paths is an empty dict
+                reachable_positions, reachable_paths = (
+                    board.find_all_jumpable_positions(current_loc, remaining_movement)
+                )
+            else:
+                # send reachable positions and the shortest valid paths to get to them.
+                reachable_positions, reachable_paths = board.find_all_reachable_paths(
+                    current_loc, remaining_movement
+                )
+
             # only allow user to pick a square in range
-
-            # send reachable positions and the shortest valid paths to get to them.
-            reachable_positions, reachable_paths = board.find_all_reachable_paths(
-                current_loc, remaining_movement, False, additional_movement_check
-            )
-
             new_row, new_col = char.pyxel_manager.get_user_input(
                 prompt=prompt + f"\nMovement remaining: {remaining_movement}",
                 is_mouse=True,

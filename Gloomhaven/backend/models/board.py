@@ -18,6 +18,11 @@ MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
 
 
+PositionPathResult = tuple[
+    list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]
+]
+
+
 # the board holds all the game metadata including the monster and player who are playing
 # it adjudicates actions and ends the game
 # the board draws itself as well!
@@ -251,6 +256,52 @@ class Board:
             row, col = self.pick_unoccupied_location()
             self.locations[row][col] = x
 
+    def find_all_jumpable_positions(
+        self,
+        start: tuple[int, int],
+        num_moves: int,
+    ) -> PositionPathResult:
+        """
+        Finds all valid jumpable positions within `num_moves` where diagonal movements
+        cost as much as cardinal movements.
+
+        Args:
+            start: Starting position as (row, col)
+            num_moves: Maximum jump distance
+
+        Returns:
+            List of valid jumpable positions as normalized and flipped (col, row)
+            for Pyxel compatibility and a blank dict to maintain consistency in function
+            sugnatures with find_all_reachable_paths()
+        """
+        # Algorithm should be simple, we create a block of coordinates where
+        # corners are:
+        # top left:     (start_x - num_moves, start_y + num_moves)
+        # top right:    (start_x + num_moves, start_y + num_moves)
+        # bottom left:  (start_x - num_moves, start_y - num_moves)
+        # bottom right: (start_x + num_moves, start_y - num_moves)
+        # then check if each move is valid.
+        # I don't think other search algorithms will be more efficient here
+        # given that we need to check every square and num_moves will be small.
+        start_x, start_y = start
+        bounds = range(-num_moves, num_moves + 1)
+        jumpable_positions = [
+            (jump_x, jump_y)
+            for d_x in bounds
+            for d_y in bounds
+            if self.is_legal_move(jump_x := start_x + d_x, jump_y := start_y + d_y)
+        ]
+
+        # Flip and normalize, look to turn this into a function if we
+        # do this one more time.
+        jumpable_positions = [
+            pos
+            for x, y in jumpable_positions
+            for pos in [self.pyxel_manager.normalize_coordinate((y, x))]
+        ]
+
+        return jumpable_positions, {}
+
     def find_all_reachable_paths(
         self,
         start: tuple[int, int],
@@ -259,7 +310,7 @@ class Board:
         additional_movement_check: Optional[
             Callable[[tuple[int, int], tuple[int, int]], bool]
         ] = None,
-    ) -> tuple[list[tuple[int, int]], dict[tuple[int, int], list[tuple[int, int]]]]:
+    ) -> PositionPathResult:
         """
         Finds all positions reachable within the movement range and the shortest path to each position.
 
