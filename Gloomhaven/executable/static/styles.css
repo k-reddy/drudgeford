@@ -55,6 +55,7 @@ p {
 .host-button {
     display: block;
     width: 200px;
+    margin: 0rem;
     padding: 1rem;
     background-color: #00b543;
     color: white;
@@ -65,7 +66,7 @@ p {
     transition: all 0.1s ease;
     cursor: pointer;
     font-family: 'Press Start 2P', cursive;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .download-button:hover, .host-button:hover, .tutorial-button:hover {

@@ -128,9 +128,11 @@ MAIN_HTML = """
                 HOST GAME
             </button>
             
+            <!-- doesn't work yet
             <a href="/download" class="download-button">
                 DOWNLOAD GAME
             </a>
+            -->
 
             <a href="/tutorial" class="tutorial-button">
                 LEARN TO PLAY
@@ -140,11 +142,13 @@ MAIN_HTML = """
         <div id="gameLink" class="game-link"></div>
         
         <div class="note">
-            <strong>INSTRUCTIONS:</strong>
+            <strong>GAME HOSTING INSTRUCTIONS:</strong>
             <ol>
-                <li>DOWNLOAD THE GAME CLIENT</li>
+                <!--doesn't work yet<li>DOWNLOAD THE GAME CLIENT</li>-->
+                <li>PULL CODE FROM THE GITHUB REPOS</li>
                 <li>TO HOST: CLICK "HOST GAME" AND SHARE THE LINK</li>
-                <li>TO JOIN: USE A SHARED GAME LINK</li>
+                <li>TO JOIN: ASK HOST FOR PORT NUMBER</li>
+                <li>CLICK 'LEARN TO PLAY' FOR INSTRUCTIONS ON PLAYING THE GAME</li>
             </ol>
         </div>
     </div>
