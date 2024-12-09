@@ -244,6 +244,10 @@ li {
     grid-template-columns: 1fr;
     gap: 1rem;
     margin: 1rem 0;
+    width: 80%; /* Creates buffer on both sides */
+    max-width: 800px; /* Prevents boxes from getting too wide on large screens */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (min-width: 768px) {
