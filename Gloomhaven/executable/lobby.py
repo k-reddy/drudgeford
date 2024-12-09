@@ -15,6 +15,7 @@ from typing import Dict
 from dataclasses import dataclass
 from collections import defaultdict
 import socket
+from logger import GameLog
 
 
 @dataclass
@@ -26,7 +27,7 @@ class GameInstance:
 
 
 app = Flask(__name__)
-
+logger = GameLog()
 # Store active games and their info
 active_games: Dict[str, GameInstance] = {}
 
@@ -41,8 +42,13 @@ def is_port_available(port: int) -> bool:
 
 
 def get_available_port(start_port: int = 5000, num_ports: int = 5) -> int:
+    used_ports = len(active_games)
+    logger.log_port_allocation(None, num_ports, used_ports)  # Log current usage
     for port in range(start_port, start_port + num_ports):
         if is_port_available(port):
+            logger.log_port_allocation(
+                port, num_ports, used_ports + 1
+            )  # Log allocation
             return port
     return None
 
@@ -67,21 +73,28 @@ def run_game_server(game_id: str, port: int):
         active_games[game_id] = GameInstance(
             id=game_id, port=port, process=process, status="running"
         )
+        logger.log_game_start(game_id, port)
 
         stdout, stderr = process.communicate()
 
         # Just mark game as ended, whether error or normal termination
         if game_id in active_games:
-            active_games[game_id].status = (
-                "ended" if process.returncode == 0 else "error"
-            )
-            if process.returncode != 0:
+            status = "ended" if process.returncode == 0 else "error"
+            active_games[game_id].status = status
+            if status == "error":
+                error_msg = stderr.decode()
+                logger.log_game_end(game_id, status, error_msg)
                 print(f"Game {game_id} ended with error: {stderr.decode()}")
+            else:
+                logger.log_game_end(game_id, status)  # Log normal end
 
     except Exception as e:
+        error_msg = str(e)
+        logger.log_game_error(game_id, f"Error running game: {error_msg}")
         print(f"Error running game {game_id}: {str(e)}")
         if game_id in active_games:
             active_games[game_id].status = "error"
+            logger.log_game_end(game_id, "error", error_msg)
 
 
 MAIN_HTML = """
@@ -456,8 +469,10 @@ def has_started_too_many_games(ip) -> bool:
 
     # Check daily limit
     if len(ip_attempts[ip]) >= 20:
+        logger.log_rate_limit(ip)
         return True
     else:
+        ip_attempts[ip].append(current_time)
         return False
 
 
@@ -487,6 +502,7 @@ def host_game():
 
         return jsonify({"success": True, "game_id": game_id, "port": port})
     except Exception as e:
+        logger.log_general_error(str(e))
         return jsonify({"success": False, "error": str(e)})
 
 
@@ -522,7 +538,8 @@ if __name__ == "__main__":
 
         print(f"Successfully copied CSS from {CSS_FILE} to {css_destination}")
     except Exception as e:
-        print(f"Error copying CSS file: {str(e)}")
+        logger.log_general_error(f"Server failed to start: {str(e)}")
+        print(f"Error starting up: {str(e)}")
         raise
 
     app.run(host="0.0.0.0", port=8000)
