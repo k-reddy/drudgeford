@@ -164,7 +164,9 @@ class Board:
     def attack_area(
         self, attacker: Character, attack_coords: list[tuple[int, int]], strength: int
     ) -> None:
-        self.pyxel_manager.highlight_map_tiles(attack_coords, "ALL_FRONTEND")
+        self.pyxel_manager.highlight_map_tiles(
+            attack_coords, "ALL_FRONTEND", persist=False
+        )
         for attack_row, attack_col in attack_coords:
             # check if row and col are in bounds
             if 0 <= attack_row < len(self.locations):

@@ -454,9 +454,15 @@ class LoadPlotScreen(Task):
 class HighlightMapTiles(Task):
     color: int
     tiles: list[tuple[int, int]]
+    persist: bool
 
     def perform(self, view_manager, user_input_manager):
-        user_input_manager.draw_grid_shape(self.tiles, self.color)
+        if self.persist:
+            user_input_manager.set_reachable_values(
+                reachable_positions=self.tiles, reachable_paths={}, color=self.color
+            )
+        else:
+            user_input_manager.draw_grid_shape(self.tiles, self.color)
 
 
 @dataclass
@@ -474,7 +480,7 @@ class DrawCursorGridShape(Task):
     def perform(self, view_manager, user_input_manager):
         user_input_manager.draw_shape_with_cursor = True
         user_input_manager.cursor_shape_offsets = self.tile_shape_offsets
-        user_input_manager.grid_color = self.grid_color
+        user_input_manager.highlight_color = self.grid_color
         user_input_manager.valid_starting_squares = self.valid_starting_squares
 
 
@@ -483,5 +489,4 @@ class TurnOffCursorGridShape(Task):
     def perform(self, view_manager, user_input_manager):
         user_input_manager.draw_shape_with_cursor = False
         user_input_manager.cursor_shape_offsets = []
-        user_input_manager.grid_color = user_input_manager.default_grid_color
         user_input_manager.valid_starting_squares = []
