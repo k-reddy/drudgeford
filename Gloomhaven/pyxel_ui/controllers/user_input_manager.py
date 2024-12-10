@@ -11,9 +11,9 @@ class UserInputManager:
         self.accept_keyboard_input = False
         self.accept_mouse_input = False
         self.cursor_shape_offsets = []
-        self.default_grid_color = 3
+        self.default_highlight_color = 5
         self.draw_shape_with_cursor = False
-        self.grid_color = self.default_grid_color
+        self.highlight_color = self.default_highlight_color
         self.input = ""
         self.last_mouse_pos = (-1, -1)
         self.mouse_tile_pos = None
@@ -68,7 +68,7 @@ class UserInputManager:
                         (tile_pos[0] + offset[0], tile_pos[1] + offset[1])
                         for offset in self.cursor_shape_offsets
                     ]
-                    self.draw_grid_shape(shape_tiles, color=self.grid_color)
+                    self.draw_grid_shape(shape_tiles, color=self.highlight_color)
             else:
                 self.mouse_tile_pos = None
 
@@ -82,10 +82,12 @@ class UserInputManager:
 
         if self.accept_mouse_input:
             self.print_personal_log(self.input)
+            # draw reachable positions - this is for movement only
             for pos_x, pos_y in self.reachable_positions_px:
                 self.view_manager.draw_grid(
                     pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
                 )
+            # draw paths
             if self.mouse_tile_pos and self.mouse_tile_pos in self.reachable_positions:
                 for path_x, path_y in self.reachable_paths_px.get(
                     self.mouse_tile_pos, [self.mouse_px_pos]
@@ -105,8 +107,13 @@ class UserInputManager:
         if self.accept_keyboard_input:
             if self.reachable_positions:
                 for pos_x, pos_y in self.reachable_positions_px:
+                    # draw attack grid
                     self.view_manager.draw_grid(
-                        pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
+                        pos_x,
+                        pos_y,
+                        MAP_TILE_WIDTH_PX,
+                        MAP_TILE_HEIGHT_PX,
+                        color=self.highlight_color,
                     )
             # Handle enter
             if pyxel.btnp(pyxel.KEY_RETURN):
@@ -174,7 +181,9 @@ class UserInputManager:
         self,
         reachable_positions: list[tuple[int, int]],
         reachable_paths: dict[tuple[int, int], list[tuple[int, int]]],
+        color: int | None = None,
     ) -> None:
+        self.highlight_color = color if color else self.default_highlight_color
         self.reachable_positions = [
             pos
             for pos in reachable_positions
