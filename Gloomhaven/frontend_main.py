@@ -10,7 +10,7 @@ def main(dev_mode=False):
         port = "8000"
         host = "localhost"
     else:
-        port = input("Please enter the port number")
+        port = input("Please enter the port number").strip()
         valid_ports = ["5000", "5001", "5002", "5003", "5004", "8000"]
         while port not in valid_ports:
             port = input("Please enter a valid port number")
