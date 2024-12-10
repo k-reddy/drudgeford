@@ -177,10 +177,6 @@ class Campaign:
         self.pyxel_manager.show_character_picker(
             self.available_chars, client_id=player_id
         )
-        # print the backstory for every available char
-        # for i, char in enumerate(self.available_chars):
-        #     self.disp.print_message(f"{i}: {char.__class__.__name__}",False)
-        #     self.disp.print_message(f"{char.backstory}\n", False)
 
         # let user pick a character
         player_char_num = int(
