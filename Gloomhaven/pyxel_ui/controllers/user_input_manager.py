@@ -81,6 +81,7 @@ class UserInputManager:
             self.view_manager.scroll_carousel_left()
 
         if self.accept_mouse_input:
+            self.print_personal_log(self.input)
             for pos_x, pos_y in self.reachable_positions_px:
                 self.view_manager.draw_grid(
                     pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
