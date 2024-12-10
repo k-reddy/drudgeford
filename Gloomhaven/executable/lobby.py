@@ -15,7 +15,7 @@ from typing import Dict
 from dataclasses import dataclass
 from collections import defaultdict
 import socket
-from logger import GameLog
+from logger import GameLogger
 
 
 @dataclass
@@ -27,7 +27,7 @@ class GameInstance:
 
 
 app = Flask(__name__)
-logger = GameLog()
+logger = GameLogger()
 # Store active games and their info
 active_games: Dict[str, GameInstance] = {}
 
