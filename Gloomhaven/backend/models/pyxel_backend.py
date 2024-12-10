@@ -361,7 +361,11 @@ class PyxelManager:
         self.jsonify_and_send_task(clear_log_task)
 
     def highlight_map_tiles(
-        self, tiles: list[tuple[int, int]], client_id: str, color: int = 8
+        self,
+        tiles: list[tuple[int, int]],
+        client_id: str,
+        color: int = 8,
+        persist=False,
     ):
         # first flip from backend to frontend coordinate order
         pyxel_format_tiles = [(col, row) for (row, col) in tiles]
@@ -369,7 +373,7 @@ class PyxelManager:
         normalized_tiles = [
             self.normalize_coordinate(coordinate) for coordinate in pyxel_format_tiles
         ]
-        task = tasks.HighlightMapTiles(color, normalized_tiles)
+        task = tasks.HighlightMapTiles(color, normalized_tiles, persist=persist)
         self.jsonify_and_send_task(task, client_id)
 
     def pick_rotated_attack_coordinates(
