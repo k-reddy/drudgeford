@@ -275,6 +275,7 @@ class MapView(ViewSection):
                             entity.name, entity.animation_frame
                         ),
                         scale=entity.scale,
+                        rotation=entity.rotation,
                     )
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
@@ -570,7 +571,14 @@ class CharacterPickerView(CarouselView):
             x += card_width + card_border
 
 
-def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
+def draw_sprite(
+    x: int,
+    y: int,
+    sprite: Sprite,
+    colkey: int = 0,
+    scale: int = 1,
+    rotation: int = 0,
+) -> None:
     pyxel.blt(
         x,
         y,
@@ -581,6 +589,7 @@ def draw_sprite(x, y, sprite: Sprite, colkey=0, scale=1) -> None:
         sprite.h,
         colkey,
         scale=scale,
+        rotate=rotation,
     )
 
 
