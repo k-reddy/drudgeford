@@ -193,7 +193,7 @@ class UserInputManager:
         # Convert map tile coords to pixel coords
         self.reachable_positions_px = [
             self.view_manager.get_pixel_pos_for_map_tile(pos_x, pos_y)
-            for pos_x, pos_y in reachable_positions
+            for pos_x, pos_y in self.reachable_positions
         ]
         self.reachable_paths_px = {
             end_pos: [
