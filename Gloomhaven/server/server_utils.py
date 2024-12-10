@@ -19,6 +19,10 @@ def receive_message(sock: socket.socket) -> dict:
             raise ConnectionError("Connection closed")
 
         message_length = int.from_bytes(initial_data, byteorder="big")
+        MAX_MESSAGE_SIZE = 1024 * 1024  # 1MB
+        if message_length > MAX_MESSAGE_SIZE:
+            raise ConnectionError(f"Message too large: {message_length} bytes")
+
         remaining_data = b""
 
         # If we got extra data beyond the length, keep it
