@@ -180,10 +180,10 @@ class WeakenEnemy(ActionStep):
         if not target:
             return
         target.attack_modifier_deck.append(modifier)
-        board.pyxel_manager.log.append(f"Weakened {target.name} by -{self.strength}")
+        board.pyxel_manager.log.append(f"Weakened {target.name} by {self.strength}")
 
     def __str__(self):
-        return f"Weaken enemy by -{self.strength} <{self.att_range}>"
+        return f"Weaken enemy by {self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
