@@ -3,7 +3,7 @@ from collections import deque
 from typing import Optional
 import abc
 from pyxel_ui.models.entity import Entity
-from pyxel_ui.enums import AnimationFrame
+from pyxel_ui.enums import AnimationFrame, RotationDirection
 from pyxel_ui.constants import FRAME_DURATION_MS
 
 # from pyxel_ui.models.view_section import ActionCardView, CharacterPickerView
@@ -60,9 +60,55 @@ class RemoveEntityTask(Task):
     """
 
     entity_id: int
+    show_death_animation: bool = False
+    # tuple[rotate degrees (ccw), scale]
+    action_steps: Optional[deque[tuple[int, int]]] = None
 
-    def perform(self, view_manager, user_input_manager):
-        view_manager.remove_entity(self.entity_id)
+    # Rotation properties
+    rotation_direction: RotationDirection = RotationDirection.CLOCK_WISE
+    rotation_duration_ms: int = 500
+    rotation_final_scale: float = 0.0
+    rotation_count: float = 1.0
+
+    def perform(self, view_manager, _):
+        if self.show_death_animation and self.action_steps is None:
+            self.action_steps = self._get_rotate_scale_move_steps()
+
+        if self.show_death_animation and self.action_steps:
+            rotation, scale = self.action_steps.popleft()
+
+            view_manager.map_view.entities[self.entity_id].update_rotation(rotation)
+            view_manager.map_view.entities[self.entity_id].update_scale(scale)
+            view_manager.map_view.draw()
+
+        elif self.show_death_animation and not self.action_steps:
+            self.show_death_animation = False
+
+        elif not self.show_death_animation:
+            view_manager.remove_entity(self.entity_id)
+
+    def _get_rotate_scale_move_steps(self) -> deque[tuple[int, float]]:
+        """
+        Calculates the degree and scale-based rotating and shrinking to remove dead sprites.
+
+        Effect is broken into discrete steps, the duration determines the number of steps,
+        which determines the speed of the rotation and scaling.
+
+        Returns:
+            A tuple containing:
+            - Rotation degrees, positive values are counter clock-wise
+            - Scaling as a float
+        """
+        step_count = self.rotation_duration_ms // FRAME_DURATION_MS
+        rotation_range = 360 * self.rotation_count / step_count
+
+        return deque(
+            (
+                int(i * rotation_range % 360 * self.rotation_direction),
+                (((step_count - i) / step_count) + self.rotation_final_scale),
+            )
+            for i in range(step_count + 1)
+        )
 
 
 @dataclass
