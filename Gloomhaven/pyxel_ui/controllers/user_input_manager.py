@@ -99,15 +99,15 @@ class UserInputManager:
                 self.accept_mouse_input = False
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
 
-                # messy way to hide paths
-                self.reachable_positions = []
-                self.reachable_positions_px = []
-                self.reachable_paths_px = {}
-
                 self.return_input_to_server()
                 return
 
         if self.accept_keyboard_input:
+            if self.reachable_positions:
+                for pos_x, pos_y in self.reachable_positions_px:
+                    self.view_manager.draw_grid(
+                        pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
+                    )
             # Handle enter
             if pyxel.btnp(pyxel.KEY_RETURN):
                 self.view_manager.reset_personal_log()
@@ -146,6 +146,10 @@ class UserInputManager:
         self.prompt = prompt
 
     def return_input_to_server(self):
+        # messy way to hide paths
+        self.reachable_positions = []
+        self.reachable_positions_px = []
+        self.reachable_paths_px = {}
         self.server_client.post_user_input(self.input)
 
     # nit: this method doesn't actually get mouse input, maybe
@@ -171,7 +175,11 @@ class UserInputManager:
         reachable_positions: list[tuple[int, int]],
         reachable_paths: dict[tuple[int, int], list[tuple[int, int]]],
     ) -> None:
-        self.reachable_positions = reachable_positions
+        self.reachable_positions = [
+            pos
+            for pos in reachable_positions
+            if pos in self.view_manager.map_view.valid_map_coordinates
+        ]
 
         # Convert map tile coords to pixel coords
         self.reachable_positions_px = [
