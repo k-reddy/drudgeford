@@ -456,7 +456,10 @@ class HighlightMapTiles(Task):
     tiles: list[tuple[int, int]]
 
     def perform(self, view_manager, user_input_manager):
-        user_input_manager.draw_grid_shape(self.tiles, self.color)
+        # user_input_manager.draw_grid_shape(self.tiles, self.color)
+        user_input_manager.set_reachable_values(
+            reachable_positions=self.tiles, reachable_paths={}
+        )
 
 
 @dataclass
