@@ -10,13 +10,13 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Defensive Stance",
-        actions=[actions.ShieldSelf(3, 1), actions.SingleTargetAttack(4, 1)],
+        actions=[actions.ShieldSelf(3, 1), actions.SingleTargetAttack(2, 1)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Sweeping Blow",
-        actions=[actions.AreaAttackFromSelf(shape=shapes.cone(2), strength=2)],
+        actions=[actions.AreaAttackFromSelf(shape=shapes.cone(2), strength=1)],
         movement=3,
         jump=False,
     ),
@@ -41,13 +41,13 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Shield Bash",
-        actions=[actions.SingleTargetAttack(4, 1), actions.Push(2, 1)],
+        actions=[actions.SingleTargetAttack(2, 1), actions.Push(2, 1)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Recuperating Blow",
-        actions=[actions.SingleTargetAttack(4, 1), actions.ModifySelfHealth(2)],
+        actions=[actions.SingleTargetAttack(2, 1), actions.ModifySelfHealth(2)],
         movement=2,
         jump=False,
     ),

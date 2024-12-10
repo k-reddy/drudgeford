@@ -42,14 +42,14 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Growth Burst",
-        actions=[actions.HealAllAllies(3, 2), actions.BlessAllAllies(2)],
+        actions=[actions.HealAllAllies(2, 2), actions.BlessAllAllies(2)],
         movement=1,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Protective Bloom",
         actions=[
-            actions.HealAllAllies(3, 5),
+            actions.HealAllAllies(2, 5),
             actions.AreaAttackFromSelf(
                 shape=shapes.ring(2), element_type=obstacle.PoisonShroom
             ),

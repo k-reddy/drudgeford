@@ -7,7 +7,7 @@ cards = [
         attack_name="Cold Tears",
         actions=[
             actions.AreaAttackWithTarget(
-                shape=shapes.ring(1), element_type=obstacle.Ice, att_range=3, damage=3
+                shape=shapes.ring(1), element_type=obstacle.Ice, att_range=3, damage=2
             ),
             actions.CurseAllEnemies(3),
         ],
@@ -22,23 +22,17 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Bone Rally",
-        actions=[actions.SingleTargetAttack(3, 2), actions.SummonSkeleton()],
+        actions=[actions.SummonSkeleton()],
         movement=4,
         jump=True,
     ),
     actions.ActionCard(
         attack_name="Psychic Torment",
-        actions=[actions.CurseAllEnemies(3), actions.Pull(2, 3)],
-        movement=3,
-        jump=True,
-    ),
-    actions.ActionCard(
-        attack_name="Blood Rain",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=3),
-            actions.WeakenAllEnemies(1, 2),
+            actions.CurseAllEnemies(3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(3), strength=1),
         ],
-        movement=2,
+        movement=3,
         jump=True,
     ),
     actions.ActionCard(

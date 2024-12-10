@@ -7,7 +7,7 @@ cards = [
         attack_name="Shadow Veil",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=1
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=2
             ),
             actions.WeakenAllEnemies(2, 2),
         ],
@@ -22,7 +22,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Fae Strike",
-        actions=[actions.SingleTargetAttack(3, 2), actions.WeakenEnemy(2, 2)],
+        actions=[actions.SingleTargetAttack(2, 2), actions.WeakenEnemy(2, 2)],
         movement=4,
         jump=True,
     ),
@@ -30,7 +30,7 @@ cards = [
         attack_name="Fairy Ring",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Spores, strength=3
+                shape=shapes.ring(2), element_type=obstacle.Spores, strength=2
             )
         ],
         movement=3,

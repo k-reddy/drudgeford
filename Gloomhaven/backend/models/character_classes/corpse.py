@@ -9,7 +9,7 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.cone(2), strength=1, element_type=obstacle.InfectedOoze
             ),
-            actions.WeakenAllEnemies(2, 2),
+            actions.WeakenAllEnemies(1, 2),
         ],
         movement=2,
         jump=False,
@@ -18,7 +18,7 @@ cards = [
         attack_name="Infectious Trail",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.line(3), element_type=obstacle.InfectedOoze, strength=2
+                shape=shapes.line(3), element_type=obstacle.InfectedOoze, strength=1
             ),
             actions.WeakenAllEnemies(1, 2),
         ],
@@ -27,14 +27,14 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Festering Touch",
-        actions=[actions.SingleTargetAttack(3, 1), actions.Curse(1)],
+        actions=[actions.SingleTargetAttack(2, 1), actions.Curse(1)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Flesh Purge",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.cone(2), strength=2),
+            actions.AreaAttackFromSelf(shape=shapes.cone(2), strength=1),
             actions.CurseAllEnemies(2),
         ],
         movement=2,
@@ -44,7 +44,7 @@ cards = [
         attack_name="Corpse Explosion",
         actions=[
             actions.ModifySelfHealth(-2),
-            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=2),
         ],
         movement=1,
         jump=False,

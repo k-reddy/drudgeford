@@ -20,7 +20,7 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Fire
             ),
-            actions.HealAllAllies(2, 2),
+            actions.HealAllAllies(3, 2),
         ],
         movement=2,
         jump=False,
@@ -38,13 +38,13 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Good Hunting",
-        actions=[actions.SingleTargetAttack(4, 1), actions.BlessAndFortifyAlly(3, 2)],
+        actions=[actions.SingleTargetAttack(4, 1), actions.BlessAndFortifyAlly(2, 2)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Slow Death",
-        actions=[actions.SingleTargetAttack(4, 2), actions.CurseAllEnemies(2)],
+        actions=[actions.SingleTargetAttack(3, 2), actions.CurseAllEnemies(2)],
         movement=3,
         jump=False,
     ),

@@ -7,7 +7,7 @@ cards = [
         attack_name="Flame Darts",
         actions=[
             actions.SingleTargetAttack(2, 4),
-            actions.SingleTargetAttack(2, 4),
+            actions.SingleTargetAttack(1, 4),
         ],
         movement=3,
         jump=True,
@@ -38,7 +38,7 @@ cards = [
                 shape=shapes.cone(2), element_type=obstacle.Fire, strength=2
             ),
         ],
-        movement=5,  # Increased base movement to represent the "dash"
+        movement=4,
         jump=True,
     ),
     actions.ActionCard(

@@ -13,14 +13,14 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Crimson Tendril",
-        actions=[actions.Pull(3, 4), actions.SingleTargetAttack(3, 1)],
+        actions=[actions.Pull(3, 4), actions.SingleTargetAttack(2, 1)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Spliting Lash",
         actions=[
-            actions.SingleTargetAttack(strength=3, att_range=3),
+            actions.SingleTargetAttack(strength=2, att_range=3),
             actions.Teleport(3),
         ],
         movement=2,
@@ -30,7 +30,7 @@ cards = [
         attack_name="Engulf",
         actions=[
             actions.Pull(2, 2),
-            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=1),
         ],
         movement=2,
         jump=False,
@@ -48,7 +48,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Absorb Life",
-        actions=[actions.SingleTargetAttack(3, 2), actions.ModifySelfHealth(2)],
+        actions=[actions.SingleTargetAttack(1, 2), actions.ModifySelfHealth(2)],
         movement=2,
         jump=False,
     ),

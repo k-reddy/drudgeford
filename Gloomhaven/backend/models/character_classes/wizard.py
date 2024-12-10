@@ -14,7 +14,7 @@ cards = [
             )
         ],
         movement=2,
-        jump=True,
+        jump=False,
     ),
     action_model.ActionCard(
         attack_name="Fire and Ice",
@@ -39,7 +39,7 @@ cards = [
         attack_name="Scholar's Escape",
         actions=[action_model.SingleTargetAttack(strength=3, att_range=1)],
         movement=5,
-        jump=False,
+        jump=True,
     ),
     action_model.ActionCard(
         attack_name="Masochistic Explosion",
@@ -56,7 +56,7 @@ cards = [
         attack_name="Lightning Charge",
         actions=[
             action_model.AreaAttackWithTarget(
-                shape=shapes.line(3), damage=4, att_range=2
+                shape=shapes.line(3), damage=3, att_range=2
             ),
             action_model.ModifySelfHealth(3),
         ],
@@ -66,7 +66,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Random Teleport",
         actions=[
-            action_model.SingleTargetAttack(strength=3, att_range=1),
+            action_model.SingleTargetAttack(strength=2, att_range=1),
+            action_model.Teleport(att_range=1),
             action_model.Teleport(att_range=1),
         ],
         movement=2,
@@ -76,7 +77,7 @@ cards = [
         attack_name="Phase Strike",
         actions=[
             action_model.AreaAttackWithTarget(
-                shape=shapes.bar(1, 2), damage=4, att_range=3
+                shape=shapes.bar(1, 2), damage=3, att_range=3
             )
         ],
         movement=2,

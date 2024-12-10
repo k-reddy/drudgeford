@@ -11,7 +11,7 @@ cards = [
     # ),
     actions.ActionCard(
         attack_name="Brutal Slam",
-        actions=[actions.SingleTargetAttack(5, 1, knock_down=True), actions.Push(3, 1)],
+        actions=[actions.SingleTargetAttack(2, 1, knock_down=True), actions.Push(3, 1)],
         movement=2,
         jump=True,
     ),
@@ -33,7 +33,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Blood Frenzy",
-        actions=[actions.SingleTargetAttack(3, 1), actions.ModifySelfHealth(3)],
+        actions=[actions.SingleTargetAttack(2, 1), actions.ModifySelfHealth(3)],
         movement=3,
         jump=True,
     ),

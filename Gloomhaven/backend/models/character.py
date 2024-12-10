@@ -352,10 +352,10 @@ class Treeman(Character):
         self.pyxel_sprite_name = "treeman"
 
     def create_action_cards(self):
-        return character_classes.tank_melee.cards
+        return character_classes.treeman.cards
 
     def set_health(self):
-        return character_classes.tank_melee.health
+        return character_classes.treeman.health
 
 
 class Fairy(Character):
@@ -401,10 +401,10 @@ class MushroomMan(Character):
         self.elemental_affinity = obstacle.Spores
 
     def create_action_cards(self):
-        return character_classes.support_fungal.cards
+        return character_classes.mushroomman.cards
 
     def set_health(self):
-        return character_classes.support_fungal.health
+        return character_classes.mushroomman.health
 
 
 # class EvilBlob(Character):

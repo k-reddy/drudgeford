@@ -8,7 +8,7 @@ cards = [
         actions=[
             actions.CurseAllEnemies(2),
             actions.BlessAllAllies(2),
-            actions.SingleTargetAttack(3, 2),
+            actions.SingleTargetAttack(2, 2),
         ],
         movement=2,
         jump=False,
@@ -17,7 +17,7 @@ cards = [
         attack_name="Void Circle",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=2
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=1
             ),
             actions.WeakenAllEnemies(2, 2),
         ],
@@ -26,7 +26,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Soul Link",
-        actions=[actions.BlessAndFortifyAlly(2, 3), actions.BlessAndFortifyAlly(2, 3)],
+        actions=[actions.BlessAndFortifyAlly(2, 2), actions.HealAlly(2, 2)],
         movement=1,
         jump=False,
     ),
@@ -35,7 +35,7 @@ cards = [
         actions=[
             actions.ShieldAllAllies(3, 1, 3),
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.Shadow, strength=3
+                shape=shapes.ring(2), element_type=obstacle.Shadow, strength=1
             ),
         ],
         movement=1,

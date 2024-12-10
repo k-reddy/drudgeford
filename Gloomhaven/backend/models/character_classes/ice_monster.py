@@ -7,7 +7,7 @@ cards = [
         attack_name="Ice Slam",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(1), element_type=obstacle.Ice, strength=3
+                shape=shapes.ring(1), element_type=obstacle.Ice, strength=2
             ),
         ],
         movement=2,
@@ -25,7 +25,7 @@ cards = [
     actions.ActionCard(
         attack_name="Avalanche Charge",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.line(3), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.line(3), strength=1),
             actions.PushAllEnemies(1, 1),
         ],
         movement=4,

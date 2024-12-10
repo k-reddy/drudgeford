@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Phase Strike",
         actions=[
-            actions.SingleTargetAttack(3, 2),
+            actions.SingleTargetAttack(2, 2),
             actions.Teleport(2),
         ],
         movement=3,
@@ -22,7 +22,7 @@ cards = [
         attack_name="Haunting Mist",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.arc(4), element_type=obstacle.Shadow, strength=3
+                shape=shapes.arc(4), element_type=obstacle.Shadow, strength=2
             ),
             actions.WeakenAllEnemies(1, 2),
         ],
@@ -40,7 +40,7 @@ cards = [
         actions=[
             actions.Teleport(3),
             actions.AreaAttackFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=3
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=2
             ),
         ],
         movement=2,
