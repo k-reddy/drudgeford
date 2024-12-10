@@ -141,7 +141,7 @@ MAIN_HTML = """
 </head>
 <body>
     <div class="container">
-        <h1>GLOOMHAVEN</h1>
+        <h1>DRUDGEFORD</h1>
         
         <p>WELCOME, ADVENTURER!</p>
         
