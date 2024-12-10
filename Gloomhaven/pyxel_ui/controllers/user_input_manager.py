@@ -9,6 +9,7 @@ class UserInputManager:
         self.view_manager = view_manager
 
         self.accept_keyboard_input = False
+        self.single_keystroke = False
         self.accept_mouse_input = False
         self.cursor_shape_offsets = []
         self.default_highlight_color = 5
@@ -97,10 +98,7 @@ class UserInputManager:
                     )
             if pyxel.btnp(pyxel.MOUSE_BUTTON_LEFT) and self.mouse_tile_pos:
                 tile_pos_x, tile_pos_y = self.mouse_tile_pos
-                self.view_manager.reset_personal_log()
-                self.accept_mouse_input = False
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
-
                 self.return_input_to_server()
                 return
 
@@ -117,8 +115,6 @@ class UserInputManager:
                     )
             # Handle enter
             if pyxel.btnp(pyxel.KEY_RETURN):
-                self.view_manager.reset_personal_log()
-                self.accept_keyboard_input = False
                 self.return_input_to_server()
                 return
 
@@ -135,24 +131,34 @@ class UserInputManager:
             for key in range(pyxel.KEY_A, pyxel.KEY_Z + 1):
                 if pyxel.btnp(key):
                     self.input += chr(key).lower()
+                    if self.single_keystroke:
+                        self.return_input_to_server()
 
             # Check for 0-9 (ASCII 48-57)
             for key in range(pyxel.KEY_0, pyxel.KEY_9 + 1):
                 if pyxel.btnp(key):
                     self.input += chr(key)
+                    if self.single_keystroke:
+                        self.return_input_to_server()
 
             self.print_personal_log(self.input)
 
     def print_personal_log(self, user_input):
         self.view_manager.update_personal_log(self.prompt + "\n" + user_input)
 
-    def get_keyboard_input(self, prompt):
+    def get_keyboard_input(self, prompt, single_keystroke=False):
         # clear out input
         self.input = ""
+        self.single_keystroke = single_keystroke
         self.accept_keyboard_input = True
         self.prompt = prompt
 
     def return_input_to_server(self):
+        # reset our input manager state
+        self.view_manager.reset_personal_log()
+        self.accept_mouse_input = False
+        self.accept_keyboard_input = False
+        self.single_keystroke = False
         # messy way to hide paths
         self.reachable_positions = []
         self.reachable_positions_px = []

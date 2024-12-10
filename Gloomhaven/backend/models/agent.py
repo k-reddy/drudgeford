@@ -245,7 +245,10 @@ class Human(Agent):
         valid_inputs = [str(i) for i, _ in enumerate(available_action_cards)]
 
         action_card_num = pyxel_manager.get_user_input(
-            prompt=prompt, valid_inputs=valid_inputs, client_id=client_id
+            prompt=prompt,
+            valid_inputs=valid_inputs,
+            client_id=client_id,
+            single_keystroke=True,
         )
         action_card_to_perform = available_action_cards.pop(int(action_card_num))
         # load the new action cards now that you've popped from the list
@@ -260,6 +263,7 @@ class Human(Agent):
             prompt="Type 1 to move first or 2 to perform actions first.",
             valid_inputs=["1", "2"],
             client_id=client_id,
+            single_keystroke=True,
         )
         return key_press == "1"
 
@@ -269,6 +273,7 @@ class Human(Agent):
             prompt="Type (s) then enter to short rest or just enter to continue.",
             valid_inputs=["s", ""],
             client_id=client_id,
+            single_keystroke=True,
         )
         print(key_press)
         return key_press == "s"

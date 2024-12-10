@@ -89,6 +89,7 @@ class Campaign:
         user_input = self.pyxel_manager.get_user_input(
             f"Press enter to start on level 1 or type the number of the level you want to start on (1-{len(self.levels)})",
             acceptable_input,
+            single_keystroke=True,
         )
         if user_input != "":
             level_start = int(user_input)
@@ -154,6 +155,7 @@ class Campaign:
                     "How many players are playing? Type 1, 2, or 3.",
                     ["1", "2", "3"],
                     "frontend_1",
+                    single_keystroke=True,
                 )
             )
 
@@ -184,6 +186,7 @@ class Campaign:
                 prompt="Type the number of the character you want to play. ",
                 valid_inputs=[f"{j}" for j, _ in enumerate(self.available_chars)],
                 client_id=player_id,
+                single_keystroke=True,
             )
         )
         player_char = self.available_chars.pop(player_char_num)
