@@ -8,16 +8,16 @@ from pyxel_ui.constants import (
     DEFAULT_PYXEL_WIDTH,
     DEFAULT_PYXEL_HEIGHT,
 )
-from .models.tasks import ActionTask, LoadCampaign, SaveCampaign
+from .models.tasks import (
+    ActionTask,
+    LoadCampaign,
+    RemoveEntityTask,
+    SaveCampaign,
+)
 from pyxel_ui.controllers.view_manager import ViewManager
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
 from .controllers.user_input_manager import UserInputManager
-
-# TODO(john): enable mouse control
-# TODO(john): create highlighting class and methods.
-# TODO(john): allow mouse to highlight grid sections
-# TODO: limit re-draw to areas that will change.
 
 
 class PyxelEngine:
@@ -84,15 +84,21 @@ class PyxelEngine:
             task_output = self.current_task.perform(
                 self.view_manager, self.keyboard_manager
             )
-            # don't clear the task if it's an action task and has steps to do
+            # don't clear the task if it has animations to finish
             if (
                 isinstance(self.current_task, ActionTask)
                 and self.current_task.action_steps
             ):
                 return
+            elif (
+                isinstance(self.current_task, RemoveEntityTask)
+                and self.current_task.show_death_animation
+            ):
+                return
             # if we're asked for a campaign, send what we get to the server
             elif isinstance(self.current_task, (LoadCampaign, SaveCampaign)):
                 self.server_client.post_user_input(task_output)
+
             self.current_task = None
             perform_time = time.time() - start_time
         self.loop_num += 1
