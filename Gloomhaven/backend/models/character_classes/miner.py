@@ -72,7 +72,7 @@ cards = [
         actions=[
             action_model.Pull(squares=2, att_range=3),
             action_model.SingleTargetAttack(strength=3, att_range=1, knock_down=True),
-            action_model.WeakenEnemy(strength=-2, att_range=1),
+            action_model.WeakenEnemy(strength=2, att_range=1),
         ],
         movement=2,
         jump=False,
