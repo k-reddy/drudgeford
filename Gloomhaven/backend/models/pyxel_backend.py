@@ -407,13 +407,13 @@ class PyxelManager:
             # display potential attack in yellow
             self.highlight_map_tiles(attack_coords, client_id, color=10)
             user_input = self.get_user_input(
-                "Hit enter to rotate or (f) and enter to accept the shape",
-                ["", "f"],
+                "Hit (r) to rotate or enter to accept the shape",
+                ["", "r"],
                 client_id,
             )
             # clear the map
             self.jsonify_and_send_task(tasks.RedrawMap(), client_id)
-            if user_input == "f":
+            if user_input == "":
                 return attack_coords
             current_shape = next(shape_iterator)
 
