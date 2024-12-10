@@ -263,7 +263,8 @@ class Board:
     ) -> PositionPathResult:
         """
         Finds all valid jumpable positions within `num_moves` where diagonal movements
-        cost as much as cardinal movements.
+        cost as much as cardinal movements. We never push/pull with jump, so there's no
+        additional movement check here
 
         Args:
             start: Starting position as (row, col)
@@ -364,7 +365,9 @@ class Board:
                         # movement check exists, you pass the movement check, and it's a legal move
                         or (
                             self.is_legal_move(new_row, new_col)
-                            and additional_movement_check(start, (new_row, new_col))
+                            and additional_movement_check(
+                                current_pos, (new_row, new_col)
+                            )
                         )
                     )
                 ]
@@ -648,6 +651,9 @@ class Board:
             path_length_jump = len(path_traveled)
             path_traveled = path_traveled[-1:]
         for loc in path_traveled:
+            # if they die during the movement, move on
+            if acting_character not in self.characters:
+                return
             # move character one step
             self.update_character_location(
                 acting_character, acting_character_loc, loc, is_jump
@@ -802,6 +808,9 @@ class Board:
             )
             destinations.append(destination)
         for destination in destinations:
+            # if the character died during the movement, move on
+            if target not in self.characters:
+                return
             # force the algo to move the way we want, square by square
             self.move_character_toward_location(target, destination, 1, is_jump=False)
 
