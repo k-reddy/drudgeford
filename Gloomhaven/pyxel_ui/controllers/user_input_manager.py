@@ -98,6 +98,12 @@ class UserInputManager:
                 self.view_manager.reset_personal_log()
                 self.accept_mouse_input = False
                 self.input = f"{tile_pos_y}, {tile_pos_x}"
+
+                # messy way to hide paths
+                self.reachable_positions = []
+                self.reachable_positions_px = []
+                self.reachable_paths_px = {}
+
                 self.return_input_to_server()
                 return
 
