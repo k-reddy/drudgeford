@@ -235,7 +235,7 @@ class ActionTask(Task):
         Movement is broken into discrete steps, where the number of steps determines
         the speed of the animation. The steps are stored as tuples of (x, y) pixel coordinates.
 
-        The third value in the tuple represents the size of the sprite. Default is 1.
+        The third value in the tuple represents the size of the sprite. Default is 1.0
         """
         assert (
             self.duration_ms > FRAME_DURATION_MS
@@ -265,7 +265,7 @@ class ActionTask(Task):
 
 
 def parabolic_scaling(
-    i: int, step_count: int, base_scale: int = 1, peak_scale: int = 2
+    i: int, step_count: int, base_scale: float = 1.0, peak_scale: float = 2.0
 ):
     """Adjusts the scale parabolically over step_count frames.
 
