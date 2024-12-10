@@ -7,7 +7,7 @@ cards = [
     actions.ActionCard(
         attack_name="Piercing Stomp",
         actions=[
-            actions.SingleTargetAttack(strength=5, att_range=1, knock_down=True),
+            actions.SingleTargetAttack(strength=4, att_range=1, knock_down=True),
         ],
         movement=2,
         jump=True,
@@ -15,7 +15,7 @@ cards = [
     actions.ActionCard(
         attack_name="Biting Gale",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.circle(3), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(3), strength=2),
             actions.PushAllEnemies(2, 3),
         ],
         movement=3,
@@ -35,7 +35,7 @@ cards = [
     actions.ActionCard(
         attack_name="Wing Sweep",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=4),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=2),
             actions.PushAllEnemies(1, 1),
         ],
         movement=4,
@@ -48,14 +48,13 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.cone(3), element_type=obstacle.Ice, strength=3
             ),
-            actions.SingleTargetAttack(1, 1, True),
         ],
         movement=2,
         jump=True,
     ),
     actions.ActionCard(
         attack_name="Territorial Strike",
-        actions=[actions.SingleTargetAttack(4, 1, knock_down=True), actions.Push(2, 2)],
+        actions=[actions.SingleTargetAttack(2, 1, knock_down=True), actions.Push(2, 2)],
         movement=3,
         jump=True,
     ),

@@ -5,13 +5,13 @@ from backend.models import obstacle
 cards = [
     actions.ActionCard(
         attack_name="Shield Wall",
-        actions=[actions.ShieldSelf(3, 2), actions.ShieldAllAllies(1, 2, 2)],
+        actions=[actions.ShieldAllAllies(2, 2, 2)],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Combat Stance",
-        actions=[actions.Fortify(3), actions.ShieldSelf(2, 2)],
+        actions=[actions.SingleTargetAttack(3, 1), actions.ShieldSelf(2, 2)],
         movement=2,
         jump=False,
     ),
@@ -37,8 +37,8 @@ cards = [
         jump=False,
     ),
     actions.ActionCard(
-        attack_name="Battle Line",
-        actions=[actions.SingleTargetAttack(4, 2), actions.ShieldAllAllies(2, 1, 2)],
+        attack_name="Grave Line",
+        actions=[actions.AreaAttackFromSelf(shape=shapes.line(3), strength=2)],
         movement=2,
         jump=False,
     ),

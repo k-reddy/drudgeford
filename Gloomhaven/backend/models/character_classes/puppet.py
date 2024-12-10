@@ -6,8 +6,8 @@ cards = [
     actions.ActionCard(
         attack_name="Critical Meltdown",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=6),
-            actions.ModifySelfHealth(-5),
+            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=3),
+            actions.ModifySelfHealth(-3),
         ],
         movement=3,
         jump=False,
@@ -15,8 +15,8 @@ cards = [
     actions.ActionCard(
         attack_name="Chain Reaction",
         actions=[
-            actions.SingleTargetAttack(3, 2),
-            actions.SingleTargetAttack(3, 2),
+            actions.SingleTargetAttack(2, 2),
+            actions.SingleTargetAttack(2, 2),
             actions.ModifySelfHealth(-2),
         ],
         movement=4,
@@ -34,8 +34,8 @@ cards = [
         attack_name="Containment Breach",
         actions=[
             actions.Pull(3, 3),
-            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=6),
-            actions.ModifySelfHealth(-4),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
+            actions.ModifySelfHealth(-3),
         ],
         movement=2,
         jump=False,

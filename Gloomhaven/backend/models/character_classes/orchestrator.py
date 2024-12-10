@@ -23,7 +23,6 @@ cards = [
             actions.Teleport(5),
             actions.Teleport(5),
             actions.Teleport(5),
-            actions.SingleTargetAttack(4, 6, True),
         ],
         movement=3,
         jump=True,
@@ -47,7 +46,7 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.circle(2), element_type=obstacle.Shadow
             ),
-            actions.SingleTargetAttack(strength=4, att_range=2, knock_down=True),
+            actions.SingleTargetAttack(strength=3, att_range=2, knock_down=True),
             actions.WeakenAllEnemies(2, 2),
             actions.HealAllAllies(3, 3),
         ],
