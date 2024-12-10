@@ -55,4 +55,4 @@ cards = [
     ),
 ]
 
-health = 1
+health = 3
