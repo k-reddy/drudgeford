@@ -247,8 +247,15 @@ class PyxelManager:
         self.jsonify_and_send_task(task, client_id)
 
     def save_campign(self, campaign_state):
+        user_input = self.get_user_input(
+            "Would you like to save your progress? Type (y)es or (n)o. ", ["y", "n"]
+        )
+        if user_input != "y":
+            return
         task = tasks.SaveCampaign(campaign_state)
         self.jsonify_and_send_task(task)
+        filename = self.server_client.get_user_input()["input"]
+        self.get_user_input(f"Successfully saved {filename}. Hit enter to continue.")
 
     def get_campaign_to_load(self):
         """
@@ -256,9 +263,37 @@ class PyxelManager:
         otherwise returns None
         only asks frontend_1 if they want to load to avoid conflicts
         """
+        client_id = "frontend_1"
+        # first ask if they want to load a campaign
+        user_input = self.get_user_input(
+            "Type (y)es to load a campaign or hit enter to start a new campaign",
+            ["y", ""],
+            client_id,
+        )
+        if user_input != "y":
+            return None
+
+        # if they do, retrieve all the saved campaign data
         task = tasks.LoadCampaign()
         self.jsonify_and_send_task(task, "frontend_1")
-        return self.server_client.get_user_input()["input"]
+        saved_campaigns = self.server_client.get_user_input()["input"]
+        if not saved_campaigns:
+            self.get_user_input(
+                "No saved files found. Hit enter to start a new campaign. ",
+                client_id=client_id,
+            )
+            return None
+
+        # show saved files and ask them to pick one
+        prompt = "These are the files you may load:"
+        for file_str in saved_campaigns:
+            prompt += f"\n{file_str}"
+        prompt += "\nType the number of the file you want to load. "
+        valid_inputs = [str(i) for i, _ in enumerate(saved_campaigns)]
+        file_num = int(self.get_user_input(prompt, valid_inputs, client_id))
+
+        # return the appropriate campaign data
+        return list(saved_campaigns.values())[file_num]
 
     def process_mouse_input(self, user_input):
         """

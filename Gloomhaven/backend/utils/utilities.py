@@ -28,7 +28,9 @@ class GameState(Enum):
 
 def get_campaign_filenames():
     return [
-        p.name for p in list(Path(SAVE_FILE_DIR).glob("*.pickle")) if "game_" in p.name
+        p.name
+        for p in list(Path(SAVE_FILE_DIR).glob("*.json"))
+        if "campaign_" in p.name
     ]
 
 

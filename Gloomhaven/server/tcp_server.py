@@ -67,7 +67,8 @@ class TCPServer:
                     return
 
                 try:
-                    client_socket, _ = self.server_socket.accept()
+                    client_socket, address = self.server_socket.accept()
+                    client_ip = address[0]
                 except socket.timeout:
                     continue
 
@@ -76,6 +77,25 @@ class TCPServer:
 
                 client_info = receive_message(client_socket)
                 client_type = ClientType(client_info.get("client_type"))
+                # Add IP whitelist check for backend
+                if client_type == ClientType.BACKEND:
+                    ALLOWED_IPS = {
+                        "127.0.0.1",  # IPv4 localhost
+                        "::1",  # IPv6 localhost
+                        "13.59.128.25",  # AWS instance
+                    }
+
+                    # Handle IPv6 mapped IPv4 addresses
+                    if client_ip.startswith("::ffff:"):
+                        # Convert IPv6-mapped IPv4 to pure IPv4
+                        client_ip = client_ip.replace("::ffff:", "")
+
+                    if client_ip not in ALLOWED_IPS:
+                        print(
+                            f"Rejected backend connection from unauthorized IP: {client_ip}"
+                        )
+                        client_socket.close()
+                        continue
 
                 # If a frontend client connects and shutdown timer is running, stop it
                 if client_type == ClientType.FRONTEND:

@@ -8,7 +8,7 @@ from pyxel_ui.constants import (
     DEFAULT_PYXEL_WIDTH,
     DEFAULT_PYXEL_HEIGHT,
 )
-from .models.tasks import ActionTask, LoadCampaign
+from .models.tasks import ActionTask, LoadCampaign, SaveCampaign
 from pyxel_ui.controllers.view_manager import ViewManager
 from server.tcp_client import TCPClient, ClientType
 from server.task_jsonifier import TaskJsonifier
@@ -91,7 +91,7 @@ class PyxelEngine:
             ):
                 return
             # if we're asked for a campaign, send what we get to the server
-            elif isinstance(self.current_task, LoadCampaign):
+            elif isinstance(self.current_task, (LoadCampaign, SaveCampaign)):
                 self.server_client.post_user_input(task_output)
             self.current_task = None
             perform_time = time.time() - start_time
