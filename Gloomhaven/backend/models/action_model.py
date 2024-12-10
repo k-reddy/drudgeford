@@ -46,12 +46,10 @@ class AreaAttackFromSelf(ActionStep):
         return f"{attack_type}Attack{damage_str}:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
-        perform_str = f"{attacker.name} "
         if self.element_type:
-            perform_str += f"throws {self.element_type.__name__}"
-            if self.strength:
-                perform_str += " and "
-        return perform_str
+            return f"{attacker.name} throws {self.element_type.__name__}"
+        else:
+            return ""
 
 
 @dataclass
@@ -128,12 +126,10 @@ class AreaAttackWithTarget(ActionStep):
         return f"{attack_type}Attack{damage_str} <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
-        perform_str = f"{attacker.name} "
         if self.element_type:
-            perform_str += f"throws {self.element_type.__name__}"
-            if self.damage:
-                perform_str += " and "
-        return perform_str
+            return f"{attacker.name} throws {self.element_type.__name__}"
+        else:
+            return ""
 
 
 @dataclass
