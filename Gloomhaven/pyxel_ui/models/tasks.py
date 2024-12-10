@@ -291,9 +291,10 @@ class InputTask(Task):
     prompt: str
     reachable_positions: Optional[list[tuple[int, int]]] = None
     reachable_paths: Optional[dict[tuple[int, int], list[tuple[int, int]]]] = None
+    single_keystroke: bool = False
 
     def perform(self, view_manager, user_input_manager):
-        user_input_manager.get_keyboard_input(self.prompt)
+        user_input_manager.get_keyboard_input(self.prompt, self.single_keystroke)
 
     # this was just for terminal input
     # def clear_input(self):
@@ -312,11 +313,13 @@ class InputTask(Task):
 class MouseInputTask(Task):
     """
     task that asks for mouse input in pyxel
+    single keystroke is there just to maintain the same interface as inputtask
     """
 
     prompt: str
     reachable_positions: Optional[list[tuple[int, int]]] = None
     reachable_paths: Optional[dict[tuple[int, int], list[tuple[int, int]]]] = None
+    single_keystroke: bool = True
 
     def perform(self, view_manager, user_input_manager):
         user_input_manager.get_mouse_input(self.prompt)

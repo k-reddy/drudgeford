@@ -203,7 +203,12 @@ class PyxelManager:
         is_mouse=False,
         reachable_positions=None,
         reachable_paths=None,
+        single_keystroke=False,
     ):
+        """
+        single keystroke is only applicable for keyboard input and
+        doesn't require the user to hit enter
+        """
         # Flip coordinates to front end land
         if reachable_positions:
             reachable_positions = [
@@ -222,6 +227,7 @@ class PyxelManager:
             prompt=prompt,
             reachable_positions=reachable_positions,
             reachable_paths=reachable_paths,
+            single_keystroke=single_keystroke,
         )
 
         self.jsonify_and_send_task(task, client_id)
