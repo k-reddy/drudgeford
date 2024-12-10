@@ -275,23 +275,18 @@ class Board:
             for Pyxel compatibility and a blank dict to maintain consistency in function
             sugnatures with find_all_reachable_paths()
         """
-        # Algorithm should be simple, we create a block of coordinates where
-        # corners are:
-        # top left:     (start_x - num_moves, start_y + num_moves)
-        # top right:    (start_x + num_moves, start_y + num_moves)
-        # bottom left:  (start_x - num_moves, start_y - num_moves)
-        # bottom right: (start_x + num_moves, start_y - num_moves)
-        # then check if each move is valid.
-        # I don't think other search algorithms will be more efficient here
-        # given that we need to check every square and num_moves will be small.
-        start_x, start_y = start
-        bounds = range(-num_moves, num_moves + 1)
+        # Since we cannot jump over walls, we will get all jumpable positions by calling
+        # find_all_reachable_paths with exclude_walls_only set to True, then we will
+        # remove all character locations to prevent jumping onto them.
+        jumpable_positions, _ = self.find_all_reachable_paths(
+            start, num_moves, exclude_walls_only=True
+        )
+
+        # remove character locations. can be more efficient if self.locations is a set
         jumpable_positions = [
-            (jump_x, jump_y)
-            for d_x in bounds
-            for d_y in bounds
-            if self.is_legal_move(jump_x := start_x + d_x, jump_y := start_y + d_y)
-            and (jump_x, jump_y) != start
+            (pos_x, pos_y)
+            for pos_x, pos_y in jumpable_positions
+            if self.locations[pos_x][pos_y] is None
         ]
 
         return jumpable_positions, {}
