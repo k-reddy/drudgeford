@@ -255,9 +255,9 @@ class ActionTask(Task):
                 int(start_px_x + i / step_count * (diff_px_x)),
                 int(start_px_y + i / step_count * (diff_px_y)),
                 (
-                    parabolic_scaling(i, step_count, peak_scale=1.25)
+                    parabolic_scaling(i, step_count, peak_scale=1.15)
                     if is_jump
-                    else parabolic_scaling(i, step_count, peak_scale=1.05)
+                    else parabolic_scaling(i, step_count, peak_scale=1)
                 ),
             )
             for i in range(step_count + 1)
