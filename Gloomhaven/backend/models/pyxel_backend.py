@@ -405,7 +405,7 @@ class PyxelManager:
                 current_shape = next(shape_iterator)
                 continue
             # display potential attack in yellow
-            self.highlight_map_tiles(attack_coords, client_id, color=10)
+            self.highlight_map_tiles(attack_coords, client_id, color=10, persist=True)
             user_input = self.get_user_input(
                 "Hit (r) to rotate or enter to accept the shape",
                 ["", "r"],
