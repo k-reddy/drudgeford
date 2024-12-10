@@ -450,7 +450,7 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../frontend_main.dist/frontend_main.bin"
+    exe_path = "../banana/frontend_main.dist/frontend_main.bin"
     return send_file(exe_path, as_attachment=True, download_name="gloomhaven.bin")
 
 
