@@ -350,7 +350,8 @@ class GameLoop:
     def set_up_monsters(self):
         monsters = []
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        for i in range(self.num_players * 3):
+        player_enemy_num_mapping = {1: 3, 2: 5, 3: 7}
+        for i in range(player_enemy_num_mapping[self.num_players]):
             class_num = i % len(self.level.monster_classes)
             monster_name = self.level.monster_classes[class_num].__name__
             monster = self.level.monster_classes[class_num](
@@ -362,5 +363,9 @@ class GameLoop:
                 is_monster=True,
                 log=self.pyxel_manager.log,
             )
+            # if you have more than 1 player, make half of the enemies stronger
+            if self.num_players > 1 and i % 2 == 0:
+                monster.max_health += self.num_players
+                monster.health += self.num_players
             monsters.append(monster)
         return monsters
