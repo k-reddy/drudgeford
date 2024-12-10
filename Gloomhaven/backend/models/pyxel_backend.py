@@ -117,8 +117,10 @@ class PyxelManager:
         )
         self.jsonify_and_send_task(task)
 
-    def remove_entity(self, entity_id):
-        task = tasks.RemoveEntityTask(entity_id)
+    def remove_entity(self, entity_id, show_death_animation: bool = False):
+        task = tasks.RemoveEntityTask(
+            entity_id, show_death_animation=show_death_animation
+        )
         self.jsonify_and_send_task(task)
 
     def set_x_y_offset(self, coordinates: list[tuple[int, int]]):

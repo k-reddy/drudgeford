@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum, IntEnum, auto
 
 
 class AnimationFrame(Enum):
@@ -15,3 +15,8 @@ class Direction(Enum):
     WEST = auto()
     EAST = auto()
     SOUTH = auto()
+
+
+class RotationDirection(IntEnum):
+    COUNTER_CLOCK_WISE = 1
+    CLOCK_WISE = -1

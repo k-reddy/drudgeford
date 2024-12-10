@@ -25,6 +25,8 @@ class Entity:
     priority: int
     alive: bool = True
     scale: int = 1
+    # Degrees counter-clockwise
+    rotation: int = 0
 
     def update_position(self, x: int, y: int) -> None:
         """
@@ -39,3 +41,6 @@ class Entity:
 
     def update_scale(self, scale: int) -> None:
         self.scale = scale
+
+    def update_rotation(self, rotation: int) -> None:
+        self.rotation = rotation

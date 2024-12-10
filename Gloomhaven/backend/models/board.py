@@ -587,7 +587,7 @@ class Board:
         self.remove_character(target)
         row, col = self.find_location_of_target(target)
         self.update_locations(row, col, None)
-        self.pyxel_manager.remove_entity(target.id)
+        self.pyxel_manager.remove_entity(target.id, show_death_animation=True)
         died_by = f" by{damage_str}" if damage_str else ""
         self.pyxel_manager.log.append(f"{target.name} has been killed{died_by}.")
         # if it's your turn, end it immediately
