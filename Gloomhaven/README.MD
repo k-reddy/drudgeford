@@ -1,53 +1,65 @@
-# Gloomhaven Game Setup Instructions
+# Mac Setup Instructions for Gloomhaven Game
 
-## Initial Setup
+## Setup
 
-1. Clone the repository:
+1. Open Terminal (you can find this using Spotlight search - press Cmd+Space and type "Terminal")
+
+2. Install Homebrew (macOS package manager) by pasting this command:
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+3. Install Python 3.12:
+   ```bash
+   brew install python@3.12
+   ```
+
+4. Clone the repository:
    ```bash
    git clone [repository-url]
    ```
 
-2. Navigate to the Gloomhaven directory:
+5. Navigate to the Gloomhaven directory:
    ```bash
    cd gloomhaven
    ```
 
-3. Create and activate a virtual environment:
+6. Create and activate a virtual environment:
    ```bash
-   # On macOS/Linux
-   python3 -m venv venv
+   python3.12 -m venv venv
    source venv/bin/activate
-
-   # On Windows
-   python -m venv venv
-   .\venv\Scripts\activate
    ```
 
-4. Install required dependencies:
+7. Install required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
 ## Playing the Game
 
-1. Open your web browser and navigate to:
+1. Open your web browser and go to:
    ```
    http://13.59.128.25:8000/
    ```
 
-2. Click the "Host Game" button.
+2. Click the "Host Game" button
 
-3. Follow the provided link to start the game. You will receive a port number - keep this number handy.
+3. Follow the link to start the game - you'll get a port number
 
-4. In your terminal (with the virtual environment activated), run:
+4. In Terminal (with your virtual environment still activated), run:
    ```bash
    python3 frontend_main.py
    ```
 
-5. When prompted, enter the port number you received from the web interface.
+5. When asked, enter the port number you got from the website
 
-## Troubleshooting
+## Common Issues
 
-- Make sure your virtual environment is activated before running any Python commands
-- If you encounter any dependency issues, try removing and recreating your virtual environment
-- Ensure you're using Python 3.x
+- If you see "Command not found" for brew commands after installation, try closing and reopening Terminal
+- If you get a permissions error during the Homebrew installation, follow the instructions it provides about directory ownership
+- If pip install fails, make sure your virtual environment is activated (you should see "(venv)" at the start of your Terminal prompt)
+- To reactivate your virtual environment after closing Terminal:
+  ```bash
+  cd gloomhaven
+  source venv/bin/activate
+  ```
