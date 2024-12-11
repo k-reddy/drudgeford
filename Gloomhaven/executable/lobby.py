@@ -140,38 +140,39 @@ MAIN_HTML = """
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>DRUDGEFORD</h1>
-        
-        <p>WELCOME, ADVENTURER!</p>
-        
-        <div class="button-container">
-            <button onclick="hostGame()" id="hostButton" class="host-button">
-                HOST GAME
-            </button>
-            
-            <!-- doesn't work yet
-            <a href="/download" class="download-button">
-                DOWNLOAD GAME
-            </a>
-            -->
-
-            <a href="/tutorial" class="tutorial-button">
-                LEARN TO PLAY
-            </a>
+    <div class="flex-container">
+        <!-- Art Section -->
+        <div class="art-section">
+            <img src="/static/drudgeford_cover.png" alt="Drudgeford Cover Art">
         </div>
         
-        <div id="gameLink" class="game-link"></div>
-        
-        <div class="note">
-            <strong>GAME HOSTING INSTRUCTIONS:</strong>
-            <ol>
-                <!--doesn't work yet<li>DOWNLOAD THE GAME CLIENT</li>-->
-                <li>PULL CODE FROM THE GITHUB REPOS</li>
-                <li>TO HOST: CLICK "HOST GAME" AND SHARE THE LINK</li>
-                <li>TO JOIN: ASK HOST FOR PORT NUMBER</li>
-                <li>CLICK 'LEARN TO PLAY' FOR INSTRUCTIONS ON PLAYING THE GAME</li>
-            </ol>
+        <!-- Content Section -->
+        <div class="content-section">
+            <div class="container">
+                <h1>WELCOME, ADVENTURER</h1>
+                            
+                <div class="button-container">
+                    <button onclick="hostGame()" id="hostButton" class="host-button">
+                        HOST GAME
+                    </button>
+                    
+                    <a href="/tutorial" class="tutorial-button">
+                        LEARN TO PLAY
+                    </a>
+                </div>
+                
+                <div id="gameLink" class="game-link"></div>
+                
+                <div class="note">
+                    <strong>GAME HOSTING INSTRUCTIONS:</strong>
+                    <ol>
+                        <li>PULL CODE FROM THE GITHUB REPOS</li>
+                        <li>TO HOST: CLICK "HOST GAME" AND SHARE THE LINK</li>
+                        <li>TO JOIN: ASK HOST FOR PORT NUMBER</li>
+                        <li>CLICK 'LEARN TO PLAY' FOR INSTRUCTIONS ON PLAYING THE GAME</li>
+                    </ol>
+                </div>
+            </div>
         </div>
     </div>
 </body>
