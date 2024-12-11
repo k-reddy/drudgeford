@@ -413,7 +413,7 @@ TUTORIAL_HTML = """
     </script>
 </head>
 <body>
-    <div class="tutorial-container">
+    <div class="container">
         <h1>HOW TO PLAY</h1>
         
         <div class="tutorial-content">

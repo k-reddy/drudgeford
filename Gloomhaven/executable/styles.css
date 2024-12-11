@@ -7,8 +7,8 @@ body {
     padding: 2rem;
 }
 
-.container {
-    max-width: none;
+/* .container {
+    max-width: 800px;
     margin: 0;
     background-color: #3f3f74;
     border: 4px solid #fff;
@@ -18,19 +18,15 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
-}
-
-.tutorial-container {
-    max-width: none;
-    margin: 0;
+} */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
     background-color: #3f3f74;
     border: 4px solid #fff;
+    image-rendering: pixelated;
     box-shadow: 10px 10px 0px #000;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem;
 }
 
 h1 {
