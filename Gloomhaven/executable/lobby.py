@@ -257,8 +257,27 @@ TUTORIAL_HTML = """
         let currentSlide = 0;
         const slides = [
             {
+                text: `<div>
+                WELCOME TO DRUDGEFORD!<br><br>The forces of darkness have been hard at work, and it's up to you to save your town. Here's how it works:<br><br>
+                <ul style="list-style-type: none; padding-left: 40px; margin: 16px 0; text-align: left">
+                <li style="margin-bottom: 12px;">
+                    - Drudgeford is a <span style='color: #00BFFF'>cooperative</span> game, which means you'll be on a team with the other human players.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - A full run-through of the game is called a <span style='color: #FFC87C'>campaign</span>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - In each campaign, you'll work your way through multiple levels. On each level, your goal is to <span style='color: #FF1493'>defeat all your enemies</span>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - The game is <span style='color: #8FBC8F'>turn based</span> like a board game, so players and monsters take their turns one at a time.
+                </li>
+                </ul>
+                </div>`
+            },
+            {
                 image: "/static/help_images/log.png",
-                text: "WELCOME TO DRUDGEFORD!<br><br>Drudgeford is a turn-based, dungeon-crawling, cooperative strategy game.<br><br>When you enter the game, you'll see a screen like this. The <span style='color: #FF1493'>log</span> will tell you what each character does on their turn.<br><br>"
+                text: "When you enter the game, you'll see a screen like this. The <span style='color: #FF1493'>log</span> will tell you what each character does on their turn.<br><br>"
             },
             {
                 image: "/static/help_images/initiative_bar.png",
