@@ -275,7 +275,6 @@ class Human(Agent):
             client_id=client_id,
             single_keystroke=True,
         )
-        print(key_press)
         return key_press == "s"
 
     @staticmethod
@@ -295,6 +294,9 @@ class Human(Agent):
         for opponent in in_range_opponents:
             prompt += f"{opponent.name}{': Shield ' + str(opponent.shield[0]) if opponent.shield[0] > 0 else ''}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
+        pyxel_manager.highlight_map_tiles(
+            tiles=valid_inputs, client_id=client_id, color=10, persist=True
+        )
 
         # get user input on which to attack
         row, col = pyxel_manager.get_user_input(

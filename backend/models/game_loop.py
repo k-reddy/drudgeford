@@ -275,7 +275,7 @@ class GameLoop:
         if not self.all_ai_mode:
             self.pyxel_manager.pause_for_all_players(
                 self.num_players,
-                prompt="End of turn. All players must hit enter to continue",
+                prompt="End of turn. Hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 
@@ -288,7 +288,7 @@ class GameLoop:
         if not self.all_ai_mode:
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
-                prompt="End of round. All players must hit enter to continue",
+                prompt="End of round. Hit enter to continue",
             )
             self.pyxel_manager.log.clear()
 

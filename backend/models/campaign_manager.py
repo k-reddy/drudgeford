@@ -132,7 +132,7 @@ class Campaign:
             # otherwise, let them see the victory message and choose to progress
             self.pyxel_manager.pause_for_all_players(
                 num_players=self.num_players,
-                prompt=message + "\nAll players must press enter to continue",
+                prompt=message + "\nHit enter to continue",
             )
             # reset the view manager
             print("resetting view manager")
@@ -291,6 +291,6 @@ class Campaign:
             ):
                 self.pyxel_manager.pause_for_all_players(
                     self.num_players,
-                    "All players joined. All players must hit enter to continue.",
+                    "All players joined. Hit enter to continue.",
                 )
                 return

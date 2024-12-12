@@ -510,14 +510,15 @@ class Board:
 
     # is the attack in range?
     def is_attack_in_range(
-        self, attack_distance: int, attacker: Character, target: Character
+        self, attack_distance: int, attacker: Character, target: Character, jump: bool
     ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         # BUG path_to_target might be [], which would make dist_to_target 0 and return True
-        dist_to_target = len(
-            self.get_shortest_valid_path(attacker_location, target_location)
+        shortest_path = self.get_shortest_valid_path(
+            attacker_location, target_location, is_jump=jump
         )
+        dist_to_target = len(shortest_path)
         return attack_distance >= dist_to_target
 
     def find_location_of_target(self, target) -> tuple[int, int]:
@@ -595,15 +596,19 @@ class Board:
             raise DieAndEndTurn()
 
     def find_in_range_opponents_or_allies(
-        self, actor: Character, distance: int, opponents=True
+        self, actor: Character, distance: int, opponents=True, jump=True
     ) -> list[Character]:
+        """
+        we use jump as a default because we use this to find which targets are in range
+        so we don't care about the literal path, just the distance of an attack
+        """
+        in_range_chars = []
         if opponents:
             chars = self.find_opponents(actor)
         else:
             chars = self.find_allies(actor)
-        in_range_chars = []
         for char in chars:
-            if self.is_attack_in_range(distance, actor, char):
+            if self.is_attack_in_range(distance, actor, char, jump):
                 in_range_chars.append(char)
         return in_range_chars
 
