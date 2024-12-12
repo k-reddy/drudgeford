@@ -520,7 +520,7 @@ class Board:
                 attacker_location, target_location, is_jump=jump
             )
         )
-        return attack_distance >= dist_to_target and attack_distance > 0
+        return attack_distance >= dist_to_target and dist_to_target > 0
 
     def find_location_of_target(self, target) -> tuple[int, int]:
         for row_num, row in enumerate(self.locations):
