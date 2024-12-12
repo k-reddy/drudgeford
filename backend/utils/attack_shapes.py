@@ -153,6 +153,6 @@ def print_all_directions(shape):
 def demo_directional_rotations():
     # Create a vertical line
     # vertical_line = line((1, 0), 3)
-    vertical_line = cone(2)
+    vertical_line = arc(3)
 
     print_all_directions(vertical_line)
