@@ -518,9 +518,8 @@ class Board:
         shortest_path = self.get_shortest_valid_path(
             attacker_location, target_location, is_jump=jump
         )
-        # if there is a path, get its length, otherwise -1
-        dist_to_target = len(shortest_path) if shortest_path else -1
-        return attack_distance >= dist_to_target and dist_to_target > -1
+        dist_to_target = len(shortest_path)
+        return attack_distance >= dist_to_target
 
     def find_location_of_target(self, target) -> tuple[int, int]:
         for row_num, row in enumerate(self.locations):
@@ -608,7 +607,6 @@ class Board:
             chars = self.find_opponents(actor)
         else:
             chars = self.find_allies(actor)
-            in_range_chars.append(actor)
         for char in chars:
             if self.is_attack_in_range(distance, actor, char, jump):
                 in_range_chars.append(char)
