@@ -343,11 +343,13 @@ class PyxelManager:
         self.jsonify_and_send_task(task)
         if pause_until_enter:
             self.pause_for_all_players(
-                num_players=num_players, prompt="All players must hit enter to continue"
+                num_players=num_players,
             )
 
     def pause_for_all_players(
-        self, num_players: int, prompt: str = "All players must hit enter to continue"
+        self,
+        num_players: int,
+        prompt: str = "Hit enter to continue.",
     ):
         task = tasks.InputTask(prompt)
         self.jsonify_and_send_task(task, "ALL_FRONTEND")
