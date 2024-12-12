@@ -86,7 +86,11 @@ class UserInputManager:
             # draw reachable positions - this is for movement only
             for pos_x, pos_y in self.reachable_positions_px:
                 self.view_manager.draw_grid(
-                    pos_x, pos_y, MAP_TILE_WIDTH_PX, MAP_TILE_HEIGHT_PX, color=5
+                    pos_x,
+                    pos_y,
+                    MAP_TILE_WIDTH_PX,
+                    MAP_TILE_HEIGHT_PX,
+                    color=self.highlight_color,
                 )
             # draw paths
             if self.mouse_tile_pos and self.mouse_tile_pos in self.reachable_positions:
