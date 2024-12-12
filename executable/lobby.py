@@ -167,7 +167,7 @@ MAIN_HTML = """
                     <strong>GAME HOSTING INSTRUCTIONS:</strong>
                     <ol>
                         <li>PULL CODE FROM THE GITHUB REPOS</li>
-                        <li>TO HOST: CLICK "HOST GAME" AND SHARE THE LINK</li>
+                        <li>TO HOST: CLICK "HOST GAME" AND THEN FOLLOW THE LINK. START YOUR FRONTEND_MAIN.PY FILE, USE THE PROVIDED PORT NUMBER, SELECT A NUMBER OF PLAYERS, AND SHARE THE PORT NUMBER WITH OTHER PLAYERS</li>
                         <li>TO JOIN: ASK HOST FOR PORT NUMBER</li>
                         <li>CLICK 'LEARN TO PLAY' FOR INSTRUCTIONS ON PLAYING THE GAME</li>
                     </ol>
@@ -232,7 +232,7 @@ JOIN_HTML = """
         <h1 class="success-heading">JOIN GAME</h1>
         <div class="note">
             <strong>INSTRUCTIONS:</strong>
-            <p>1. RUN YOUR GLOOMHAVEN FILE</p>
+            <p>1. RUN YOUR DRUDGEFORD FRONTEND_MAIN.PY FILE</p>
             <p>2. SET A NUMBER OF PLAYERS</p>
             <p>3. SHARE THE PORT NUMBER WITH YOUR FRIENDS</p>
             <p>4. TELL THEM TO RUN THEIR FILES AND JOIN THE ADVENTURE!</p>
@@ -250,7 +250,7 @@ TUTORIAL_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>How to Play - Gloomhaven</title>
+    <title>How to Play - Drudgeford</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css">
     <script>
@@ -471,7 +471,7 @@ def send_static(path):
 @app.route("/download")
 def download():
     exe_path = "../banana/frontend_main.dist/frontend_main.bin"
-    return send_file(exe_path, as_attachment=True, download_name="gloomhaven.bin")
+    return send_file(exe_path, as_attachment=True, download_name="drudgeford.bin")
 
 
 # create limits of number of games hosted per IP
