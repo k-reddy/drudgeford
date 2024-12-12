@@ -241,7 +241,12 @@ class PyxelManager:
 
         # if there's validation, keep asking for input until you get what you need
         while user_input not in valid_inputs:
-            task = task_class("Invalid selection pressed. Try again.\n" + prompt)
+            task = task_class(
+                prompt="Invalid selection pressed. Try again.\n" + prompt,
+                reachable_positions=reachable_positions,
+                reachable_paths=reachable_paths,
+                single_keystroke=single_keystroke,
+            )
             self.jsonify_and_send_task(task, client_id)
             user_input = self.server_client.get_user_input()["input"]
             # process our new input if it's mouse input
@@ -343,11 +348,13 @@ class PyxelManager:
         self.jsonify_and_send_task(task)
         if pause_until_enter:
             self.pause_for_all_players(
-                num_players=num_players, prompt="All players must hit enter to continue"
+                num_players=num_players,
             )
 
     def pause_for_all_players(
-        self, num_players: int, prompt: str = "All players must hit enter to continue"
+        self,
+        num_players: int,
+        prompt: str = "Hit enter to continue.",
     ):
         task = tasks.InputTask(prompt)
         self.jsonify_and_send_task(task, "ALL_FRONTEND")

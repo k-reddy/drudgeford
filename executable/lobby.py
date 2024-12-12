@@ -166,7 +166,7 @@ MAIN_HTML = """
                 <div class="note">
                     <strong>GAME HOSTING INSTRUCTIONS:</strong>
                     <ol>
-                        <li>PULL CODE FROM THE GITHUB REPOS</li>
+                        <li>PULL CODE FROM THE GITHUB <a href="https://github.com/k-reddy/drudgeford" style="color: #6495ED">REPOS</a></li>
                         <li>TO HOST: CLICK "HOST GAME" AND THEN FOLLOW THE LINK. START YOUR FRONTEND_MAIN.PY FILE, USE THE PROVIDED PORT NUMBER, SELECT A NUMBER OF PLAYERS, AND SHARE THE PORT NUMBER WITH OTHER PLAYERS</li>
                         <li>TO JOIN: ASK HOST FOR PORT NUMBER</li>
                         <li>CLICK 'LEARN TO PLAY' FOR INSTRUCTIONS ON PLAYING THE GAME</li>
