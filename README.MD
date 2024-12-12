@@ -1,4 +1,4 @@
-# Mac Setup Instructions for Gloomhaven Game
+# Mac Setup Instructions for Drudgeford Game
 
 ## Setup
 
@@ -19,9 +19,9 @@
    git clone [repository-url]
    ```
 
-5. Navigate to the Gloomhaven directory:
+5. Navigate to the Drudgeford directory:
    ```bash
-   cd gloomhaven
+   cd drudgeford
    ```
 
 6. Create and activate a virtual environment:
@@ -60,6 +60,6 @@
 - If pip install fails, make sure your virtual environment is activated (you should see "(venv)" at the start of your Terminal prompt)
 - To reactivate your virtual environment after closing Terminal:
   ```bash
-  cd gloomhaven
+  cd drudgeford
   source venv/bin/activate
   ```

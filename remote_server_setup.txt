@@ -15,7 +15,7 @@ rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --exclude="**/__pycache__/**" \
 --exclude="**/.pytest_cache/**" \
 --exclude="*" \
-Documents/rc/rc/gloomhaven/ ec2-user@13.59.128.25:gloomhaven/
+Documents/rc/drudgeford/ ec2-user@13.59.128.25:drudgeford/
 
 # ssh into the linux instance
 ssh -i Documents/developer_creds/drudgeford_key.pem ec2-user@13.59.128.25
