@@ -515,12 +515,12 @@ class Board:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         # BUG path_to_target might be [], which would make dist_to_target 0 and return True
-        dist_to_target = len(
-            self.get_shortest_valid_path(
-                attacker_location, target_location, is_jump=jump
-            )
+        shortest_path = self.get_shortest_valid_path(
+            attacker_location, target_location, is_jump=jump
         )
-        return attack_distance >= dist_to_target and dist_to_target > 0
+        # if there is a path, get its length, otherwise -1
+        dist_to_target = len(shortest_path) if shortest_path else -1
+        return attack_distance >= dist_to_target and dist_to_target > -1
 
     def find_location_of_target(self, target) -> tuple[int, int]:
         for row_num, row in enumerate(self.locations):
