@@ -1,0 +1,343 @@
+body {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #222034;
+    color: #fff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 2rem;
+}
+
+/* .container {
+    max-width: 800px;
+    margin: 0;
+    background-color: #3f3f74;
+    border: 4px solid #fff;
+    box-shadow: 10px 10px 0px #000;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+} */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #3f3f74;
+    border: 4px solid #fff;
+    image-rendering: pixelated;
+    box-shadow: 10px 10px 0px #000;
+}
+
+h1 {
+    color: #fff;
+    text-align: center;
+    font-size: 24px;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}
+
+p {
+    font-size: 12px;
+    margin: 1rem 0;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.download-button {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: #ff004d;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+}
+
+.host-button {
+    display: block;
+    width: 200px;
+    margin: 0rem;
+    padding: 1rem;
+    background-color: #00b543;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+}
+
+.download-button:hover, .host-button:hover, .tutorial-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+.download-button:active, .host-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px #000;
+}
+
+.note {
+    background-color: #1a1a2e;
+    padding: 1rem;
+    border: 4px solid #fff;
+    margin: 0.75rem 0;
+    font-size: 10px;
+}
+
+.note strong {
+    color: #ffec27;
+}
+
+ol {
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+}
+
+li {
+    margin: 0.75rem 0;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    background: #fff;
+}
+
+.game-link {
+    display: none;
+    background-color: #1a1a2e;
+    padding: 1rem;
+    border: 4px solid #fff;
+    margin: 1rem 0;
+    word-break: break-all;
+    font-size: 10px;
+    text-align: center;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.host-button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.welcome-text {
+    text-align: center;
+}
+
+/* Error page specific styles */
+.error-container {
+    text-align: center;
+}
+
+.error-heading {
+    color: #ff004d;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}
+
+/* Success page specific styles */
+.success-heading {
+    color: #00b543;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 2rem;
+}
+.tutorial-content {
+    margin: 20px 0;
+    padding: 20px;
+    background: black;
+    border-radius: 8px;
+}
+
+.tutorial-image {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 4px;
+    margin: 0 auto;
+    display: block;
+}
+
+.tutorial-text {
+    color: white;
+    text-align: center;
+    margin: 15px 0;
+    font-family: 'Press Start 2P', cursive;
+    line-height: 1.5;
+    padding: 0 20px;
+}
+
+.tutorial-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 30px auto;
+    max-width: 300px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.nav-button {
+    display: block;
+    width: 40px;
+    height: 30px;
+    padding: 5px;
+    background-color: #666666;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 12px;
+}
+
+.nav-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+.nav-button:disabled {
+    background-color: #444444;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.slide-counter {
+    color: white;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    min-width: 80px;
+    text-align: center;
+}
+
+.back-button {
+    margin-top: 40px;
+    display: inline-block;
+    clear: both;
+}
+
+.tutorial-button {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: #4A90E2;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: 4px solid #fff;
+    box-shadow: 4px 4px 0px #000;
+    transition: all 0.1s ease;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+    width: 80%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (min-width: 768px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Center the last item if it's alone */
+    .grid-container > *:last-child:nth-child(odd) {
+        grid-column: 1 / span 2;
+        max-width: calc(50% - 1rem); /* Match width of other items */
+        margin: 0 auto; /* Center it */
+    }
+}
+
+.grid-item {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem;
+    max-width: 100%; /* Prevent items from extending beyond their grid cell */
+    box-sizing: border-box; /* Include padding in width calculation */
+    text-align: center;
+}
+
+.grid-item h3 {
+    color: #00BFFF;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 0.9em;
+}
+
+.grid-item p {
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.special-grid-item h3 {
+    color: #FF8FA7;
+    text-align: center;
+}
+
+.flex-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+.art-section {
+    width: 35%;  /* Instead of fixed 400px */
+    min-width: 200px; /* Prevent from getting too small */
+    flex-shrink: 0;
+    border: 4px solid #fff;
+    box-shadow: 10px 10px 0px #000;
+    image-rendering: pixelated;
+    background-color: #3f3f74;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+}
+
+.art-section img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.content-section {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
