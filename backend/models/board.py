@@ -581,7 +581,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f"\nAttack targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
+        to_log = f"\nAttack {strength} targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
         if target.shield[0] > 0:
             to_log += f"\n{target.name} has shield {target.shield[0]}"
             modified_attack_strength -= target.shield[0]
@@ -724,9 +724,9 @@ class Board:
             element.perform(row, col, self, affected_character)
         # if they have an elemental affinity for this element, they heal instead of take damage
         if affected_character.elemental_affinity == element.__class__:
-            self.pyxel_manager.log.append(
-                f"{affected_character.name} has an affinity for {element.__class__.__name__}"
-            )
+            # self.pyxel_manager.log.append(
+            #     f"{affected_character.name} has an affinity for {element.__class__.__name__}"
+            # )
             damage = damage * -1
         if damage:
             self.modify_target_health(
@@ -798,7 +798,7 @@ class Board:
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} heals for {-1*damage} and has {target.health} health"
+                f"{target.name} heals{" from "+damage_str if damage_str else""}for {-1*damage} and has {target.health} health"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
