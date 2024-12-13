@@ -295,7 +295,7 @@ class Human(Agent):
             prompt += f"{opponent.name}{': Shield ' + str(opponent.shield[0]) if opponent.shield[0] > 0 else ''}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
         pyxel_manager.highlight_map_tiles(
-            tiles=valid_inputs, client_id=client_id, color=10, persist=True
+            tiles=valid_inputs, client_id="ALL_FRONTEND", color=10, persist=True
         )
 
         # get user input on which to attack
