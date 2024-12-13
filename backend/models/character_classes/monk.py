@@ -5,7 +5,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Bitter Harvest",
         actions=[
-            action_model.SingleTargetAttack(3, 1),
+            action_model.SingleTargetAttack(3, 3),
             action_model.Fortify(2),
         ],
         movement=2,
