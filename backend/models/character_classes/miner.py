@@ -50,8 +50,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Self Sacrifice",
         actions=[
-            action_model.SingleTargetAttack(strength=6, att_range=1),
-            action_model.BlessSelf(),
+            action_model.Fortify(2),
+            action_model.SingleTargetAttack(strength=5, att_range=1),
             action_model.ModifySelfHealth(-4),
         ],
         movement=2,
