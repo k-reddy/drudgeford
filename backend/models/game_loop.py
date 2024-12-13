@@ -308,6 +308,8 @@ class GameLoop:
 
         if short_rest:
             char.short_rest()
+        # reset the log
+        self.pyxel_manager.clear_log()
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
