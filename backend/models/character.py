@@ -106,18 +106,20 @@ class Character(abc.ABC):
         )
 
     def make_attack_modifier_deck(self) -> list:
-        attack_modifier_deck = [
+        attack_modifier_deck = []
+        attack_modifiers = [
             utilities.make_multiply_modifier(2, "2x"),
             utilities.make_multiply_modifier(0, "Null"),
         ]
         for modifier in [-2, -1, 0, 1, 2]:
-            attack_modifier_deck.append(utilities.make_additive_modifier(modifier))
+            attack_modifiers.append(utilities.make_additive_modifier(modifier))
 
         attack_modifier_weights = [1, 1, 1, 3, 3, 3, 1]
         for i, weight in enumerate(attack_modifier_weights):
-            for _ in range(weight + 1):
-                attack_modifier_deck.append(attack_modifier_deck[i])
+            for _ in range(weight):
+                attack_modifier_deck.append(attack_modifiers[i])
         random.shuffle(attack_modifier_deck)
+        print([card[1] for card in attack_modifier_deck])
         return attack_modifier_deck
 
     def pick_rotated_attack_coordinates(
