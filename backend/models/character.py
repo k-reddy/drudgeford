@@ -119,7 +119,6 @@ class Character(abc.ABC):
             for _ in range(weight):
                 attack_modifier_deck.append(attack_modifiers[i])
         random.shuffle(attack_modifier_deck)
-        print([card[1] for card in attack_modifier_deck])
         return attack_modifier_deck
 
     def pick_rotated_attack_coordinates(

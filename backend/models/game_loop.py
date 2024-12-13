@@ -296,6 +296,7 @@ class GameLoop:
         # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
         short_rest = False
         if len(char.available_action_cards) == 0:
+            self.pyxel_manager.log.append(f"{char.name} short resting")
             self.pyxel_manager.add_to_personal_log(
                 "No more action cards left, time to short rest!",
                 clear=True,
@@ -303,6 +304,7 @@ class GameLoop:
             )
             short_rest = True
         else:
+            self.pyxel_manager.log.append(f"{char.name} deciding on short rest")
             short_rest = char.decide_if_short_rest()
 
         if short_rest:
