@@ -405,8 +405,8 @@ class SaveCampaign(Task):
 
         filename = self.get_unused_filename()
         os.makedirs(SAVE_FILE_DIR, exist_ok=True)
-        with open(SAVE_FILE_DIR + filename, "wb") as f:
-            json.dump(self.campaign_state, f)
+        with open(SAVE_FILE_DIR + filename, "w") as f:
+            json.dump(self.campaign_state.__dict__, f)
         return filename
 
     def get_unused_filename(self):
@@ -445,9 +445,9 @@ class LoadCampaign(Task):
             if file_size > 1_000_000:  # 1MB in bytes
                 print(f"Save file {filename} is too large ({file_size} bytes)")
                 continue
-            with open(file_path, "rb") as f:
+            with open(file_path, "r") as f:
                 campaign_state = json.load(f)
-                file_dict[f"{i}: {filename}"] = campaign_state.__dict__
+                file_dict[f"{i}: {filename}"] = campaign_state
         return file_dict
 
 

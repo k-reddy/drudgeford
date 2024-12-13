@@ -37,7 +37,7 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Scholar's Escape",
-        actions=[action_model.SingleTargetAttack(strength=3, att_range=1)],
+        actions=[action_model.Fortify(3)],
         movement=5,
         jump=True,
     ),
