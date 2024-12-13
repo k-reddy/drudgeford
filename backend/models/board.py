@@ -858,7 +858,7 @@ class Board:
         from backend.models.agent import Ai
 
         new_char = char_class(
-            f"Spooky {char_class.__name__}",
+            f"Summoned {char_class.__name__}",
             self.pyxel_manager,
             "💀",
             Ai(),
