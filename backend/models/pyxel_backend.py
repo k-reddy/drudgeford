@@ -284,6 +284,7 @@ class PyxelManager:
             "Type (y)es to load a campaign or hit enter to start a new campaign",
             ["y", ""],
             client_id,
+            single_keystroke=True,
         )
         if user_input != "y":
             return None
