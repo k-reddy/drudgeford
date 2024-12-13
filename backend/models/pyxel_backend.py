@@ -261,7 +261,9 @@ class PyxelManager:
 
     def save_campign(self, campaign_state):
         user_input = self.get_user_input(
-            "Would you like to save your progress? Type (y)es or (n)o. ", ["y", "n"]
+            "Would you like to save your progress? Type (y)es or (n)o. ",
+            ["y", "n"],
+            single_keystroke=True,
         )
         if user_input != "y":
             return
@@ -420,9 +422,10 @@ class PyxelManager:
             # display potential attack in yellow
             self.highlight_map_tiles(attack_coords, client_id, color=10, persist=True)
             user_input = self.get_user_input(
-                "Hit (r) then enter to rotate or enter to accept the shape",
+                "Hit (r) to rotate or enter to accept the shape",
                 ["", "r"],
                 client_id,
+                single_keystroke=True,
             )
             # clear the map
             self.jsonify_and_send_task(tasks.RedrawMap(), client_id)
