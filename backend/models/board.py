@@ -518,25 +518,27 @@ class Board:
             for y in range(len(self.locations[0]))
             if not self.locations[x][y]
         )
-        player_x = (min_x, min_x + 2)
-        y_bound = (0, self.size - 1)
-        monster_x = (min_x + 2, self.size - 1)
+        player_max_x = min_x + 1
+        board_edge = self.size - 1
+        # space the player and monster starts
+        monster_min_x = board_edge - 3
 
         while True:
             if not is_start:
                 rand_location = (
-                    random.randint(0, self.size - 1),
-                    random.randint(0, self.size - 1),
+                    random.randint(0, board_edge),
+                    random.randint(0, board_edge),
                 )
-            elif not is_monster:
+            elif is_monster:
                 rand_location = (
-                    random.randint(player_x[0], player_x[1]),
-                    random.randint(y_bound[0], y_bound[1]),
+                    random.randint(monster_min_x, board_edge),
+                    random.randint(0, board_edge),
                 )
+
             else:
                 rand_location = (
-                    random.randint(monster_x[0], monster_x[1]),
-                    random.randint(y_bound[0], y_bound[1]),
+                    random.randint(min_x, player_max_x),
+                    random.randint(0, board_edge),
                 )
             if not self.locations[rand_location[0]][rand_location[1]]:
                 return rand_location
