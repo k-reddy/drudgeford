@@ -50,8 +50,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Self Sacrifice",
         actions=[
-            action_model.SingleTargetAttack(strength=6, att_range=1),
-            action_model.BlessSelf(),
+            action_model.Fortify(2),
+            action_model.SingleTargetAttack(strength=5, att_range=1),
             action_model.ModifySelfHealth(-4),
         ],
         movement=2,
@@ -82,7 +82,7 @@ cards = [
         attack_name="Stone Defense",
         actions=[
             action_model.MakeObstableArea(obstacle_type=Rock, shape=shapes.bar(1, 1)),
-            action_model.ShieldAllAllies(strength=2, duration=1, att_range=2),
+            action_model.ShieldAllAllies(strength=2, duration=2, att_range=2),
         ],
         movement=3,
         jump=False,
