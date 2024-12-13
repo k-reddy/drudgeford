@@ -255,7 +255,9 @@ class Board:
 
     def set_character_starting_locations(self) -> None:
         for x in self.characters:
-            row, col = self.pick_unoccupied_location()
+            row, col = self.pick_unoccupied_location(
+                is_start=True, is_monster=x.team_monster
+            )
             self.locations[row][col] = x
 
     def find_all_jumpable_positions(
@@ -406,7 +408,6 @@ class Board:
         starting cell.
         Returns empty list if it is impossible to reach the end.
         """
-
         closed: set[tuple[int, int]] = set()
 
         previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
@@ -420,7 +421,7 @@ class Board:
         ) -> int:
             return max(abs(pos_a[0] - pos_b[0]), abs(pos_a[1] - pos_b[1]))
 
-        def is_valid_jump_path(path: list, end: tuple) -> bool:
+        def is_valid_jump_path(path: list, end: tuple, start: tuple) -> bool:
             """
             returns true if the landing position (smaller of num_moves or path length)
             is legal or second to last move is legal if the landing position is target
@@ -437,10 +438,18 @@ class Board:
                 return True
 
             # If not, check if previous position exists and is legal
+            # only if the landing point is the end
+            # first catch edge case where we start adjacent
+            if position_index == 0 and position == end:
+                return True
             if position_index > 0 and position == end:
                 prev_pos = path[position_index - 1]
-                if self.is_legal_move(
-                    prev_pos[0], prev_pos[1], jump_intermediate_move=False
+                # can be legal by being is_legal_move or by being the start position
+                if (
+                    self.is_legal_move(
+                        prev_pos[0], prev_pos[1], jump_intermediate_move=False
+                    )
+                    or prev_pos == start
                 ):
                     return True
 
@@ -452,7 +461,7 @@ class Board:
             if current == end:
                 path = self.generate_path(previous_cell, end)
                 # only return the path if it's a valid path
-                if not is_jump or is_valid_jump_path(path, end):
+                if not is_jump or is_valid_jump_path(path, end, start):
                     return path
 
             if current in closed:
@@ -499,12 +508,36 @@ class Board:
         path = path[1:]  # drop the starting position
         return path
 
-    def pick_unoccupied_location(self) -> tuple[int, int]:
+    def pick_unoccupied_location(
+        self, is_start: bool = False, is_monster: bool = True
+    ) -> tuple[int, int]:
+        # find first non_wall location
+        min_x = min(
+            x
+            for x in range(len(self.locations))
+            for y in range(len(self.locations[0]))
+            if not self.locations[x][y]
+        )
+        player_x = (min_x, min_x + 2)
+        y_bound = (0, self.size - 1)
+        monster_x = (min_x + 2, self.size - 1)
+
         while True:
-            rand_location = (
-                random.randint(0, self.size - 1),
-                random.randint(0, self.size - 1),
-            )
+            if not is_start:
+                rand_location = (
+                    random.randint(0, self.size - 1),
+                    random.randint(0, self.size - 1),
+                )
+            elif not is_monster:
+                rand_location = (
+                    random.randint(player_x[0], player_x[1]),
+                    random.randint(y_bound[0], y_bound[1]),
+                )
+            else:
+                rand_location = (
+                    random.randint(monster_x[0], monster_x[1]),
+                    random.randint(y_bound[0], y_bound[1]),
+                )
             if not self.locations[rand_location[0]][rand_location[1]]:
                 return rand_location
 
@@ -514,12 +547,12 @@ class Board:
     ) -> bool:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
-        # BUG path_to_target might be [], which would make dist_to_target 0 and return True
         shortest_path = self.get_shortest_valid_path(
-            attacker_location, target_location, is_jump=jump
+            attacker_location, target_location, is_jump=True
         )
         dist_to_target = len(shortest_path)
-        return attack_distance >= dist_to_target
+        # exclude cases where we can't get to the target (in which case dist will be 0 b/c empty list)
+        return attack_distance >= dist_to_target and shortest_path
 
     def find_location_of_target(self, target) -> tuple[int, int]:
         for row_num, row in enumerate(self.locations):
@@ -607,6 +640,9 @@ class Board:
             chars = self.find_opponents(actor)
         else:
             chars = self.find_allies(actor)
+            # since we exclude anything with empty path, we need to add
+            # our own position here since we count as an ally
+            in_range_chars.append(actor)
         for char in chars:
             if self.is_attack_in_range(distance, actor, char, jump):
                 in_range_chars.append(char)
