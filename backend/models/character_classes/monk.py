@@ -54,7 +54,10 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Scythe Swipe",
-        actions=[action_model.AreaAttackFromSelf(shapes.arc(3), 4)],
+        actions=[
+            action_model.Pull(2, 3),
+            action_model.AreaAttackFromSelf(shapes.arc(3), 4),
+        ],
         movement=2,
         jump=False,
     ),
