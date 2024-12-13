@@ -304,7 +304,6 @@ class GameLoop:
             )
             short_rest = True
         else:
-            self.pyxel_manager.log.append(f"{char.name} deciding on short rest")
             short_rest = char.decide_if_short_rest()
 
         if short_rest:
@@ -314,9 +313,9 @@ class GameLoop:
         if len(char.available_action_cards) == 0:
             if not char.team_monster:
                 self.pyxel_manager.log.append(
-                    "Drat, you ran out of cards and got exhausted"
+                    f"Drat, {char.name} ran out of cards and got exhausted"
                 )
-                self.game_state = GameState.EXHAUSTED
+                self.board.kill_target(char)
             else:
                 raise ValueError("Monsters getting exhausted...")
 
