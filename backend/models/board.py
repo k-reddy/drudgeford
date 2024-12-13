@@ -581,9 +581,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = (
-            f"\nAttack targets {target.name} with {attack_modifier_string} modifier"
-        )
+        to_log = f"\nAttack targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
         if target.shield[0] > 0:
             to_log += f"\n{target.name} has shield {target.shield[0]}"
             modified_attack_strength -= target.shield[0]
