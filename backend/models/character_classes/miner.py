@@ -7,6 +7,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Heavy Hammer",
         actions=[
+            action_model.Pull(2, 3),
             action_model.SingleTargetAttack(strength=5, att_range=1, knock_down=True),
             action_model.Fortify(strength=2),
         ],

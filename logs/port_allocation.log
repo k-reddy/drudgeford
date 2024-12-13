@@ -14,3 +14,5 @@
 2024-12-11 12:47:03,776 - Port 5001 allocated - 1/5 ports in use
 2024-12-11 12:47:49,433 - Failed to allocate port - all ports in range 5000-5004 in use
 2024-12-11 12:47:49,434 - Port 5001 allocated - 1/5 ports in use
+2024-12-12 14:35:30,547 - Failed to allocate port - all ports in range 5000-5004 in use
+2024-12-12 14:35:30,547 - Port 5001 allocated - 1/5 ports in use

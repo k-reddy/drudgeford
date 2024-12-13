@@ -70,7 +70,9 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
-    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+    def decide_if_short_rest(
+        pyxel_manager: PyxelManager, client_id: str, name: str
+    ) -> bool:
         pass
 
     @staticmethod
@@ -134,7 +136,9 @@ class Ai(Agent):
         return nearest_opponent
 
     @staticmethod
-    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+    def decide_if_short_rest(
+        pyxel_manager: PyxelManager, client_id: str, name: str
+    ) -> bool:
         return False
 
     @staticmethod
@@ -268,7 +272,10 @@ class Human(Agent):
         return key_press == "1"
 
     @staticmethod
-    def decide_if_short_rest(pyxel_manager: PyxelManager, client_id: str) -> bool:
+    def decide_if_short_rest(
+        pyxel_manager: PyxelManager, client_id: str, name: str
+    ) -> bool:
+        pyxel_manager.log.append(f"{name} deciding on short rest")
         key_press = pyxel_manager.get_user_input(
             prompt="Type (s) then enter to short rest or just enter to continue.",
             valid_inputs=["s", ""],
@@ -295,7 +302,7 @@ class Human(Agent):
             prompt += f"{opponent.name}{': Shield ' + str(opponent.shield[0]) if opponent.shield[0] > 0 else ''}\n"
             valid_inputs.append(board.find_location_of_target(opponent))
         pyxel_manager.highlight_map_tiles(
-            tiles=valid_inputs, client_id=client_id, color=10, persist=True
+            tiles=valid_inputs, client_id="ALL_FRONTEND", color=10, persist=True
         )
 
         # get user input on which to attack
