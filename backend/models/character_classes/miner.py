@@ -82,7 +82,7 @@ cards = [
         attack_name="Stone Defense",
         actions=[
             action_model.MakeObstableArea(obstacle_type=Rock, shape=shapes.bar(1, 1)),
-            action_model.ShieldAllAllies(strength=2, duration=1, att_range=2),
+            action_model.ShieldAllAllies(strength=2, duration=2, att_range=2),
         ],
         movement=3,
         jump=False,
