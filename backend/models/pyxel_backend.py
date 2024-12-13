@@ -306,7 +306,9 @@ class PyxelManager:
             prompt += f"\n{file_str}"
         prompt += "\nType the number of the file you want to load. "
         valid_inputs = [str(i) for i, _ in enumerate(saved_campaigns)]
-        file_num = int(self.get_user_input(prompt, valid_inputs, client_id))
+        file_num = int(
+            self.get_user_input(prompt, valid_inputs, client_id, single_keystroke=True)
+        )
 
         # return the appropriate campaign data
         return list(saved_campaigns.values())[file_num]
