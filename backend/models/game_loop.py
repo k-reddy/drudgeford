@@ -281,8 +281,8 @@ class GameLoop:
 
     def _end_round(self) -> None:
         if not self.all_ai_mode:
-            # 0 because that's the default round number
-            self.pyxel_manager.load_round_turn_info(0, None)
+            # -1 because that's the signal to the frontend to display short rest (messy)
+            self.pyxel_manager.load_round_turn_info(-1, None)
         for char in self.board.characters:
             self.refresh_character_cards(char)
         if not self.all_ai_mode:
@@ -309,7 +309,7 @@ class GameLoop:
         if short_rest:
             char.short_rest()
         # reset the log
-        self.pyxel_manager.clear_log()
+        self.pyxel_manager.log.clear()
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:

@@ -145,7 +145,12 @@ class LogView(ViewSection):
 
         # Try to draw header
         if self.display_round_turn:
-            header = f"Round {self.round_number}, {self.acting_character_name}'s turn"
+            if self.round_number == -1:
+                header = f"End of Round"
+            else:
+                header = (
+                    f"Round {self.round_number}, {self.acting_character_name}'s turn"
+                )
             header_height = get_line_height(header, "large")
 
             if header_height <= available_height:
