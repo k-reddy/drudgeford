@@ -350,7 +350,7 @@ class GameLoop:
     def set_up_monsters(self):
         monsters = []
         emoji = ["🌵", "🪼 ", "💀", "🧟"]
-        player_enemy_num_mapping = {1: 3, 2: 4, 3: 5}
+        player_enemy_num_mapping = {1: 3, 2: 5, 3: 6}
         for i in range(player_enemy_num_mapping[self.num_players]):
             class_num = i % len(self.level.monster_classes)
             monster_name = self.level.monster_classes[class_num].__name__
