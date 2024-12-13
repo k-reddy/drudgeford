@@ -161,7 +161,7 @@ class Fortify(ActionStep):
         return f"Fortify self by {self.strength}"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} fortifies self by {self.strength}"
+        return f"+{self.strength} -> [{len(attacker.attack_modifier_deck)}]"
 
 
 @dataclass
@@ -305,7 +305,7 @@ class BlessSelf(ActionStep):
         return "Bless self"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} blesses self"
+        return f"2x -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
 
 
 @dataclass
@@ -321,11 +321,11 @@ class BlessAndFortifyAlly(ActionStep):
         target.attack_modifier_deck.insert(rand_index, bless)
         target.attack_modifier_deck.append(modifier)
         board.pyxel_manager.log.append(
-            f"{attacker.name} blesses and fortifies {target.name} by {self.strength}"
+            f"+{self.strength} and 2x -> {target.name}'s [{len(target.attack_modifier_deck)}]"
         )
 
     def __str__(self):
-        return f"Bless ally <{self.att_range}>\nFortify ally by {self.strength}"
+        return f"Bless and fortify +{self.strength} ally <{self.att_range}>"
 
     def perform_string(self, attacker):
         return ""
@@ -363,7 +363,9 @@ class Curse(ActionStep):
         rand_index = random.randint(0, len(target.attack_modifier_deck))
         modifier = utils.make_multiply_modifier(0, "Null Curse")
         target.attack_modifier_deck.insert(rand_index, modifier)
-        board.pyxel_manager.log.append(f"Cursed {target.name}")
+        board.pyxel_manager.log.append(
+            f"Null -> {target.name}'s [{len(target.attack_modifier_deck)}]"
+        )
 
     def __str__(self):
         return f"Curse enemy <{self.att_range}>"
@@ -383,7 +385,7 @@ class CurseSelf(ActionStep):
         return "Curse self"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} curses self"
+        return f"Null -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
 
 
 @dataclass
@@ -398,7 +400,9 @@ class CurseAllEnemies(ActionStep):
             rand_index = random.randint(0, len(enemy.attack_modifier_deck))
             modifier = utils.make_multiply_modifier(0, "Null Curse")
             enemy.attack_modifier_deck.insert(rand_index, modifier)
-            board.pyxel_manager.log.append(f"Cursed {enemy.name}")
+            board.pyxel_manager.log.append(
+                f"Null -> {enemy.name}'s[{len(enemy.attack_modifier_deck)}]"
+            )
 
     def __str__(self):
         return f"Curse all enemies <{self.att_range}>"
