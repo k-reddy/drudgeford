@@ -43,7 +43,7 @@ class AreaAttackFromSelf(ActionStep):
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
         damage_str = f" {self.strength}" if self.strength else ""
-        return f"{attack_type}Attack{damage_str}:\n{shapes.print_shape(self.shape)}"
+        return f"{attack_type}<color: 8>Attack {damage_str}</color>:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         if self.element_type:
@@ -73,9 +73,7 @@ class SingleTargetAttack(ActionStep):
 
     def __str__(self):
         range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
-        print_str = (
-            f"Attack {self.strength}{range_str}{', pierce' if self.pierce else ''}"
-        )
+        print_str = f"<color: 8>Attack {self.strength}</color>{range_str}{', pierce' if self.pierce else ''}"
         print_str += "\nKnock down (50%)" if self.knock_down else ""
         return print_str
 
@@ -126,7 +124,7 @@ class AreaAttackWithTarget(ActionStep):
     def __str__(self):
         attack_type = f"{self.element_type.__name__} " if self.element_type else ""
         damage_str = f" {self.damage}" if self.damage else ""
-        return f"{attack_type}Attack{damage_str} <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
+        return f"{attack_type}<color: 8>Attack{damage_str}</color> <{self.att_range}>:\n{shapes.print_shape(self.shape)}"
 
     def perform_string(self, attacker):
         if self.element_type:
