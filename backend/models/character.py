@@ -70,11 +70,16 @@ class Character(abc.ABC):
         # add some space between the movement and attack
         self.log.append("")
 
-    def select_attack_target(self, in_range_opponents, board):
+    def select_attack_target(self, in_range_opponents, board, opponent=True):
         if not in_range_opponents:
             return None
         return self.agent.select_attack_target(
-            self.pyxel_manager, in_range_opponents, board, self, self.client_id
+            self.pyxel_manager,
+            in_range_opponents,
+            board,
+            self,
+            self.client_id,
+            opponent,
         )
 
     def short_rest(self) -> None:
