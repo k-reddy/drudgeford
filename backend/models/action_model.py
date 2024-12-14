@@ -633,7 +633,7 @@ def select_in_range_target(board, attacker, att_range, opponent=True):
     in_range_chars = board.find_in_range_opponents_or_allies(
         attacker, att_range, opponents=opponent
     )
-    target = attacker.select_attack_target(in_range_chars, board)
+    target = attacker.select_attack_target(in_range_chars, board, opponent=opponent)
     return target
 
 

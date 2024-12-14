@@ -44,6 +44,7 @@ class Agent(abc.ABC):
         board,
         char,
         client_id: Optional[str] = None,
+        opponent: bool = True,
     ):
         pass
 
@@ -119,12 +120,15 @@ class Ai(Agent):
         board,
         char,
         client_id: Optional[str] = None,
+        opponent: bool = True,
     ):
-        # monster picks a random opponent
+        # if it's an ally, pick a random one
+        if not opponent:
+            return random.choice(in_range_opponents)
+        # otherwise, pick the closest opponent
         shortest_dist = 1000
         nearest_opponent = None
         attacker_location = board.find_location_of_target(char)
-        # pick the closest opponent
         for opponent in in_range_opponents:
             opponent_location = board.find_location_of_target(opponent)
             opponent_dist = len(
@@ -291,6 +295,7 @@ class Human(Agent):
         board,
         char,
         client_id: Optional[str] = None,
+        opponent: bool = True,
     ):
         # show in range opponents and collect info
         valid_inputs = []
