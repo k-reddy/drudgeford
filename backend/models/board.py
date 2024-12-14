@@ -189,7 +189,9 @@ class Board:
             # check if row and col are in bounds
             if 0 <= obstacle_row < len(self.locations):
                 if 0 <= obstacle_col < len(self.locations[obstacle_row]):
-                    # if it's unoccupied, place obstacle there
+                    # if it's unoccupied, clear terrain there
+                    self.clear_terrain_square(obstacle_row, obstacle_col)
+                    # then place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
                         obs = obstacle_type(
                             self.round_num, obj_id=next(self.id_generator)
@@ -550,7 +552,10 @@ class Board:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         shortest_path = self.get_shortest_valid_path(
-            attacker_location, target_location, is_jump=True
+            attacker_location, target_location, is_jump=jump
+        )
+        print(
+            f"shortest path {attacker.name} to {target.name}: {shortest_path}, jump={jump}"
         )
         dist_to_target = len(shortest_path)
         # exclude cases where we can't get to the target (in which case dist will be 0 b/c empty list)
