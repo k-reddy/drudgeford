@@ -8,8 +8,9 @@ cards = [
         attack_name="Heavy Hammer",
         actions=[
             action_model.Pull(2, 3),
-            action_model.SingleTargetAttack(strength=5, att_range=1, knock_down=True),
-            action_model.Fortify(strength=2),
+            action_model.SingleTargetAttack(
+                strength=4, att_range=1, knock_down=True, pierce=True
+            ),
         ],
         movement=0,
         jump=False,
@@ -50,8 +51,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Self Sacrifice",
         actions=[
-            action_model.Fortify(2),
-            action_model.SingleTargetAttack(strength=5, att_range=1),
+            action_model.SingleTargetAttack(strength=6, att_range=1, pierce=True),
             action_model.ModifySelfHealth(-4),
         ],
         movement=2,

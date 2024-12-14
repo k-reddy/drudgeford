@@ -13,7 +13,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Crimson Tendril",
-        actions=[actions.Pull(3, 4), actions.SingleTargetAttack(2, 1)],
+        actions=[actions.Pull(3, 4), actions.SingleTargetAttack(2, 1, pierce=True)],
         movement=2,
         jump=False,
     ),

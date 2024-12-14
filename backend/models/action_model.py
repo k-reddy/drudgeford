@@ -57,6 +57,7 @@ class SingleTargetAttack(ActionStep):
     strength: int
     att_range: int
     knock_down: bool = False
+    pierce: bool = False
 
     def perform(self, board, attacker, round_num):
         target = select_in_range_target(board, attacker, self.att_range)
@@ -66,13 +67,15 @@ class SingleTargetAttack(ActionStep):
                 board.pyxel_manager.log.append(f"{target.name} was knocked down")
             elif self.knock_down:
                 board.pyxel_manager.log.append("Knock down failed")
-            board.attack_target(attacker, self.strength, target)
+            board.attack_target(attacker, self.strength, target, pierce=self.pierce)
         else:
             board.pyxel_manager.log.append("No targets in range for attack")
 
     def __str__(self):
         range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
-        print_str = f"Attack {self.strength}{range_str}"
+        print_str = (
+            f"Attack {self.strength}{range_str}{', pierce' if self.pierce else ''}"
+        )
         print_str += "\nKnock down (50%)" if self.knock_down else ""
         return print_str
 
@@ -161,7 +164,7 @@ class Fortify(ActionStep):
         return f"Fortify self by {self.strength}"
 
     def perform_string(self, attacker):
-        return f"+{self.strength} -> [{len(attacker.attack_modifier_deck)}]"
+        return f"+{self.strength} -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
 
 
 @dataclass
@@ -633,7 +636,7 @@ def select_in_range_target(board, attacker, att_range, opponent=True):
     in_range_chars = board.find_in_range_opponents_or_allies(
         attacker, att_range, opponents=opponent
     )
-    target = attacker.select_attack_target(in_range_chars, board)
+    target = attacker.select_attack_target(in_range_chars, board, opponent=opponent)
     return target
 
 

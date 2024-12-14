@@ -15,8 +15,11 @@ cards = [
         jump=True,
     ),
     actions.ActionCard(
-        attack_name="Haunting Screech",
-        actions=[actions.WeakenAllEnemies(2, 3), actions.PushAllEnemies(2, 3)],
+        attack_name="Piercing Screech",
+        actions=[
+            actions.SingleTargetAttack(2, 2, pierce=True),
+            actions.PushAllEnemies(2, 3),
+        ],
         movement=3,
         jump=True,
     ),

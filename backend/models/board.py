@@ -16,6 +16,8 @@ from backend.utils.utilities import DieAndEndTurn, directions
 
 MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
+# num of cards you need to kill if you want to avoid taking damage
+CARDS_NEEDED_TO_BLOCK_DAMAGE = 2
 
 
 PositionPathResult = tuple[
@@ -134,8 +136,8 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    # do not add terrain effects where walls are
-                    if isinstance(potential_char, obstacle.Wall):
+                    # do not add terrain effects where walls and rocks are
+                    if isinstance(potential_char, (obstacle.Wall, obstacle.Rock)):
                         continue
                     terrain_obj = effect_type(self.round_num, next(self.id_generator))
                     # if there's something there already, and it's the same element
@@ -189,7 +191,9 @@ class Board:
             # check if row and col are in bounds
             if 0 <= obstacle_row < len(self.locations):
                 if 0 <= obstacle_col < len(self.locations[obstacle_row]):
-                    # if it's unoccupied, place obstacle there
+                    # if it's unoccupied, clear terrain there
+                    self.clear_terrain_square(obstacle_row, obstacle_col)
+                    # then place obstacle there
                     if not self.locations[obstacle_row][obstacle_col]:
                         obs = obstacle_type(
                             self.round_num, obj_id=next(self.id_generator)
@@ -389,6 +393,7 @@ class Board:
         end: tuple[int, int],
         is_jump: bool = False,
         num_moves: int = 100,
+        is_attack: bool = False,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
@@ -408,6 +413,9 @@ class Board:
         starting cell.
         Returns empty list if it is impossible to reach the end.
         """
+        # a small hack
+        if is_attack:
+            is_jump = True
         closed: set[tuple[int, int]] = set()
 
         previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
@@ -461,7 +469,7 @@ class Board:
             if current == end:
                 path = self.generate_path(previous_cell, end)
                 # only return the path if it's a valid path
-                if not is_jump or is_valid_jump_path(path, end, start):
+                if not is_jump or is_valid_jump_path(path, end, start) or is_attack:
                     return path
 
             if current in closed:
@@ -550,7 +558,10 @@ class Board:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         shortest_path = self.get_shortest_valid_path(
-            attacker_location, target_location, is_jump=True
+            attacker_location, target_location, is_jump=jump, is_attack=True
+        )
+        print(
+            f"shortest path {attacker.name} to {target.name}: {shortest_path}, jump={jump}"
         )
         dist_to_target = len(shortest_path)
         # exclude cases where we can't get to the target (in which case dist will be 0 b/c empty list)
@@ -577,14 +588,17 @@ class Board:
             if pot_opponent.team_monster == actor.team_monster
         ]
 
-    def attack_target(self, attacker, strength, target):
+    def attack_target(self, attacker, strength, target, pierce=False):
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
         to_log = f"\nAttack {strength} targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
         if target.shield[0] > 0:
-            to_log += f"\n{target.name} has shield {target.shield[0]}"
-            modified_attack_strength -= target.shield[0]
+            if pierce:
+                to_log += f"\nAttack pierces shield {target.shield[0]}"
+            else:
+                to_log += f"\n{target.name} has shield {target.shield[0]}"
+                modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             modified_attack_strength = 0
             to_log += f", does no damage!\n"
@@ -720,7 +734,7 @@ class Board:
         # if it's not ice or it's ice and they're moving, you can have the element perform
         # this is to avoid slipping when ice is thrown at you or when you start
         # your turn on ice
-        if not isinstance(element, obstacle.Ice) or movement:
+        if (not isinstance(element, obstacle.Ice)) or movement:
             element.perform(row, col, self, affected_character)
         # if they have an elemental affinity for this element, they heal instead of take damage
         if affected_character.elemental_affinity == element.__class__:
@@ -783,6 +797,19 @@ class Board:
         # if it's a heal (negative damage) and you have max health, do nothing
         if target.health == target.max_health and damage < 0:
             return
+        # if this will kill target or if damage > 4, ask character if they want to kill cards:
+        if (target.health <= damage) or damage > 4:
+            if len(
+                target.available_action_cards
+            ) > CARDS_NEEDED_TO_BLOCK_DAMAGE and target.decide_if_kill_cards(
+                damage, CARDS_NEEDED_TO_BLOCK_DAMAGE
+            ):
+                target.kill_random_cards(CARDS_NEEDED_TO_BLOCK_DAMAGE)
+                self.pyxel_manager.log.append(
+                    f"{target.name} killed 2 cards to avoid damage"
+                )
+                return
+
         # add needed spacing if we have a string
         damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
@@ -798,7 +825,7 @@ class Board:
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} heals{" from "+damage_str if damage_str else""}for {-1*damage} and has {target.health} health"
+                f"{target.name} heals{" from "+damage_str if damage_str else""} for {-1*damage} and has {target.health} health"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
@@ -876,3 +903,4 @@ class Board:
         self.update_character_location(
             target, self.find_location_of_target(target), new_loc
         )
+        self.deal_terrain_damage_current_location(target)
