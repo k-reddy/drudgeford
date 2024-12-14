@@ -57,6 +57,7 @@ class SingleTargetAttack(ActionStep):
     strength: int
     att_range: int
     knock_down: bool = False
+    pierce: bool = False
 
     def perform(self, board, attacker, round_num):
         target = select_in_range_target(board, attacker, self.att_range)
