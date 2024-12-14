@@ -876,3 +876,4 @@ class Board:
         self.update_character_location(
             target, self.find_location_of_target(target), new_loc
         )
+        self.deal_terrain_damage_current_location(target)
