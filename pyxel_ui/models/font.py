@@ -1,6 +1,7 @@
 from types import ModuleType
-
-from PIL import Image, ImageDraw, ImageFont  # type: ignore
+from typing import Dict, List, Tuple
+import re
+from PIL import Image, ImageDraw, ImageFont
 
 
 class PixelFont:
@@ -9,36 +10,30 @@ class PixelFont:
         self.medium_font = ImageFont.truetype(font_path, 8)
         self.large_font = ImageFont.truetype(font_path, 12)
         self.pyxel = pyxel
+        # Cache of (text, size) -> (pixels, width)
+        # pixels are relative to (0,0) origin
+        # width is exact bbox width for positioning
+        self.cache: Dict[Tuple[str, str], Tuple[List[Tuple[int, int]], int]] = {}
 
     def get_line_height(self, size="medium"):
         """Get the line height for a given font size"""
         if size == "small":
-            return 10  # Increased from 8
+            return 10
         elif size == "medium":
-            return 14  # Increased from 10
+            return 14
         else:  # large
-            return 18  # Increased from 14
+            return 18
 
-    def get_text_width(self, text, size="medium"):
-        """
-        Get the width of text in pixels for the given size
-
-        Args:
-            text: Text to measure
-            size: "small", "medium", or "large"
-
-        Returns:
-            Width in pixels
-        """
+    def get_text_width(self, text: str, size="medium"):
+        """Get the width of text in pixels for the given size"""
         if size == "small":
-            return len(text) * 4  # Pyxel's built-in font is 4 pixels wide
+            return len(text) * 4
 
         font = self.medium_font if size == "medium" else self.large_font
         bbox = font.getbbox(text)
-        padding = max(2, 4 if size == "medium" else 12)
-        return bbox[2] - bbox[0] + padding * 2
+        return bbox[2] - bbox[0]
 
-    def wrap_text(self, text, max_width, size="medium"):
+    def wrap_text(self, text: str, max_width, size="medium"):
         """
         Wrap text to fit within max_width pixels
 
@@ -55,7 +50,6 @@ class PixelFont:
 
         lines = []
         for paragraph in text.split("\n"):
-            # Split on space but keep empty strings to preserve spacing
             words = paragraph.split(" ")
             if not words:
                 lines.append("")
@@ -65,7 +59,6 @@ class PixelFont:
             current_width = self.get_text_width(current_line, size)
 
             for word in words[1:]:
-                # Add the space and word even if word is empty (was a space in original)
                 next_piece = " " + word
                 word_width = self.get_text_width(next_piece, size)
 
@@ -81,74 +74,124 @@ class PixelFont:
 
         return lines
 
-    def redraw_text(self, col, text_pixels) -> None:
-        if not text_pixels:
-            return
-        for px_x, px_y in text_pixels:
-            self.pyxel.pset(px_x, px_y, col)
+    def parse_color_tags(self, text: str, default_color: int) -> List[Tuple[str, int]]:
+        """Parse text with color tags into segments of (text, color)"""
+        segments = []
+        current_pos = 0
 
-    def draw_text(self, x, y, text, col, size="medium", max_width=None):
+        # Pattern matches <color: number>text</color>
+        pattern = r"<color:\s*(\d+)>(.*?)</color>"
+
+        while current_pos < len(text):
+            match = re.search(pattern, text[current_pos:])
+            if not match:
+                # Add remaining text with default color
+                remaining = text[current_pos:]
+                if remaining:
+                    segments.append((remaining, default_color))
+                break
+
+            # Add text before the tag with default color if any
+            start = current_pos + match.start()
+            if start > current_pos:
+                segments.append((text[current_pos:start], default_color))
+
+            # Add the colored text
+            color = int(match.group(1))
+            content = match.group(2)
+            segments.append((content, color))
+
+            current_pos = current_pos + match.end()
+
+        return segments
+
+    def cache_text(self, text: str, size: str) -> Tuple[List[Tuple[int, int]], int]:
+        """Generate and cache pixel positions for text"""
+        cache_key = (text, size)
+        if cache_key in self.cache:
+            return self.cache[cache_key]
+
+        if size == "small":
+            width = len(text) * 4
+            # For small size, we don't cache pixels since it uses built-in font
+            return ([], width)
+
+        font = self.medium_font if size == "medium" else self.large_font
+        bbox = font.getbbox(text)
+        width = bbox[2] - bbox[0]
+        height = bbox[3] - bbox[1]
+
+        # Create image with no padding
+        img = Image.new("1", (width, height), 0)
+        draw = ImageDraw.Draw(img)
+
+        # Draw text aligned to top-left
+        draw.text((0, 0), text, font=font, fill=1)
+
+        # Store pixel positions relative to (0,0)
+        pixels = []
+        for py in range(height):
+            for px in range(width):
+                if img.getpixel((px, py)):
+                    pixels.append((px, py))
+
+        self.cache[cache_key] = (pixels, width)
+        return (pixels, width)
+
+    def draw_text(
+        self, x: int, y: int, text: str, col: int, size="medium", max_width=None
+    ):
         """
-        Draw text at the specified position with given size. Supports multi-line text
-        and optional width-based line wrapping.
+        Draw text at the specified position with given size. Supports multi-line text,
+        optional width-based line wrapping, and color tags.
 
         Args:
-            pyxel: Pyxel instance
-            text: Text to draw (can include newlines)
             x: X coordinate
             y: Y coordinate
-            col: Color
+            text: Text to draw (can include newlines and color tags)
+            col: Default color (used for text without color tags)
             size: "small", "medium", or "large"
             max_width: Optional maximum width in pixels. Text will wrap if it exceeds this width.
         """
-        pyxel = self.pyxel
+        if not text:
+            return []
 
-        text_pixels = []
-
-        # Split and wrap text into lines
-        lines = self.wrap_text(str(text), max_width, size)
+        all_pixels = []
         current_y = y
         line_height = self.get_line_height(size)
 
+        # Split and wrap text into lines
+        lines = self.wrap_text(str(text), max_width, size)
+
         for line in lines:
             if size == "small":
-                pyxel.text(x, current_y, line, col)
+                self.pyxel.text(x, current_y, line, col)
                 current_y += line_height
                 continue
 
-            # Select the appropriate font based on size
-            font = self.medium_font if size == "medium" else self.large_font
-            font_size = 8 if size == "medium" else 12
+            current_x = x
+            segments = self.parse_color_tags(line, col)  # Pass the default color here
 
-            # Get text size first to create minimum sized image
-            bbox = font.getbbox(line)
+            for segment_text, color in segments:
+                cached_pixels, width = self.cache_text(segment_text, size)
 
-            # Add padding to prevent cutoff
-            padding = max(2, font_size // 4)  # Scale padding with font size
-            w = bbox[2] - bbox[0] + padding * 2
-            h = bbox[3] - bbox[1] + padding * 2
+                # Offset cached pixels to current position
+                segment_pixels = [
+                    (px + current_x, py + current_y) for px, py in cached_pixels
+                ]
 
-            # Create image with padding
-            img = Image.new("1", (w, h), 0)
-            draw = ImageDraw.Draw(img)
+                # Draw pixels with segment color
+                for px_x, px_y in segment_pixels:
+                    self.pyxel.pset(px_x, px_y, color)
 
-            # Draw text in white (1) on black (0) background, with padding offset
-            draw.text((padding, padding), line, font=font, fill=1)
-
-            # Convert to pixels in Pyxel
-            pixels = img.load()
-            # print(f"{pixels=}")
-            for py in range(h):
-                for px in range(w):
-                    if pixels[px, py]:
-                        text_pixels.append((x + px - padding, current_y + py - padding))
-                        pyxel.pset(x + px - padding, current_y + py - padding, col)
+                all_pixels.extend(segment_pixels)
+                current_x += width
 
             current_y += line_height
 
-        return text_pixels
+        return all_pixels
 
-    def get_text_height(self, text, size="medium", max_width=None):
+    def get_text_height(self, text: str, size="medium", max_width=None):
         """
         Get the total height of text in pixels, including all lines
 
@@ -163,3 +206,10 @@ class PixelFont:
         lines = self.wrap_text(str(text), max_width, size)
         line_height = self.get_line_height(size)
         return len(lines) * line_height
+
+    def redraw_text(self, col: int, text_pixels: List[Tuple[int, int]]) -> None:
+        """Redraw cached pixel positions with new color"""
+        if not text_pixels:
+            return
+        for px_x, px_y in text_pixels:
+            self.pyxel.pset(px_x, px_y, col)
