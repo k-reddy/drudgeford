@@ -797,8 +797,8 @@ class Board:
         # if it's a heal (negative damage) and you have max health, do nothing
         if target.health == target.max_health and damage < 0:
             return
-        # if this will kill target or if damage > 5, ask character if they want to kill cards:
-        if (target.health <= damage) or damage > 5:
+        # if this will kill target or if damage > 4, ask character if they want to kill cards:
+        if (target.health <= damage) or damage > 4:
             if len(
                 target.available_action_cards
             ) > CARDS_NEEDED_TO_BLOCK_DAMAGE and target.decide_if_kill_cards(
