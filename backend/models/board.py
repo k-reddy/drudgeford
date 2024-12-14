@@ -134,8 +134,8 @@ class Board:
             if 0 <= effect_row < len(self.terrain):
                 if 0 <= effect_col < len(self.terrain[effect_row]):
                     potential_char = self.locations[effect_row][effect_col]
-                    # do not add terrain effects where walls are
-                    if isinstance(potential_char, obstacle.Wall):
+                    # do not add terrain effects where walls and rocks are
+                    if isinstance(potential_char, (obstacle.Wall, obstacle.Rock)):
                         continue
                     terrain_obj = effect_type(self.round_num, next(self.id_generator))
                     # if there's something there already, and it's the same element
