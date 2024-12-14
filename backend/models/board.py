@@ -16,6 +16,8 @@ from backend.utils.utilities import DieAndEndTurn, directions
 
 MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
+# num of cards you need to kill if you want to avoid taking damage
+CARDS_NEEDED_TO_BLOCK_DAMAGE = 2
 
 
 PositionPathResult = tuple[
@@ -795,6 +797,19 @@ class Board:
         # if it's a heal (negative damage) and you have max health, do nothing
         if target.health == target.max_health and damage < 0:
             return
+        # if this will kill target or if damage > 5, ask character if they want to kill cards:
+        if (target.health <= damage) or damage > 5:
+            if len(
+                target.available_action_cards
+            ) > CARDS_NEEDED_TO_BLOCK_DAMAGE and target.decide_if_kill_cards(
+                damage, CARDS_NEEDED_TO_BLOCK_DAMAGE
+            ):
+                target.kill_random_cards(CARDS_NEEDED_TO_BLOCK_DAMAGE)
+                self.pyxel_manager.log.append(
+                    f"{target.name} killed 2 cards to avoid damage"
+                )
+                return
+
         # add needed spacing if we have a string
         damage_str = " " + damage_str if damage_str else damage_str
         # if this is a heal (damage is -), don't allow them to heal beyond max health
