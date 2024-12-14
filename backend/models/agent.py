@@ -359,6 +359,10 @@ class Human(Agent):
             )
             # we ask them to click on their character if they want to finish their movement
             if current_loc == (new_row, new_col):
+                # take damage if it's a jump and they moved
+                if is_jump and remaining_movement != movement:
+                    board.deal_terrain_damage_current_location(char)
+                    board.pyxel_manager.log.append("Movement done!")
                 return
 
             path_len = len(

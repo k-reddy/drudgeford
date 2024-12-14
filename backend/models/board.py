@@ -720,7 +720,7 @@ class Board:
         # if it's not ice or it's ice and they're moving, you can have the element perform
         # this is to avoid slipping when ice is thrown at you or when you start
         # your turn on ice
-        if not isinstance(element, obstacle.Ice) or movement:
+        if (not isinstance(element, obstacle.Ice)) or movement:
             element.perform(row, col, self, affected_character)
         # if they have an elemental affinity for this element, they heal instead of take damage
         if affected_character.elemental_affinity == element.__class__:
