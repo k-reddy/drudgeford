@@ -110,6 +110,23 @@ class Character(abc.ABC):
             self.available_action_cards, self.client_id
         )
 
+    def kill_random_cards(self, num_cards: int):
+        """
+        Moves num_cards random available cards to killed cards
+        """
+        for _ in range(num_cards):
+            killed_card = random.choice(self.available_action_cards)
+            self.available_action_cards.remove(killed_card)
+            self.killed_action_cards.append(killed_card)
+        self.pyxel_manager.load_action_cards(
+            self.available_action_cards, self.client_id
+        )
+
+    def decide_if_kill_cards(self, damage: int, cards_needed_to_block_damage: int):
+        return self.agent.decide_if_kill_cards(
+            damage, cards_needed_to_block_damage, self.client_id, self.pyxel_manager
+        )
+
     def make_attack_modifier_deck(self) -> list:
         attack_modifier_deck = []
         attack_modifiers = [

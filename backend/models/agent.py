@@ -50,6 +50,13 @@ class Agent(abc.ABC):
 
     @staticmethod
     @abc.abstractmethod
+    def decide_if_kill_cards(
+        damage: int, cards_needed_to_block_damage: int, client_id: str, pyxel_manager
+    ):
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
     def perform_movement(
         char, movement: int, is_jump: bool, board, client_id: Optional[str] = None
     ):
@@ -112,6 +119,13 @@ class Ai(Agent):
     ) -> bool:
         # monster always moves first - won't move if they're within range
         return True
+
+    @staticmethod
+    def decide_if_kill_cards(
+        damage: int, cards_needed_to_block_damage: int, client_id: str, pyxel_manager
+    ):
+        # monster never kills cards to avoid damage
+        return False
 
     @staticmethod
     def select_attack_target(
@@ -262,6 +276,16 @@ class Human(Agent):
         # load the new action cards now that you've popped from the list
         pyxel_manager.load_action_cards(available_action_cards, client_id)
         return action_card_to_perform
+
+    @staticmethod
+    def decide_if_kill_cards(
+        damage: int, cards_needed_to_block_damage: int, client_id: str, pyxel_manager
+    ):
+        prompt = f"You're about to take {damage} damage. Would you prefer to kill {cards_needed_to_block_damage} active cards? (y) or (n)"
+        user_input = pyxel_manager.get_user_input(
+            prompt, valid_inputs=["y", "n"], client_id=client_id, single_keystroke=True
+        )
+        return user_input == "y"
 
     @staticmethod
     def decide_if_move_first(
