@@ -161,7 +161,7 @@ class Fortify(ActionStep):
         return f"Fortify self by {self.strength}"
 
     def perform_string(self, attacker):
-        return f"+{self.strength} -> [{len(attacker.attack_modifier_deck)}]"
+        return f"+{self.strength} -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
 
 
 @dataclass
