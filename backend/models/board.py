@@ -560,9 +560,6 @@ class Board:
         shortest_path = self.get_shortest_valid_path(
             attacker_location, target_location, is_jump=jump, is_attack=True
         )
-        print(
-            f"shortest path {attacker.name} to {target.name}: {shortest_path}, jump={jump}"
-        )
         dist_to_target = len(shortest_path)
         # exclude cases where we can't get to the target (in which case dist will be 0 b/c empty list)
         return attack_distance >= dist_to_target and shortest_path
