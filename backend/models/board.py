@@ -798,7 +798,7 @@ class Board:
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} heals{" from "+damage_str if damage_str else""}for {-1*damage} and has {target.health} health"
+                f"{target.name} heals{" from "+damage_str if damage_str else""} for {-1*damage} and has {target.health} health"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
