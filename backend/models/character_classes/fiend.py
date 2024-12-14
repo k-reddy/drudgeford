@@ -3,12 +3,12 @@ from backend.utils import attack_shapes as shapes
 from backend.models import obstacle
 
 cards = [
-    # actions.ActionCard(
-    #     attack_name="Rending Claws",
-    #     actions=[actions.SingleTargetAttack(4, 1), actions.SingleTargetAttack(2, 1)],
-    #     movement=3,
-    #     jump=True,
-    # ),
+    actions.ActionCard(
+        attack_name="Piercing Claws",
+        actions=[actions.SingleTargetAttack(4, 1, pierce=True)],
+        movement=3,
+        jump=True,
+    ),
     actions.ActionCard(
         attack_name="Brutal Slam",
         actions=[actions.SingleTargetAttack(2, 1, knock_down=True), actions.Push(3, 1)],
@@ -19,7 +19,7 @@ cards = [
         attack_name="Chain Pull",
         actions=[
             actions.Pull(4, 4),
-            actions.SingleTargetAttack(3, 1),
+            actions.SingleTargetAttack(3, 1, knock_down=True),
             actions.Push(2, 1),
         ],
         movement=1,
