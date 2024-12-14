@@ -5,7 +5,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Bitter Harvest",
         actions=[
-            action_model.SingleTargetAttack(3, 3),
+            action_model.SingleTargetAttack(3, 3, pierce=True),
             action_model.Fortify(2),
         ],
         movement=2,
@@ -14,8 +14,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Sacred Cultivation",
         actions=[
-            action_model.BlessAndFortifyAlly(att_range=2, strength=2),
             action_model.SingleTargetAttack(3, 1),
+            action_model.BlessAndFortifyAlly(att_range=2, strength=2),
         ],
         movement=3,
         jump=True,
@@ -33,7 +33,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Fermented Fury",
         actions=[
-            action_model.SingleTargetAttack(2, 1),
+            action_model.SingleTargetAttack(2, 1, pierce=True),
             action_model.Curse(1),
             action_model.Fortify(2),
         ],

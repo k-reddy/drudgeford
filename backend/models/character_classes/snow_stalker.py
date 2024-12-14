@@ -15,12 +15,9 @@ cards = [
         jump=False,
     ),
     actions.ActionCard(
-        attack_name="Warming Fire",
+        attack_name="Blood Sacrifice",
         actions=[
-            actions.AreaAttackFromSelf(
-                shape=shapes.circle(1), element_type=obstacle.Fire
-            ),
-            actions.HealAllAllies(3, 2),
+            actions.SingleTargetAttack(4, 2, pierce=True),
         ],
         movement=2,
         jump=False,
@@ -37,8 +34,8 @@ cards = [
         jump=False,
     ),
     actions.ActionCard(
-        attack_name="Good Hunting",
-        actions=[actions.SingleTargetAttack(4, 1), actions.BlessAndFortifyAlly(2, 2)],
+        attack_name="Re-Supply",
+        actions=[actions.HealAllAllies(3, 2), actions.BlessAndFortifyAlly(2, 2)],
         movement=2,
         jump=False,
     ),

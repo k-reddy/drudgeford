@@ -70,11 +70,16 @@ class Character(abc.ABC):
         # add some space between the movement and attack
         self.log.append("")
 
-    def select_attack_target(self, in_range_opponents, board):
+    def select_attack_target(self, in_range_opponents, board, opponent=True):
         if not in_range_opponents:
             return None
         return self.agent.select_attack_target(
-            self.pyxel_manager, in_range_opponents, board, self, self.client_id
+            self.pyxel_manager,
+            in_range_opponents,
+            board,
+            self,
+            self.client_id,
+            opponent,
         )
 
     def short_rest(self) -> None:
@@ -103,6 +108,23 @@ class Character(abc.ABC):
         # load new available cards
         self.pyxel_manager.load_action_cards(
             self.available_action_cards, self.client_id
+        )
+
+    def kill_random_cards(self, num_cards: int):
+        """
+        Moves num_cards random available cards to killed cards
+        """
+        for _ in range(num_cards):
+            killed_card = random.choice(self.available_action_cards)
+            self.available_action_cards.remove(killed_card)
+            self.killed_action_cards.append(killed_card)
+        self.pyxel_manager.load_action_cards(
+            self.available_action_cards, self.client_id
+        )
+
+    def decide_if_kill_cards(self, damage: int, cards_needed_to_block_damage: int):
+        return self.agent.decide_if_kill_cards(
+            damage, cards_needed_to_block_damage, self.client_id, self.pyxel_manager
         )
 
     def make_attack_modifier_deck(self) -> list:
