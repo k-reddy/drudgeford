@@ -391,6 +391,7 @@ class Board:
         end: tuple[int, int],
         is_jump: bool = False,
         num_moves: int = 100,
+        is_attack: bool = False,
     ) -> list[tuple[int, int]]:
         """
         Finds the shortest valid path between a start and end coordinate in (row, col) format.
@@ -410,6 +411,9 @@ class Board:
         starting cell.
         Returns empty list if it is impossible to reach the end.
         """
+        # a small hack
+        if is_attack:
+            is_jump = True
         closed: set[tuple[int, int]] = set()
 
         previous_cell: dict[tuple[int, int], tuple[int, int]] = {}
@@ -463,7 +467,7 @@ class Board:
             if current == end:
                 path = self.generate_path(previous_cell, end)
                 # only return the path if it's a valid path
-                if not is_jump or is_valid_jump_path(path, end, start):
+                if not is_jump or is_valid_jump_path(path, end, start) or is_attack:
                     return path
 
             if current in closed:
@@ -552,7 +556,7 @@ class Board:
         attacker_location = self.find_location_of_target(attacker)
         target_location = self.find_location_of_target(target)
         shortest_path = self.get_shortest_valid_path(
-            attacker_location, target_location, is_jump=jump
+            attacker_location, target_location, is_jump=jump, is_attack=True
         )
         print(
             f"shortest path {attacker.name} to {target.name}: {shortest_path}, jump={jump}"
