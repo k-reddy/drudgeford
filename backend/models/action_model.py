@@ -67,7 +67,7 @@ class SingleTargetAttack(ActionStep):
                 board.pyxel_manager.log.append(f"{target.name} was knocked down")
             elif self.knock_down:
                 board.pyxel_manager.log.append("Knock down failed")
-            board.attack_target(attacker, self.strength, target)
+            board.attack_target(attacker, self.strength, target, pierce=self.pierce)
         else:
             board.pyxel_manager.log.append("No targets in range for attack")
 
