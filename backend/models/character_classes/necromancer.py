@@ -15,7 +15,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Curse of Futility",
         actions=[
-            action_model.SingleTargetAttack(2, 3),
+            action_model.SingleTargetAttack(2, 3, pierce=True),
             action_model.Curse(3),
         ],
         movement=2,
@@ -43,7 +43,10 @@ cards = [
     ),
     action_model.ActionCard(
         attack_name="Soul Strike",
-        actions=[action_model.SingleTargetAttack(4, 1), action_model.Curse(1)],
+        actions=[
+            action_model.SingleTargetAttack(4, 1, pierce=True),
+            action_model.Curse(1),
+        ],
         movement=1,
         jump=False,
     ),

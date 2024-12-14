@@ -586,14 +586,17 @@ class Board:
             if pot_opponent.team_monster == actor.team_monster
         ]
 
-    def attack_target(self, attacker, strength, target):
+    def attack_target(self, attacker, strength, target, pierce=False):
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
         to_log = f"\nAttack {strength} targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
         if target.shield[0] > 0:
-            to_log += f"\n{target.name} has shield {target.shield[0]}"
-            modified_attack_strength -= target.shield[0]
+            if pierce:
+                to_log += f"\nAttack pierces shield {target.shield[0]}"
+            else:
+                to_log += f"\n{target.name} has shield {target.shield[0]}"
+                modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             modified_attack_strength = 0
             to_log += f", does no damage!\n"
