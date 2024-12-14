@@ -73,7 +73,9 @@ class SingleTargetAttack(ActionStep):
 
     def __str__(self):
         range_str = f" <{self.att_range}>" if self.att_range > 1 else ""
-        print_str = f"Attack {self.strength}{range_str}"
+        print_str = (
+            f"Attack {self.strength}{range_str}{', pierce' if self.pierce else ''}"
+        )
         print_str += "\nKnock down (50%)" if self.knock_down else ""
         return print_str
 
