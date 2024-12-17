@@ -211,7 +211,7 @@ class WeakenAllEnemies(ActionStep):
         return f"Weaken all enemies by -{self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
-        return f""
+        return ""
 
 
 @dataclass
@@ -331,7 +331,7 @@ class BlessAndFortifyAlly(ActionStep):
         target.attack_modifier_deck.insert(rand_index, bless)
         target.attack_modifier_deck.append(modifier)
         board.pyxel_manager.log.append(
-            f"<color:{utils.color_map["modifier_deck"]}>+{self.strength} and 2x -> {target.name}'s [{len(target.attack_modifier_deck)}]</color>"
+            f"<color:{utils.color_map['modifier_deck']}>+{self.strength} and 2x -> {target.name}'s [{len(target.attack_modifier_deck)}]</color>"
         )
 
     def __str__(self):

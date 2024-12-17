@@ -589,7 +589,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f"\n<color:{color_map["attack"]}>Attack {strength}</color> targets {target.name}\n<color:{color_map["modifier_deck"]}>[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}</color>"
+        to_log = f"\n<color:{color_map['attack']}>Attack {strength}</color> targets {target.name}\n<color:{color_map['modifier_deck']}>[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}</color>"
         if target.shield[0] > 0:
             if pierce:
                 to_log += f"\nAttack pierces shield {target.shield[0]}"
@@ -598,10 +598,10 @@ class Board:
                 modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             modified_attack_strength = 0
-            to_log += f", does <color:{color_map["damage"]}>no damage</color>!\n"
+            to_log += f", does <color:{color_map['damage']}>no damage</color>!\n"
         elif self.is_shadow_interference(attacker, target):
             modified_attack_strength = 0
-            to_log += f", missed due to shadow\n"
+            to_log += ", missed due to shadow\n"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -813,16 +813,16 @@ class Board:
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes <color:{color_map["damage"]}>{damage}{damage_str} damage</color>"
+                f"{target.name} takes <color:{color_map['damage']}>{damage}{damage_str} damage</color>"
             )
             self.kill_target(target, damage_str)
         elif damage > 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes <color:{color_map["damage"]}>{damage}{damage_str} damage</color> and has <color:{color_map["health"]}>{target.health} health</color>"
+                f"{target.name} takes <color:{color_map['damage']}>{damage}{damage_str} damage</color> and has <color:{color_map['health']}>{target.health} health</color>"
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} <color:{color_map["heal"]}>heals{" from "+damage_str if damage_str else""} for {-1*damage}</color> and has <color:{color_map["health"]}>{target.health} health</color>"
+                f"{target.name} <color:{color_map['heal']}>heals{' from '+damage_str if damage_str else''} for {-1*damage}</color> and has <color:{color_map['health']}>{target.health} health</color>"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
