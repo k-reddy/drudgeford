@@ -34,6 +34,18 @@ def get_campaign_filenames():
     ]
 
 
+def wrap_color_tags(text: str, color: int) -> str:
+    """
+    Wraps each line of text in color tags.
+
+    Example:
+        Input: "Line 1\nLine 2", 13
+        Output: "<color:13>Line 1</color>\n<color:13>Line 2</color>"
+    """
+    lines = text.strip().split("\n")
+    return "\n".join(f"<color:{color}>{line}</color>" for line in lines if line)
+
+
 class DieAndEndTurn(Exception):
     pass
 
@@ -48,3 +60,12 @@ directions = [
     (1, -1),  # SW
     (-1, -1),  # NW
 ]
+
+color_map = {
+    "damage": 8,
+    "heal": 11,
+    "modifier_deck": 12,
+    "attack": 8,
+    "action_card": 13,
+    "health": 3,
+}
