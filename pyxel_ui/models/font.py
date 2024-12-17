@@ -35,6 +35,8 @@ class PixelFont:
         bbox = font.getbbox(text_no_tags)
         return bbox[2] - bbox[0]
 
+    import re
+
     def wrap_text(self, text: str, max_width, size="medium"):
         """
         Wrap text to fit within max_width pixels, properly handling color tags
@@ -126,6 +128,8 @@ class PixelFont:
                     if active_color is not None:
                         line_text += "</color>"
 
+                    # Trim space at the beginning of new line if not followed by * or @
+                    line_text = re.sub(r"^ (\S)", r"\1", line_text)
                     lines.append(line_text)
 
                     # Start new line with this segment
@@ -152,6 +156,8 @@ class PixelFont:
                 if active_color is not None:
                     line_text += "</color>"
 
+                # Trim space at the beginning of new line if not followed by * or @
+                line_text = re.sub(r"^ (\S)", r"\1", line_text)
                 lines.append(line_text)
 
         return lines

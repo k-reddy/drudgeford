@@ -125,7 +125,7 @@ class ViewManager:
         )
         self.carousel_view, carousel_borders = (
             self.view_factory.create_view_with_border(
-                view_class, carousel_params, [10, 10, 0, 10]
+                view_class, carousel_params, [10, 30, 0, 30]
             )
         )
         self.views.extend([self.carousel_view, *carousel_borders])
