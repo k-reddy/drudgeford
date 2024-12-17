@@ -589,7 +589,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f"\n<color:{color_map['attack']}>Attack {strength}</color> targets {target.name}\n<color:{color_map['modifier_deck']}>[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}</color>"
+        to_log = f"\nAttack {strength} targets {target.name}\n<color:{color_map['modifier_deck']}>[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}</color>"
         if target.shield[0] > 0:
             if pierce:
                 to_log += f"\nAttack pierces shield {target.shield[0]}"
@@ -634,7 +634,9 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id, show_death_animation=True)
         died_by = f" by{damage_str}" if damage_str else ""
-        self.pyxel_manager.log.append(f"{target.name} has been killed{died_by}.")
+        self.pyxel_manager.log.append(
+            f"{target.name} <color:{color_map['killed']}>has been killed</color>{died_by}."
+        )
         # if it's your turn, end it immediately
         if target == self.acting_character:
             raise DieAndEndTurn()
