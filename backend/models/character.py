@@ -82,15 +82,20 @@ class Character(abc.ABC):
         )
 
     def short_rest(self) -> None:
+        used_cards = [
+            card
+            for card in self.action_cards
+            if card not in self.killed_action_cards
+            and card not in self.available_action_cards
+        ]
+        if not used_cards:
+            if not self.available_action_cards:
+                return
+            else:
+                raise ValueError("Short resting with no used cards and available cards")
         # kill a random card that's not already been killed and that's used (not available)
-        killed_card = random.choice(
-            [
-                card
-                for card in self.action_cards
-                if card not in self.killed_action_cards
-                and card not in self.available_action_cards
-            ]
-        )
+        killed_card = random.choice(used_cards)
+        self.killed_action_cards.append(killed_card)
         # reset our available cards
         self.available_action_cards = [
             card for card in self.action_cards if card not in self.killed_action_cards
@@ -102,8 +107,6 @@ class Character(abc.ABC):
                 prompt=f"You short rested and lost {killed_card}\nHit enter to continue",
                 client_id=self.client_id,
             )
-        self.available_action_cards.remove(killed_card)
-        self.killed_action_cards.append(killed_card)
         # load new available cards
         self.pyxel_manager.load_action_cards(
             self.available_action_cards, self.client_id

@@ -295,9 +295,9 @@ class GameLoop:
             self.pyxel_manager.log.clear()
 
     def refresh_character_cards(self, char: character.Character) -> None:
-        # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
+        # If chars don't have remaining action cards, short rest
         short_rest = False
-        if len(char.available_action_cards) == 0:
+        if not char.available_action_cards:
             self.pyxel_manager.log.append(f"{char.name} short resting")
             self.pyxel_manager.add_to_personal_log(
                 "No more action cards left, time to short rest!",
@@ -315,13 +315,10 @@ class GameLoop:
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
-            if not char.team_monster:
-                self.pyxel_manager.log.append(
-                    f"Drat, {char.name} ran out of cards and got exhausted"
-                )
-                self.board.kill_target(char)
-            else:
-                raise ValueError("Monsters getting exhausted...")
+            self.pyxel_manager.log.append(
+                f"Drat, {char.name} ran out of cards and got exhausted"
+            )
+            self.board.kill_target(char)
 
     def _lose_game_dead(self) -> str:
         message = """You died...GAME OVER
