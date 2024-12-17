@@ -180,7 +180,7 @@ class GameLoop:
             self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
-                f"<color:{color_map["action_card"]}>{acting_character.name} chose:</color> {wrap_color_tags(str(action_card), 13)}"
+                f"<color:{color_map['action_card']}>{acting_character.name} chose:</color> {wrap_color_tags(str(action_card), 13)}"
             )
             actions = [
                 lambda: acting_character.perform_movement(
