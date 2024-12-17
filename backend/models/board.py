@@ -589,7 +589,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f"\nAttack {strength} targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
+        to_log = f"\n<color:8>Attack {strength}</color> targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
         if target.shield[0] > 0:
             if pierce:
                 to_log += f"\nAttack pierces shield {target.shield[0]}"
@@ -598,7 +598,7 @@ class Board:
                 modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             modified_attack_strength = 0
-            to_log += f", does no damage!\n"
+            to_log += f", does <color:9>no damage</color>!\n"
         elif self.is_shadow_interference(attacker, target):
             modified_attack_strength = 0
             to_log += f", missed due to shadow\n"
@@ -813,16 +813,16 @@ class Board:
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes {damage}{damage_str} damage"
+                f"{target.name} takes <color:9>{damage}{damage_str} damage</color>"
             )
             self.kill_target(target, damage_str)
         elif damage > 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes {damage}{damage_str} damage and has {target.health} health"
+                f"{target.name} takes <color:9>{damage}{damage_str} damage</color> and has {target.health} health"
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} heals{" from "+damage_str if damage_str else""} for {-1*damage} and has {target.health} health"
+                f"{target.name} <color:11>heals{" from "+damage_str if damage_str else""} for {-1*damage}</color> and has {target.health} health"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
