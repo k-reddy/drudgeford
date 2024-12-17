@@ -29,8 +29,10 @@ class PixelFont:
         if size == "small":
             return len(text) * 4
 
+        # Remove color tags for width calculation
+        text_no_tags = re.sub(r"<color:\s*\d+>|</color>", "", text)
         font = self.medium_font if size == "medium" else self.large_font
-        bbox = font.getbbox(text)
+        bbox = font.getbbox(text_no_tags)
         return bbox[2] - bbox[0]
 
     def wrap_text(self, text: str, max_width, size="medium"):
@@ -79,29 +81,17 @@ class PixelFont:
         segments = []
         current_pos = 0
 
-        # Pattern matches <color: number>text</color>
-        pattern = r"<color:\s*(\d+)>(.*?)</color>"
+        # Updated pattern to specifically match color tags or any text
+        pattern = r"<color:\s*(\d+)>(.*?)</color>|(.*?(?=<color:|$))"
 
-        while current_pos < len(text):
-            match = re.search(pattern, text[current_pos:])
-            if not match:
-                # Add remaining text with default color
-                remaining = text[current_pos:]
-                if remaining:
-                    segments.append((remaining, default_color))
-                break
-
-            # Add text before the tag with default color if any
-            start = current_pos + match.start()
-            if start > current_pos:
-                segments.append((text[current_pos:start], default_color))
-
-            # Add the colored text
-            color = int(match.group(1))
-            content = match.group(2)
-            segments.append((content, color))
-
-            current_pos = current_pos + match.end()
+        for match in re.finditer(pattern, text):
+            if match.group(3) is not None:  # Plain text
+                if match.group(3):  # Only add if non-empty
+                    segments.append((match.group(3), default_color))
+            elif match.groups()[0]:  # Colored text
+                color = int(match.group(1))
+                content = match.group(2)
+                segments.append((content, color))
 
         return segments
 
@@ -140,7 +130,7 @@ class PixelFont:
 
     def draw_text(
         self, x: int, y: int, text: str, col: int, size="medium", max_width=None
-    ):
+    ) -> List[Tuple[int, int, int]]:
         """
         Draw text at the specified position with given size. Supports multi-line text,
         optional width-based line wrapping, and color tags.
@@ -152,6 +142,9 @@ class PixelFont:
             col: Default color (used for text without color tags)
             size: "small", "medium", or "large"
             max_width: Optional maximum width in pixels. Text will wrap if it exceeds this width.
+
+        Returns:
+            List of tuples (x, y, color) for each pixel
         """
         if not text:
             return []
@@ -170,19 +163,19 @@ class PixelFont:
                 continue
 
             current_x = x
-            segments = self.parse_color_tags(line, col)  # Pass the default color here
+            segments = self.parse_color_tags(line, col)
 
             for segment_text, color in segments:
                 cached_pixels, width = self.cache_text(segment_text, size)
 
-                # Offset cached pixels to current position
+                # Offset cached pixels to current position and include color
                 segment_pixels = [
-                    (px + current_x, py + current_y) for px, py in cached_pixels
+                    (px + current_x, py + current_y, color) for px, py in cached_pixels
                 ]
 
                 # Draw pixels with segment color
-                for px_x, px_y in segment_pixels:
-                    self.pyxel.pset(px_x, px_y, color)
+                for px_x, px_y, px_color in segment_pixels:
+                    self.pyxel.pset(px_x, px_y, px_color)
 
                 all_pixels.extend(segment_pixels)
                 current_x += width
@@ -190,6 +183,13 @@ class PixelFont:
             current_y += line_height
 
         return all_pixels
+
+    def redraw_text(self, text_pixels: List[Tuple[int, int, int]]) -> None:
+        """Redraw cached pixel positions with their stored colors"""
+        if not text_pixels:
+            return
+        for px_x, px_y, px_color in text_pixels:
+            self.pyxel.pset(px_x, px_y, px_color)
 
     def get_text_height(self, text: str, size="medium", max_width=None):
         """
@@ -206,10 +206,3 @@ class PixelFont:
         lines = self.wrap_text(str(text), max_width, size)
         line_height = self.get_line_height(size)
         return len(lines) * line_height
-
-    def redraw_text(self, col: int, text_pixels: List[Tuple[int, int]]) -> None:
-        """Redraw cached pixel positions with new color"""
-        if not text_pixels:
-            return
-        for px_x, px_y in text_pixels:
-            self.pyxel.pset(px_x, px_y, col)
