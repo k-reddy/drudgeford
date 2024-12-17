@@ -81,7 +81,6 @@ class PoisonShroom(TerrainObject):
 
     def perform(self, row, col, board, affected_character):
         board.clear_terrain_square(row, col)
-        board.pyxel_manager.log.append("The mushroom exploded into spores!")
         spore_coords = [
             (row + coordinate[0], col + coordinate[1])
             for coordinate in shapes.circle(1)

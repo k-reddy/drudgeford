@@ -180,7 +180,7 @@ class WeakenEnemy(ActionStep):
             return
         target.attack_modifier_deck.append(modifier)
         board.pyxel_manager.log.append(
-            f"-{self.strength} -> {target.name}'s [{len(target.attack_modifier_deck)}]"
+            f"<color:{utils.color_map['modifier_deck']}>-{self.strength} -> {target.name}'s [{len(target.attack_modifier_deck)}]</color>"
         )
 
     def __str__(self):
@@ -205,7 +205,10 @@ class WeakenAllEnemies(ActionStep):
             modifier = utils.make_additive_modifier(-self.strength)
             enemy.attack_modifier_deck.append(modifier)
         enemy_names = ", ".join(enemy.name for enemy in enemies)
-        board.pyxel_manager.log.append(f"Weakened by -{self.strength}: " + enemy_names)
+        board.pyxel_manager.log.append(
+            f"<color:{utils.color_map['modifier_deck']}>Weakened by -{self.strength}:</color> "
+            + enemy_names
+        )
 
     def __str__(self):
         return f"Weaken all enemies by -{self.strength} <{self.att_range}>"
@@ -226,7 +229,7 @@ class ShieldSelf(ActionStep):
         return f"Shield {self.strength}, {self.duration} turn{'s' if self.duration>1 else ''}"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} shields {self.strength} self, {self.duration} turn{'s' if self.duration>1 else ''}"
+        return f"{attacker.name} <color:{utils.color_map['shield']}>shields {self.strength} self, {self.duration} turn{'s' if self.duration>1 else ''}</color>"
 
 
 @dataclass
@@ -241,7 +244,7 @@ class ShieldAllAllies(ActionStep):
         )
         for ally in in_range_allies:
             ally.shield = (self.strength, round_num + self.duration)
-        shield_str = f"Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ''}: "
+        shield_str = f"<color:{utils.color_map['shield']}>Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ''}:</color> "
         ally_names = ", ".join(ally.name for ally in in_range_allies)
         board.pyxel_manager.log.append(shield_str + ally_names)
 
@@ -315,7 +318,7 @@ class BlessSelf(ActionStep):
         return "Bless self"
 
     def perform_string(self, attacker):
-        return f"2x -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
+        return f"<color:{utils.color_map['modifier_deck']}>2x -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]</color>"
 
 
 @dataclass
@@ -353,8 +356,9 @@ class BlessAllAllies(ActionStep):
             rand_index = random.randint(0, len(ally.attack_modifier_deck))
             modifier = utils.make_multiply_modifier(2, "2x Bless")
             ally.attack_modifier_deck.insert(rand_index, modifier)
-        ally_names = ", ".join(ally.name for ally in in_range_allies)
-        board.pyxel_manager.log.append("Blessed: " + ally_names)
+            board.pyxel_manager.log.append(
+                f"<color:{utils.color_map['modifier_deck']}>2x -> {ally.name}'s[{len(ally.attack_modifier_deck)}]</color>"
+            )
 
     def __str__(self):
         return f"Bless all allies <{self.att_range}>"
@@ -375,7 +379,7 @@ class Curse(ActionStep):
         modifier = utils.make_multiply_modifier(0, "Null Curse")
         target.attack_modifier_deck.insert(rand_index, modifier)
         board.pyxel_manager.log.append(
-            f"Null -> {target.name}'s [{len(target.attack_modifier_deck)}]"
+            f"<color:{utils.color_map['modifier_deck']}>Null -> {target.name}'s [{len(target.attack_modifier_deck)}]</color>"
         )
 
     def __str__(self):
@@ -396,7 +400,7 @@ class CurseSelf(ActionStep):
         return "Curse self"
 
     def perform_string(self, attacker):
-        return f"Null -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
+        return f"<color:{utils.color_map['modifier_deck']}>Null -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]</color>"
 
 
 @dataclass
@@ -412,7 +416,7 @@ class CurseAllEnemies(ActionStep):
             modifier = utils.make_multiply_modifier(0, "Null Curse")
             enemy.attack_modifier_deck.insert(rand_index, modifier)
             board.pyxel_manager.log.append(
-                f"Null -> {enemy.name}'s[{len(enemy.attack_modifier_deck)}]"
+                f"<color:{utils.color_map['modifier_deck']}>Null -> {enemy.name}'s[{len(enemy.attack_modifier_deck)}]</color>"
             )
 
     def __str__(self):

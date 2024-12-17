@@ -236,12 +236,16 @@ class GameLoop:
         prints shield info to the log if any enemies have shields
         """
         shield_info = [
-            f"{char.name}: {char.shield[0]}"
+            f"{char.name} {char.shield[0]}"
             for char in self.board.characters
             if char.team_monster != acting_character.team_monster and char.shield[0] > 0
         ]
         if shield_info:
-            self.pyxel_manager.log.append(f"Enemy Shields: {', '.join(shield_info)}")
+            self.pyxel_manager.log.append(
+                wrap_color_tags(
+                    f"Enemy Shields: {', '.join(shield_info)}", color_map["shield"]
+                )
+            )
 
     def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins

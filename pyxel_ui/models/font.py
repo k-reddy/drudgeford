@@ -37,10 +37,11 @@ class PixelFont:
 
     def wrap_text(self, text: str, max_width, size="medium"):
         """
-        Wrap text to fit within max_width pixels
+        Wrap text to fit within max_width pixels, properly handling color tags
+        across line breaks.
 
         Args:
-            text: Text to wrap
+            text: Text to wrap (can include color tags)
             max_width: Maximum width in pixels
             size: Font size to use for measurement
 
@@ -52,27 +53,106 @@ class PixelFont:
 
         lines = []
         for paragraph in text.split("\n"):
-            words = paragraph.split(" ")
-            if not words:
+            if not paragraph:
                 lines.append("")
                 continue
 
-            current_line = words[0]
-            current_width = self.get_text_width(current_line, size)
+            # Split into segments preserving color tags
+            segments = []
+            current_pos = 0
+            current_color = None
 
-            for word in words[1:]:
-                next_piece = " " + word
-                word_width = self.get_text_width(next_piece, size)
+            while current_pos < len(paragraph):
+                # Check for color start tag
+                color_start = re.match(r"<color:\s*(\d+)>", paragraph[current_pos:])
+                if color_start:
+                    current_color = color_start.group(1)
+                    current_pos += len(color_start.group(0))
+                    continue
 
-                if current_width + word_width <= max_width:
-                    current_line += next_piece
-                    current_width += word_width
+                # Check for color end tag
+                if paragraph[current_pos:].startswith("</color>"):
+                    current_color = None
+                    current_pos += len("</color>")
+                    continue
+
+                # Find next space or tag
+                next_space = paragraph.find(" ", current_pos)
+                next_color_start = paragraph.find("<color:", current_pos)
+                next_color_end = paragraph.find("</color>", current_pos)
+
+                # Find the nearest delimiter
+                delimiters = [
+                    pos
+                    for pos in [next_space, next_color_start, next_color_end]
+                    if pos != -1
+                ]
+                next_break = min(delimiters) if delimiters else len(paragraph)
+
+                word = paragraph[current_pos:next_break]
+                if word:  # Only add non-empty segments
+                    segments.append((word, current_color))
+                current_pos = next_break
+
+                # Add space as separate segment if we broke at a space
+                if next_break == next_space:
+                    current_pos += 1
+                    segments.append((" ", current_color))
+
+            # Build lines from segments
+            current_line = []
+            current_width = 0
+
+            for text_segment, color in segments:
+                # Calculate width of this segment
+                measure_text = text_segment
+                segment_width = self.get_text_width(measure_text, size)
+
+                # If adding this segment would exceed max_width
+                if current_width + segment_width > max_width and current_line:
+                    # Complete the current line
+                    line_text = ""
+                    active_color = None
+
+                    for line_segment, seg_color in current_line:
+                        if seg_color != active_color:
+                            if active_color is not None:
+                                line_text += "</color>"
+                            if seg_color is not None:
+                                line_text += f"<color:{seg_color}>"
+                            active_color = seg_color
+                        line_text += line_segment
+
+                    if active_color is not None:
+                        line_text += "</color>"
+
+                    lines.append(line_text)
+
+                    # Start new line with this segment
+                    current_line = [(text_segment, color)]
+                    current_width = segment_width
                 else:
-                    lines.append(current_line)
-                    current_line = word
-                    current_width = self.get_text_width(word, size)
+                    current_line.append((text_segment, color))
+                    current_width += segment_width
 
-            lines.append(current_line)
+            # Add the last line if there is one
+            if current_line:
+                line_text = ""
+                active_color = None
+
+                for line_segment, seg_color in current_line:
+                    if seg_color != active_color:
+                        if active_color is not None:
+                            line_text += "</color>"
+                        if seg_color is not None:
+                            line_text += f"<color:{seg_color}>"
+                        active_color = seg_color
+                    line_text += line_segment
+
+                if active_color is not None:
+                    line_text += "</color>"
+
+                lines.append(line_text)
 
         return lines
 

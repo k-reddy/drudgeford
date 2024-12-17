@@ -62,10 +62,12 @@ directions = [
 ]
 
 color_map = {
-    "damage": 8,
+    "damage": 9,
     "heal": 11,
     "modifier_deck": 12,
-    "attack": 8,
+    "attack": 9,
     "action_card": 13,
-    "health": 3,
+    "health": 14,
+    "shield": 4,
+    "killed": 8,
 }
