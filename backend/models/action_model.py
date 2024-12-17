@@ -199,10 +199,13 @@ class WeakenAllEnemies(ActionStep):
         enemies = board.find_in_range_opponents_or_allies(
             attacker, self.att_range, opponents=True
         )
+        if not enemies:
+            return
         for enemy in enemies:
             modifier = utils.make_additive_modifier(-self.strength)
             enemy.attack_modifier_deck.append(modifier)
-            board.pyxel_manager.log.append(f"{enemy.name}")
+        enemy_names = ", ".join(enemy.name for enemy in enemies)
+        board.pyxel_manager.log.append(f"Weakened by -{self.strength}: " + enemy_names)
 
     def __str__(self):
         return f"Weaken all enemies by -{self.strength} <{self.att_range}>"
@@ -350,7 +353,8 @@ class BlessAllAllies(ActionStep):
             rand_index = random.randint(0, len(ally.attack_modifier_deck))
             modifier = utils.make_multiply_modifier(2, "2x Bless")
             ally.attack_modifier_deck.insert(rand_index, modifier)
-            board.pyxel_manager.log.append(f"Blessed {ally.name}")
+        ally_names = ", ".join(ally.name for ally in in_range_allies)
+        board.pyxel_manager.log.append("Blessed: " + ally_names)
 
     def __str__(self):
         return f"Bless all allies <{self.att_range}>"
