@@ -6,7 +6,7 @@ cards = [
     actions.ActionCard(
         attack_name="Healing Spores",
         actions=[
-            actions.HealAllAllies(3, 3),
+            actions.HealAllAllies(3, 5),
             actions.AreaAttackFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Spores, strength=1
             ),
@@ -35,23 +35,21 @@ cards = [
             actions.AreaAttackFromSelf(
                 shape=shapes.circle(1), element_type=obstacle.Spores, strength=2
             ),
-            actions.WeakenAllEnemies(2, 2),
         ],
         movement=2,
         jump=False,
     ),
     actions.ActionCard(
-        attack_name="Growth Burst",
-        actions=[actions.HealAllAllies(2, 2), actions.BlessAllAllies(2)],
+        attack_name="Fungal Surge",
+        actions=[actions.SingleTargetAttack(3, 2)],
         movement=1,
         jump=False,
     ),
     actions.ActionCard(
         attack_name="Protective Bloom",
         actions=[
-            actions.HealAllAllies(2, 5),
             actions.AreaAttackFromSelf(
-                shape=shapes.ring(2), element_type=obstacle.PoisonShroom
+                shape=shapes.ring(2), element_type=obstacle.PoisonShroom, strength=3
             ),
         ],
         movement=2,

@@ -16,9 +16,8 @@ cards = [
         attack_name="Fire Trail",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.line(4), element_type=obstacle.Fire, strength=1
+                shape=shapes.line(4), element_type=obstacle.Fire, strength=2
             ),
-            actions.WeakenAllEnemies(1, 2),
         ],
         movement=4,
         jump=True,
@@ -55,7 +54,6 @@ cards = [
     actions.ActionCard(
         attack_name="Heat Wave",
         actions=[
-            actions.WeakenAllEnemies(2, 2),
             actions.AreaAttackFromSelf(shapes.cone(2), 2),
         ],
         movement=3,
