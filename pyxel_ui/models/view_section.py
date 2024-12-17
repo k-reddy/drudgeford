@@ -538,7 +538,7 @@ class CharacterPickerView(CarouselView):
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
         y = self.start_pos[1] + 200
-        padding = 50
+        padding = 0
         card_border = 4
         card_width = (
             self.bounding_coordinate[0]
