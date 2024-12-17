@@ -386,7 +386,6 @@ class Human(Agent):
                 # take damage if it's a jump and they moved
                 if is_jump and remaining_movement != movement:
                     board.deal_terrain_damage_current_location(char)
-                    board.pyxel_manager.log.append("Movement done!")
                 return
 
             path_len = len(
@@ -420,7 +419,6 @@ class Human(Agent):
         # board doesn't deal damage to jumping Humans, because they move step by step, so deal final damage here
         if is_jump:
             board.deal_terrain_damage_current_location(char)
-        board.pyxel_manager.log.append("Movement done!")
 
     @staticmethod
     def move_other_character(

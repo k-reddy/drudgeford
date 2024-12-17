@@ -1,6 +1,7 @@
 from types import ModuleType
-from typing import List, Tuple
-from PIL import Image, ImageDraw, ImageFont  # type: ignore
+from typing import Dict, List, Tuple
+import re
+from PIL import Image, ImageDraw, ImageFont
 
 
 class PixelFont:
@@ -9,7 +10,10 @@ class PixelFont:
         self.medium_font = ImageFont.truetype(font_path, 8)
         self.large_font = ImageFont.truetype(font_path, 12)
         self.pyxel = pyxel
-        self.word_colors = {}  # {"damage": 5, "health": 3, "attack": 4, "Attack": 4}
+        # Cache of (text, size) -> (pixels, width)
+        # pixels are relative to (0,0) origin
+        # width is exact bbox width for positioning
+        self.cache: Dict[Tuple[str, str], Tuple[List[Tuple[int, int]], int]] = {}
 
     def get_line_height(self, size="medium"):
         """Get the line height for a given font size"""
@@ -20,167 +24,271 @@ class PixelFont:
         else:  # large
             return 18
 
-    def get_text_width(self, text, size="medium"):
+    def get_text_width(self, text: str, size="medium"):
         """Get the width of text in pixels for the given size"""
         if size == "small":
             return len(text) * 4
 
+        # Remove color tags for width calculation
+        text_no_tags = re.sub(r"<color:\s*\d+>|</color>", "", text)
         font = self.medium_font if size == "medium" else self.large_font
-        bbox = font.getbbox(text)
-        padding = max(2, 4 if size == "medium" else 12)
-        return bbox[2] - bbox[0] + padding * 2
+        bbox = font.getbbox(text_no_tags)
+        return bbox[2] - bbox[0]
 
-    def wrap_text(self, text, max_width, size="medium"):
-        """Wrap text to fit within max_width pixels"""
+    import re
+
+    def wrap_text(self, text: str, max_width, size="medium"):
+        """
+        Wrap text to fit within max_width pixels, properly handling color tags
+        across line breaks.
+
+        Args:
+            text: Text to wrap (can include color tags)
+            max_width: Maximum width in pixels
+            size: Font size to use for measurement
+
+        Returns:
+            List of lines that fit within max_width
+        """
         if max_width is None:
             return text.split("\n")
 
         lines = []
         for paragraph in text.split("\n"):
-            words = paragraph.split(" ")
-            if not words:
+            if not paragraph:
                 lines.append("")
                 continue
 
-            current_line = words[0]
-            current_width = self.get_text_width(current_line, size)
+            # Split into segments preserving color tags
+            segments = []
+            current_pos = 0
+            current_color = None
 
-            for word in words[1:]:
-                next_piece = " " + word
-                word_width = self.get_text_width(next_piece, size)
+            while current_pos < len(paragraph):
+                # Check for color start tag
+                color_start = re.match(r"<color:\s*(\d+)>", paragraph[current_pos:])
+                if color_start:
+                    current_color = color_start.group(1)
+                    current_pos += len(color_start.group(0))
+                    continue
 
-                if current_width + word_width <= max_width:
-                    current_line += next_piece
-                    current_width += word_width
+                # Check for color end tag
+                if paragraph[current_pos:].startswith("</color>"):
+                    current_color = None
+                    current_pos += len("</color>")
+                    continue
+
+                # Find next space or tag
+                next_space = paragraph.find(" ", current_pos)
+                next_color_start = paragraph.find("<color:", current_pos)
+                next_color_end = paragraph.find("</color>", current_pos)
+
+                # Find the nearest delimiter
+                delimiters = [
+                    pos
+                    for pos in [next_space, next_color_start, next_color_end]
+                    if pos != -1
+                ]
+                next_break = min(delimiters) if delimiters else len(paragraph)
+
+                word = paragraph[current_pos:next_break]
+                if word:  # Only add non-empty segments
+                    segments.append((word, current_color))
+                current_pos = next_break
+
+                # Add space as separate segment if we broke at a space
+                if next_break == next_space:
+                    current_pos += 1
+                    segments.append((" ", current_color))
+
+            # Build lines from segments
+            current_line = []
+            current_width = 0
+
+            for text_segment, color in segments:
+                # Calculate width of this segment
+                measure_text = text_segment
+                segment_width = self.get_text_width(measure_text, size)
+
+                # If adding this segment would exceed max_width
+                if current_width + segment_width > max_width and current_line:
+                    # Complete the current line
+                    line_text = ""
+                    active_color = None
+
+                    for line_segment, seg_color in current_line:
+                        if seg_color != active_color:
+                            if active_color is not None:
+                                line_text += "</color>"
+                            if seg_color is not None:
+                                line_text += f"<color:{seg_color}>"
+                            active_color = seg_color
+                        line_text += line_segment
+
+                    if active_color is not None:
+                        line_text += "</color>"
+
+                    # Trim space at the beginning of new line if not followed by * or @
+                    line_text = re.sub(r"^ (\S)", r"\1", line_text)
+                    lines.append(line_text)
+
+                    # Start new line with this segment
+                    current_line = [(text_segment, color)]
+                    current_width = segment_width
                 else:
-                    lines.append(current_line)
-                    current_line = word
-                    current_width = self.get_text_width(word, size)
+                    current_line.append((text_segment, color))
+                    current_width += segment_width
 
-            lines.append(current_line)
+            # Add the last line if there is one
+            if current_line:
+                line_text = ""
+                active_color = None
+
+                for line_segment, seg_color in current_line:
+                    if seg_color != active_color:
+                        if active_color is not None:
+                            line_text += "</color>"
+                        if seg_color is not None:
+                            line_text += f"<color:{seg_color}>"
+                        active_color = seg_color
+                    line_text += line_segment
+
+                if active_color is not None:
+                    line_text += "</color>"
+
+                # Trim space at the beginning of new line if not followed by * or @
+                line_text = re.sub(r"^ (\S)", r"\1", line_text)
+                lines.append(line_text)
 
         return lines
 
-    def get_word_positions(self, text: str) -> List[Tuple[int, int, int]]:
-        """
-        Find positions of colored words in text
-        Returns list of (start_pos, end_pos, color)
-        """
-        if not self.word_colors:
-            return []
+    def parse_color_tags(self, text: str, default_color: int) -> List[Tuple[str, int]]:
+        """Parse text with color tags into segments of (text, color)"""
+        segments = []
+        current_pos = 0
 
-        positions = []
-        text_lower = text.lower()
+        # Updated pattern to specifically match color tags or any text
+        pattern = r"<color:\s*(\d+)>(.*?)</color>|(.*?(?=<color:|$))"
 
-        for word, color in self.word_colors.items():
-            word = word.lower()
-            start = 0
-            while True:
-                # Find next occurrence of word
-                pos = text_lower.find(word, start)
-                if pos == -1:
-                    break
+        for match in re.finditer(pattern, text):
+            if match.group(3) is not None:  # Plain text
+                if match.group(3):  # Only add if non-empty
+                    segments.append((match.group(3), default_color))
+            elif match.groups()[0]:  # Colored text
+                color = int(match.group(1))
+                content = match.group(2)
+                segments.append((content, color))
 
-                # Verify it's a whole word by checking boundaries
-                before = pos == 0 or not text_lower[pos - 1].isalnum()
-                after = (
-                    pos + len(word) >= len(text)
-                    or not text_lower[pos + len(word)].isalnum()
-                )
+        return segments
 
-                if before and after:
-                    positions.append((pos, pos + len(word), color))
-                start = pos + 1
+    def cache_text(self, text: str, size: str) -> Tuple[List[Tuple[int, int]], int]:
+        """Generate and cache pixel positions for text"""
+        cache_key = (text, size)
+        if cache_key in self.cache:
+            return self.cache[cache_key]
 
-        return sorted(positions)
+        if size == "small":
+            width = len(text) * 4
+            # For small size, we don't cache pixels since it uses built-in font
+            return ([], width)
 
-    def redraw_text(self, col: int, text_pixels: List[Tuple[int, int, int]]) -> None:
-        """Redraw text pixels with their saved colors"""
-        if not text_pixels:
-            return
-        for px_x, px_y, px_col in text_pixels:
-            self.pyxel.pset(px_x, px_y, px_col)
+        font = self.medium_font if size == "medium" else self.large_font
+        bbox = font.getbbox(text)
+        width = bbox[2] - bbox[0]
+        height = bbox[3] - bbox[1]
+
+        # Create image with no padding
+        img = Image.new("1", (width, height), 0)
+        draw = ImageDraw.Draw(img)
+
+        # Draw text aligned to top-left
+        draw.text((0, 0), text, font=font, fill=1)
+
+        # Store pixel positions relative to (0,0)
+        pixels = []
+        for py in range(height):
+            for px in range(width):
+                if img.getpixel((px, py)):
+                    pixels.append((px, py))
+
+        self.cache[cache_key] = (pixels, width)
+        return (pixels, width)
 
     def draw_text(
         self, x: int, y: int, text: str, col: int, size="medium", max_width=None
     ) -> List[Tuple[int, int, int]]:
-        """Draw text with colored words"""
-        text_pixels = []
-        lines = self.wrap_text(str(text), max_width, size)
+        """
+        Draw text at the specified position with given size. Supports multi-line text,
+        optional width-based line wrapping, and color tags.
+
+        Args:
+            x: X coordinate
+            y: Y coordinate
+            text: Text to draw (can include newlines and color tags)
+            col: Default color (used for text without color tags)
+            size: "small", "medium", or "large"
+            max_width: Optional maximum width in pixels. Text will wrap if it exceeds this width.
+
+        Returns:
+            List of tuples (x, y, color) for each pixel
+        """
+        if not text:
+            return []
+
+        all_pixels = []
         current_y = y
+        line_height = self.get_line_height(size)
+
+        # Split and wrap text into lines
+        lines = self.wrap_text(str(text), max_width, size)
 
         for line in lines:
-            word_positions = self.get_word_positions(line)
-
             if size == "small":
-                current_x = x
-                last_pos = 0
+                self.pyxel.text(x, current_y, line, col)
+                current_y += line_height
+                continue
 
-                # Draw text segments with appropriate colors
-                for start, end, word_col in word_positions:
-                    # Draw text before the colored word
-                    if start > last_pos:
-                        segment = line[last_pos:start]
-                        self.pyxel.text(current_x, current_y, segment, col)
-                        for dx in range(len(segment) * 4):
-                            text_pixels.append((current_x + dx, current_y, col))
-                        current_x += len(segment) * 4
+            current_x = x
+            segments = self.parse_color_tags(line, col)
 
-                    # Draw the colored word
-                    segment = line[start:end]
-                    self.pyxel.text(current_x, current_y, segment, word_col)
-                    for dx in range(len(segment) * 4):
-                        text_pixels.append((current_x + dx, current_y, word_col))
-                    current_x += len(segment) * 4
-                    last_pos = end
+            for segment_text, color in segments:
+                cached_pixels, width = self.cache_text(segment_text, size)
 
-                # Draw remaining text
-                if last_pos < len(line):
-                    segment = line[last_pos:]
-                    self.pyxel.text(current_x, current_y, segment, col)
-                    for dx in range(len(segment) * 4):
-                        text_pixels.append((current_x + dx, current_y, col))
+                # Offset cached pixels to current position and include color
+                segment_pixels = [
+                    (px + current_x, py + current_y, color) for px, py in cached_pixels
+                ]
 
-            else:  # medium and large fonts
-                font = self.medium_font if size == "medium" else self.large_font
-                padding = max(2, 8 if size == "medium" else 12)
+                # Draw pixels with segment color
+                for px_x, px_y, px_color in segment_pixels:
+                    self.pyxel.pset(px_x, px_y, px_color)
 
-                # Create image for the whole line
-                bbox = font.getbbox(line)
-                w = bbox[2] - bbox[0] + padding * 2
-                h = bbox[3] - bbox[1] + padding * 2
-                img = Image.new("1", (w, h), 0)
-                draw = ImageDraw.Draw(img)
-                draw.text((padding, padding), line, font=font, fill=1)
-                pixels = img.load()
+                all_pixels.extend(segment_pixels)
+                current_x += width
 
-                # Draw with colors based on word positions
-                for py in range(h):
-                    for px in range(w):
-                        if not pixels[px, py]:
-                            continue
+            current_y += line_height
 
-                        pixel_x = x + px - padding
-                        pixel_y = current_y + py - padding
+        return all_pixels
 
-                        # Determine which word this pixel belongs to
-                        char_pos = int((px - padding) * len(line) / (w - padding * 2))
-                        pixel_col = col
+    def redraw_text(self, text_pixels: List[Tuple[int, int, int]]) -> None:
+        """Redraw cached pixel positions with their stored colors"""
+        if not text_pixels:
+            return
+        for px_x, px_y, px_color in text_pixels:
+            self.pyxel.pset(px_x, px_y, px_color)
 
-                        for start, end, word_col in word_positions:
-                            if start <= char_pos < end:
-                                pixel_col = word_col
-                                break
+    def get_text_height(self, text: str, size="medium", max_width=None):
+        """
+        Get the total height of text in pixels, including all lines
 
-                        text_pixels.append((pixel_x, pixel_y, pixel_col))
-                        self.pyxel.pset(pixel_x, pixel_y, pixel_col)
+        Args:
+            text: Text to measure (can include newlines)
+            size: "small", "medium", or "large"
+            max_width: Optional maximum width for word wrapping
 
-            current_y += self.get_line_height(size)
-
-        return text_pixels
-
-    def get_text_height(self, text, size="medium", max_width=None):
-        """Get the total height of text in pixels"""
+        Returns:
+            Height in pixels
+        """
         lines = self.wrap_text(str(text), max_width, size)
         line_height = self.get_line_height(size)
         return len(lines) * line_height

@@ -109,7 +109,7 @@ class LogView(ViewSection):
     def _redraw(self) -> None:
         if not self.log and self.round_number <= 0:
             return
-        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.font.redraw_text(self.text_pixels)
 
     def _draw(self) -> None:
         if not self.is_log_changed:
@@ -318,7 +318,7 @@ class CarouselView(ViewSection):
         if not self.items:
             return
         self.draw_page_indicator(self.start_pos[1])
-        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.font.redraw_text(self.text_pixels)
         self.draw_navigation_hints()
 
     def get_start_end_idx(self) -> tuple[int, int]:
@@ -528,7 +528,7 @@ class CharacterPickerView(CarouselView):
             sprite = SpriteView(self.font, [0, 10], self.end_pos)
             sprite.sprite_name = card["sprite_name"]
             sprite.draw()
-        self.font.redraw_text(self.font_color, self.text_pixels)
+        self.font.redraw_text(self.text_pixels)
         self.draw_navigation_hints()
 
     def draw_items(self):
@@ -538,7 +538,7 @@ class CharacterPickerView(CarouselView):
         x = self.start_pos[0]
         # !!! ideally put something here that measures the height of the page indicator
         y = self.start_pos[1] + 200
-        padding = 50
+        padding = 0
         card_border = 4
         card_width = (
             self.bounding_coordinate[0]

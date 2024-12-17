@@ -51,7 +51,8 @@ cards = [
     action_model.ActionCard(
         attack_name="Self Sacrifice",
         actions=[
-            action_model.SingleTargetAttack(strength=6, att_range=1, pierce=True),
+            action_model.Fortify(2),
+            action_model.SingleTargetAttack(strength=4, att_range=1, pierce=True),
             action_model.ModifySelfHealth(-4),
         ],
         movement=2,
@@ -72,7 +73,7 @@ cards = [
         attack_name="Tax Assessment",
         actions=[
             action_model.Pull(squares=2, att_range=3),
-            action_model.SingleTargetAttack(strength=3, att_range=1, knock_down=True),
+            action_model.SingleTargetAttack(strength=4, att_range=1, knock_down=True),
             action_model.WeakenEnemy(strength=2, att_range=1),
         ],
         movement=2,
@@ -90,4 +91,4 @@ cards = [
 ]
 backstory = """A former tax auditor turned mason with an obsession for crystals, driven to the mountains by her passionate belief in their power. Her journey began when a debtor introduced her to the mystical world of crystal energy. Now incredibly strong from years of mining, she uses her power to collect ever more precious gems. Though others mock her new-age beliefs, her connection to the stones only grows stronger - as does her ability to wield her tools in combat. A durable melee fighter who packs big punches while preserving their health with shields and healing crystals."""
 
-health = 13
+health = 12

@@ -8,7 +8,7 @@ from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn, EntrappedAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
-from backend.utils.utilities import GameState, DieAndEndTurn
+from backend.utils.utilities import GameState, DieAndEndTurn, wrap_color_tags, color_map
 
 
 class GameLoop:
@@ -180,10 +180,8 @@ class GameLoop:
             self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
-                f"{acting_character.name} chose {action_card.attack_name}\n"
+                f"<color:{color_map['action_card']}>{acting_character.name} chose:</color> {wrap_color_tags(str(action_card), 13)}"
             )
-            # print the action card
-            self.pyxel_manager.log.append(action_card)
             actions = [
                 lambda: acting_character.perform_movement(
                     action_card.movement, action_card.jump, self.board
@@ -238,12 +236,16 @@ class GameLoop:
         prints shield info to the log if any enemies have shields
         """
         shield_info = [
-            f"{char.name}: {char.shield[0]}"
+            f"{char.name} {char.shield[0]}"
             for char in self.board.characters
             if char.team_monster != acting_character.team_monster and char.shield[0] > 0
         ]
         if shield_info:
-            self.pyxel_manager.log.append(f"Enemy Shields: {', '.join(shield_info)}")
+            self.pyxel_manager.log.append(
+                wrap_color_tags(
+                    f"Enemy Shields: {', '.join(shield_info)}", color_map["shield"]
+                )
+            )
 
     def check_and_update_game_state(self) -> None:
         # if all the monsters are dead, player wins
@@ -293,9 +295,9 @@ class GameLoop:
             self.pyxel_manager.log.clear()
 
     def refresh_character_cards(self, char: character.Character) -> None:
-        # If players don't have remaining action cards, short rest. Note: this should never happen to monsters - we check for that below
+        # If chars don't have remaining action cards, short rest
         short_rest = False
-        if len(char.available_action_cards) == 0:
+        if not char.available_action_cards:
             self.pyxel_manager.log.append(f"{char.name} short resting")
             self.pyxel_manager.add_to_personal_log(
                 "No more action cards left, time to short rest!",
@@ -313,13 +315,10 @@ class GameLoop:
 
         # if player has no cards after short resting, they're done!
         if len(char.available_action_cards) == 0:
-            if not char.team_monster:
-                self.pyxel_manager.log.append(
-                    f"Drat, {char.name} ran out of cards and got exhausted"
-                )
-                self.board.kill_target(char)
-            else:
-                raise ValueError("Monsters getting exhausted...")
+            self.pyxel_manager.log.append(
+                f"Drat, {char.name} ran out of cards and got exhausted"
+            )
+            self.board.kill_target(char)
 
     def _lose_game_dead(self) -> str:
         message = """You died...GAME OVER

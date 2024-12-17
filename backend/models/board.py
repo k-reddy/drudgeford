@@ -11,7 +11,7 @@ from ..utils.listwithupdate import ListWithUpdate
 import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
 from backend.utils import attack_shapes as shapes
-from backend.utils.utilities import DieAndEndTurn, directions
+from backend.utils.utilities import DieAndEndTurn, directions, color_map
 
 
 MAX_ROUNDS = 1000
@@ -560,9 +560,6 @@ class Board:
         shortest_path = self.get_shortest_valid_path(
             attacker_location, target_location, is_jump=jump, is_attack=True
         )
-        print(
-            f"shortest path {attacker.name} to {target.name}: {shortest_path}, jump={jump}"
-        )
         dist_to_target = len(shortest_path)
         # exclude cases where we can't get to the target (in which case dist will be 0 b/c empty list)
         return attack_distance >= dist_to_target and shortest_path
@@ -592,7 +589,7 @@ class Board:
         modified_attack_strength, attack_modifier_string = (
             self.select_and_apply_attack_modifier(attacker, strength)
         )
-        to_log = f"\nAttack {strength} targets {target.name}\n[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}"
+        to_log = f"\nAttack {strength} targets {target.name}\n<color:{color_map['modifier_deck']}>[{len(attacker.attack_modifier_deck)+1}] -> {attack_modifier_string}</color>"
         if target.shield[0] > 0:
             if pierce:
                 to_log += f"\nAttack pierces shield {target.shield[0]}"
@@ -601,10 +598,10 @@ class Board:
                 modified_attack_strength -= target.shield[0]
         if modified_attack_strength <= 0:
             modified_attack_strength = 0
-            to_log += f", does no damage!\n"
+            to_log += f", does <color:{color_map['damage']}>no damage</color>!\n"
         elif self.is_shadow_interference(attacker, target):
             modified_attack_strength = 0
-            to_log += f", missed due to shadow\n"
+            to_log += ", missed due to shadow\n"
         self.pyxel_manager.log.append(to_log)
         self.modify_target_health(target, modified_attack_strength)
 
@@ -637,7 +634,9 @@ class Board:
         self.update_locations(row, col, None)
         self.pyxel_manager.remove_entity(target.id, show_death_animation=True)
         died_by = f" by{damage_str}" if damage_str else ""
-        self.pyxel_manager.log.append(f"{target.name} has been killed{died_by}.")
+        self.pyxel_manager.log.append(
+            f"{target.name} <color:{color_map['killed']}>has been killed</color>{died_by}."
+        )
         # if it's your turn, end it immediately
         if target == self.acting_character:
             raise DieAndEndTurn()
@@ -816,16 +815,16 @@ class Board:
         target.health = min(target.health - damage, target.max_health)
         if target.health <= 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes {damage}{damage_str} damage"
+                f"{target.name} takes <color:{color_map['damage']}>{damage}{damage_str} damage</color>"
             )
             self.kill_target(target, damage_str)
         elif damage > 0:
             self.pyxel_manager.log.append(
-                f"{target.name} takes {damage}{damage_str} damage and has {target.health} health"
+                f"{target.name} takes <color:{color_map['damage']}>{damage}{damage_str} damage</color> and has <color:{color_map['health']}>{target.health} health</color>"
             )
         else:
             self.pyxel_manager.log.append(
-                f"{target.name} heals{" from "+damage_str if damage_str else""} for {-1*damage} and has {target.health} health"
+                f"{target.name} <color:{color_map['heal']}>heals{' from '+damage_str if damage_str else''} for {-1*damage}</color> and has <color:{color_map['health']}>{target.health} health</color>"
             )
         # updating healths also affects the initiative bar
         self.pyxel_manager.load_characters(self.characters)
