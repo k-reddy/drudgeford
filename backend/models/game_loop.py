@@ -8,7 +8,7 @@ from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn, EntrappedAndLoseTurn
 from backend.models.pyxel_backend import PyxelManager
 from backend.models.level import Level
-from backend.utils.utilities import GameState, DieAndEndTurn
+from backend.utils.utilities import GameState, DieAndEndTurn, wrap_color_tags, color_map
 
 
 class GameLoop:
@@ -180,7 +180,7 @@ class GameLoop:
             self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
-                f"{acting_character.name} chose {str(action_card)}\n"
+                f"<color:{color_map["action_card"]}>{acting_character.name} chose:</color> {wrap_color_tags(str(action_card), 13)}"
             )
             actions = [
                 lambda: acting_character.perform_movement(

@@ -164,7 +164,7 @@ class Fortify(ActionStep):
         return f"Fortify self by {self.strength}"
 
     def perform_string(self, attacker):
-        return f"+{self.strength} -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]"
+        return f"<color:{utils.color_map['modifier_deck']}>+{self.strength} -> {attacker.name}'s [{len(attacker.attack_modifier_deck)}]</color>"
 
 
 @dataclass
@@ -246,7 +246,7 @@ class ShieldAllAllies(ActionStep):
         board.pyxel_manager.log.append(shield_str + ally_names)
 
     def __str__(self):
-        return f"Shield {self.strength} all allies <{self.att_range}>, {self.duration} turns"
+        return f"Shield {self.strength} all allies <{self.att_range}>, {self.duration} turn{'s' if self.duration >1 else ''}"
 
     def perform_string(self, attacker):
         return ""
@@ -331,7 +331,7 @@ class BlessAndFortifyAlly(ActionStep):
         target.attack_modifier_deck.insert(rand_index, bless)
         target.attack_modifier_deck.append(modifier)
         board.pyxel_manager.log.append(
-            f"+{self.strength} and 2x -> {target.name}'s [{len(target.attack_modifier_deck)}]"
+            f"<color:{utils.color_map["modifier_deck"]}>+{self.strength} and 2x -> {target.name}'s [{len(target.attack_modifier_deck)}]</color>"
         )
 
     def __str__(self):
