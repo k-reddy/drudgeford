@@ -76,7 +76,7 @@ class ViewManager:
             ],
         )
         self.log_view, log_borders = self.view_factory.create_view_with_border(
-            view.LogView, log_view_params, [4, 0, 0, 0]
+            view.LogView, log_view_params, [4, 4, 0, 0]
         )
         self.views.extend([self.log_view, *log_borders])
 
