@@ -76,7 +76,7 @@ class ViewManager:
             ],
         )
         self.log_view, log_borders = self.view_factory.create_view_with_border(
-            view.LogView, log_view_params, [4, 0, 0, 0]
+            view.LogView, log_view_params, [4, 4, 0, 0]
         )
         self.views.extend([self.log_view, *log_borders])
 
@@ -125,7 +125,7 @@ class ViewManager:
         )
         self.carousel_view, carousel_borders = (
             self.view_factory.create_view_with_border(
-                view_class, carousel_params, [10, 10, 0, 10]
+                view_class, carousel_params, [10, 30, 0, 30]
             )
         )
         self.views.extend([self.carousel_view, *carousel_borders])
