@@ -238,13 +238,15 @@ class ShieldAllAllies(ActionStep):
         )
         for ally in in_range_allies:
             ally.shield = (self.strength, round_num + self.duration)
-            board.pyxel_manager.log.append(f"{ally.name}")
+        shield_str = f"Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ''}: "
+        ally_names = ", ".join(ally.name for ally in in_range_allies)
+        board.pyxel_manager.log.append(shield_str + ally_names)
 
     def __str__(self):
         return f"Shield {self.strength} all allies <{self.att_range}>, {self.duration} turns"
 
     def perform_string(self, attacker):
-        return f"Shield {self.strength}, {self.duration} turn{'s' if self.duration >1 else ''} these allies:"
+        return ""
 
 
 @dataclass
