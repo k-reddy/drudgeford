@@ -211,7 +211,7 @@ class WeakenAllEnemies(ActionStep):
         return f"Weaken all enemies by -{self.strength} <{self.att_range}>"
 
     def perform_string(self, attacker):
-        return f"{attacker.name} weakens all enemies by -{self.strength}:"
+        return f""
 
 
 @dataclass

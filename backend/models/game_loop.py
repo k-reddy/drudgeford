@@ -180,10 +180,8 @@ class GameLoop:
             self.display_enemy_shield_info(acting_character)
             action_card = acting_character.select_action_card()
             self.pyxel_manager.log.append(
-                f"{acting_character.name} chose {action_card.attack_name}\n"
+                f"{acting_character.name} chose {str(action_card)}\n"
             )
-            # print the action card
-            self.pyxel_manager.log.append(action_card)
             actions = [
                 lambda: acting_character.perform_movement(
                     action_card.movement, action_card.jump, self.board
