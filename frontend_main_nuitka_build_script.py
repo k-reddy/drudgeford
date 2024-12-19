@@ -46,6 +46,7 @@ def create_build_script():
                 "--include-module=_sysconfigdata__darwin_darwin",
                 "--python-flag=no_site",
                 "--macos-app-icon=executable/static/drudgeford_cover.png",
+                "--macos-sign-identity=Developer ID Application: Keerthi Reddy (CKMMRP742B)",
             ]
         )
 
