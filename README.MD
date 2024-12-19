@@ -1,7 +1,14 @@
-![Character Picker](/gifs/character_picker.gif)
-![AI Attack](/gifs/ai_attack.gif)
-![Movement](/gifs/movement.gif)
-![Fireball](/gifs/fireball.gif)
+<table border="0" cellspacing="0" cellpadding="0" style="border:none;">
+  <tr>
+    <td width="50%" style="border:none;"><img src="/gifs/character_picker.gif" alt="Character Picker"/></td>
+    <td width="50%" style="border:none;"><img src="/gifs/ai_attack.gif" alt="AI Attack"/></td>
+  </tr>
+  <tr>
+    <td width="50%" style="border:none;"><img src="/gifs/movement.gif" alt="Movement"/></td>
+    <td width="50%" style="border:none;"><img src="/gifs/fireball.gif" alt="Fireball"/></td>
+  </tr>
+</table>
+
 
 # Mac Setup Instructions for Drudgeford Game
 Note: we haven't playtested on PCs yet...
@@ -41,16 +48,7 @@ Note: we haven't playtested on PCs yet...
    https://drudgeford.quest/
    ```
 
-2. Click the "Host Game" button
-
-3. Follow the link to start the game - you'll get a port number
-
-4. In Terminal (with your virtual environment still activated and in the drudgeford folder), run:
-   ```bash
-   python3 frontend_main.py
-   ```
-
-5. When asked, enter the port number you got from the website
+2. Follow the instructions on the website
 
 ## Common Issues
 - If pip install fails, make sure your virtual environment is activated (you should see "(venv)" at the start of your Terminal prompt)
