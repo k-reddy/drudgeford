@@ -1,3 +1,8 @@
+![Character Picker](/gifs/character_picker.gif)
+![AI Attack](/gifs/ai_attack.gif)
+![Movement](/gifs/movement.gif)
+![Fireball](/gifs/fireball.gif)
+
 # Mac Setup Instructions for Drudgeford Game
 Note: we haven't playtested on PCs yet...
 
