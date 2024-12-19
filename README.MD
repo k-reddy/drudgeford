@@ -48,16 +48,7 @@ Note: we haven't playtested on PCs yet...
    https://drudgeford.quest/
    ```
 
-2. Click the "Host Game" button
-
-3. Follow the link to start the game - you'll get a port number
-
-4. In Terminal (with your virtual environment still activated and in the drudgeford folder), run:
-   ```bash
-   python3 frontend_main.py
-   ```
-
-5. When asked, enter the port number you got from the website
+2. Follow the instructions on the website
 
 ## Common Issues
 - If pip install fails, make sure your virtual environment is activated (you should see "(venv)" at the start of your Terminal prompt)
