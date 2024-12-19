@@ -1,7 +1,7 @@
 one time only:
 chmod 400 Documents/developer_creds/drudgeford_key.pem
 
-# copy the code over - once i figure out the executable stuff, we should send that over instead 
+# copy the code over
 rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="backend/***" \
 --include="executable/***" \
@@ -12,6 +12,7 @@ rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="main.py" \
 --include="my_resource.pyxres" \
 --include="requirements.txt" \
+--include="banana/***" \
 --exclude="**/__pycache__/**" \
 --exclude="**/.pytest_cache/**" \
 --exclude="*" \
