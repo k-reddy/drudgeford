@@ -1,3 +1,4 @@
 flask==3.1.0
 pillow==11.0.0
 pyxel==2.2.7
+wxPython

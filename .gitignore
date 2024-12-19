@@ -1,5 +1,4 @@
 *.venv
-Gloomhaven/__pycache__/
 .ipynb_checkpoints/
 env/
 .env
@@ -18,3 +17,4 @@ executable/logs/
 pixel_art/
 Logs/
 saved_campaign_files/
+logs/*
