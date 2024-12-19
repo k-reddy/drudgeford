@@ -1,11 +1,14 @@
-<table>
+<table border="0" cellspacing="0" cellpadding="0" style="border:none;">
   <tr>
-    <td width="25%"><img src="/gifs/character_picker.gif" alt="Character Picker"/></td>
-    <td width="25%"><img src="/gifs/ai_attack.gif" alt="AI Attack"/></td>
-    <td width="25%"><img src="/gifs/movement.gif" alt="Movement"/></td>
-    <td width="25%"><img src="/gifs/fireball.gif" alt="Fireball"/></td>
+    <td width="50%" style="border:none;"><img src="/gifs/character_picker.gif" alt="Character Picker"/></td>
+    <td width="50%" style="border:none;"><img src="/gifs/ai_attack.gif" alt="AI Attack"/></td>
+  </tr>
+  <tr>
+    <td width="50%" style="border:none;"><img src="/gifs/movement.gif" alt="Movement"/></td>
+    <td width="50%" style="border:none;"><img src="/gifs/fireball.gif" alt="Fireball"/></td>
   </tr>
 </table>
+
 
 # Mac Setup Instructions for Drudgeford Game
 Note: we haven't playtested on PCs yet...
