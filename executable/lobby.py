@@ -159,6 +159,10 @@ MAIN_HTML = """
                     <a href="/tutorial" class="tutorial-button">
                         LEARN TO PLAY
                     </a>
+
+                    <a href="/download" class="download-button">
+                        DOWNLOAD
+                    </a>
                 </div>
                 
                 <div id="gameLink" class="game-link"></div>
@@ -473,8 +477,13 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../banana/frontend_main.dist/frontend_main.bin"
-    return send_file(exe_path, as_attachment=True, download_name="drudgeford.bin")
+    exe_path = "../banana/frontend_main.dmg"
+    return send_file(
+        exe_path,
+        as_attachment=True,
+        download_name="frontend_main.dmg",
+        mimetype="application/x-apple-diskimage",
+    )
 
 
 # create limits of number of games hosted per IP
