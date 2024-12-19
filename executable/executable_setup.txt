@@ -2,18 +2,44 @@
 pyinstaller --clean frontend_main.spec
 
 # or run the nuitka python file, then 
-mv frontend_main.app Drudgeford.app
+# force code sign 
+codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/frontend_main.app
+
+# make zip 
+ditto -c -k --keepParent "banana/frontend_main.app" "banana/frontend_main.zip"
+# submit to apple for notarization 
+xcrun notarytool submit "banana/frontend_main.zip" --keychain-profile "Drudgeford-notary" --wait
+# get log if fails: 
+xcrun notarytool log [ID] --keychain-profile "Drudgeford-notary"
+# staple notarization ticket
+xcrun stapler staple "banana/frontend_main.app" 
+
+
+# create dmg
  create-dmg \
-  --volname "Drudgeford" \
+  --volname "frontend_main" \
   --window-pos 200 120 \
   --window-size 800 400 \
   --volicon banana/frontend_main.build/icons/icons.icns \
   --icon-size 100 \
-  --icon Drudgeford.app 200 200 \
-  --hide-extension Drudgeford.app \
+  --icon frontend_main.app 200 200 \
+  --hide-extension frontend_main.app \
   --app-drop-link 600 200 \
-  banana/drudgeford.dmg \
-  banana/Drudgeford.app
+  banana/frontend_main.dmg \
+  banana/frontend_main.app
 
+# code sign dmg 
+codesign --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/frontend_main.dmg
+
+# submit for notarization 
+xcrun notarytool submit "banana/frontend_main.dmg" --keychain-profile "Drudgeford-notary" --wait
+
+# staple ticket to dmg
+xcrun stapler staple "banana/frontend_main.dmg"
+
+
+# verify notarization 
+spctl --assess -vv banana/drudgeford.app
+spctl --assess -vv banana/drudgeford.dmg
 
 # game speed seems similar, but nuitka loads *way* faster
