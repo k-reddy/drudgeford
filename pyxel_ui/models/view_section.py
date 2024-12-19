@@ -498,7 +498,7 @@ class SpriteView(ViewSection):
         self.sprite_width = BITS
         self.sprite_x = (
             self.bounding_coordinate[0] - self.start_pos[0]
-        ) / 2 - self.sprite_width
+        ) / 2 - self.sprite_width / 2
         self.sprite_y = 100
 
     def _draw(self) -> None:
