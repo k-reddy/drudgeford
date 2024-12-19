@@ -1,4 +1,4 @@
-import textwrap
+import argparse
 from pyxel_ui.engine import PyxelEngine
 from backend.utils.config import TEXT_WIDTH
 
@@ -20,4 +20,7 @@ def main(dev_mode=False):
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dev", action="store_true", help="Run in development mode")
+    args = parser.parse_args()
+    main(dev_mode=args.dev)
