@@ -477,11 +477,11 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../banana/drudgeford.dmg"
+    exe_path = "../banana/frontend_main.dmg"
     return send_file(
         exe_path,
         as_attachment=True,
-        download_name="drudgeford.dmg",
+        download_name="frontend_main.dmg",
         mimetype="application/x-apple-diskimage",
     )
 
