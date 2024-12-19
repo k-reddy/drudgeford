@@ -5,12 +5,6 @@
     <td width="25%"><img src="/gifs/movement.gif" alt="Movement"/></td>
     <td width="25%"><img src="/gifs/fireball.gif" alt="Fireball"/></td>
   </tr>
-  <tr>
-    <td align="center">Character Selection</td>
-    <td align="center">Enemy AI Combat</td>
-    <td align="center">Player Movement</td>
-    <td align="center">Fireball Ability</td>
-  </tr>
 </table>
 
 # Mac Setup Instructions for Drudgeford Game
