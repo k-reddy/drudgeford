@@ -1,14 +1,12 @@
 import sys
 from subprocess import run
+import platform
 
 
 def create_build_script():
-    # Ensure we're using Python's executable for the compilation
     python_exe = sys.executable
-
     main_script = "frontend_main.py"
 
-    # List of modules to include
     include_modules = [
         "backend.utils.config",
         "pyxel_ui.constants",
@@ -29,7 +27,6 @@ def create_build_script():
         "server.server_utils",
     ]
 
-    # Base Nuitka command
     nuitka_command = [
         python_exe,
         "-m",
@@ -40,6 +37,17 @@ def create_build_script():
         "--output-dir=banana",
         "--nofollow-import-to=numpy",
     ]
+
+    # Add macOS specific flags
+    if platform.system() == "Darwin":
+        nuitka_command.extend(
+            [
+                "--macos-create-app-bundle",
+                "--include-module=_sysconfigdata__darwin_darwin",
+                "--python-flag=no_site",
+                "--macos-app-icon=executable/static/drudgeford_cover.png",
+            ]
+        )
 
     # Add module includes
     for module in include_modules:
@@ -56,23 +64,20 @@ def create_build_script():
         ]
     )
 
-    # Additional options for better compilation
+    # Additional compilation options
     nuitka_command.extend(
         [
             "--show-progress",
             "--show-memory",
-            "--enable-console",
         ]
     )
 
-    # Add the main script at the end
+    # Add main script
     nuitka_command.append(main_script)
 
-    # Print the command for debugging
     print("Running Nuitka with command:")
     print(" ".join(nuitka_command))
 
-    # Run the compilation
     print("\nStarting Nuitka compilation...")
     result = run(nuitka_command)
 
