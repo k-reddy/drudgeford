@@ -1,7 +1,17 @@
-![Character Picker](/gifs/character_picker.gif)
-![AI Attack](/gifs/ai_attack.gif)
-![Movement](/gifs/movement.gif)
-![Fireball](/gifs/fireball.gif)
+<table>
+  <tr>
+    <td width="25%"><img src="/gifs/character_picker.gif" alt="Character Picker"/></td>
+    <td width="25%"><img src="/gifs/ai_attack.gif" alt="AI Attack"/></td>
+    <td width="25%"><img src="/gifs/movement.gif" alt="Movement"/></td>
+    <td width="25%"><img src="/gifs/fireball.gif" alt="Fireball"/></td>
+  </tr>
+  <tr>
+    <td align="center">Character Selection</td>
+    <td align="center">Enemy AI Combat</td>
+    <td align="center">Player Movement</td>
+    <td align="center">Fireball Ability</td>
+  </tr>
+</table>
 
 # Mac Setup Instructions for Drudgeford Game
 Note: we haven't playtested on PCs yet...
