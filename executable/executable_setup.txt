@@ -38,5 +38,3 @@ xcrun stapler staple "banana/drudgeford.dmg"
 # verify notarization 
 spctl --assess -vv banana/drudgeford.app
 spctl --assess -vv banana/drudgeford.dmg
-
-# game speed seems similar, but nuitka loads *way* faster
