@@ -44,16 +44,26 @@ cards = [
         attack_name="Dance of Darkness",
         actions=[
             actions.AreaAttackFromSelf(
-                shape=shapes.circle(2), element_type=obstacle.Shadow
-            ),
-            actions.SingleTargetAttack(
-                strength=3, att_range=2, knock_down=True, pierce=True
+                shape=shapes.circle(2), element_type=obstacle.Shadow, strength=1
             ),
             actions.WeakenAllEnemies(2, 2),
             actions.HealAllAllies(3, 3),
         ],
         movement=3,
         jump=True,
+    ),
+    actions.ActionCard(
+        attack_name="Strings of Fate",
+        actions=[
+            actions.Pull(4, 5),
+            actions.SingleTargetAttack(
+                strength=4,
+                att_range=1,
+                knock_down=True,
+            ),
+        ],
+        movement=0,
+        jump=False,
     ),
 ]
 

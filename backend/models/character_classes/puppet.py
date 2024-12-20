@@ -47,7 +47,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Execute Command",
-        actions=[actions.SingleTargetAttack(3, 2)],
+        actions=[actions.SingleTargetAttack(3, 2, pierce=True)],
         movement=2,
         jump=False,
     ),
