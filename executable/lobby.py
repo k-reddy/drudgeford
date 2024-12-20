@@ -307,29 +307,32 @@ TUTORIAL_HTML = """
             },
             {
                 image: "/static/help_images/modifier_deck.png",
-                image_size: 50,
-                text: "When you attack, you will draw a random modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack for 3 but draw a -2 modifier, your attack does only 1 damage <span style='color: #00BFFF'>:(</span><br><br>"
+                image_size: 100,
+                text: "When you attack, you will draw a card from your <span style='color: #678AD4'>attack modifier deck</span> that adjusts how much damage you do.<br><br>"+
+                    "The notation below means the character <span style='color: #00BFFF'>attacked for 3</span> and drew a <span style='color: #678AD4'>+2</span> from their 13-card modifier deck. "+
+                    "With the modifier, the attack does <span style='color: #FF9933'>5 damage</span>.<br><br>"
+
             },
             {
                 alignment: "left",
                 text: `<div>
-                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #00BFFF">attack modifier deck</span>:</div>
+                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #678AD4">attack modifier deck</span>:</div>
                     <div class="grid-container">
                         <div class="grid-item">
                             <h3>Fortify by 2</h3>
-                            <p>Puts a +2 card on top of your attack modifier deck</p>
+                            <p>Puts a +2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>+2 -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Weaken by 2</h3>
-                            <p>Puts a -2 card on top of your attack modifier deck</p>
+                            <p>Puts a -2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>-2 -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Bless</h3>
-                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack</p>
+                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack<br><br><span style='color: #678AD4'>2x -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Curse</h3>
-                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack</p>
+                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack<br><br><span style='color: #678AD4'>Null -> Happy's [5]</span></p>
                         </div>
                     </div>
                 </div>`
@@ -343,7 +346,7 @@ TUTORIAL_HTML = """
                             <h3>Shield</h3>
                             <p>Decreases damage you take from attacks, expires on your turn</p>
                         </div>
-                        <div class="grid-item special-grid-item">
+                        <div class="grid-item">
                             <h3>Area Attacks</h3>
                             <p>Let you hit an area rather than a specific target</p>
                         </div>
@@ -357,7 +360,7 @@ TUTORIAL_HTML = """
             {
                 image: "/static/help_images/range_attack.png",
                 image_size: 200,
-                text: "Some of your attacks are <span style='color: #00BFFF'>area effect attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
+                text: "Some of your attacks are <span style='color: #00BFFF'>area attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
             },
             {
                 alignment: "left",
