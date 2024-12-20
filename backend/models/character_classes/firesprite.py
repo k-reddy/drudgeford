@@ -9,7 +9,7 @@ cards = [
             actions.SingleTargetAttack(2, 4),
             actions.SingleTargetAttack(1, 4),
         ],
-        movement=3,
+        movement=2,
         jump=True,
     ),
     actions.ActionCard(
@@ -19,7 +19,7 @@ cards = [
                 shape=shapes.line(4), element_type=obstacle.Fire, strength=2
             ),
         ],
-        movement=4,
+        movement=2,
         jump=True,
     ),
     actions.ActionCard(
@@ -27,7 +27,7 @@ cards = [
         actions=[
             actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=2),
         ],
-        movement=3,
+        movement=2,
         jump=True,
     ),
     actions.ActionCard(
@@ -37,7 +37,7 @@ cards = [
                 shape=shapes.cone(2), element_type=obstacle.Fire, strength=2
             ),
         ],
-        movement=4,
+        movement=3,
         jump=True,
     ),
     actions.ActionCard(
@@ -48,7 +48,7 @@ cards = [
                 shape=shapes.ring(2), element_type=obstacle.Fire, strength=1
             ),
         ],
-        movement=3,
+        movement=1,
         jump=True,
     ),
     actions.ActionCard(
@@ -56,7 +56,7 @@ cards = [
         actions=[
             actions.AreaAttackFromSelf(shapes.cone(2), 2),
         ],
-        movement=3,
+        movement=2,
         jump=True,
     ),
 ]
