@@ -893,6 +893,7 @@ class Board:
         self.characters.append(new_char)
         row, col = self.pick_unoccupied_location()
         self.locations[row][col] = new_char
+        self.deal_terrain_damage_current_location(new_char)
         self.pyxel_manager.add_entity(new_char, row, col)
         self.pyxel_manager.load_characters(self.characters)
 
