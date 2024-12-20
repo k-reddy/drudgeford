@@ -1,41 +1,38 @@
-# using pyinstaller - downside is it's slow to start up
-pyinstaller --clean frontend_main.spec
-
-# or run the nuitka python file, then 
+# un the nuitka python file, then 
 # force code sign 
-codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/frontend_main.app
+codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/drudgeford.app
 
 # make zip 
-ditto -c -k --keepParent "banana/frontend_main.app" "banana/frontend_main.zip"
+ditto -c -k --keepParent "banana/drudgeford.app" "banana/drudgeford.zip"
 # submit to apple for notarization 
-xcrun notarytool submit "banana/frontend_main.zip" --keychain-profile "Drudgeford-notary" --wait
+xcrun notarytool submit "banana/drudgeford.zip" --keychain-profile "Drudgeford-notary" --wait
 # get log if fails: 
 xcrun notarytool log [ID] --keychain-profile "Drudgeford-notary"
 # staple notarization ticket
-xcrun stapler staple "banana/frontend_main.app" 
+xcrun stapler staple "banana/drudgeford.app" 
 
 
 # create dmg
  create-dmg \
-  --volname "frontend_main" \
+  --volname "drudgeford" \
   --window-pos 200 120 \
   --window-size 800 400 \
-  --volicon banana/frontend_main.build/icons/icons.icns \
+  --volicon banana/drudgeford.build/icons/icons.icns \
   --icon-size 100 \
-  --icon frontend_main.app 200 200 \
-  --hide-extension frontend_main.app \
+  --icon drudgeford.app 200 200 \
+  --hide-extension drudgeford.app \
   --app-drop-link 600 200 \
-  banana/frontend_main.dmg \
-  banana/frontend_main.app
+  banana/drudgeford.dmg \
+  banana/drudgeford.app
 
 # code sign dmg 
-codesign --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/frontend_main.dmg
+codesign --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/drudgeford.dmg
 
 # submit for notarization 
-xcrun notarytool submit "banana/frontend_main.dmg" --keychain-profile "Drudgeford-notary" --wait
+xcrun notarytool submit "banana/drudgeford.dmg" --keychain-profile "Drudgeford-notary" --wait
 
 # staple ticket to dmg
-xcrun stapler staple "banana/frontend_main.dmg"
+xcrun stapler staple "banana/drudgeford.dmg"
 
 
 # verify notarization 
