@@ -5,7 +5,7 @@ import platform
 
 def create_build_script():
     python_exe = sys.executable
-    main_script = "frontend_main.py"
+    main_script = "drudgeford.py"
 
     include_modules = [
         "backend.utils.config",

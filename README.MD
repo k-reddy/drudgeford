@@ -58,7 +58,7 @@ You have two options:
    ```
    In the other two, run:   
    ```bash
-   python3 frontend_main.py --dev
+   python3 drudgeford.py --dev
    ```
    Each terminal window will run an instance of the pyxel frontend.
 

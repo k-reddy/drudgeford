@@ -238,10 +238,10 @@ JOIN_HTML = """
         <h1 class="success-heading">JOIN GAME</h1>
         <div class="note">
             <strong>INSTRUCTIONS:</strong>
-            <p>1. RUN YOUR DRUDGEFORD FRONTEND_MAIN.PY FILE</p>
+            <p>1. RUN YOUR DOWNLOADED DRUDGEFORD APP</p>
             <p>2. SET A NUMBER OF PLAYERS</p>
             <p>3. SHARE THE PORT NUMBER WITH YOUR FRIENDS</p>
-            <p>4. TELL THEM TO RUN THEIR FILES AND JOIN THE ADVENTURE!</p>
+            <p>4. TELL THEM TO RUN THEIR APPS AND JOIN THE ADVENTURE!</p>
         </div>
         <p>Game Status: RUNNING</p>
         <p>Game Port: {port}</p>
@@ -476,11 +476,11 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../banana/frontend_main.dmg"
+    exe_path = "../banana/drudgeford.dmg"
     return send_file(
         exe_path,
         as_attachment=True,
-        download_name="frontend_main.dmg",
+        download_name="drudgeford.dmg",
         mimetype="application/x-apple-diskimage",
     )
 
