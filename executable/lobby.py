@@ -168,15 +168,14 @@ MAIN_HTML = """
                 <div id="gameLink" class="game-link"></div>
                 
                 <div class="note">
-                    <strong>GAME HOSTING INSTRUCTIONS:</strong>
+                    <strong>GAME SET-UP INSTRUCTIONS:</strong>
                     <ol>
-                        <li>All players should clone the <a href="https://github.com/k-reddy/drudgeford" style="color: #6495ED">github repos</a> and pull the latest code</li>
-                        <li>TO HOST: Click 'HOST GAME', follow the link, and share the port number with all players</li>
-                        <li>Once a game is hosted, all players (including host) should open the terminal, navigate to the drudgeford folder in the cloned repos, and run frontend_main.py</li>
-                        <li>Enter the port number when prompted to join the same game</li>
-                        <li>Click 'LEARN TO PLAY' for instructions on playing the game</li>
+                        <li>Click 'DOWNLOAD' to get the latest version of the game. Open the download and drag Drudgeford into your Applications folder</li>
+                        <li>One person should click 'HOST GAME', follow the link, and share the port number with all players</li>
+                        <li>Once a game is hosted, all players (including host) should open their copy of Drudgeford and select the approrpriate port to join</li>
+                        <li>If you've never played before, we highly recommend clicking 'LEARN TO PLAY' for a very brief orientation to playing the game</li>
                     </ol>
-                    <span style="font-size: 0.7em; font-style: italic;">* Game has only been playtested on Mac</span>
+                    <span style="font-size: 0.7em; font-style: italic;">* Game only works on Mac</span>
 
                 </div>
             </div>
