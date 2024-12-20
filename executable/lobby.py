@@ -168,15 +168,14 @@ MAIN_HTML = """
                 <div id="gameLink" class="game-link"></div>
                 
                 <div class="note">
-                    <strong>GAME HOSTING INSTRUCTIONS:</strong>
+                    <strong>GAME SET-UP INSTRUCTIONS:</strong>
                     <ol>
-                        <li>All players should clone the <a href="https://github.com/k-reddy/drudgeford" style="color: #6495ED">github repos</a> and pull the latest code</li>
-                        <li>TO HOST: Click 'HOST GAME', follow the link, and share the port number with all players</li>
-                        <li>Once a game is hosted, all players (including host) should open the terminal, navigate to the drudgeford folder in the cloned repos, and run frontend_main.py</li>
-                        <li>Enter the port number when prompted to join the same game</li>
-                        <li>Click 'LEARN TO PLAY' for instructions on playing the game</li>
+                        <li>Click 'DOWNLOAD' to get the latest version of the game. Open the download and drag Drudgeford into your Applications folder</li>
+                        <li>One person should click 'HOST GAME', follow the link, and share the port number with all players</li>
+                        <li>Once a game is hosted, all players (including host) should open their copy of Drudgeford and select the approrpriate port to join</li>
+                        <li>If you've never played before, we highly recommend clicking 'LEARN TO PLAY' for a very brief orientation to playing the game</li>
                     </ol>
-                    <span style="font-size: 0.7em; font-style: italic;">* Game has only been playtested on Mac</span>
+                    <span style="font-size: 0.7em; font-style: italic;">* Game only works on Mac</span>
 
                 </div>
             </div>
@@ -239,10 +238,10 @@ JOIN_HTML = """
         <h1 class="success-heading">JOIN GAME</h1>
         <div class="note">
             <strong>INSTRUCTIONS:</strong>
-            <p>1. RUN YOUR DRUDGEFORD FRONTEND_MAIN.PY FILE</p>
+            <p>1. RUN YOUR DOWNLOADED DRUDGEFORD APP</p>
             <p>2. SET A NUMBER OF PLAYERS</p>
             <p>3. SHARE THE PORT NUMBER WITH YOUR FRIENDS</p>
-            <p>4. TELL THEM TO RUN THEIR FILES AND JOIN THE ADVENTURE!</p>
+            <p>4. TELL THEM TO RUN THEIR APPS AND JOIN THE ADVENTURE!</p>
         </div>
         <p>Game Status: RUNNING</p>
         <p>Game Port: {port}</p>
@@ -308,29 +307,32 @@ TUTORIAL_HTML = """
             },
             {
                 image: "/static/help_images/modifier_deck.png",
-                image_size: 50,
-                text: "When you attack, you will draw a random modifier from your <span style='color: #00BFFF'>attack modifier deck</span> - this adds some excitement to the game!<br><br>If you attack for 3 but draw a -2 modifier, your attack does only 1 damage <span style='color: #00BFFF'>:(</span><br><br>"
+                image_size: 100,
+                text: "When you attack, you will draw a card from your <span style='color: #678AD4'>attack modifier deck</span> that adjusts how much damage you do.<br><br>"+
+                    "The notation below means the character <span style='color: #00BFFF'>attacked for 3</span> and drew a <span style='color: #678AD4'>+2</span> from their 13-card modifier deck. "+
+                    "With the modifier, the attack does <span style='color: #FF9933'>5 damage</span>.<br><br>"
+
             },
             {
                 alignment: "left",
                 text: `<div>
-                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #00BFFF">attack modifier deck</span>:</div>
+                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #678AD4">attack modifier deck</span>:</div>
                     <div class="grid-container">
                         <div class="grid-item">
                             <h3>Fortify by 2</h3>
-                            <p>Puts a +2 card on top of your attack modifier deck</p>
+                            <p>Puts a +2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>+2 -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Weaken by 2</h3>
-                            <p>Puts a -2 card on top of your attack modifier deck</p>
+                            <p>Puts a -2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>-2 -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Bless</h3>
-                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack</p>
+                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack<br><br><span style='color: #678AD4'>2x -> Happy's [5]</span></p>
                         </div>
                         <div class="grid-item">
                             <h3>Curse</h3>
-                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack</p>
+                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack<br><br><span style='color: #678AD4'>Null -> Happy's [5]</span></p>
                         </div>
                     </div>
                 </div>`
@@ -344,7 +346,7 @@ TUTORIAL_HTML = """
                             <h3>Shield</h3>
                             <p>Decreases damage you take from attacks, expires on your turn</p>
                         </div>
-                        <div class="grid-item special-grid-item">
+                        <div class="grid-item">
                             <h3>Area Attacks</h3>
                             <p>Let you hit an area rather than a specific target</p>
                         </div>
@@ -358,7 +360,7 @@ TUTORIAL_HTML = """
             {
                 image: "/static/help_images/range_attack.png",
                 image_size: 200,
-                text: "Some of your attacks are <span style='color: #00BFFF'>area effect attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
+                text: "Some of your attacks are <span style='color: #00BFFF'>area attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
             },
             {
                 alignment: "left",
@@ -477,11 +479,11 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../banana/frontend_main.dmg"
+    exe_path = "../banana/drudgeford.dmg"
     return send_file(
         exe_path,
         as_attachment=True,
-        download_name="frontend_main.dmg",
+        download_name="drudgeford.dmg",
         mimetype="application/x-apple-diskimage",
     )
 

@@ -1,15 +1,14 @@
 from backend.models import action_model as actions
 from backend.utils import attack_shapes as shapes
-from backend.models import obstacle
 
 cards = [
     actions.ActionCard(
         attack_name="Critical Meltdown",
         actions=[
-            actions.AreaAttackFromSelf(shape=shapes.circle(2), strength=3),
+            actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
             actions.ModifySelfHealth(-3),
         ],
-        movement=3,
+        movement=2,
         jump=False,
     ),
     actions.ActionCard(
@@ -19,7 +18,7 @@ cards = [
             actions.SingleTargetAttack(2, 2),
             actions.ModifySelfHealth(-2),
         ],
-        movement=4,
+        movement=1,
         jump=False,
     ),
     actions.ActionCard(
@@ -37,7 +36,7 @@ cards = [
             actions.AreaAttackFromSelf(shape=shapes.circle(1), strength=3),
             actions.ModifySelfHealth(-3),
         ],
-        movement=2,
+        movement=1,
         jump=False,
     ),
     actions.ActionCard(
@@ -48,7 +47,7 @@ cards = [
     ),
     actions.ActionCard(
         attack_name="Execute Command",
-        actions=[actions.SingleTargetAttack(3, 2)],
+        actions=[actions.SingleTargetAttack(3, 2, pierce=True)],
         movement=2,
         jump=False,
     ),

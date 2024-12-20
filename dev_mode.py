@@ -2,7 +2,7 @@ import signal
 import subprocess
 import time
 import traceback
-from frontend_main import main as frontend_main
+from drudgeford import main as drudgeford_main
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
 
     try:
         print("Starting client...")
-        frontend_main(dev_mode=True)
+        drudgeford_main(dev_mode=True)
     except Exception as e:
         print(f"Error occurred: {e}")
         print("Full traceback:")
