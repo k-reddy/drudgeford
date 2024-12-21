@@ -359,7 +359,7 @@ class GameLoop:
             monster = self.level.monster_classes[class_num](
                 monster_name,
                 self.pyxel_manager,
-                emoji[class_num],
+                emoji[0],
                 backend.models.agent.Ai(),
                 char_id=next(self.id_generator),
                 is_monster=True,
