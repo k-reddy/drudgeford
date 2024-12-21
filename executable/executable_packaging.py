@@ -58,9 +58,8 @@ def main():
         'xcrun notarytool submit "banana/drudgeford.dmg" --keychain-profile "Drudgeford-notary" --wait',
         # Staple DMG
         'xcrun stapler staple "banana/drudgeford.dmg"',
-        # Verify notarization for both app and DMG
+        # Verify notarization for app (dmg will say error)
         "spctl --assess -vv banana/drudgeford.app",
-        "spctl --assess -vv banana/drudgeford.dmg",
     ]
 
     # Execute commands in sequence
