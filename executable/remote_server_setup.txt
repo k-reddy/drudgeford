@@ -12,7 +12,8 @@ rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="main.py" \
 --include="my_resource.pyxres" \
 --include="requirements.txt" \
---include="banana/***" \
+--include="banana/" \
+--include="banana/drudgeford.dmg" \
 --exclude="**/__pycache__/**" \
 --exclude="**/.pytest_cache/**" \
 --exclude="*" \
