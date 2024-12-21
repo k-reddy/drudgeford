@@ -347,7 +347,7 @@ TUTORIAL_HTML = """
                             <p>Decreases damage you take from attacks, expires on your turn</p>
                         </div>
                         <div class="grid-item">
-                            <h3>Area Attacks</h3>
+                            <h3 style="color: #00BFFF">Area Attacks</h3>
                             <p>Let you hit an area rather than a specific target</p>
                         </div>
                         <div class="grid-item special-grid-item">
