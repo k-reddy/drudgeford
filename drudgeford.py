@@ -1,7 +1,6 @@
 import argparse
 import wx
 from pyxel_ui.engine import PyxelEngine
-from backend.utils.config import TEXT_WIDTH
 
 
 def main(dev_mode=False):
