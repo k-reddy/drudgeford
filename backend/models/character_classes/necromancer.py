@@ -35,7 +35,7 @@ cards = [
     action_model.ActionCard(
         attack_name="Shadow Step",
         actions=[
-            action_model.SingleTargetAttack(2, 2),
+            action_model.AreaAttackFromSelf(shapes.circle(1), 2, Shadow),
             action_model.ModifySelfHealth(3),
         ],
         movement=4,
@@ -69,16 +69,9 @@ cards = [
         jump=False,
     ),
     action_model.ActionCard(
-        # switch this to shadow that shows up around you
         attack_name="Shadow Tendril",
         actions=[
-            action_model.AreaAttackFromSelf(
-                shape=shapes.circle(
-                    2,
-                ),
-                element_type=Shadow,
-            ),
-            action_model.AreaAttackFromSelf(shapes.arc(4), 2, element_type=Shadow),
+            action_model.AreaAttackFromSelf(shapes.arc(4), 3, element_type=Shadow),
         ],
         movement=3,
         jump=False,
