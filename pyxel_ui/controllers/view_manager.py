@@ -86,7 +86,7 @@ class ViewManager:
                 0,
                 self.map_view.bounding_coordinate[1],
             ],
-            bounding_coordinate=[self.canvas_width, BITS * 18],
+            bounding_coordinate=[self.canvas_width, BITS * 18 + 10],
         )
         self.action_card_view, action_card_borders = (
             self.view_factory.create_view_with_border(
