@@ -37,7 +37,7 @@ class ViewManager:
         initiative_bar_view_params = ViewParams(
             font=self.font,
             start_pos=[0, 0],
-            bounding_coordinate=[BITS * initiative_bar_width, BITS],
+            bounding_coordinate=[BITS * initiative_bar_width, BITS * 2],
         )
         self.initiative_bar_view, bar_borders = (
             self.view_factory.create_view_with_border(
@@ -50,11 +50,11 @@ class ViewManager:
             font=self.font,
             start_pos=[
                 0,
-                BITS,
+                self.initiative_bar_view.bounding_coordinate[1],
             ],
             bounding_coordinate=[
                 self.initiative_bar_view.bounding_coordinate[0],
-                BITS * 12,
+                BITS * 11 + self.initiative_bar_view.bounding_coordinate[1],
             ],
             floor_color_map=floor_color_map,
             wall_color_map=wall_color_map,
@@ -86,7 +86,10 @@ class ViewManager:
                 0,
                 self.map_view.bounding_coordinate[1],
             ],
-            bounding_coordinate=[self.canvas_width, BITS * 18 + 10],
+            bounding_coordinate=[
+                self.canvas_width,
+                self.map_view.bounding_coordinate[1] + 6 * BITS + 10,
+            ],
         )
         self.action_card_view, action_card_borders = (
             self.view_factory.create_view_with_border(
