@@ -37,17 +37,18 @@ class UserInputManager:
         curr_mouse_x, curr_mouse_y = pyxel.mouse_x, pyxel.mouse_y
         if self.last_mouse_pos != (curr_mouse_x, curr_mouse_y):
             last_mouse_x, last_mouse_y = self.last_mouse_pos
-            if view := self.view_manager.get_view_for_coordinate_px(
+            hit_views = self.view_manager.get_views_for_coordinate_px(
                 last_mouse_x, last_mouse_y
-            ):
+            )
+            for view in hit_views:
                 view.redraw()
 
             # Grid concerns
             grid_left_px = round_down_to_nearest_multiple(
-                curr_mouse_x, MAP_TILE_WIDTH_PX, self.view_manager.view_border
+                curr_mouse_x, MAP_TILE_WIDTH_PX, self.view_manager.map_view_border
             )
             grid_top_px = round_down_to_nearest_multiple(
-                curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.view_border
+                curr_mouse_y, MAP_TILE_HEIGHT_PX, self.view_manager.map_view_border
             )
             self.mouse_px_pos = (grid_left_px, grid_top_px)
 
