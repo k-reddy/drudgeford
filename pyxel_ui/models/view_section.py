@@ -11,6 +11,7 @@ from pyxel_ui.constants import (
     BITS,
     BACKGROUND_TILES,
     WALL_DIRECTIONS,
+    WALL_THICKNESS,
 )
 
 # !!! somehow enforce the end bounds throughout
@@ -206,8 +207,9 @@ class MapView(ViewSection):
         random.seed(100)
         for x, y in self.valid_map_coordinates:
             # get coordinates
-            x_px = x * self.tile_width_px + self.start_pos[0]
-            y_px = y * self.tile_height_px + self.start_pos[1]
+            # add wall thickness b/c we can subtract px from this and draw the walls "before" the map
+            x_px = x * self.tile_width_px + self.start_pos[0] + WALL_THICKNESS
+            y_px = y * self.tile_height_px + self.start_pos[1] + WALL_THICKNESS
 
             # draw floor tile
             floor_tile = BACKGROUND_TILES[random.choice(self.dungeon_floor_tile_names)]
@@ -247,8 +249,8 @@ class MapView(ViewSection):
         # draw grid only on valid map coordinates'
         for x, y in self.valid_map_coordinates:
             pyxel.rectb(
-                x * self.tile_width_px + self.start_pos[0],
-                y * self.tile_height_px + self.start_pos[1],
+                x * self.tile_width_px + self.start_pos[0] + WALL_THICKNESS,
+                y * self.tile_height_px + self.start_pos[1] + WALL_THICKNESS,
                 self.tile_width_px,
                 self.tile_height_px,
                 GRID_COLOR,
@@ -285,8 +287,8 @@ class MapView(ViewSection):
 
     def convert_grid_to_pixel_pos(self, tile_x: int, tile_y: int) -> tuple[int, int]:
         """Converts grid-based tile coordinates to pixel coordinates on the canvas."""
-        pixel_x = self.start_pos[0] + (tile_x * self.tile_width_px)
-        pixel_y = self.start_pos[1] + (tile_y * self.tile_height_px)
+        pixel_x = self.start_pos[0] + (tile_x * self.tile_width_px) + WALL_THICKNESS
+        pixel_y = self.start_pos[1] + (tile_y * self.tile_height_px) + WALL_THICKNESS
         return (pixel_x, pixel_y)
 
 

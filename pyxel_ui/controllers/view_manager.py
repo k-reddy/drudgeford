@@ -3,10 +3,7 @@ import pyxel
 from typing import Optional
 
 from pyxel_ui.controllers.view_factory import ViewFactory
-from pyxel_ui.constants import (
-    BITS,
-    FONT_PATH,
-)
+from pyxel_ui.constants import BITS, FONT_PATH, WALL_THICKNESS
 from pyxel_ui.models.font import PixelFont
 from pyxel_ui.views.sprite import SpriteManager
 from pyxel_ui.models.view_params import MapViewParams, ViewParams
@@ -15,7 +12,7 @@ from pyxel_ui.models import view_section as view
 
 class ViewManager:
     def __init__(self, pyxel_width: int, pyxel_height: int):
-        self.view_border: int = 10
+        self.map_view_border: int = 10 + WALL_THICKNESS
         self.sprite_manager = SpriteManager()
         self.font = PixelFont(pyxel, f"../{FONT_PATH}")
         self.canvas_width = pyxel_width
@@ -229,25 +226,31 @@ class ViewManager:
         """Converts grid-based tile coordinates to pixel coordinates on the map."""
         return self.map_view.convert_grid_to_pixel_pos(tile_x, tile_y)
 
-    def get_view_for_coordinate_px(
+    def get_views_for_coordinate_px(
         self,
         px_x: int,
         px_y: int,
     ) -> Optional[view.ViewSection]:
-        view = next(
-            (
-                curr_view
-                for curr_view in self.views
-                if curr_view.start_pos[0] <= px_x < curr_view.end_pos[0]
-                and curr_view.start_pos[1] <= px_y < curr_view.end_pos[1]
-                and curr_view.active
-            ),
-            None,
-        )
-        # print(view)
-        # if view:
-        #     print(view.active)
-        return view
+        hit_views = set()
+        for px_x, px_y in [
+            (px_x, px_y),
+            (px_x + 16, px_y),
+            (px_x, px_y + 16),
+            (px_x + 16, px_y + 16),
+        ]:
+            hit_view = next(
+                (
+                    curr_view
+                    for curr_view in self.views
+                    if curr_view.start_pos[0] <= px_x < curr_view.end_pos[0]
+                    and curr_view.start_pos[1] <= px_y < curr_view.end_pos[1]
+                    and curr_view.active
+                ),
+                None,
+            )
+            if hit_view:
+                hit_views.add(hit_view)
+        return hit_views
 
     def draw_grid(
         self,
@@ -270,8 +273,8 @@ class ViewManager:
         if not self.map_view:
             return None
         # get rid of offsets
-        px_x -= self.map_view.start_pos[0]
-        px_y -= self.map_view.start_pos[1]
+        px_x -= self.map_view.start_pos[0] + WALL_THICKNESS
+        px_y -= self.map_view.start_pos[1] + WALL_THICKNESS
         # figure out the tile number (not px)
         x_num = px_x / self.map_view.tile_width_px
         y_num = px_y / self.map_view.tile_height_px
@@ -283,8 +286,8 @@ class ViewManager:
         self,
         tile_x: int,
         tile_y: int,
-        offset_x: int = 0,
-        offset_y: int = 0,
+        offset_x: int = WALL_THICKNESS,
+        offset_y: int = WALL_THICKNESS,
     ) -> tuple[int, int]:
         """Converts the tile numbers into pixel coordinates representing the top-left corner
         in the tile.
