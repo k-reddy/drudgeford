@@ -58,14 +58,14 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(CURRENT_DIR)
 STATIC_DIR = os.path.join(CURRENT_DIR, "static")
 CSS_FILE = os.path.join(CURRENT_DIR, "styles.css")
-main_path = os.path.join(BASE_DIR, "backend_main.py")
+backend_main_path = os.path.join(BASE_DIR, "backend_main.py")
 
 
 def run_game_server(game_id: str, port: int):
     """Run the game server in a separate process"""
     try:
         process = subprocess.Popen(
-            ["python", main_path, str(port)],
+            ["python", backend_main_path, str(port)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
