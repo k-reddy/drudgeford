@@ -32,33 +32,33 @@ def main():
     # List of commands to execute
     commands = [
         # Code sign the app
-        'codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime executable/executable_file/drudgeford.app',
+        'codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime executable_packaging/executable_file/drudgeford.app',
         # Create zip for notarization
-        'ditto -c -k --keepParent "banana/drudgeford.app" "banana/drudgeford.zip"',
+        'ditto -c -k --keepParent "executable_packaging/executable_file/drudgeford.app" "executable_packaging/executable_file/drudgeford.zip"',
         # Submit app for notarization and wait for result
-        'xcrun notarytool submit "banana/drudgeford.zip" --keychain-profile "Drudgeford-notary" --wait',
+        'xcrun notarytool submit "executable_packaging/executable_file/drudgeford.zip" --keychain-profile "Drudgeford-notary" --wait',
         # Staple the app
-        'xcrun stapler staple "banana/drudgeford.app"',
+        'xcrun stapler staple "executable_packaging/executable_file/drudgeford.app"',
         # Create DMG
         """create-dmg \\
             --volname "drudgeford" \\
             --window-pos 200 120 \\
             --window-size 800 400 \\
-            --volicon banana/drudgeford.build/icons/icons.icns \\
+            --volicon executable_packaging/executable_file/drudgeford.build/icons/icons.icns \\
             --icon-size 100 \\
             --icon drudgeford.app 200 200 \\
             --hide-extension drudgeford.app \\
             --app-drop-link 600 200 \\
-            banana/drudgeford.dmg \\
-            banana/drudgeford.app""",
+            executable_packaging/executable_file/drudgeford.dmg \\
+            executable_packaging/executable_file/drudgeford.app""",
         # Code sign DMG
-        'codesign --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/drudgeford.dmg',
+        'codesign --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime executable_packaging/executable_file/drudgeford.dmg',
         # Submit DMG for notarization
-        'xcrun notarytool submit "banana/drudgeford.dmg" --keychain-profile "Drudgeford-notary" --wait',
+        'xcrun notarytool submit "executable_packaging/executable_file/drudgeford.dmg" --keychain-profile "Drudgeford-notary" --wait',
         # Staple DMG
-        'xcrun stapler staple "banana/drudgeford.dmg"',
+        'xcrun stapler staple "executable_packaging/executable_file/drudgeford.dmg"',
         # Verify notarization for app (dmg will say error)
-        "spctl --assess -vv banana/drudgeford.app",
+        "spctl --assess -vv executable_packaging/executable_file/drudgeford.app",
     ]
 
     # Execute commands in sequence
