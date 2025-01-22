@@ -85,7 +85,7 @@ def create_build_script():
     if result.returncode == 0:
         print("Compilation completed successfully!")
         print(
-            "Your executable can be found in the 'executable/executable_file' directory"
+            "Your executable can be found in the 'executable_packaging/executable_file' directory"
         )
     else:
         print("Compilation failed with error code:", result.returncode)

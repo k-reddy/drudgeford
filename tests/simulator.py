@@ -1,6 +1,6 @@
 import pandas as pd
 import random
-from .. import main
+from .. import backend_main
 
 # setup variables
 LOG_PATH = "ai_mode_condensed_log.txt"
@@ -12,7 +12,7 @@ for i in range(NUM_GAMES):
     if i % 10 == 0:
         print(f"Running game {i}/{NUM_GAMES}")
     num_players = random.choice([1, 2, 3])
-    end_state = main.main(num_players, all_ai_mode=True)
+    end_state = backend_main.main(num_players, all_ai_mode=True)
     game_data.append({"end_state": end_state, "num_players": num_players})
 
 # convert data to a dataframe and create summary statistics
