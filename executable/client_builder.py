@@ -34,7 +34,7 @@ def create_build_script():
         "--follow-imports",
         "--standalone",
         "--static-libpython=no",
-        "--output-dir=banana",
+        "--output-dir=executable_file",
         "--nofollow-import-to=numpy",
     ]
 
@@ -84,7 +84,9 @@ def create_build_script():
 
     if result.returncode == 0:
         print("Compilation completed successfully!")
-        print("Your executable can be found in the 'banana' directory")
+        print(
+            "Your executable can be found in the 'executable/executable_file' directory"
+        )
     else:
         print("Compilation failed with error code:", result.returncode)
 
