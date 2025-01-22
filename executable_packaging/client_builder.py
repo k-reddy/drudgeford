@@ -2,6 +2,10 @@ import sys
 from subprocess import run
 import platform
 
+"""
+this is meant to be run from the main drudgeford folder
+"""
+
 
 def create_build_script():
     python_exe = sys.executable
@@ -34,7 +38,7 @@ def create_build_script():
         "--follow-imports",
         "--standalone",
         "--static-libpython=no",
-        "--output-dir=executable_file",
+        "--output-dir=executable_packaging/executable_file",
         "--nofollow-import-to=numpy",
     ]
 
@@ -45,7 +49,7 @@ def create_build_script():
                 "--macos-create-app-bundle",
                 "--include-module=_sysconfigdata__darwin_darwin",
                 "--python-flag=no_site",
-                "--macos-app-icon=../lobby/static/drudgeford_cover.png",
+                "--macos-app-icon=lobby/static/drudgeford_cover.png",
                 "--macos-sign-identity=Developer ID Application: Keerthi Reddy (CKMMRP742B)",
             ]
         )
