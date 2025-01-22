@@ -39,7 +39,7 @@ class PyxelEngine:
         self.start_time: float = time.time()
         self.loop_durations: deque[float] = deque(maxlen=WINDOW_LENGTH)
         pyxel.init(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
-        pyxel.load("../my_resource.pyxres")
+        pyxel.load("assets/my_resource.pyxres")
 
         self.view_manager = ViewManager(DEFAULT_PYXEL_WIDTH, DEFAULT_PYXEL_HEIGHT)
         # self.mouse_tile_pos = None
