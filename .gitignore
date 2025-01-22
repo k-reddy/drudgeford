@@ -12,8 +12,9 @@ debug_log.txt
 frontend_main.dist/
 frontend_main.spec
 build/
-banana/
-executable/logs/
+executable/
+lobby/logs
+executable/executable_file
 pixel_art/
 Logs/
 saved_campaign_files/
