@@ -4,15 +4,15 @@ chmod 400 Documents/developer_creds/drudgeford_key.pem
 # copy the code over
 rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="backend/***" \
---include="executable/***" \
+--include="executable_packaging/***" \
 --include="pyxel_ui/***" \
 --include="server/***" \
 --include="__init__.py" \
 --include="drudgeford.py" \
 --include="backend_main.py" \
 --include="requirements.txt" \
---include="executable/executable_file/" \
---include="executable/executable_file/drudgeford.dmg" \
+--include="executable_packaging/executable_file/" \
+--include="executable_packaging/executable_file/drudgeford.dmg" \
 --exclude="**/__pycache__/**" \
 --exclude="**/.pytest_cache/**" \
 --exclude="*" \

@@ -479,7 +479,7 @@ def send_static(path):
 
 @app.route("/download")
 def download():
-    exe_path = "../banana/drudgeford.dmg"
+    exe_path = "../executable_packaging/executable_file/drudgeford.dmg"
     return send_file(
         exe_path,
         as_attachment=True,
