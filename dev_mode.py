@@ -4,6 +4,10 @@ import time
 import traceback
 from drudgeford import main as drudgeford_main
 
+"""
+starts both the backend and 1 frontend locally
+"""
+
 
 def main():
     # signal handler for SIGINT
@@ -12,7 +16,7 @@ def main():
     print("===DEV MODE===")
     print("Starting server...")
     server_process = subprocess.Popen(
-        ["python3", "main.py", "8000"],
+        ["python3", "backend_main.py", "8000"],
     )
 
     # wait for server to start
