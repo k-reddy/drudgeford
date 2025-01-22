@@ -2,7 +2,6 @@
 import os
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 
@@ -66,7 +65,7 @@ def main():
     for command in commands:
         print("\n" + "=" * 80)
         print(f"Executing command:\n{command}\n")
-        result = run_command(command)
+        _ = run_command(command)
 
 
 if __name__ == "__main__":
