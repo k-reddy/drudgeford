@@ -21,11 +21,6 @@ def main(dev_mode=False):
             port = dialog.GetStringSelection()
         else:
             return
-
-        # port = input("Please enter the port number").strip()
-        # valid_ports = ["5000", "5001", "5002", "5003", "5004", "8000"]
-        # while port not in valid_ports:
-        #     port = input("Please enter a valid port number")
     port = int(port)
     pyxel_view = PyxelEngine(port, host=host)
     pyxel_view.start()

@@ -1,7 +1,6 @@
 import os
 import sys
 import traceback
-import time
 from backend.models.campaign_manager import Campaign
 from server.tcp_server import TCPServer, ClientType
 
