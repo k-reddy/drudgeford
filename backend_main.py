@@ -4,6 +4,10 @@ import traceback
 from backend.models.campaign_manager import Campaign
 from server.tcp_server import TCPServer, ClientType
 
+"""
+Runs the backend for Drudgeford
+"""
+
 
 def main(num_players: int = 1, all_ai_mode=False):
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
