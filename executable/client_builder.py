@@ -61,7 +61,7 @@ def create_build_script():
             "--include-package-data=backend",
             "--include-package-data=server",
             "--include-data-dir=pyxel_ui/assets/Press_Start_2P=pyxel_ui/assets/Press_Start_2P",
-            "--include-data-files=my_resource.pyxres=my_resource.pyxres",
+            "--include-data-files=pyxel_ui/assets/my_resource.pyxres=my_resource.pyxres",
         ]
     )
 
