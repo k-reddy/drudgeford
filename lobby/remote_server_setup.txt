@@ -10,7 +10,6 @@ rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="__init__.py" \
 --include="drudgeford.py" \
 --include="backend_main.py" \
---include="my_resource.pyxres" \
 --include="requirements.txt" \
 --include="executable/executable_file/" \
 --include="executable/executable_file/drudgeford.dmg" \
