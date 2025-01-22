@@ -2,6 +2,12 @@ import argparse
 import wx
 from pyxel_ui.engine import PyxelEngine
 
+"""
+runs the frontend 
+- if in dev mode, looks for the backend on localhost
+- else, looks for the backend on the server and requires you to specify the port
+"""
+
 
 def main(dev_mode=False):
     host = "13.59.128.25"
