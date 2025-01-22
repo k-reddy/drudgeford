@@ -54,7 +54,7 @@ You have two options:
 
 2. For two-player on the same computer, you'll need to open three terminal windows and navigate each to the Drudgeford folder. In one, run:
    ```bash
-   python3 main.py
+   python3 backend_main.py
    ```
    In the other two, run:   
    ```bash
