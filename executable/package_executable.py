@@ -32,7 +32,7 @@ def main():
     # List of commands to execute
     commands = [
         # Code sign the app
-        'codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime banana/drudgeford.app',
+        'codesign --force --deep --strict --sign "Developer ID Application: Keerthi Reddy (CKMMRP742B)" --options runtime executable/executable_file/drudgeford.app',
         # Create zip for notarization
         'ditto -c -k --keepParent "banana/drudgeford.app" "banana/drudgeford.zip"',
         # Submit app for notarization and wait for result
