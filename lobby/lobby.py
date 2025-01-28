@@ -98,34 +98,6 @@ def run_game_server(game_id: str, port: int):
             logger.log_game_end(game_id, "error", error_msg)
 
 
-JOIN_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Join Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1 class="success-heading">JOIN GAME</h1>
-        <div class="note">
-            <strong>INSTRUCTIONS:</strong>
-            <p>1. RUN YOUR DOWNLOADED DRUDGEFORD APP</p>
-            <p>2. SET A NUMBER OF PLAYERS</p>
-            <p>3. SHARE THE PORT NUMBER WITH YOUR FRIENDS</p>
-            <p>4. TELL THEM TO RUN THEIR APPS AND JOIN THE ADVENTURE!</p>
-        </div>
-        <p>Game Status: RUNNING</p>
-        <p>Game Port: {port}</p>
-    </div>
-</body>
-</html>
-"""
-
-
 @app.route("/")
 def home():
     return render_template("main.html")
@@ -208,7 +180,7 @@ def join_game(game_id):
     if game.status != "running":
         return render_template("ended.html"), 400
 
-    return render_template_string(JOIN_HTML.format(port=game.port))
+    return render_template("join.html", port=game.port)
 
 
 @app.route("/tutorial")
