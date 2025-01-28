@@ -7,6 +7,7 @@ rsync -avzP -e "ssh -i Documents/developer_creds/drudgeford_key.pem" \
 --include="executable_packaging/***" \
 --include="pyxel_ui/***" \
 --include="server/***" \
+--include="lobby/***" \
 --include="__init__.py" \
 --include="drudgeford.py" \
 --include="backend_main.py" \
