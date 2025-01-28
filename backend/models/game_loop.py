@@ -1,8 +1,6 @@
 import random
-import copy
 import backend.models.character as character
 from backend.utils.config import DEBUG
-from backend.models.display import Display
 import backend.models.agent
 from backend.models.board import Board
 from backend.models.obstacle import SlipAndLoseTurn, EntrappedAndLoseTurn
