@@ -858,9 +858,6 @@ class Board:
             # reset to shield 0 indefinitely
             character.shield = (0, MAX_ROUNDS)
 
-    def append_to_attack_modifier_deck(self, target: Character, modifier_card: tuple):
-        target.attack_modifier_deck.append(modifier_card)
-
     def add_new_ai_char(self, is_monster, char_class: Type[Character]):
         from backend.models.agent import Ai
 
