@@ -603,7 +603,7 @@ class Board:
             modified_attack_strength = 0
             to_log += ", missed due to shadow\n"
         self.pyxel_manager.log.append(to_log)
-        self.modify_target_health(target, modified_attack_strength)
+        self.deal_damage_to_target(target, modified_attack_strength)
 
     def is_shadow_interference(self, attacker, target):
         """returns true if the attack misses due to shadow"""
@@ -742,7 +742,7 @@ class Board:
             # )
             damage = damage * -1
         if damage:
-            self.modify_target_health(
+            self.deal_damage_to_target(
                 affected_character, damage, element.__class__.__name__
             )
         # if it's rotting flesh and doesn't do damage:
@@ -784,7 +784,7 @@ class Board:
         else:
             return is_position_within_board and self.locations[row][col] is None
 
-    def modify_target_health(
+    def deal_damage_to_target(
         self, target: Character, damage: int, damage_str: str = ""
     ) -> None:
         """
