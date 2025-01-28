@@ -469,9 +469,6 @@ class Board:
                 chance_of_miss += 0.1
         return random.random() < chance_of_miss
 
-    def update_locations(self, row, col, new_item):
-        self.locations[row][col] = new_item
-
     def remove_character(self, target):
         self.characters.remove(target)
         self.pyxel_manager.load_characters(self.characters)

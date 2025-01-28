@@ -14,7 +14,6 @@ class BoardInitializer:
         self.terrain = self._initialize_terrain(size, size)
 
     def set_up_board(self):
-
         self.reshape_board()
         self.set_character_starting_locations()
         self.potential_shapes = [
