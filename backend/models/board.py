@@ -472,14 +472,13 @@ class Board:
     def remove_character(self, target):
         self.characters.remove(target)
         self.pyxel_manager.load_characters(self.characters)
-        # this method is not necessary as well, keeping it till we discuss
 
     def kill_target(self, target: Character, damage_str: str = "") -> None:
         if target not in self.characters:
             return
         self.remove_character(target)
         row, col = self.find_location_of_target(target)
-        self.update_locations(row, col, None)
+        self.locations[row][col] = None
         self.pyxel_manager.remove_entity(target.id, show_death_animation=True)
         died_by = f" by{damage_str}" if damage_str else ""
         self.pyxel_manager.log.append(
@@ -615,8 +614,8 @@ class Board:
         is_jump: bool = False,
     ) -> None:
         # Add action queue logic here.
-        self.update_locations(old_location[0], old_location[1], None)
-        self.update_locations(new_location[0], new_location[1], actor)
+        self.locations[old_location[0]][old_location[1]] = None
+        self.locations[new_location[0]][new_location[1]] = actor
         self.pyxel_manager.move_character(actor, old_location, new_location, is_jump)
 
     def is_legal_move(self, row: int, col: int, jump_intermediate_move=False) -> bool:
