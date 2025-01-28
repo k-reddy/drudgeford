@@ -22,6 +22,9 @@ from .controllers.user_input_manager import UserInputManager
 
 class PyxelEngine:
     def __init__(self, port, host):
+        # self.total_time = 0
+        # self.num_loops = 0
+        # self.total_task_time = 0
         self.server_client = TCPClient(ClientType.FRONTEND, port=port, host=host)
         self.tj = TaskJsonifier()
         self.current_task = None
@@ -71,6 +74,8 @@ class PyxelEngine:
                     self.task_queue.append(task)
             self.loop_num = 0
             get_task_time = time.time() - start_time
+            # self.total_task_time += get_task_time
+            # self.total_time += get_task_time
 
         # every loop, try to grab a task from the queue
         if not self.current_task and self.task_queue:
@@ -78,6 +83,7 @@ class PyxelEngine:
             current_task_json = self.task_queue.popleft()
             self.current_task = self.tj.make_task_from_json(current_task_json)
             unjsonify_time = time.time() - start_time
+            # self.total_time += unjsonify_time
 
         if self.current_task:
             start_time = time.time()
@@ -101,6 +107,7 @@ class PyxelEngine:
 
             self.current_task = None
             perform_time = time.time() - start_time
+            # self.total_time += perform_time
         self.loop_num += 1
         # print("------")
         # print(f"ui time: {ui_time}")
@@ -108,6 +115,9 @@ class PyxelEngine:
         # print(f"get_task_time : {get_task_time}")
         # print(f"unjsonify time: {unjsonify_time}")
         # print("------")
+        # self.num_loops += 1
+        # print(f"task time avg: {self.total_task_time/self.num_loops}")
+        # print(f"total time avg: {self.total_time/self.num_loops}")
 
     def draw(self):
         """everything in the tasks draws itself,
