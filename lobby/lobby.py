@@ -98,25 +98,6 @@ def run_game_server(game_id: str, port: int):
             logger.log_game_end(game_id, "error", error_msg)
 
 
-ERROR_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Not Found</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="container error-container">
-        <h1 class="error-heading">GAME NOT FOUND</h1>
-        <p>This game session no longer exists or has ended.</p>
-    </div>
-</body>
-</html>
-"""
-
 ENDED_HTML = """
 <!DOCTYPE html>
 <html lang="en">
@@ -240,7 +221,7 @@ def host_game():
 @app.route("/join/<game_id>")
 def join_game(game_id):
     if game_id not in active_games:
-        return render_template_string(ERROR_HTML), 404
+        return render_template("error.html"), 404
 
     game = active_games[game_id]
     if game.status != "running":
