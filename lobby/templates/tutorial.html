@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play - Drudgeford</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script>
+        let currentSlide = 0;
+        const slides = [
+            {
+                text: `<div>
+                WELCOME TO DRUDGEFORD!<br><br>The forces of darkness have been hard at work, and it's up to you to save your town. Here's how it works:<br><br>
+                <ul style="list-style-type: none; padding-left: 40px; margin: 16px 0; text-align: left">
+                <li style="margin-bottom: 12px;">
+                    - Drudgeford is a <span style='color: #00BFFF'>cooperative</span> game, which means you'll be on a team with the other human players.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - A full run-through of the game is called a <span style='color: #FFC87C'>campaign</span>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - In each campaign, you'll work your way through multiple levels. On each level, your goal is to <span style='color: #FF1493'>defeat all your enemies</span>.
+                </li>
+                <li style="margin-bottom: 12px;">
+                    - The game is <span style='color: #8FBC8F'>turn based</span> like a board game, so players and monsters take their turns one at a time.
+                </li>
+                </ul>
+                </div>`
+            },
+            {
+                image: "/static/help_images/log.png",
+                text: "When you enter the game, you'll see a screen like this. The <span style='color: #FF1493'>log</span> will tell you what each character does on their turn.<br><br>"
+            },
+            {
+                image: "/static/help_images/initiative_bar.png",
+                text: "The <span style='color: #FF1493'>initiative bar</span> will show you how much health each character has, the turn order for the round, and who's on what team.<br><br>Turn order is randomly set each round.<br><br><br>"
+            },
+            {
+                image: "/static/help_images/action_cards.png",
+                text: "During your turn, you will choose an <span style='color: #FF1493'>action card</span>.<br><br>Your available <span style='color: #FF1493'>action cards</span> are displayed below the map/log area. You can use the left and right arrows to scroll through them.<br><br>"
+            },
+            {
+                image: "/static/help_images/short_rest.png",
+                image_size: 150,
+                text: "When you use a card, you cannot use it again until you <span style='color: #8FBC8F'>short rest</span> at the end of a round.<br><br>During a <span style='color: #8FBC8F'>short rest</span>, you lose a random used card and get back all your other used cards. If you lose all your cards, you get exhausted and lose the game.<br><br>"
+            },
+            {
+                image: "/static/help_images/card_highlighted.png",
+                image_size: 200,
+                text: "Most cards have <span style='color: #FFC87C'>movement</span> (or jump, which lets you jump over things on the board), <span style='color: #00BFFF'>attacks</span>, and other <span style='color: #FF8FA7'>special abilities</span>.<br><br>"+
+                "On some cards, you will see a <span style='color: #FFC87C'><2></span> - this means your ability can be done to anyone within 2 squares of you. If no range is specified, the ability can only be done to squares adjacent to you.<br><br>"
+
+            },
+            {
+                image: "/static/help_images/modifier_deck.png",
+                image_size: 100,
+                text: "When you attack, you will draw a card from your <span style='color: #678AD4'>attack modifier deck</span> that adjusts how much damage you do.<br><br>"+
+                    "The notation below means the character <span style='color: #00BFFF'>attacked for 3</span> and drew a <span style='color: #678AD4'>+2</span> from their 13-card modifier deck. "+
+                    "With the modifier, the attack does <span style='color: #FF9933'>5 damage</span>.<br><br>"
+
+            },
+            {
+                alignment: "left",
+                text: `<div>
+                    <div>Some <span style='color: #FF8FA7'>special abilities</span> affect your <span style="color: #678AD4">attack modifier deck</span>:</div>
+                    <div class="grid-container">
+                        <div class="grid-item">
+                            <h3>Fortify by 2</h3>
+                            <p>Puts a +2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>+2 -> Happy's [5]</span></p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Weaken by 2</h3>
+                            <p>Puts a -2 card on top of your attack modifier deck<br><br><span style='color: #678AD4'>-2 -> Happy's [5]</span></p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Bless</h3>
+                            <p>Puts a 2x card in a random spot in your attack modifier deck - this doubles your attack<br><br><span style='color: #678AD4'>2x -> Happy's [5]</span></p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Curse</h3>
+                            <p>Puts a null card in a random spot attack modifier deck - you miss your attack<br><br><span style='color: #678AD4'>Null -> Happy's [5]</span></p>
+                        </div>
+                    </div>
+                </div>`
+            },
+            {
+                alignment: "left",
+                text: `<div>
+                    <p style="margin: 16px 0 8px 0;"><br>Other <span style="color: #FF8FA7">special abilities</span> include:</p>
+                    <div class="grid-container">
+                        <div class="grid-item special-grid-item">
+                            <h3>Shield</h3>
+                            <p>Decreases damage you take from attacks, expires on your turn</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3 style="color: #00BFFF">Area Attacks</h3>
+                            <p>Let you hit an area rather than a specific target</p>
+                        </div>
+                        <div class="grid-item special-grid-item">
+                            <h3>Knock Down (50%)</h3>
+                            <p>Gives you a 50% chance of knocking down an enemy, which skips their next turn</p>
+                        </div>
+                    </div>
+                </div>`
+            },
+            {
+                image: "/static/help_images/range_attack.png",
+                image_size: 200,
+                text: "Some of your attacks are <span style='color: #00BFFF'>area attacks</span>. These hit a full area rather than a single character.<br><br>You will be able to <span style='color: #B19CD9'>rotate</span> these attack shapes. If they have <span style='color: #FFC87C'>range</span>, you will then be able to pick a square to attack.<br><br>"
+            },
+            {
+                alignment: "left",
+                text: `<div>
+                    <p style="margin-bottom: 16px;">
+                    There are also some <span style="color: #BC8F82">element effects</span>. If you start in or move through an element that does damage, you'll lose health.<br><br>Some characters have <span style="color: #BC8F82">element affinities</span>, which means they will heal from that element instead.<br><br>
+                    </p>
+                </div>`
+            },
+            {
+                image: "/static/help_images/elements.png",
+                image_size: 75,
+                alignment: "left",
+                text: `<div>
+                    <p style="margin-bottom: 16px;">
+                    Here are some common <span style="color: #BC8F82">elements</span>. The rest you can figure out by experimenting!
+                    </p>
+                    <ul style="list-style-type: none; padding-left: 20px; margin: 16px 0;">
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Fire</span>: Does 1 damage
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Ice</span>: Gives you a 25% chance of slipping when you pass through it
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Rotting Flesh</span>: Has a 50% chance of infecting you and doing 3 damage
+                    </li>
+                    <li style="margin-bottom: 12px;">
+                        - <span style="color: #BC8F82">Shadow</span>: Gives any attack that moves through it a 10% chance of missing per square. If your attack passes through 3 shadow squares, it has a 30% chance of missing.
+                    </li>
+                    </ul>
+                </div>`
+            }
+        ];
+
+        function updateSlide() {
+            const imageElement = document.getElementById('tutorialImage');
+            const textElement = document.getElementById('tutorialText');
+            
+            if (slides[currentSlide].image) {
+                imageElement.src = slides[currentSlide].image;
+                imageElement.style.display = 'block';
+                
+                if (slides[currentSlide].image_size) {
+                    imageElement.style.width = 'auto';
+                    imageElement.style.height = slides[currentSlide].image_size + 'px';
+                } else {
+                    imageElement.style.width = '500px';
+                    imageElement.style.height = 'auto';
+                }
+            } else {
+                imageElement.style.display = 'none';
+            }
+            
+            textElement.style.textAlign = slides[currentSlide].alignment === 'left' ? 'left' : 'center';
+            textElement.innerHTML = slides[currentSlide].text;
+            
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${slides.length}`;
+            document.getElementById('prevButton').disabled = currentSlide === 0;
+            document.getElementById('nextButton').disabled = currentSlide === slides.length - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        window.onload = updateSlide;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>HOW TO PLAY</h1>
+        
+        <div class="tutorial-content">
+            <div class="tutorial-controls">
+                <button onclick="prevSlide()" class="nav-button" id="prevButton">←</button>
+                <span id="slideCounter" class="slide-counter"></span>
+                <button onclick="nextSlide()" class="nav-button" id="nextButton">→</button>
+            </div>
+            <div class="carousel-container">
+                <p id="tutorialText" class="tutorial-text"></p>
+                <img id="tutorialImage" alt="Tutorial" class="tutorial-image" style="width: 500px; height: auto;">
+            </div>
+        </div>
+        
+        <div class="back-button-container">
+            <a href="/" class="host-button back-button">
+                BACK TO LOBBY
+            </a>
+        </div>
+    </div>
+</body>
+</html>
