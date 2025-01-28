@@ -18,6 +18,15 @@ import socket
 from logger import GameLogger
 
 
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(CURRENT_DIR)
+STATIC_DIR = os.path.join(CURRENT_DIR, "static")
+CSS_FILE = os.path.join(CURRENT_DIR, "styles.css")
+backend_main_path = os.path.join(BASE_DIR, "backend_main.py")
+# keep track of attemps per IP (resets everytime we reset the server)
+ip_attempts = defaultdict(list)  # IP -> list of timestamps
+
+
 @dataclass
 class GameInstance:
     id: str
@@ -51,14 +60,6 @@ def get_available_port(start_port: int = 5000, num_ports: int = 5) -> int:
             )  # Log allocation
             return port
     return None
-
-
-# Get the directory where the script is located
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(CURRENT_DIR)
-STATIC_DIR = os.path.join(CURRENT_DIR, "static")
-CSS_FILE = os.path.join(CURRENT_DIR, "styles.css")
-backend_main_path = os.path.join(BASE_DIR, "backend_main.py")
 
 
 def run_game_server(game_id: str, port: int):
@@ -97,6 +98,22 @@ def run_game_server(game_id: str, port: int):
             logger.log_game_end(game_id, "error", error_msg)
 
 
+def has_started_too_many_games(ip) -> bool:
+    current_time = time.time()
+    # Clean up old attempts (older than 24 hours)
+    ip_attempts[ip] = [
+        t for t in ip_attempts[ip] if current_time - t < 86400
+    ]  # 24 hours in seconds
+
+    # Check daily limit
+    if len(ip_attempts[ip]) >= 20:
+        logger.log_rate_limit(ip)
+        return True
+    else:
+        ip_attempts[ip].append(current_time)
+        return False
+
+
 @app.route("/")
 def home():
     return render_template("main.html")
@@ -116,28 +133,6 @@ def download():
         download_name="drudgeford.dmg",
         mimetype="application/x-apple-diskimage",
     )
-
-
-# create limits of number of games hosted per IP
-# resets every time we reset this script, which is fine b/c we just
-# are wary of spam bots
-ip_attempts = defaultdict(list)  # IP -> list of timestamps
-
-
-def has_started_too_many_games(ip) -> bool:
-    current_time = time.time()
-    # Clean up old attempts (older than 24 hours)
-    ip_attempts[ip] = [
-        t for t in ip_attempts[ip] if current_time - t < 86400
-    ]  # 24 hours in seconds
-
-    # Check daily limit
-    if len(ip_attempts[ip]) >= 20:
-        logger.log_rate_limit(ip)
-        return True
-    else:
-        ip_attempts[ip].append(current_time)
-        return False
 
 
 @app.route("/host-game")
