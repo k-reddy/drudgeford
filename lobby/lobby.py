@@ -98,25 +98,6 @@ def run_game_server(game_id: str, port: int):
             logger.log_game_end(game_id, "error", error_msg)
 
 
-ENDED_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Ended</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body>
-    <div class="container error-container">
-        <h1 class="error-heading">GAME HAS ENDED</h1>
-        <p>This game session has already ended.</p>
-    </div>
-</body>
-</html>
-"""
-
 JOIN_HTML = """
 <!DOCTYPE html>
 <html lang="en">
@@ -225,7 +206,7 @@ def join_game(game_id):
 
     game = active_games[game_id]
     if game.status != "running":
-        return render_template_string(ENDED_HTML), 400
+        return render_template("ended.html"), 400
 
     return render_template_string(JOIN_HTML.format(port=game.port))
 
