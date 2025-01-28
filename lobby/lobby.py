@@ -98,94 +98,6 @@ def run_game_server(game_id: str, port: int):
             logger.log_game_end(game_id, "error", error_msg)
 
 
-MAIN_HTML = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drudgeford Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/styles.css">
-    <script>
-        async function hostGame() {
-            const hostButton = document.getElementById('hostButton');
-            const gameLinkDiv = document.getElementById('gameLink');
-            
-            hostButton.disabled = true;
-            hostButton.textContent = 'STARTING GAME...';
-            
-            try {
-                const response = await fetch('/host-game');
-                const data = await response.json();
-                
-                if (data.success) {
-                    const gameUrl = `${window.location.origin}/join/${data.game_id}`;
-                    gameLinkDiv.innerHTML = `
-                        <p>GO TO THIS LINK FOR START-UP INSTRUCTIONS:</p>
-                        <a href="${gameUrl}" class="game-link-button">${gameUrl}</a>
-                        <p>GAME PORT: ${data.port}</p>
-                    `;
-                    gameLinkDiv.style.display = 'block';
-                } else {
-                    alert('Failed to start game: ' + data.error);
-                    hostButton.disabled = false;
-                    hostButton.textContent = 'HOST GAME';
-                }
-            } catch (error) {
-                alert('Error starting game');
-                hostButton.disabled = false;
-                hostButton.textContent = 'HOST GAME';
-            }
-        }
-    </script>
-</head>
-<body>
-    <div class="flex-container">
-        <!-- Art Section -->
-        <div class="art-section">
-            <img src="/static/drudgeford_cover.png" alt="Drudgeford Cover Art">
-        </div>
-        
-        <!-- Content Section -->
-        <div class="content-section">
-            <div class="container">
-                <h1>WELCOME, ADVENTURER</h1>
-                            
-                <div class="button-container">
-                    <button onclick="hostGame()" id="hostButton" class="host-button">
-                        HOST GAME
-                    </button>
-                    
-                    <a href="/tutorial" class="tutorial-button">
-                        LEARN TO PLAY
-                    </a>
-
-                    <a href="/download" class="download-button">
-                        DOWNLOAD
-                    </a>
-                </div>
-                
-                <div id="gameLink" class="game-link"></div>
-                
-                <div class="note">
-                    <strong>GAME SET-UP INSTRUCTIONS:</strong>
-                    <ol>
-                        <li>Click 'DOWNLOAD' to get the latest version of the game. Open the download and drag Drudgeford into your Applications folder</li>
-                        <li>One person should click 'HOST GAME', follow the link, and share the port number with all players</li>
-                        <li>Once a game is hosted, all players (including host) should open their copy of Drudgeford and select the approrpriate port to join</li>
-                        <li>If you've never played before, we highly recommend clicking 'LEARN TO PLAY' for a very brief orientation to playing the game</li>
-                    </ol>
-                    <span style="font-size: 0.7em; font-style: italic;">* Game only works on Mac</span>
-
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-"""
-
 ERROR_HTML = """
 <!DOCTYPE html>
 <html lang="en">
@@ -254,7 +166,7 @@ JOIN_HTML = """
 
 @app.route("/")
 def home():
-    return render_template_string(MAIN_HTML)
+    return render_template("main.html")
 
 
 @app.route("/static/<path:path>")
