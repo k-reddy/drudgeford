@@ -260,7 +260,7 @@ class ModifySelfHealth(ActionStep):
     strength: int
 
     def perform(self, board, attacker, round_num):
-        board.modify_target_health(attacker, -self.strength)
+        board.deal_damage_to_target(attacker, -self.strength)
 
     def __str__(self):
         if self.strength > 0:
@@ -279,7 +279,7 @@ class HealAlly(ActionStep):
 
     def perform(self, board, attacker, round_num):
         target = select_in_range_target(board, attacker, self.att_range, False)
-        board.modify_target_health(target, -self.strength)
+        board.deal_damage_to_target(target, -self.strength)
 
     def __str__(self):
         return f"Heal ally {self.strength} <{self.att_range}>"
@@ -298,7 +298,7 @@ class HealAllAllies(ActionStep):
             attacker, self.att_range, opponents=False
         )
         for ally in in_range_allies:
-            board.modify_target_health(ally, -self.strength)
+            board.deal_damage_to_target(ally, -self.strength)
 
     def __str__(self):
         return f"Heal all allies {self.strength} <{self.att_range}>"
