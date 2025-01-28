@@ -13,7 +13,11 @@ import backend.models.pyxel_backend as pyxel_backend
 import backend.models.obstacle as obstacle
 from backend.utils.utilities import DieAndEndTurn, directions, color_map
 
-
+"""
+This class is overloaded:
+#TODO refactor out different jobs - e.g. could refactor out 
+a movement manager, attack and/or health management, etc.
+"""
 MAX_ROUNDS = 1000
 EMPTY_CELL = "|      "
 # num of cards you need to kill if you want to avoid taking damage

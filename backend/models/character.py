@@ -8,6 +8,12 @@ from backend.utils import attack_shapes as shapes
 
 MAX_ROUNDS = 1000
 
+"""
+I could be a little more thoughtful here and match class names 
+with the file in character classes - then I could do away 
+with most of this duplication by specifying the base class most intelligently
+"""
+
 
 # characters are our actors
 # they have core attributes (health, name, etc.) and a set of attacks they can do
